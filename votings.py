@@ -4,22 +4,14 @@ import lxml.html
 
 from datetime import datetime
 
-LOCAL_TEST = False
-
 
 def main():
-
     bills = []
     for i in range(0, 200):
-        if LOCAL_TEST:
-            with open('2015P02267.html', 'r') as filein:
-                html_file = filein.read()
-                tree = lxml.html.fromstring( html_file )
-        else:
-            url = 'http://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2015P' + "%05d" % (2266+i)
-            print('request url: ' + url)
-            response = urllib.request.urlopen(url)
-            tree = lxml.html.fromstring( str(response.read()) )
+        url = 'http://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2015P' + "%05d" % (2266+i)
+        print('request url: ' + url)
+        response = urllib.request.urlopen(url)
+        tree = lxml.html.fromstring( str(response.read()) )
 
         elements = tree.xpath('//div[@class="search-result-content"]/h3')
 
@@ -37,30 +29,35 @@ def main():
 
 class Bill():
     def __init__(self):
-        self.type = 'Undefined'  # [Amendement, Motie, Wetsvoorstel]
+        self.title = 'undefined'
+        self.original_title = 'undefined'
+        self.type = 'undefined'  # [Amendement, Motie, Wetsvoorstel]
         self.date = datetime.now()
         self.votes = []
         self.url = ''
 
     def from_url(self, url):
         self.url = url
-        if LOCAL_TEST:
-            test_document_url = '2015D04817.html'
-            with open(test_document_url, 'r') as filein:
-                html_file = filein.read()
-                tree = lxml.html.fromstring(html_file)
-        else:
-            response = urllib.request.urlopen('http://www.tweedekamer.nl' + url)
-            tree = lxml.html.fromstring(str(response.read()))
+        response = urllib.request.urlopen('http://www.tweedekamer.nl' + url)
+        tree = lxml.html.fromstring(str(response.read()))
 
+        # get bill summary
+        original_title = tree.xpath('//div[@class="paper-description"]/span')
+        if original_title:
+            self.original_title = original_title[0].text
+        title = tree.xpath('//div[@class="paper-description"]/p')
+        if title:
+            self.title = title[0].text
+
+        # get the bill type
         types = tree.xpath('//div[@class="paper-header"]/h1')
-
         if types:
             self.type = types[0].text
         else:
             types = tree.xpath('//div[@class="bill-info"]/h2')
             self.type = types[0].text
 
+        # get the vote results
         vote_results_table = tree.xpath('//div[@class="vote-result"]/table/tbody/tr')
         for vote_html in vote_results_table:
             vote = Vote()
@@ -71,6 +68,8 @@ class Bill():
     def __str__(self):
         summary = ''
         summary += 'Type: ' + self.type + '\n'
+        summary += 'Title: ' + self.title + '\n'
+        summary += 'Original title: ' + self.original_title + '\n'
         for vote in self.votes:
             summary += str(vote) + '\n'
         return summary
