@@ -27,6 +27,12 @@ def main():
         print(bill)
 
 
+class Member():
+    def __init__(self):
+        self.name = 'undefined'
+        self.party = Party()
+
+
 class Bill():
     def __init__(self):
         self.title = 'undefined'
@@ -35,6 +41,17 @@ class Bill():
         self.date = datetime.now()
         self.votes = []
         self.url = ''
+        self.author = Member()
+
+    def get_vote_results(self):
+        options = dict()
+        for vote in self.votes:
+            if vote.decision in options:
+                options[vote.decision] += vote.party.seats
+            else:
+                options[vote.decision] = vote.party.seats
+        for option in options:
+            print(option + ' ' + str(options[option]))
 
     def from_url(self, url):
         self.url = url
@@ -53,16 +70,21 @@ class Bill():
         types = tree.xpath('//div[@class="paper-header"]/h1')
         if types:
             self.type = types[0].text
-        else:
-            types = tree.xpath('//div[@class="bill-info"]/h2')
-            self.type = types[0].text
+        elif tree.xpath('//div[@class="bill-info"]/h2'):
+            self.type = tree.xpath('//div[@class="bill-info"]/h2')[0].text
+
+        # get the bill author
+        authors = tree.xpath('//div[@class="paper-header"]/dl/dd/a')
+        for author in authors:
+            print(author.text)
+            print(author.attrib['href'])
+            self.author.name = author.text
 
         # get the vote results
         vote_results_table = tree.xpath('//div[@class="vote-result"]/table/tbody/tr')
         for vote_html in vote_results_table:
             vote = Vote()
             self.votes.append(vote.from_html_row(vote_html))
-
         assert len(types) <= 1
 
     def __str__(self):
@@ -70,6 +92,7 @@ class Bill():
         summary += 'Type: ' + self.type + '\n'
         summary += 'Title: ' + self.title + '\n'
         summary += 'Original title: ' + self.original_title + '\n'
+        self.get_vote_results()
         for vote in self.votes:
             summary += str(vote) + '\n'
         return summary
@@ -79,6 +102,7 @@ class Party():
     def __init__(self):
         self.name = ''
         self.seats = 0
+        self.url = 'undefined'
 
 
 class Vote():
