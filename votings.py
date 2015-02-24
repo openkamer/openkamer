@@ -42,6 +42,7 @@ class Bill():
         self.votes = []
         self.url = ''
         self.author = Member()
+        self.document_url = 'undefined'
 
     def get_vote_results(self):
         options = dict()
@@ -58,13 +59,18 @@ class Bill():
         response = urllib.request.urlopen('http://www.tweedekamer.nl' + url)
         tree = lxml.html.fromstring(str(response.read()))
 
-        # get bill summary
+        # get bill title
         original_title = tree.xpath('//div[@class="paper-description"]/span')
         if original_title:
             self.original_title = original_title[0].text
         title = tree.xpath('//div[@class="paper-description"]/p')
         if title:
             self.title = title[0].text
+
+        document_url = tree.xpath('//div[@class="paper-description"]/a')
+        if document_url:
+            self.document_url = document_url[0].attrib['href']
+            print(self.document_url)
 
         # get the bill type
         types = tree.xpath('//div[@class="paper-header"]/h1')
