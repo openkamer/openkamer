@@ -1,1 +1,6 @@
 .idea/
+env/
+
+*.pyc
+
+/dev.db
