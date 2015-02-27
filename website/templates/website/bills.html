@@ -14,9 +14,27 @@
 </div>
 
 <div class="row">
-
   <div class="col-lg-12">
     <div align="center"><h4>Uitslagen</h4></div>
   </div>
 </div>
+
+<hr/>
+
+{% for bill in bills %}
+<div class="row">
+    <div class="col-md-4" align="center">
+        <h4>{{ bill.title }}</h4>
+        <p>{{ bill.datetime|date:"Y-m-d"}}</p>
+        <h5>{{ bill.author }}</h5>
+    </div>
+    <div class="col-md-4" align="center">
+      {% for vote in bill.votes %}
+        <p>{{ vote.party }} ({{ vote.party.seats }}) - {{ vote.decision }}</p>
+      {% endfor %}
+    </div>
+</div>
+<hr/>
+{% endfor %}
+
 {% endblock %}
