@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+<html>
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tweede Kamer Stemmingen</title>
+  
+  {# Load CSS and JavaScript #}
+  {% bootstrap_css %}
+  
+  <style type="text/css">
+  <!--
+  @import url("{{ STATIC_URL }}css/custom.css");
+  -->
+  </style>
+  
+  <style type="text/css">
+  <!--
+  @import url("{{ STATIC_URL }}bootstrap-sortable/Contents/bootstrap-sortable.css");
+  -->
+  </style>
+
+<script src={% bootstrap_jquery_url %} ></script>
+{% bootstrap_javascript %}
+{{ form.media }}
+<script src="{% static "website/bootstrap-sortable/Scripts/bootstrap-sortable.js" %}"></script>
+<script src="{% static "website/bootstrap-sortable/Scripts/moment.min.js" %}"></script>
+
+
+{% block headcontent %}{% endblock %}
+
+</head>
+
+  <!-- navbar -->
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Open Tweede Kamer</a>
+      </div>
+      <div class="navbar-collapse collapse navbar-responsive-collapse">
+        <ul class="nav navbar-nav">
+          
+          {% if activeMenu == "account" %} 
+          <li class="active">
+          {% else %}
+          <li>
+          {% endif %}
+            <a href="/">Uitslagen</a>
+          </li>
+          
+          {% if activeMenu == "shares" %}
+          <li class="active">
+          {% else %}
+          <li>
+          {% endif %}
+            <a href="/transactions/0">Statistiek</a>
+          </li>
+
+          {% if activeMenu == "transactions" %}
+          <li class="active">
+          {% else %}
+          <li>
+          {% endif %}
+            <a href="/transactionsreal/0">Open Data</a>
+          </li>
+
+          
+        </ul>
+
+      </div>
+        <!--/.nav-collapse -->
+    </div>
+  </div>
+
+  <div class="container">
+    {% block content %}Empty page{% endblock %}
+    <hr>
+    <footer class="row">
+    </footer>
+  </div>
+
+</body>
+
+</html> 

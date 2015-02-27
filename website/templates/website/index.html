@@ -1,0 +1,23 @@
+{% extends "website/base.html" %}
+
+{% block title %}Care{% endblock %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="subnav subnav subnav-fixed-top">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="/transactions/new"><b class="text-info">{% bootstrap_icon "plus" %}<font style="padding-left:0.5em;">New share</font></b></a></li>
+      <li><a href="/transactionsreal/new"><b class="text-info">{% bootstrap_icon "plus" %}<font style="padding-left:0.5em;">New transaction</font></b></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+
+  <div class="col-lg-4">
+    <div align="center"><h4>Shares</h4></div>
+  </div>
+</div>
+{% endblock %}
