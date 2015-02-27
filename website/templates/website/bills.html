@@ -6,9 +6,9 @@
 <div class="subnav subnav subnav-fixed-top">
   <div class="container">
     <ul class="nav navbar-nav">
-      <li><a href="/uitslagen/moties/"><b class="text-info">{% bootstrap_icon "plus" %}<font style="padding-left:0.5em;">Moties</font></b></a></li>
-      <li><a href="/uitslagen/wetsvoorstellen/"><b class="text-info">{% bootstrap_icon "plus" %}<font style="padding-left:0.5em;">Wetsvoorstellen</font></b></a></li>
-      <li><a href="/uitslagen/amendementen/"><b class="text-info">{% bootstrap_icon "plus" %}<font style="padding-left:0.5em;">Amendementen</font></b></a></li>
+      <li><a href="/uitslagen/moties/"><b class="text-info">{% bootstrap_icon "pencil" %}<font style="padding-left:0.5em;">Moties</font></b></a></li>
+      <li><a href="/uitslagen/wetsvoorstellen/"><b class="text-info">{% bootstrap_icon "book" %}<font style="padding-left:0.5em;">Wetsvoorstellen</font></b></a></li>
+      <li><a href="/uitslagen/amendementen/"><b class="text-info">{% bootstrap_icon "file" %}<font style="padding-left:0.5em;">Amendementen</font></b></a></li>
     </ul>
   </div>
 </div>
@@ -27,10 +27,11 @@
         <h4>{{ bill.title }}</h4>
         <p>{{ bill.datetime|date:"Y-m-d"}}</p>
         <h5>{{ bill.author }}</h5>
+        <img class="party_icon" src="{{ MEDIA_URL }}{{ bill.author.party.icon_url }}" width="100px">
     </div>
     <div class="col-md-4" align="center">
       {% for vote in bill.votes %}
-        <p>{{ vote.party }} ({{ vote.party.seats }}) - {{ vote.decision }}</p>
+        <p><img class="party_icon" src="{{ MEDIA_URL }}{{ vote.party.icon_url }}" width="100px"> - {{ vote.party.seats }} zetels - {{ vote.decision }}</p>
       {% endfor %}
     </div>
 </div>

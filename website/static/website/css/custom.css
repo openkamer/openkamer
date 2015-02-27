@@ -18,3 +18,8 @@ body {
 .aligncenter {
   float: center;
 }
+
+.party_icon {
+  max-width: 50px;
+  max-height: 50px;
+}

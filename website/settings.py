@@ -60,6 +60,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/website/media/')
+MEDIA_URL = '/static/website/media/'
+
 ##############
 # Bootstrap3 #
 ##############

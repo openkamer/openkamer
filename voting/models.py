@@ -11,6 +11,7 @@ class Party(models.Model):
     name = models.CharField(max_length=200)
     seats = models.IntegerField()
     url = models.URLField(blank=True, null=False, default='')
+    icon_url = models.ImageField(blank=True, null=True)
 
     def __str__(self):
         return self.name
