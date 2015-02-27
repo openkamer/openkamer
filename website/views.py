@@ -12,3 +12,12 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(HomeView, self).get_context_data(**kwargs)
         return context
+
+
+class VotingsView(TemplateView):
+    template_name = "website/votings.html"
+    context_object_name = "votings"
+
+    def get_context_data(self, **kwargs):
+        context = super(VotingsView, self).get_context_data(**kwargs)
+        return context

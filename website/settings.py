@@ -26,7 +26,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'bootstrap3', #bootstrap3 see: https://github.com/dyve/django-bootstrap3
     'website',
-    'voting'
+    'voting',
 )
 
 MIDDLEWARE_CLASSES = (
