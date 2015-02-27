@@ -10,7 +10,7 @@ from voting.models import Bill, Vote, Member, Party
 
 class BillAdmin(admin.ModelAdmin):
     model = Bill
-    list_display = ('title', 'author', 'type', 'date', 'date')
+    list_display = ('title', 'author', 'type', 'datetime')
 
 
 class MemberAdmin(admin.ModelAdmin):
