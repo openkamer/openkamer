@@ -1,3 +1,4 @@
 django==1.7.1
 django-bootstrap3==5.1.1
 pillow=2.7.0
+lxml=3.4.2

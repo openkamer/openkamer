@@ -1,8 +1,15 @@
-
 import urllib.request
+from datetime import datetime
+
+import os
 import lxml.html
 
-from datetime import datetime
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "website.settings")
+
+from website.voting.models import Party
+from website.voting.models import Member
+from website.voting.models import Bill
+from website.voting.models import Vote
 
 
 def main():
