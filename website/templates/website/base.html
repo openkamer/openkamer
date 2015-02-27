@@ -17,7 +17,7 @@
   
   <style type="text/css">
   <!--
-  @import url("{{ STATIC_URL }}css/custom.css");
+  @import url("{% static "website/css/custom.css" %}");
   -->
   </style>
   
@@ -57,7 +57,7 @@
           {% else %}
           <li>
           {% endif %}
-            <a href="/">Uitslagen</a>
+            <a href="/uitslagen/">Uitslagen</a>
           </li>
           
           {% if activeMenu == "shares" %}
