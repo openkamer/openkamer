@@ -1,14 +1,18 @@
 import urllib.request
 from datetime import datetime
+import requests
 
 import os
 import lxml.html
+import html
 
 
 from voting.models import Bill as BillModel
+from voting.models import Member
+from voting.models import Party
 
 
-def scrape():
+def get_bills():
     bills = []
     for i in range(0, 200):
         url = 'http://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2015P' + "%05d" % (2266+i)
@@ -25,16 +29,66 @@ def scrape():
             bill.from_url(url)
             bills.append(bill)
             print(bill)
+
             # billmodel = BillModel.objects.create(title=bill.title, author=bill.author, type=bill.type)
+            # billmodel.save()
 
     for bill in bills:
         print(bill)
 
 
-class Member():
-    def __init__(self):
-        self.name = 'undefined'
-        self.party = Party()
+def get_members_parlement():
+    members = []
+    url = 'http://www.tweedekamer.nl/kamerleden/alle_kamerleden'
+    page = requests.get(url)
+    tree = lxml.html.fromstring(page.content)
+
+    rows = tree.xpath("//tbody/tr")
+
+    for row in rows:
+        columns = row.xpath("td")
+        if len(columns) == 8:
+            surname = columns[0][0].text.split(',')[0]
+            prefix = columns[0][0].text.split('.')[-1].strip()
+            forename = columns[1][0].text
+
+            if member_exists(forename, surname):
+                continue
+
+            party_name = columns[2][0].text
+            party = get_or_create_party(party_name)
+            residence = columns[3][0].text
+            # if not residence:
+            #     residence = ''
+            age = columns[4][0].text
+            sex = columns[5][0].text
+            if sex == 'Man':
+                sex = Member.MALE
+            elif sex == 'Vrouw':
+                sex = Member.FEMALE
+            member = Member.objects.create(forename=forename,
+                                           surname=surname,
+                                           surname_prefix=prefix,
+                                           age=age,
+                                           sex=sex,
+                                           residence=residence,
+                                           party=party)
+            members.append(member)
+            print("new member: " + str(member))
+
+
+def member_exists(forename, surname):
+    return Member.objects.filter(forename=forename, surname=surname).exists()
+
+
+def get_or_create_party(party_name):
+    party = Party.objects.filter(name=party_name)
+    if party.exists():
+        return party[0]
+
+    party = Party.objects.create(name=party_name, seats=0)
+    party.save()
+    return party
 
 
 class Bill():
@@ -106,13 +160,6 @@ class Bill():
         for vote in self.votes:
             summary += str(vote) + '\n'
         return summary
-
-
-class Party():
-    def __init__(self):
-        self.name = ''
-        self.seats = 0
-        self.url = 'undefined'
 
 
 class Vote():

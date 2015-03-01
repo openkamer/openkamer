@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('voting', '0006_auto_20150227_0311'),
+        ('voting', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='party',
-            name='icon_url',
-            field=models.ImageField(upload_to='', null=True, blank=True),
+            model_name='member',
+            name='residence',
+            field=models.CharField(default='', blank=True, max_length=200),
             preserve_default=True,
         ),
     ]

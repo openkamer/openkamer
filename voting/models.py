@@ -18,11 +18,31 @@ class Party(models.Model):
 
 
 class Member(models.Model):
-    name = models.CharField(max_length=200)
+    MALE = 'M'
+    FEMALE = 'F'
+
+    SEX = (
+        (MALE, 'Man'),
+        (FEMALE, 'Vrouw'),
+    )
+
+    forename = models.CharField(max_length=200)
+    surname = models.CharField(max_length=200)
+    surname_prefix = models.CharField(max_length=200, blank=True, null=True, default='')
+    age = models.IntegerField()
+    sex = models.CharField(max_length=1, choices=SEX)
+    residence = models.CharField(max_length=200, blank=True, null=True, default='')
     party = models.ForeignKey(Party)
 
+    def get_full_name(self):
+        fullname = self.forename
+        if self.surname_prefix:
+            fullname += ' ' + self. surname_prefix
+        fullname += ' ' + self.surname
+        return fullname
+
     def __str__(self):
-        return self.name + ' (' + str(self.party) + ')'
+        return self.get_full_name() + ' (' + str(self.party) + ')'
 
 
 class Bill(models.Model):

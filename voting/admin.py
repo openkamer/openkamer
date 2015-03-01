@@ -14,7 +14,7 @@ class BillAdmin(admin.ModelAdmin):
 
 class MemberAdmin(admin.ModelAdmin):
     model = Member
-    list_display = ('name', 'party')
+    list_display = ('surname', 'forename', 'surname_prefix', 'party', 'age', 'sex')
 
 
 class PartyAdmin(admin.ModelAdmin):
