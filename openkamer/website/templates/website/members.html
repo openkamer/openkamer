@@ -5,7 +5,7 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h3>Kamerleden</h3></div>
+    <div align="center"><h4>Kamerleden</h4></div>
   </div>
 </div>
 
@@ -14,8 +14,8 @@
 <div class="row">
 {% for member in members %}
   <div class="col-md-4" align="center">
-    <h4>{{ member.get_full_name }}</h4>
-    <h5>{{ member.party }}</h5>
+    <h5>{{ member.get_full_name }}</h5>
+    <h6>{{ member.party }}</h6>
   </div>
 {% endfor %}
 </div>

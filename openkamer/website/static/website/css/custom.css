@@ -1,10 +1,9 @@
-body { 
-  padding-top: 60px; 
+html, body {
+    height:100%;
 }
 
-#fixed-height-drinks {
-  overflow: hidden;
-  height: 270px;
+body {
+  padding-top: 70px;
 }
 
 .alignleft {
