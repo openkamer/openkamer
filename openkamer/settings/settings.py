@@ -25,8 +25,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3', #bootstrap3 see: https://github.com/dyve/django-bootstrap3
-    'website',
-    'voting',
+    'openkamer',
+    'openkamer.website',
+    'openkamer.voting',
+    'openkamer.settings',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -39,9 +41,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'website.urls'
+ROOT_URLCONF = 'openkamer.website.urls'
 
-WSGI_APPLICATION = 'website.wsgi.application'
+WSGI_APPLICATION = 'openkamer.website.wsgi.application'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
@@ -58,6 +60,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
+# Additional locations of static files
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(BASE_DIR, 'website/static/'),
+)
+
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/website/media/')
@@ -68,11 +78,11 @@ MEDIA_URL = '/static/website/media/'
 ##############
 
 BOOTSTRAP3 = {
-    'jquery_url': 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', #'//code.jquery.com/jquery.min.js',
-    'base_url': STATIC_URL + 'website/bootstrap/', #'//netdna.bootstrapcdn.com/bootstrap/3.0.3/'
-    'css_url': STATIC_URL + 'website/bootstrap/css/bootstrap_flatly.min.css',
+    'jquery_url': '//code.jquery.com/jquery-2.1.4.min.js', #'//code.jquery.com/jquery.min.js',
+    'base_url': '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/', #'//netdna.bootstrapcdn.com/bootstrap/3.0.3/'
+    'css_url':  os.path.join(STATIC_URL, 'website/bootstrap/css/bootstrap_paper.min.css'),
     'theme_url': None,
-    'javascript_url': STATIC_URL + 'website/bootstrap/js/bootstrap.min.js',
+    'javascript_url': '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js',
     'horizontal_label_class': 'col-md-2',
     'horizontal_field_class': 'col-md-4',
 }
@@ -85,7 +95,7 @@ BOOTSTRAP3 = {
 # ignored in your version control system allowing for settings to be
 # defined per machine.
 try:
-    from website.local_settings import *
+    from openkamer.settings.local_settings import *
 except ImportError as e:
     if "local_settings" not in str(e):
         print("settings error")

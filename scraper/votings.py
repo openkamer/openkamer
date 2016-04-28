@@ -1,43 +1,33 @@
-import urllib.request
+import logging
+logger = logging.getLogger(__name__)
+
 from datetime import datetime
 import requests
 
-import os
 import lxml.html
-import html
 
-
-from voting.models import Bill as BillModel
-from voting.models import Member
-from voting.models import Party
+from openkamer.voting.models import Bill
+from openkamer.voting.models import Member
+from openkamer.voting.models import Party
+from openkamer.voting.models import Vote
 
 
 def get_bills():
-    bills = []
     for i in range(0, 200):
         url = 'http://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2015P' + "%05d" % (2266+i)
         print('request url: ' + url)
-        response = urllib.request.urlopen(url)
-        tree = lxml.html.fromstring(str(response.read()))
+        page = requests.get(url)
+        tree = lxml.html.fromstring(page.content)
 
         elements = tree.xpath('//div[@class="search-result-content"]/h3')
 
         bills_urls = get_bill_urls(elements)
 
         for url in bills_urls:
-            bill = Bill()
-            bill.from_url(url)
-            bills.append(bill)
-            print(bill)
-
-            # billmodel = BillModel.objects.create(title=bill.title, author=bill.author, type=bill.type)
-            # billmodel.save()
-
-    for bill in bills:
-        print(bill)
+            create_bill_from_url(url)
 
 
-def get_members_parlement():
+def create_members():
     members = []
     url = 'http://www.tweedekamer.nl/kamerleden/alle_kamerleden'
     page = requests.get(url)
@@ -49,6 +39,7 @@ def get_members_parlement():
         columns = row.xpath("td")
         if len(columns) == 8:
             surname = columns[0][0].text.split(',')[0]
+            print(surname)
             prefix = columns[0][0].text.split('.')[-1].strip()
             forename = columns[1][0].text
 
@@ -60,16 +51,17 @@ def get_members_parlement():
             residence = columns[3][0].text
             # if not residence:
             #     residence = ''
-            age = columns[4][0].text
+            age = columns[4][0][0].text
             sex = columns[5][0].text
+            assert age is not None
             if sex == 'Man':
                 sex = Member.MALE
             elif sex == 'Vrouw':
                 sex = Member.FEMALE
+            print(age)
             member = Member.objects.create(forename=forename,
                                            surname=surname,
                                            surname_prefix=prefix,
-                                           age=age,
                                            sex=sex,
                                            residence=residence,
                                            party=party)
@@ -91,106 +83,95 @@ def get_or_create_party(party_name):
     return party
 
 
-class Bill():
-    def __init__(self):
-        self.title = 'undefined'
-        self.original_title = 'undefined'
-        self.type = 'undefined'  # [Amendement, Motie, Wetsvoorstel]
-        self.date = datetime.now()
-        self.votes = []
-        self.url = ''
-        self.author = Member()
-        self.document_url = 'undefined'
-
-    def get_vote_results(self):
-        options = dict()
-        for vote in self.votes:
-            if vote.decision in options:
-                options[vote.decision] += vote.party.seats
-            else:
-                options[vote.decision] = vote.party.seats
-        for option in options:
-            print(option + ' ' + str(options[option]))
-
-    def from_url(self, url):
-        self.url = url
-        response = urllib.request.urlopen('http://www.tweedekamer.nl' + url)
-        tree = lxml.html.fromstring(str(response.read()))
-
-        # get bill title
-        original_title = tree.xpath('//div[@class="paper-description"]/span')
-        if original_title:
-            self.original_title = original_title[0].text
-        title = tree.xpath('//div[@class="paper-description"]/p')
-        if title:
-            self.title = title[0].text
-
-        document_url = tree.xpath('//div[@class="paper-description"]/a')
-        if document_url:
-            self.document_url = document_url[0].attrib['href']
-            print(self.document_url)
-
-        # get the bill type
-        types = tree.xpath('//div[@class="paper-header"]/h1')
-        if types:
-            self.type = types[0].text
-        elif tree.xpath('//div[@class="bill-info"]/h2'):
-            self.type = tree.xpath('//div[@class="bill-info"]/h2')[0].text
-
-        # get the bill author
-        authors = tree.xpath('//div[@class="paper-header"]/dl/dd/a')
-        for author in authors:
-            print(author.text)
-            print(author.attrib['href'])
-            self.author.name = author.text
-
-        # get the vote results
-        vote_results_table = tree.xpath('//div[@class="vote-result"]/table/tbody/tr')
-        for vote_html in vote_results_table:
-            vote = Vote()
-            self.votes.append(vote.from_html_row(vote_html))
-        assert len(types) <= 1
-
-    def __str__(self):
-        summary = ''
-        summary += 'Type: ' + self.type + '\n'
-        summary += 'Title: ' + self.title + '\n'
-        summary += 'Original title: ' + self.original_title + '\n'
-        self.get_vote_results()
-        for vote in self.votes:
-            summary += str(vote) + '\n'
-        return summary
+def get_vote_results(votes):
+    options = dict()
+    for vote in votes:
+        if vote.decision in options:
+            options[vote.decision] += vote.party.seats
+        else:
+            options[vote.decision] = vote.party.seats
+    for option in options:
+        print(option + ' ' + str(options[option]))
 
 
-class Vote():
-    def __init__(self):
-        self.party = Party()
-        self.decision = ''
-        self.details = ''
+def create_bill_from_url(url):
+    url = url
+    page = requests.get('http://www.tweedekamer.nl' + url)
+    tree = lxml.html.fromstring(page.content)
 
-    def from_html_row(self, row):
-        ncol = 0
-        for column in row.iter():
-            if column.tag == 'td':
-                ncol += 1
+    # get bill title
+    original_title_element = tree.xpath('//div[@class="paper-description"]/span')
+    if original_title_element:
+        original_title = original_title_element[0].text
+    title = tree.xpath('//div[@class="paper-description"]/p')
+    if title:
+        title = title[0].text
 
-            if ncol == 1 and column.tag == 'a':
-                self.party.name = column.text
-            elif ncol == 2:
-                self.party.seats = int(column.text)
-            elif ncol == 3 and column.tag == 'img':
-                self.decision = 'VOOR'
-            elif ncol == 4 and column.tag == 'img':
-                self.decision = 'TEGEN'
-            elif ncol == 5 and column.tag == 'h4':
-                self.details = column.text
-        return self
+    document_url = tree.xpath('//div[@class="paper-description"]/a')
+    if document_url:
+        document_url = document_url[0].attrib['href']
 
-    def __str__(self):
-        summary = self.party.name + ' (' + str(self.party.seats) + ')' + ': ' + self.decision
-        if self.details:
-            summary += ' (' + self.details + ')'
-        return summary
+    # get the bill type
+    types = tree.xpath('//div[@class="paper-header"]/h1')
+    assert len(types) <= 1
+    if types:
+        bill_type = types[0].text
+    elif tree.xpath('//div[@class="bill-info"]/h2'):
+        bill_type = tree.xpath('//div[@class="bill-info"]/h2')[0].text
+
+    # get the bill author
+    authors = tree.xpath('//div[@class="paper-header"]/dl/dd/a')
+    if authors:
+        forename = authors[0].text.split()[0]
+        surname = authors[0].text.split()[-1]
+        member = Member.find_member(forename, surname)
+        if not member:
+            logger.warning("Member model could not be found for: " + forename + ' ' + surname)
+            return None
+
+        bill = Bill.objects.create(title=title, original_title=original_title,
+                                   author=member, type=bill_type, document_url=document_url)
+        bill.save()
+    else:
+        logger.warning("No bill author found")
+        return None
+
+    # get the vote results
+    vote_results_table = tree.xpath('//div[@class="vote-result"]/table/tbody/tr')
+    for vote_html in vote_results_table:
+        create_vote_from_html_row(vote_html, bill)
+
+    return bill
+
+
+def create_vote_from_html_row(row, bill):
+    ncol = 0
+    details = ''
+    decision = ''
+
+    for column in row.iter():
+        if column.tag == 'td':
+            ncol += 1
+
+        if ncol == 1 and column.tag == 'a':
+            party_name = column.text
+            print(party_name)
+        elif ncol == 2:
+            number_of_seats = int(column.text)
+            print(number_of_seats)
+        elif ncol == 3 and column.tag == 'img':
+            decision = Vote.FOR
+        elif ncol == 4 and column.tag == 'img':
+            decision = Vote.AGAINST
+        elif ncol == 5 and column.tag == 'h4':
+            details = column.text
+            print(details)
+
+    party = get_or_create_party(party_name)
+    vote = Vote.objects.create(bill=bill, party=party, number_of_seats=number_of_seats,
+                               decision=decision, details=details)
+    vote.save()
+    return vote
 
 
 def get_bill_urls(elements):

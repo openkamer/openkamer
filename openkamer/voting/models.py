@@ -29,7 +29,6 @@ class Member(models.Model):
     forename = models.CharField(max_length=200)
     surname = models.CharField(max_length=200)
     surname_prefix = models.CharField(max_length=200, blank=True, null=True, default='')
-    age = models.IntegerField()
     sex = models.CharField(max_length=1, choices=SEX)
     residence = models.CharField(max_length=200, blank=True, null=True, default='')
     party = models.ForeignKey(Party)
@@ -40,6 +39,15 @@ class Member(models.Model):
             fullname += ' ' + self. surname_prefix
         fullname += ' ' + self.surname
         return fullname
+
+    @staticmethod
+    def find_member(forename, surname):
+        members = Member.objects.filter(forename=forename, surname=surname)
+        if members.exists():
+            assert len(members) == 1
+            return members[0]
+        else:
+            return None
 
     def __str__(self):
         return self.get_full_name() + ' (' + str(self.party) + ')'
@@ -81,6 +89,7 @@ class Vote(models.Model):
 
     bill = models.ForeignKey(Bill)
     party = models.ForeignKey(Party)
+    number_of_seats = models.IntegerField()
     decision = models.CharField(max_length=2, choices=CHOICES)
     details = models.CharField(max_length=2000, blank=True, null=False, default='')
 

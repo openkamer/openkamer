@@ -5,3 +5,4 @@ env/
 local_settings.py
 
 /dev.db
+openkamer/website/static/website/media/*

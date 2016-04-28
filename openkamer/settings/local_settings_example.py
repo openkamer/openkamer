@@ -1,5 +1,4 @@
 DEBUG = True
-TEMPLATE_DEBUG = True
 
 # SECURITY WARNING: Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
@@ -24,3 +23,11 @@ DATABASES = {
         "PORT": "",
     }
 }
+
+
+#STATIC_ROOT = '/home/username/webapps/carestatic/'
+STATIC_ROOT = ''
+
+# URL prefix for static files.
+#STATIC_URL = 'http://www.computerautomatedremoteexchange.com/carestatic/'
+STATIC_URL = '/static/'

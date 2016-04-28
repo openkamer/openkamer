@@ -1,5 +1,5 @@
-django==1.7.1
-django-bootstrap3==5.1.1
+django==1.9.5
+django-bootstrap3==7.0.1
 requests==2.5.3
 pillow==2.7.0
 lxml==3.4.2
