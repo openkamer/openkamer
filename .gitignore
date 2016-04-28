@@ -4,5 +4,6 @@ env/
 *.pyc
 local_settings.py
 
-/dev.db
+dev.db
+openkamer.sqlite
 openkamer/website/static/website/media/*
