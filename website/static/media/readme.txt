@@ -1,0 +1,1 @@
+Generated or user uploaded media files that need to be served can be placed here.
