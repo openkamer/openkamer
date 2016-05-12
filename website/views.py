@@ -13,7 +13,7 @@ class HomeView(TemplateView):
     context_object_name = "homepage"
 
     def get_context_data(self, **kwargs):
-        context = super(HomeView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         return context
 
 
@@ -22,8 +22,7 @@ class BillsView(TemplateView):
     context_object_name = "bills"
 
     def get_context_data(self, **kwargs):
-        context = super(BillsView, self).get_context_data(**kwargs)
-
+        context = super().get_context_data(**kwargs)
         bills = Bill.objects.all()
         for bill in bills:
             bill.votes = bill.get_votes()
@@ -36,8 +35,7 @@ class MembersView(TemplateView):
     context_object_name = "members"
 
     def get_context_data(self, **kwargs):
-        context = super(MembersView, self).get_context_data(**kwargs)
-
+        context = super().get_context_data(**kwargs)
         members = Member.objects.all()
         context['members'] = members
         return context
