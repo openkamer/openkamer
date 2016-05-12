@@ -12,12 +12,12 @@ $ git clone https://github.com/openkamer/openkamer.git
 $ cd openkamer
 ```
 
-Install in a local environment (creates a Python 3 virtualenv and a sqlite database file)
+Install in a local environment (creates a Python 3 virtualenv and a sqlite database file),
 ```
 $ ./install.sh
 ```
 
-Activate the virtualenv
+Activate the virtualenv,
 ```
 $ source env/bin/activate
 ```
