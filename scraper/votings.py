@@ -6,10 +6,10 @@ import requests
 
 import lxml.html
 
-from openkamer.voting.models import Bill
-from openkamer.voting.models import Member
-from openkamer.voting.models import Party
-from openkamer.voting.models import Vote
+from voting.models import Bill
+from voting.models import Member
+from voting.models import Party
+from voting.models import Vote
 
 
 def get_bills():

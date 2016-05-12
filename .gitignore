@@ -2,8 +2,10 @@
 env/
 
 *.pyc
-local_settings.py
 
 dev.db
 openkamer.sqlite
-openkamer/website/static/website/media/*
+
+local_settings.py
+
+/website/static/media/*

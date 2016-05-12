@@ -4,8 +4,8 @@ logger = logging.getLogger(__name__)
 
 from django.views.generic import TemplateView
 
-from openkamer.voting.models import Bill
-from openkamer.voting.models import Member
+from voting.models import Bill
+from voting.models import Member
 
 
 class HomeView(TemplateView):

@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 from django.contrib import admin
 
-from openkamer.voting.models import Bill, Vote, Member, Party
+from voting.models import Bill, Vote, Member, Party
 
 
 class BillAdmin(admin.ModelAdmin):

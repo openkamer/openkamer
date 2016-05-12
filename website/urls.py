@@ -1,9 +1,9 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-from openkamer.website.views import HomeView
-from openkamer.website.views import BillsView
-from openkamer.website.views import MembersView
+from website.views import HomeView
+from website.views import BillsView
+from website.views import MembersView
 
 urlpatterns = patterns('',
                        url(r'^$', HomeView.as_view()),
