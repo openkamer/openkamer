@@ -36,7 +36,7 @@ class Member(models.Model):
     def get_full_name(self):
         fullname = self.forename
         if self.surname_prefix:
-            fullname += ' ' + self. surname_prefix
+            fullname += ' ' + self.surname_prefix
         fullname += ' ' + self.surname
         return fullname
 
