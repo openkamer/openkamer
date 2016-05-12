@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     # 'debug_toolbar',
     'bootstrap3', #bootstrap3 see: https://github.com/dyve/django-bootstrap3
     'website',
+    'parliament',
     'voting',
 )
 
