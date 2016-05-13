@@ -38,7 +38,7 @@ class ParliamentMember(models.Model):
 
 class PoliticalParty(models.Model):
     name = models.CharField(max_length=200)
-    founded = models.DateField(blank=False)
+    founded = models.DateField(blank=True, null=True)
     dissolved = models.DateField(blank=True, null=True)
     logo = models.ImageField(blank=True)
     wikidata_uri = models.CharField(max_length=200, blank=True)
@@ -53,7 +53,7 @@ class PoliticalParty(models.Model):
 class PartyMember(models.Model):
     person = models.ForeignKey(Person)
     party = models.ForeignKey(PoliticalParty)
-    joined = models.DateField(blank=False)
+    joined = models.DateField(blank=True, null=True)
     left = models.DateField(blank=True, null=True)
 
     def __str__(self):
