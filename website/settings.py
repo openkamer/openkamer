@@ -23,6 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # 'debug_toolbar',
     'bootstrap3', #bootstrap3 see: https://github.com/dyve/django-bootstrap3
+    'rest_framework',
     'website',
     'parliament',
     'voting',
