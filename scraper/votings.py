@@ -6,9 +6,11 @@ import requests
 
 import lxml.html
 
+from parliament.models import Person
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
+
 from voting.models import Bill
-from voting.models import Member
-from voting.models import Party
 from voting.models import Vote
 
 
@@ -43,7 +45,7 @@ def create_members():
             prefix = columns[0][0].text.split('.')[-1].strip()
             forename = columns[1][0].text
 
-            if member_exists(forename, surname):
+            if person_exists(forename, surname):
                 continue
 
             party_name = columns[2][0].text
@@ -54,31 +56,30 @@ def create_members():
             age = columns[4][0][0].text
             sex = columns[5][0].text
             assert age is not None
-            if sex == 'Man':
-                sex = Member.MALE
-            elif sex == 'Vrouw':
-                sex = Member.FEMALE
+            # if sex == 'Man':
+            #     sex = Member.MALE
+            # elif sex == 'Vrouw':
+            #     sex = Member.FEMALE
             print(age)
-            member = Member.objects.create(forename=forename,
-                                           surname=surname,
-                                           surname_prefix=prefix,
-                                           sex=sex,
-                                           residence=residence,
-                                           party=party)
+            person = Person.objects.create(
+                forename=forename,
+                surname=surname,
+                surname_prefix=prefix,
+            )
+            member = PartyMember.objects.create(person=person, party=party)
             members.append(member)
             print("new member: " + str(member))
 
 
-def member_exists(forename, surname):
-    return Member.objects.filter(forename=forename, surname=surname).exists()
+def person_exists(forename, surname):
+    return Person.objects.filter(forename=forename, surname=surname).exists()
 
 
 def get_or_create_party(party_name):
-    party = Party.objects.filter(name=party_name)
+    party = PoliticalParty.objects.filter(name=party_name)
     if party.exists():
         return party[0]
-
-    party = Party.objects.create(name=party_name, seats=0)
+    party = PoliticalParty.objects.create(name=party_name)
     party.save()
     return party
 
