@@ -63,6 +63,7 @@ class PartyMemberViewSet(viewsets.ModelViewSet):
     queryset = PartyMember.objects.all()
     serializer_class = PartyMemberSerializer
 
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'persons', PersonViewSet)
@@ -72,6 +73,6 @@ router.register(r'party', PoliticalPartyViewSet)
 router.register(r'partymember', PartyMemberViewSet)
 
 urlpatterns = [
-    url(r'^$', PersonsView.as_view()),
+    url(r'^persons/$', PersonsView.as_view()),
     url(r'^api/', include(router.urls)),
 ]

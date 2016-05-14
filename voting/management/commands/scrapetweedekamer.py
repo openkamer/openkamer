@@ -11,5 +11,5 @@ from scraper import votings
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        # votings.create_members()
-        votings.get_bills()
+        votings.create_members()
+        # votings.get_bills()

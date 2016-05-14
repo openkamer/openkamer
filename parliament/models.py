@@ -1,5 +1,8 @@
 from django.db import models
 
+import requests
+import urllib
+
 
 class Person(models.Model):
     forename = models.CharField(max_length=200)
@@ -16,6 +19,27 @@ class Person(models.Model):
             fullname += ' ' + str(self.surname_prefix)
         fullname += ' ' + str(self.surname)
         return fullname
+
+    def get_wikidata_url(self):
+        return 'https://www.wikidata.org/wiki/Special:EntityData/Q' + str(self.wikidata_uri)
+
+    def get_image_url(self):
+        if not self.wikidata_uri:
+            return ''
+        url = self.get_wikidata_url()
+        print(url)
+        response = requests.get(url)
+        jsondata = response.json()
+        jsondata = jsondata['entities']['Q' + str(self.wikidata_uri)]['claims']
+        if 'P569' in jsondata:  # date of birth
+            birthdate = jsondata['P569'][0]['mainsnak']['datavalue']['value']['time']
+            print(birthdate)
+        if 'P18' in jsondata:  # image
+            url = jsondata['P18'][0]['mainsnak']['datavalue']['value']
+            url = 'https://upload.wikimedia.org/wikipedia/commons/b/b8/' + str(url.replace(' ', '_'))
+            print(url)
+            return url
+        return jsondata
 
 
 class Parliament(models.Model):
