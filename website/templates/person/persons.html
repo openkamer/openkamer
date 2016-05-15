@@ -10,8 +10,11 @@
 </div>
 
 {% for person in persons %}
- {{ person }}
-    <img src="{{ person.image_url }}" width="200px">
+<div class="row">
+  {{ person }} <br/>
+  {{ person.birthdate }}
+   <img src="{{ person.wikimedia_image_url }}" width="200px">
+</div>
 {% endfor %}
 
 <hr/>

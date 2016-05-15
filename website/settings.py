@@ -26,6 +26,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'website',
     'parliament',
+    'person',
     'voting',
 )
 
