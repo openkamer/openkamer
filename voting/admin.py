@@ -4,22 +4,12 @@ logger = logging.getLogger(__name__)
 
 from django.contrib import admin
 
-from voting.models import Bill, Vote, Member, Party
+from voting.models import Bill, Vote
 
 
 class BillAdmin(admin.ModelAdmin):
     model = Bill
     list_display = ('title', 'author', 'type', 'datetime')
-
-
-class MemberAdmin(admin.ModelAdmin):
-    model = Member
-    list_display = ('surname', 'forename', 'surname_prefix', 'party', 'sex')
-
-
-class PartyAdmin(admin.ModelAdmin):
-    model = Party
-    list_display = ('name', 'seats')
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -28,6 +18,4 @@ class VoteAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Bill, BillAdmin)
-admin.site.register(Member, MemberAdmin)
-admin.site.register(Party, PartyAdmin)
 admin.site.register(Vote, VoteAdmin)
