@@ -8,5 +8,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         persons = Person.objects.all()
         for person in persons:
-            person.set_wikidata_info()
+            person.update_info()
             person.save()
