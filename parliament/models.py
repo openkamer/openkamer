@@ -28,7 +28,6 @@ class PoliticalParty(models.Model):
     name_short = models.CharField(max_length=10)
     founded = models.DateField(blank=True, null=True)
     dissolved = models.DateField(blank=True, null=True)
-    logo = models.ImageField(blank=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikimedia_logo_url = models.URLField(blank=True)
     wikipedia_url = models.URLField(blank=True)
