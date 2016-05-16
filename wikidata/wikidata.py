@@ -3,20 +3,20 @@ from datetime import datetime
 import requests
 
 
-def search(search_str):
+def search(search_str, language='en'):
     search_url = 'https://www.wikidata.org/w/api.php'
     params = {
         'action': 'wbsearchentities',
         'format': 'json',
         'search': search_str,
-        'language': 'en',
+        'language': language,
     }
     response = requests.get(search_url, params)
     return response.json()
 
 
-def search_wikidata_id(search_str):
-    results = search(search_str)
+def search_wikidata_id(search_str, language='en'):
+    results = search(search_str, language)
     if not results['search']:
         print('no wikidata found for ' + search_str)
         return None
