@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from scraper import parliament_members
+import scraper.parliament_members
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        parliament_members.create_members()
+        scraper.parliament_members.create_members()

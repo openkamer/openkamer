@@ -54,4 +54,4 @@ def get_or_create_tweede_kamer():
     if parliaments.exists():
         return parliaments[0]
     else:
-        return Parliament.objects.create(name='Tweede Kamer', wikidata_uri='Q233262')
+        return Parliament.objects.create(name='Tweede Kamer', wikidata_id='Q233262')

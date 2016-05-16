@@ -10,7 +10,7 @@ class Person(models.Model):
     surname = models.CharField(max_length=200)
     surname_prefix = models.CharField(max_length=200, blank=True, default='')
     birthdate = models.DateField(blank=True, null=True)
-    wikidata_uri = models.CharField(max_length=200, blank=True)
+    wikidata_id = models.CharField(max_length=200, blank=True)
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
 
@@ -43,19 +43,19 @@ class Person(models.Model):
             return
         wikidata_id = results_json['search'][0]['id']
         print(wikidata_id)
-        self.wikidata_uri = wikidata_id
+        self.wikidata_id = wikidata_id
         self.update_wikimedia_info()
 
     def get_wikidata_url(self):
-        return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_uri)
+        return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
 
     def update_wikimedia_info(self):
-        if not self.wikidata_uri:
+        if not self.wikidata_id:
             return ''
         url = self.get_wikidata_url()
         response = requests.get(url)
         jsondata = response.json()
-        jsondata = jsondata['entities'][str(self.wikidata_uri)]['claims']
+        jsondata = jsondata['entities'][str(self.wikidata_id)]['claims']
         if 'P569' in jsondata:  # date of birth
             birthdate = jsondata['P569'][0]['mainsnak']['datavalue']['value']['time']
             try:

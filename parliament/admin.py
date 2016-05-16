@@ -4,7 +4,7 @@ from parliament.models import Parliament, ParliamentMember, PartyMember, Politic
 
 
 class PoliticalPartyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'founded', 'dissolved', 'logo', 'wikidata_uri')
+    list_display = ('name', 'founded', 'dissolved', 'logo', 'wikidata_id')
 
 
 admin.site.register(Parliament)

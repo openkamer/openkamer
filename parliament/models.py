@@ -5,7 +5,7 @@ from person.models import Person
 
 class Parliament(models.Model):
     name = models.CharField(max_length=200)
-    wikidata_uri = models.CharField(max_length=200, blank=True)
+    wikidata_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return str(self.name)
@@ -23,10 +23,13 @@ class ParliamentMember(models.Model):
 
 class PoliticalParty(models.Model):
     name = models.CharField(max_length=200)
+    name_short = models.CharField(max_length=10)
     founded = models.DateField(blank=True, null=True)
     dissolved = models.DateField(blank=True, null=True)
     logo = models.ImageField(blank=True)
-    wikidata_uri = models.CharField(max_length=200, blank=True)
+    wikidata_id = models.CharField(max_length=200, blank=True)
+    wikimedia_logo_url = models.URLField(blank=True)
+    wikipedia_url = models.URLField(blank=True)
 
     def __str__(self):
         return str(self.name)

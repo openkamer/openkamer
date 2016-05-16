@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('surname', models.CharField(max_length=200)),
                 ('surname_prefix', models.CharField(blank=True, default='', max_length=200)),
                 ('birthdate', models.DateField(blank=True, null=True)),
-                ('wikidata_uri', models.CharField(blank=True, max_length=200)),
+                ('wikidata_id', models.CharField(blank=True, max_length=200)),
                 ('wikimedia_image_name', models.CharField(blank=True, max_length=200)),
                 ('wikimedia_image_url', models.URLField(blank=True)),
             ],

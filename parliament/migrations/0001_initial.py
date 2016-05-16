@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=200)),
-                ('wikidata_uri', models.CharField(blank=True, max_length=200)),
+                ('wikidata_id', models.CharField(blank=True, max_length=200)),
             ],
         ),
         migrations.CreateModel(
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('founded', models.DateField(blank=True, null=True)),
                 ('dissolved', models.DateField(blank=True, null=True)),
                 ('logo', models.ImageField(blank=True, upload_to='')),
-                ('wikidata_uri', models.CharField(blank=True, max_length=200)),
+                ('wikidata_id', models.CharField(blank=True, max_length=200)),
             ],
             options={
                 'verbose_name_plural': 'Political parties',
