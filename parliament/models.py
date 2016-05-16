@@ -14,7 +14,7 @@ class Parliament(models.Model):
 class ParliamentMember(models.Model):
     person = models.ForeignKey(Person)
     parliament = models.ForeignKey(Parliament)
-    joined = models.DateField(blank=False)
+    joined = models.DateField(blank=True, null=True)
     left = models.DateField(blank=True, null=True)
 
     def __str__(self):
