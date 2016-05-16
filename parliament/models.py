@@ -32,7 +32,17 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.name) + ' (' + str(self.name_short) + ')'
+
+    @staticmethod
+    def find_party(name):
+        parties = PoliticalParty.objects.filter(name=name)
+        if parties.exists():
+            return parties[0]
+        parties = PoliticalParty.objects.filter(name_short=name)
+        if parties.exists():
+            return parties[0]
+        return None
 
     @staticmethod
     def get_or_create_party(party_name):
