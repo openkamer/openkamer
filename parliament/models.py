@@ -1,5 +1,7 @@
 from django.db import models
 
+from wikidata import wikidata
+
 from person.models import Person
 
 
@@ -34,6 +36,16 @@ class PoliticalParty(models.Model):
     def __str__(self):
         return str(self.name) + ' (' + str(self.name_short) + ')'
 
+    def update_info(self, language='en'):
+        wikidata_id = wikidata.search_wikidata_id(self.name, language)
+        if not wikidata_id:
+            return
+        print(self.name + ' - id: ' + wikidata_id)
+        self.wikidata_id = wikidata_id
+        logo_filename = wikidata.get_logo_filename(self.wikidata_id)
+        if logo_filename:
+            self.wikimedia_logo_url = wikidata.get_wikimedia_image_url(logo_filename)
+
     @staticmethod
     def find_party(name):
         parties = PoliticalParty.objects.filter(name=name)
@@ -47,6 +59,9 @@ class PoliticalParty(models.Model):
     @staticmethod
     def get_or_create_party(party_name):
         party = PoliticalParty.objects.filter(name=party_name)
+        if party.exists():
+            return party[0]
+        party = PoliticalParty.objects.filter(name_short=party_name)
         if party.exists():
             return party[0]
         party = PoliticalParty.objects.create(name=party_name)

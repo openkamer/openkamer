@@ -26,15 +26,19 @@ class Person(models.Model):
     def person_exists(forename, surname):
         return Person.objects.filter(forename=forename, surname=surname).exists()
 
-    def update_info(self):
-        wikidata_id = wikidata.search_wikidata_id(self.get_full_name())
+    def update_info(self, language='en'):
+        wikidata_id = wikidata.search_wikidata_id(self.get_full_name(), language)
         if not wikidata_id:
             return
         print(wikidata_id)
         self.wikidata_id = wikidata_id
-        self.birthdate = wikidata.get_birth_date(self.wikidata_id)
-        self.wikimedia_image_name = wikidata.get_image_filename(self.wikidata_id)
-        self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
+        birthdate = wikidata.get_birth_date(self.wikidata_id)
+        if birthdate:
+            self.birthdate = birthdate
+        image_filename = wikidata.get_image_filename(self.wikidata_id)
+        if image_filename:
+            self.wikimedia_image_name = image_filename
+            self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
 
     def get_wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
