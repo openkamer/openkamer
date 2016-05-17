@@ -15,9 +15,6 @@
     <p>
       <h4>{{ party.name_short }}</h4>
       <font size="2">{{ party.name }}
-      {% if party.founded %}
-        <br/>{{ party.founded }}
-      {% endif %}
       </font>
     </p>
     <p>
@@ -28,6 +25,9 @@
     {% endif %}
     </p>
     <p><font size="2">
+    {% if party.founded %}
+      {{ party.founded }}<br/>
+    {% endif %}
     {% if party.wikipedia_url %}
       <a href="{{ party.wikipedia_url }}">wikipedia</a> |
     {% endif %}
