@@ -1,0 +1,24 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h4>Political Parties</h4></div>
+  </div>
+</div>
+
+<div class="row">
+{% for party in parties %}
+  <div class="col-sm-3 fixed-height-column" align="center">
+      <h5>{{ party.name_short }}</h5>
+      <p>{{ party.name }}</p>
+      <img src="{{ party.wikimedia_logo_url }}" width="100px">
+  </div>
+{% endfor %}
+</div>
+
+<hr/>
+
+{% endblock %}

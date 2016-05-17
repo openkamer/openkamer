@@ -5,3 +5,9 @@ html, body {
 body {
     padding-top: 80px;
 }
+
+.fixed-height-column {
+  padding: 2px;
+  overflow: hidden;
+  height: 12em;
+}
