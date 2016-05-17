@@ -28,6 +28,6 @@ def create_parties():
             print('WARNING: party already exists!')
         else:
             party = PoliticalParty.objects.create(name=name, name_short=name_short)
-            party.update_info('nl')
+            party.update_info('nl', 'nl')
             party.save()
             print('created: ' + str(party))

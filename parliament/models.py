@@ -52,7 +52,8 @@ class PoliticalParty(models.Model):
         for id in wikidata_ids:
             official_website = wikidata.get_official_website(id)
             if official_website:
-                if official_website.split('.')[-1] == top_level_domain + '/':
+                tld = official_website.split('.')[-1]
+                if tld == top_level_domain or tld == top_level_domain + '/':
                     self.official_website_url = official_website
                     wikidata_id = id
                     break
