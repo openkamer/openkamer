@@ -80,16 +80,14 @@ class PoliticalParty(models.Model):
         return None
 
     @staticmethod
-    def get_or_create_party(party_name):
+    def get_party(party_name):
         party = PoliticalParty.objects.filter(name=party_name)
         if party.exists():
             return party[0]
         party = PoliticalParty.objects.filter(name_short=party_name)
         if party.exists():
             return party[0]
-        party = PoliticalParty.objects.create(name=party_name)
-        party.save()
-        return party
+        return None
 
     class Meta:
         verbose_name_plural = "Political parties"

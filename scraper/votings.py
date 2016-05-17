@@ -117,7 +117,7 @@ def create_vote_from_html_row(row, bill):
             details = column.text
             print(details)
 
-    party = get_or_create_party(party_name)
+    party = PoliticalParty.get_party(party_name)
     vote = Vote.objects.create(bill=bill, party=party, number_of_seats=number_of_seats,
                                decision=decision, details=details)
     vote.save()
