@@ -14,7 +14,11 @@
   <div class="col-sm-3 fixed-height-column" align="center">
     <p>
       <h4>{{ party.name_short }}</h4>
-      <font size="2">{{ party.name }}</font>
+      <font size="2">{{ party.name }}
+      {% if party.founded %}
+        </br>{{ party.founded }}
+      {% endif %}
+      </font>
     </p>
     <p>
     {% if party.wikimedia_logo_url %}
@@ -28,8 +32,9 @@
       <a href="{{ party.wikipedia_url }}">wikipedia</a> |
     {% endif %}
     {% if party.official_website_url %}
-      <a href="{{ party.official_website_url }}">official website</a> |
+      <a href="{{ party.official_website_url }}">website</a> |
     {% endif %}
+    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a> </br>
     <a href="/api/party/{{ party.id }}/">API</a>
     </font></p>
   </div>

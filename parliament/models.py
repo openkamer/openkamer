@@ -61,6 +61,10 @@ class PoliticalParty(models.Model):
         self.wikipedia_url = wikidata.get_wikipedia_url(wikidata_id, language)
         print(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         logo_filename = wikidata.get_logo_filename(self.wikidata_id)
+        inception_date = wikidata.get_inception(self.wikidata_id)
+        if inception_date:
+            print(inception_date)
+            self.founded = inception_date
         if logo_filename:
             self.wikimedia_logo_url = wikidata.get_wikimedia_image_url(logo_filename)
         self.save()

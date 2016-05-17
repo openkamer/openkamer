@@ -123,3 +123,16 @@ def get_birth_date(id):
             print(error)
             return None
     return None
+
+
+def get_inception(id):
+    claims = get_claims(id)
+    if 'P571' in claims:
+        inception = claims['P571'][0]['mainsnak']['datavalue']['value']['time']
+        try:
+            inception = datetime.strptime(inception[1:11], '%Y-%m-%d')
+            return inception.date()
+        except ValueError as error:
+            print(error)
+            return None
+    return None
