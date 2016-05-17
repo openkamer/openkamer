@@ -12,9 +12,13 @@
 <div class="row">
 {% for party in parties %}
   <div class="col-sm-3 fixed-height-column" align="center">
-      <h5>{{ party.name_short }}</h5>
-      <p>{{ party.name }}</p>
-      <img src="{{ party.wikimedia_logo_url }}" width="100px">
+    <h5>{{ party.name_short }}</h5>
+    <p>{{ party.name }}</p>
+    <p><img src="{{ party.wikimedia_logo_url }}" width="100px"></p>
+    {% if party.official_website_url %}
+      <p><a href="{{ party.official_website_url }}">official website</a></p>
+    {% endif %}
+    <p><a href="/api/party/{{ party.id }}/">API</a></p>
   </div>
 {% endfor %}
 </div>

@@ -16,12 +16,19 @@ def search(search_str, language='en'):
 
 
 def search_wikidata_id(search_str, language='en'):
+    ids = search_wikidata_ids(search_str, language)
+    if ids:
+        return ids[0]
+    return None
+
+
+def search_wikidata_ids(search_str, language='en'):
     results = search(search_str, language)
-    if not results['search']:
-        print('no wikidata found for ' + search_str)
-        return None
-    wikidata_id = results['search'][0]['id']
-    return wikidata_id
+    ids = []
+    if 'search' in results:
+        for result in results['search']:
+            ids.append(result['id'])
+    return ids
 
 
 def get_item(id):
@@ -36,6 +43,20 @@ def get_item(id):
 def get_claims(id):
     item = get_item(id)
     return item['claims']
+
+
+def get_country_id(id):
+    claims = get_claims(id)
+    if 'P17' in claims:
+        return claims['P17'][0]['mainsnak']['datavalue']['value']['numeric-id']
+    return None
+
+
+def get_official_website(id):
+    claims = get_claims(id)
+    if 'P856' in claims:
+        return claims['P856'][0]['mainsnak']['datavalue']['value']
+    return None
 
 
 def get_image_filename(id):
