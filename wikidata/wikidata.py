@@ -59,6 +59,8 @@ def get_wikipedia_url(id, language='en'):
     item = get_item(id, sites=site, props='sitelinks')
     if not 'sitelinks' in item:
         return ''
+    if not site in item['sitelinks']:
+        return ''
     title = item['sitelinks'][site]['title']
     url = 'https://' + language + '.wikipedia.org/wiki/' + urllib.parse.quote(title) + ''
     return url
