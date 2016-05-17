@@ -1,0 +1,49 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Political Parties</h3></div>
+  </div>
+</div>
+
+<div class="row">
+{% for party in parties %}
+  <div class="col-sm-3 fixed-height-column" align="center">
+    <p>
+      <h4>{{ party.name_short }}</h4>
+      <font size="2">{{ party.name }}</font>
+    </p>
+    <p>
+    {% if party.wikimedia_logo_url %}
+      <img class='party-logo' src="{{ party.wikimedia_logo_url }}">
+    {% else %}
+      <font size="2">Logo missing, add it at <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a>.</font>
+    {% endif %}
+    </p>
+    <p><font size="2">
+    {% if party.wikipedia_url %}
+      <a href="{{ party.wikipedia_url }}">wikipedia</a> |
+    {% endif %}
+    {% if party.official_website_url %}
+      <a href="{{ party.official_website_url }}">official website</a> |
+    {% endif %}
+    <a href="/api/party/{{ party.id }}/">API</a>
+    </font></p>
+  </div>
+{% endfor %}
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5><a href="/api/party/">Partij API</a></h5></div>
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}
