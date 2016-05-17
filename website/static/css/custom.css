@@ -16,3 +16,19 @@ body {
   max-width: 100px;
   max-height: 50px;
 }
+
+.party-logo-small {
+  max-width: 100px;
+  max-height: 20px;
+}
+
+.party-member-column {
+  padding: 2px;
+  overflow: hidden;
+  height: 8em;
+}
+
+.person-image-small {
+  max-width: 100px;
+  max-height: 50px;
+}

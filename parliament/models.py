@@ -19,6 +19,13 @@ class ParliamentMember(models.Model):
     joined = models.DateField(blank=True, null=True)
     left = models.DateField(blank=True, null=True)
 
+    def party(self):
+        memberships = PartyMember.objects.filter(person=self.person)
+        if memberships:
+            assert memberships.count() == 1
+            return memberships[0].party
+        return None
+
     def __str__(self):
         return str(self.person) + ' (' + str(self.parliament) + ')'
 
@@ -94,7 +101,7 @@ class PoliticalParty(models.Model):
 
 
 class PartyMember(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, related_name='partymember')
     party = models.ForeignKey(PoliticalParty)
     joined = models.DateField(blank=True, null=True)
     left = models.DateField(blank=True, null=True)

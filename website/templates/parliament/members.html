@@ -1,0 +1,46 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Kamerleden</h3></div>
+  </div>
+</div>
+
+<div class="row">
+{% for member in members %}
+  <div class="col-sm-3 party-member-column" align="center">
+
+    <p>
+      <h5>{{ member.person.fullname }}</h5>
+      <font size="2">{{ member.party.name }} <br/>
+      {% if member.party.wikimedia_logo_url %}
+        <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
+      {% endif %}
+        <a href="/api/parliamentmember/{{ member.id }}/">API</a>
+      {% if member.person.wikidata_id %}
+        | <a href="https://www.wikidata.org/wiki/{{ member.person.wikidata_id }}">wikidata</a>
+      {% endif %}
+      {% if member.person.wikimedia_image_url %}
+        | <a href="{{ member.person.wikimedia_image_url }}">image</a>
+      {% endif %}
+      </font>
+    </p>
+
+  </div>
+{% endfor %}
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5><a href="/api/party/">Partij API</a></h5></div>
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}

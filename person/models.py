@@ -15,6 +15,10 @@ class Person(models.Model):
     def __str__(self):
         return self.get_full_name()
 
+    @property
+    def fullname(self):
+        return self.get_full_name()
+
     def get_full_name(self):
         fullname = self.forename
         if self.surname_prefix:

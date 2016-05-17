@@ -16,7 +16,7 @@
       <h4>{{ party.name_short }}</h4>
       <font size="2">{{ party.name }}
       {% if party.founded %}
-        </br>{{ party.founded }}
+        <br/>{{ party.founded }}
       {% endif %}
       </font>
     </p>
@@ -34,7 +34,7 @@
     {% if party.official_website_url %}
       <a href="{{ party.official_website_url }}">website</a> |
     {% endif %}
-    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a> </br>
+    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a> <br/>
     <a href="/api/party/{{ party.id }}/">API</a>
     </font></p>
   </div>

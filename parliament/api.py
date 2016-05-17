@@ -10,9 +10,11 @@ class ParliamentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ParliamentMemberSerializer(serializers.HyperlinkedModelSerializer):
+    party = serializers.HyperlinkedRelatedField(queryset=PoliticalParty.objects.all(), view_name='politicalparty-detail')
+
     class Meta:
         model = ParliamentMember
-        fields = ('id', 'person', 'parliament', 'joined', 'left')
+        fields = ('id', 'person', 'party', 'parliament', 'joined', 'left')
 
 
 class PoliticalPartySerializer(serializers.HyperlinkedModelSerializer):
