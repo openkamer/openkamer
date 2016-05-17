@@ -57,6 +57,7 @@ class PoliticalParty(models.Model):
                     wikidata_id = id
                     break
         self.wikidata_id = wikidata_id
+        self.wikipedia_url = wikidata.get_wikipedia_url(wikidata_id, language)
         print(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         logo_filename = wikidata.get_logo_filename(self.wikidata_id)
         if logo_filename:

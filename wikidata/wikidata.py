@@ -1,4 +1,5 @@
 from datetime import datetime
+import urllib.parse
 
 import requests
 
@@ -31,9 +32,17 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
-def get_item(id):
-    url = 'https://www.wikidata.org/wiki/Special:EntityData/' + id
-    params = {'format': 'json'}
+def get_item(id, sites=None, props=None):
+    url = 'https://www.wikidata.org/w/api.php'
+    params = {
+        'action': 'wbgetentities',
+        'ids': id,
+        'format': 'json'
+    }
+    if sites:
+        params['sites'] = sites
+    if props:
+        params['props'] = props
     response = requests.get(url, params)
     reponse_json = response.json()
     item_json = reponse_json['entities'][id]
@@ -43,6 +52,16 @@ def get_item(id):
 def get_claims(id):
     item = get_item(id)
     return item['claims']
+
+
+def get_wikipedia_url(id, language='en'):
+    site = language + 'wiki'
+    item = get_item(id, sites=site, props='sitelinks')
+    if not 'sitelinks' in item:
+        return ''
+    title = item['sitelinks'][site]['title']
+    url = 'https://' + language + '.wikipedia.org/wiki/' + urllib.parse.quote(title) + ''
+    return url
 
 
 def get_country_id(id):
