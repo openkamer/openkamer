@@ -6,25 +6,25 @@ from parliament.models import Parliament, ParliamentMember, PartyMember, Politic
 class ParliamentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Parliament
-        fields = ('name', 'wikidata_id')
+        fields = ('id', 'name', 'wikidata_id')
 
 
 class ParliamentMemberSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ParliamentMember
-        fields = ('person', 'parliament', 'joined', 'left')
+        fields = ('id', 'person', 'parliament', 'joined', 'left')
 
 
 class PoliticalPartySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PoliticalParty
-        fields = ('name', 'name_short', 'founded', 'dissolved', 'wikidata_id', 'wikimedia_logo_url', 'wikipedia_url')
+        fields = ('id', 'name', 'name_short', 'founded', 'dissolved', 'wikidata_id', 'wikimedia_logo_url', 'wikipedia_url')
 
 
 class PartyMemberSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PartyMember
-        fields = ('person', 'party', 'joined', 'left')
+        fields = ('id', 'person', 'party', 'joined', 'left')
 
 
 class ParliamentViewSet(viewsets.ModelViewSet):

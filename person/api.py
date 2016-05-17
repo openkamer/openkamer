@@ -7,6 +7,7 @@ class PersonSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Person
         fields = (
+            'id',
             'forename',
             'surname',
             'surname_prefix',
