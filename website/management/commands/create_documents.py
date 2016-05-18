@@ -14,6 +14,7 @@ class Command(BaseCommand):
         dossier_id = options['dossier_id'][0]
         search_results = scraper.documents.search_politieknl_dossier(dossier_id)
         for result in search_results:
+            print('create document')
             document = Document.objects.create(
                 dossier_id=str(dossier_id),
                 raw_type=result['type'],
@@ -24,10 +25,10 @@ class Command(BaseCommand):
             )
 
             if 'Kamerstuk' in result['type']:
-                print('KAMERSTUK')
-                print(result['type'])
+                print('create kamerstuk')
+                # print(result['type'])
                 items = result['type'].split(' ')
-                print(items)
+                # print(items)
                 title_parts = result['title'].split(';')
                 type_short = ''
                 type_long = ''
