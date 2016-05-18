@@ -38,6 +38,8 @@ class Command(BaseCommand):
                     print('BIJLAGE')
                     id_main = int(items[4])
                     id_sub = int(items[6])
+                    type_short = 'Bijlage'
+                    type_long = 'Bijlage'
                 else:
                     id_main = int(items[2])
                     id_sub = int(items[4])
