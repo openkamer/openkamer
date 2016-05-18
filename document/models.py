@@ -17,8 +17,17 @@ class Dossier(models.Model):
         kamerstukken = self.kamerstukken()
         titles = {}
         for stuk in kamerstukken:
-            return stuk.document.title()
-
+            title = stuk.document.title()
+            if title in titles:
+                titles[title] += 1
+            else:
+                titles[title] = 0
+        max_titles = 0
+        title = 'undefined'
+        for key, value in titles.items():
+            if value > max_titles:
+                title = key
+        return title
 
 
 class Document(models.Model):
@@ -61,3 +70,4 @@ class Kamerstuk(models.Model):
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'
+        ordering = ['id_sub']
