@@ -1,8 +1,18 @@
 from django.db import models
 
 
+class Dossier(models.Model):
+    dossier_id = models.CharField(max_length=100, blank=True, unique=True)
+
+    def __str__(self):
+        return 'Dossier model with id: ' + str(self.dossier_id)
+
+    def documents(self):
+        return Document.objects.all()
+
+
 class Document(models.Model):
-    dossier_id = models.CharField(max_length=100, blank=True)
+    dossier = models.ForeignKey(Dossier, blank=True, null=True)
     raw_title = models.CharField(max_length=500)
     raw_type = models.CharField(max_length=200)
     publisher = models.CharField(max_length=200)

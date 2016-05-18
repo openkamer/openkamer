@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from document.models import Document, Kamerstuk
+from document.models import Document, Kamerstuk, Dossier
 
 
 class DocumentAdmin(admin.ModelAdmin):
@@ -29,5 +29,6 @@ class KamerstukAdmin(admin.ModelAdmin):
         return obj.document.date_published
 
 
+admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)

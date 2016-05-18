@@ -1,12 +1,27 @@
 from rest_framework import serializers, viewsets
 
-from document.models import Document, Kamerstuk
+from document.models import Document, Kamerstuk, Dossier
+
+
+class DossierSerializer(serializers.HyperlinkedModelSerializer):
+    documents = serializers.HyperlinkedRelatedField(read_only=True,
+                                                    view_name='document-detail',
+                                                    many=True)
+
+    class Meta:
+        model = Dossier
+        fields = ('id', 'dossier_id', 'documents')
+
+
+class DossierViewSet(viewsets.ModelViewSet):
+    queryset = Dossier.objects.all()
+    serializer_class = DossierSerializer
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Document
-        fields = ('id', 'dossier_id', 'raw_type', 'raw_title', 'publisher', 'date_published', 'document_url')
+        fields = ('id', 'dossier', 'raw_type', 'raw_title', 'publisher', 'date_published', 'document_url')
 
 
 class DocumentViewSet(viewsets.ModelViewSet):

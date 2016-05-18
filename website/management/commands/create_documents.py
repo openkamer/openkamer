@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from document.models import Document, Kamerstuk
+from document.models import Document, Kamerstuk, Dossier
 import scraper.documents
 
 
@@ -12,11 +12,16 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # dossier_id = 33885
         dossier_id = options['dossier_id'][0]
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        if dossiers:
+            dossier = dossiers[0]
+        else:
+            dossier = Dossier.objects.create(dossier_id=dossier_id)
         search_results = scraper.documents.search_politieknl_dossier(dossier_id)
         for result in search_results:
             print('create document')
             document = Document.objects.create(
-                dossier_id=str(dossier_id),
+                dossier=dossier,
                 raw_type=result['type'],
                 raw_title=result['title'],
                 publisher=result['publisher'],
