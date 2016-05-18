@@ -44,12 +44,12 @@ def search_politieknl_dossier(dossier_id):
             # print(published_date)
             page_url = 'https://zoek.officielebekendmakingen.nl' + element.get('href')
             # print(page_url)
-            short_title = result_info.split('|')[1].strip()
+            type = result_info.split('|')[1].strip()
             publisher = result_info.split('|')[2].strip()
 
             result = {
                 'title': title,
-                'short_title': short_title,
+                'type': type,
                 'publisher': publisher,
                 'published_date': published_date,
                 'page_url': page_url,
@@ -57,7 +57,7 @@ def search_politieknl_dossier(dossier_id):
             results.append(result)
 
         print('------')
-        print(result['short_title'])
+        print(result['type'])
         print(result['title'])
         print(result['published_date'])
         print(result['publisher'])
