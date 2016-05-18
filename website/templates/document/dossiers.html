@@ -6,6 +6,7 @@
 <div class="row">
   <div class="col-lg-12">
     <div align="center"><h3>Dossiers</h3></div>
+    <hr/>
   </div>
 </div>
 
@@ -13,26 +14,36 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h5>Kamerstukken binnen dossier {{ dossier.dossier_id }}</h5></div>
+    <div align="center">
+      <h4>{{ dossier.title }}</h4>
+      <h4>{{ dossier.dossier_id }}</h4>
+    </div>
   </div>
 </div>
 
+
 <div class="row">
 
-  {% for kamerstuk in dossier.kamerstukken %}
-  <div class="col-sm-3 party-member-column" align="center">
-
+{% for kamerstuk in dossier.kamerstukken %}
+  {% if kamerstuk.visible %}
+  <div class="col-sm-6 kamerstuk-member-column" align="center">
     <p>
-        {{ kamerstuk.type_short }} <br/>
+      {% if kamerstuk.voorstelwet %}
+       voorstaelwet
+      {% endif %}
+      <h5><a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.type_short }}</a></h5>
       <font size="2">
-        {{ kamerstuk.document.date_published }} <br/>
+        {{ kamerstuk.type_long }} <br/>
+        <!--{{ kamerstuk.document.title }} <br/>-->
+        <b>{{ kamerstuk.document.date_published }} </b> <br/>
         {{ kamerstuk.document.publisher }} <br/>
-        <a href="{{ kamerstuk.document.document_url }}">html document</a> <br/>
+        {{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}<br/>
       </font>
     </p>
 
   </div>
-  {% endfor %}
+  {% endif %}
+{% endfor %}
 
 </div>
 
@@ -45,7 +56,7 @@
 <div class="row">
 
   {% for document in dossier.documents %}
-  <div class="col-sm-3 party-member-column" align="center">
+  <div class="col-xs-2 party-member-column" align="center">
 
     <p>
         {{ document.raw_type }} <br/>

@@ -32,3 +32,9 @@ body {
   max-width: 100px;
   max-height: 50px;
 }
+
+.kamerstuk-member-column {
+  padding: 2px;
+  overflow: hidden;
+  height: 12em;
+}
