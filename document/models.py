@@ -13,6 +13,13 @@ class Dossier(models.Model):
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
 
+    def title(self):
+        kamerstukken = self.kamerstukken()
+        titles = {}
+        for stuk in kamerstukken:
+            return stuk.document.title()
+
+
 
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)
@@ -21,6 +28,9 @@ class Document(models.Model):
     publisher = models.CharField(max_length=200)
     date_published = models.DateField(blank=True, null=True)
     document_url = models.URLField(unique=True, blank=True)
+
+    def title(self):
+        return self.raw_title.split(';')[0]
 
     def __str__(self):
         return self.raw_type
@@ -38,6 +48,16 @@ class Kamerstuk(models.Model):
 
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ' ' + str(self.type_long)
+
+    def visible(self):
+        if self.type_short == 'Koninklijke boodschap':
+            return False
+        return True
+
+    def voorstelwet(self):
+        if self.type_short == 'Voorstel van wet':
+            return True
+        return False
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'
