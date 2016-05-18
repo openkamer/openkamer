@@ -1,0 +1,78 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Dossiers</h3></div>
+  </div>
+</div>
+
+{% for dossier in dossiers %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5>Kamerstukken binnen dossier {{ dossier.dossier_id }}</h5></div>
+  </div>
+</div>
+
+<div class="row">
+
+  {% for kamerstuk in dossier.kamerstukken %}
+  <div class="col-sm-3 party-member-column" align="center">
+
+    <p>
+        {{ kamerstuk.type_short }} <br/>
+      <font size="2">
+        {{ kamerstuk.document.date_published }} <br/>
+        {{ kamerstuk.document.publisher }} <br/>
+        <a href="{{ kamerstuk.document.document_url }}">html document</a> <br/>
+      </font>
+    </p>
+
+  </div>
+  {% endfor %}
+
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5>Documenten binnen dossier {{ dossier.dossier_id }}</h5></div>
+  </div>
+</div>
+
+<div class="row">
+
+  {% for document in dossier.documents %}
+  <div class="col-sm-3 party-member-column" align="center">
+
+    <p>
+        {{ document.raw_type }} <br/>
+      <font size="2">
+        {{ document.date_published }} <br/>
+        {{ document.publisher }} <br/>
+        <a href="{{ document.document_url }}">html document</a> <br/>
+      </font>
+    </p>
+
+  </div>
+  {% endfor %}
+
+</div>
+
+<hr/>
+
+{% endfor %}
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5><a href="/api/dossier/">Dossier API</a></h5></div>
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}

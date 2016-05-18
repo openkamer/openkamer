@@ -8,7 +8,10 @@ class Dossier(models.Model):
         return 'Dossier model with id: ' + str(self.dossier_id)
 
     def documents(self):
-        return Document.objects.all()
+        return Document.objects.filter(dossier=self)
+
+    def kamerstukken(self):
+        return Kamerstuk.objects.filter(document__dossier=self)
 
 
 class Document(models.Model):
