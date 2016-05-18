@@ -22,7 +22,11 @@ class KamerstukAdmin(admin.ModelAdmin):
         'id_sub',
         'type_short',
         'type_long',
+        'document_date',
     )
+
+    def document_date(self, obj):
+        return obj.document.date_published
 
 
 admin.site.register(Document, DocumentAdmin)
