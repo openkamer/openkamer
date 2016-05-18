@@ -74,7 +74,7 @@ def create_bill_from_url(url):
     if authors:
         forename = authors[0].text.split()[0]
         surname = authors[0].text.split()[-1]
-        member = Member.find_member(forename, surname)
+        member = PartyMember.find_member(forename, surname)
         if not member:
             logger.warning("Member model could not be found for: " + forename + ' ' + surname)
             return None
