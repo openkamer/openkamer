@@ -14,4 +14,5 @@ class Command(BaseCommand):
         dossier_id = options['dossier_id'][0]
         dossier_docs = Document.objects.filter(dossier_id=dossier_id)
         for doc in dossier_docs:
+            print('delete document')
             doc.delete()
