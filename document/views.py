@@ -19,3 +19,12 @@ class DossiersView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['dossiers'] = Dossier.objects.all()
         return context
+
+
+class DossierView(TemplateView):
+    template_name = 'document/dossier.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossier'] = Dossier.objects.get(id=self.kwargs['pk'])
+        return context
