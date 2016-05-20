@@ -8,9 +8,13 @@ class DossierSerializer(serializers.HyperlinkedModelSerializer):
                                                     view_name='document-detail',
                                                     many=True)
 
+    kamerstukken = serializers.HyperlinkedRelatedField(read_only=True,
+                                                    view_name='kamerstuk-detail',
+                                                    many=True)
+
     class Meta:
         model = Dossier
-        fields = ('id', 'dossier_id', 'title', 'documents')
+        fields = ('id', 'dossier_id', 'title', 'kamerstukken', 'documents')
 
 
 class DossierViewSet(viewsets.ModelViewSet):
