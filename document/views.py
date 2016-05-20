@@ -1,6 +1,8 @@
 from django.views.generic import TemplateView
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
-from document.models import Document, Dossier
+from document.models import Document, Dossier, create_or_update_dossier
 
 
 class DocumentsView(TemplateView):
@@ -28,3 +30,18 @@ class DossierView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['dossier'] = Dossier.objects.get(id=self.kwargs['pk'])
         return context
+
+
+class AddDossierView(TemplateView):
+    template_name = 'document/dossier.html'
+
+    def get(self, request, **kwargs):
+        super().get(request=request, **kwargs)
+        dossiers = Dossier.objects.filter(dossier_id=self.kwargs['dossier_id'])
+        if dossiers.exists():
+            dossier = dossiers[0]
+        else:
+            dossier = create_or_update_dossier(self.kwargs['dossier_id'])
+        url = '/dossier/' + str(dossier.id) + '/'
+        return redirect(url)
+        # return HttpResponseRedirect()
