@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from document.models import Document, Kamerstuk, Dossier
-import scraper.documents
+from document.models import create_or_update_dossier
 
 
 class Command(BaseCommand):
@@ -12,47 +11,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # dossier_id = 33885
         dossier_id = options['dossier_id'][0]
-        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-        if dossiers:
-            dossier = dossiers[0]
-        else:
-            dossier = Dossier.objects.create(dossier_id=dossier_id)
-        search_results = scraper.documents.search_politieknl_dossier(dossier_id)
-        for result in search_results:
-            print('create document')
-            document = Document.objects.create(
-                dossier=dossier,
-                raw_type=result['type'],
-                raw_title=result['title'],
-                publisher=result['publisher'],
-                date_published=result['published_date'],
-                document_url=result['page_url'],
-            )
+        create_or_update_dossier(str(dossier_id))
 
-            if 'Kamerstuk' in result['type']:
-                print('create kamerstuk')
-                # print(result['type'])
-                items = result['type'].split(' ')
-                # print(items)
-                title_parts = result['title'].split(';')
-                type_short = ''
-                type_long = ''
-                if len(title_parts) > 2:
-                    type_short = title_parts[1].strip()
-                    type_long = title_parts[2].strip()
-                if "Bijlage" in result['type']:
-                    print('BIJLAGE')
-                    id_main = int(items[4])
-                    id_sub = int(items[6])
-                    type_short = 'Bijlage'
-                    type_long = 'Bijlage'
-                else:
-                    id_main = int(items[2])
-                    id_sub = int(items[4])
-                Kamerstuk.objects.create(
-                    document=document,
-                    id_main=id_main,
-                    id_sub=id_sub,
-                    type_short=type_short,
-                    type_long=type_long,
-                )
+
