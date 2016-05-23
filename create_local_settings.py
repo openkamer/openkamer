@@ -9,8 +9,8 @@ import tempfile
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-LOCAL_SETTINGS_PATH = os.path.join(BASE_DIR, './website/local_settings.py')
-LOCAL_SETTINGS_EXAMPLE_PATH = os.path.join(BASE_DIR, './website/local_settings_example.py')
+LOCAL_SETTINGS_PATH = os.path.join(BASE_DIR, 'website/local_settings.py')
+LOCAL_SETTINGS_EXAMPLE_PATH = os.path.join(BASE_DIR, 'website/local_settings_example.py')
 
 
 def main():
