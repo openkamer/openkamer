@@ -2,11 +2,12 @@ from datetime import datetime
 import re
 
 import requests
+import lxml
 import lxml.html
 import lxml.etree
 
 
-def get_document_id(url):
+def get_document_id_and_content(url):
     print('get document id for url: ' + url)
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
@@ -16,10 +17,15 @@ def get_document_id(url):
     else:
         elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
         if not elements:
-            return None
+            return None, ''
         document_id = elements[0].get('content')
     print('document id: ' + document_id)
-    return document_id
+    elements = tree.xpath('//div[@class="stuk"]')
+    if elements:
+        content_html = lxml.etree.tostring(elements[0])
+    else:
+        content_html = ''
+    return document_id, content_html
 
 
 def get_metadata(document_id):

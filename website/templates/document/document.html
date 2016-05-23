@@ -1,0 +1,29 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="center"><h3>Document</h3></div>
+    <div align="left">
+      <h4>{{ document.title }}</h4>
+      <H5>{{ document.date_published|date:"Y-m-d" }}</H5>
+      <h5>Dossier: <a href="/dossier/{{ document.dossier.id }}/">{{ document.dossier.dossier_id }}</a></h5>
+      <h5>Indiener: {{ document.submitter }}</h5>
+      <h5>Bron: <a href="{{ document.document_url }}">{{ document.document_url }}</a></h5>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="left">
+      {{ document.content_html|safe }}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

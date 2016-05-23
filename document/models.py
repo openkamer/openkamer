@@ -23,12 +23,13 @@ class Dossier(models.Model):
             if title in titles:
                 titles[title] += 1
             else:
-                titles[title] = 0
+                titles[title] = 1
         max_titles = 0
         title = 'undefined'
         for key, value in titles.items():
             if value > max_titles:
                 title = key
+                max_titles = value
         return title
 
 
@@ -37,14 +38,15 @@ class Document(models.Model):
     document_id = models.CharField(max_length=200, blank=True)
     title_full = models.CharField(max_length=500)
     title_short = models.CharField(max_length=200)
-    publication_type = models.CharField(max_length=200)
-    submitter = models.CharField(max_length=200)
-    category = models.CharField(max_length=200)
-    publisher = models.CharField(max_length=200)
+    publication_type = models.CharField(max_length=200, blank=True)
+    submitter = models.CharField(max_length=200, blank=True)
+    category = models.CharField(max_length=200, blank=True)
+    publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True)
+    content_html = models.CharField(max_length=200000, blank=True)
 
     def title(self):
-        return self.title_short
+        return self.title_full.split(';')[0]
 
     def document_url(self):
         return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
@@ -101,7 +103,7 @@ def create_or_update_dossier(dossier_id):
             print('WARNING: Staatscourant, skip for now')
             continue
 
-        document_id = scraper.documents.get_document_id(result['page_url'])
+        document_id, content_html = scraper.documents.get_document_id_and_content(result['page_url'])
         if not document_id:
             print('WARNING: No document id found, will not create document')
             continue
@@ -123,6 +125,7 @@ def create_or_update_dossier(dossier_id):
             category=metadata['category'],
             publisher=metadata['publisher'],
             date_published=date_published,
+            content_html=content_html,
         )
 
         if metadata['is_kamerstuk']:

@@ -14,6 +14,15 @@ class DocumentsView(TemplateView):
         return context
 
 
+class DocumentView(TemplateView):
+    template_name = 'document/document.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['document'] = Document.objects.get(id=self.kwargs['pk'])
+        return context
+
+
 class DossiersView(TemplateView):
     template_name = 'document/dossiers.html'
 
