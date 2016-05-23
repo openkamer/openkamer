@@ -144,7 +144,7 @@ def create_or_update_dossier(dossier_id):
             Kamerstuk.objects.create(
                 document=document,
                 id_main=dossier_id,
-                id_sub=metadata['id_sub'],
+                id_sub=metadata['id_sub'].zfill(2),
                 type_short=type_short,
                 type_long=type_long,
             )
