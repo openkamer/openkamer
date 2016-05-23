@@ -10,11 +10,14 @@ def get_document_id(url):
     print('get document id for url: ' + url)
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
-    elements = tree.xpath('//ul/li/a[@id="permaHyperlink"]')
-    document_url = 'https://zoek.officielebekendmakingen.nl/' + elements[0].get('href')
-    print(document_url)
     elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
-    document_id = elements[0].get('href').split('/')[-1]
+    if elements:
+        document_id = elements[0].get('href').split('/')[-1]
+    else:
+        elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
+        if not elements:
+            return None
+        document_id = elements[0].get('content')
     print('document id: ' + document_id)
     return document_id
 
@@ -49,6 +52,12 @@ def get_metadata(document_id):
             metadata[name] = elements[0].get('content')
         else:
             print('WARNING: ' + key + ' was not found')
+            metadata[name] = ''
+
+    if not metadata['title_short']:
+        elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
+        if elements:
+            metadata['title_short'] = elements[0].get('content')
 
     metadata['is_kamerstuk'] = False
     elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
@@ -104,7 +113,7 @@ def search_politieknl_dossier(dossier_id):
                 'title': title,
                 'type': type,
                 'publisher': publisher,
-                'published_date': published_date,
+                'date_published': published_date,
                 'page_url': page_url,
             }
             results.append(result)
@@ -112,7 +121,7 @@ def search_politieknl_dossier(dossier_id):
         print('------')
         print(result['type'])
         print(result['title'])
-        print(result['published_date'])
+        print(result['date_published'])
         print(result['publisher'])
         print(result['page_url'])
     return results
