@@ -13,6 +13,7 @@ class DocumentAdmin(admin.ModelAdmin):
         'submitter',
         'category',
         'publisher',
+        'document_url',
         'title_full',
     )
 
@@ -20,7 +21,6 @@ class DocumentAdmin(admin.ModelAdmin):
 class KamerstukAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'document',
         'id_main',
         'id_sub',
         'type_short',
