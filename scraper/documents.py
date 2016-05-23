@@ -51,14 +51,21 @@ def get_metadata(document_id):
     metadata = {}
     for key, name in attributes_transtable.items():
         elements = tree.xpath('/metadata_gegevens/metadata[@name="' + key + '"]')
-        if elements:
-            if len(elements) > 1:
-                print('WARNING: more than 1 element found, using first, but more info available!')
-            # print(elements[0].get('content'))
-            metadata[name] = elements[0].get('content')
-        else:
+        if not elements:
             print('WARNING: ' + key + ' was not found')
             metadata[name] = ''
+            continue
+        if len(elements) > 1:
+            if name == 'category':
+                metadata[name] = ''
+                for element in elements:
+                    if metadata[name]:
+                        metadata[name] += ' | '
+                    metadata[name] += element.get('content')
+            else:
+                print('WARNING: more than 1 element found for key: ' + key + ', using first, but more info available!')
+        else:
+            metadata[name] = elements[0].get('content')
 
     if not metadata['title_short']:
         elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
