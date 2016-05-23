@@ -7,10 +7,7 @@ from parliament.models import PoliticalParty
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        persons = Person.objects.all()
-        for person in persons:
-            person.update_info('nl')
-            person.save()
+        Person.update_persons_all('nl')
 
         parties = PoliticalParty.objects.all()
         for party in parties:

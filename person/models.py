@@ -29,7 +29,15 @@ class Person(models.Model):
     def person_exists(forename, surname):
         return Person.objects.filter(forename=forename, surname=surname).exists()
 
+    @staticmethod
+    def update_persons_all(language):
+        persons = Person.objects.all()
+        for person in persons:
+            person.update_info(language=language)
+            person.save()
+
     def update_info(self, language='en'):
+        print('get info from wikidata for ' + self.get_full_name())
         wikidata_id = wikidata.search_wikidata_id(self.get_full_name(), language)
         if not wikidata_id:
             return
