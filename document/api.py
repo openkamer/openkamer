@@ -29,6 +29,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'dossier',
             'document_id',
+            'document_url',
             'title_full',
             'title_short',
             'publication_type',
