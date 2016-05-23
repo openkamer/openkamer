@@ -25,7 +25,19 @@ class DossierViewSet(viewsets.ModelViewSet):
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Document
-        fields = ('id', 'dossier', 'raw_type', 'raw_title', 'publisher', 'date_published', 'document_url')
+        fields = (
+            'id',
+            'dossier',
+            'document_id',
+            'title_full',
+            'title_short',
+            'publication_type',
+            'submitter',
+            'category',
+            'publisher',
+            'date_published',
+            # 'content_html'  # too large, needs link to content
+        )
 
 
 class DocumentViewSet(viewsets.ModelViewSet):

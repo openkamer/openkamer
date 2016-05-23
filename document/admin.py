@@ -7,17 +7,20 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'dossier_id',
-        'raw_type',
+        'title_short',
         'date_published',
+        'publication_type',
+        'submitter',
+        'category',
         'publisher',
-        'raw_title',
+        'document_url',
+        'title_full',
     )
 
 
 class KamerstukAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'document',
         'id_main',
         'id_sub',
         'type_short',

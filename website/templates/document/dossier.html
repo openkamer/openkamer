@@ -5,21 +5,14 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h3>Dossiers</h3></div>
-    <hr/>
-  </div>
-</div>
-
-
-<div class="row">
-  <div class="col-lg-12">
     <div align="center">
-      <h4>{{ dossier.title }}</h4>
-      <h4>{{ dossier.dossier_id }}</h4>
+      <h4>Dossier {{ dossier.dossier_id }}</h4>
+      <h5>{{ dossier.title }}</h5>
     </div>
   </div>
 </div>
 
+<hr/>
 
 <div class="row">
 
@@ -30,14 +23,14 @@
       <!--{% if kamerstuk.voorstelwet %}-->
        <!--voorstaelwet-->
       <!--{% endif %}-->
-      <h5><a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.type_short }}</a></h5>
+      <h5><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a></h5>
       <font size="2">
         {% if kamerstuk.type_short !=  kamerstuk.type_long %}
         {{ kamerstuk.type_long }} <br/>
         {% endif %}
         <!--{{ kamerstuk.document.title }} <br/>-->
-        <b>{{ kamerstuk.document.date_published }} </b> <br/>
-        {{ kamerstuk.document.publisher }} <br/>
+        <b>{{ kamerstuk.document.date_published|date:"Y-m-d" }} </b> <br/>
+        {{ kamerstuk.document.submitter }} <br/>
         {{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}<br/>
       </font>
     </p>
@@ -47,6 +40,8 @@
 {% endfor %}
 
 </div>
+
+<hr/>
 
 <div class="row">
   <div class="col-lg-12">
@@ -64,7 +59,7 @@
       <font size="2">
         {{ document.date_published }} <br/>
         {{ document.publisher }} <br/>
-        <a href="{{ document.document_url }}">html document</a> <br/>
+        <a href="/document/{{ document.id }}/">html document</a> <br/>
       </font>
     </p>
 
@@ -72,8 +67,6 @@
   {% endfor %}
 
 </div>
-
-<hr/>
 
 <hr/>
 
