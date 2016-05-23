@@ -27,9 +27,16 @@ Create a superuser,
 $ python manage.py createsuperuser
 ```
 
-### Run a development server
-Run the Django dev web server, make sure you have the virtualenv activated,
+### Create demo data
+Creating data can take several minutes and mostly depends on response time of external sources,
 ```
+$ python manage.py create_data
+```
+
+### Run a development server
+Run the Django dev web server in the virtualenv,
+```
+$ source env/bin/activate
 (env)$ python manage.py runserver
 ```
 
