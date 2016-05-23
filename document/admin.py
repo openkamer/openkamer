@@ -7,10 +7,13 @@ class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'dossier_id',
-        'raw_type',
+        'title_short',
         'date_published',
+        'publication_type',
+        'submitter',
+        'category',
         'publisher',
-        'raw_title',
+        'title_full',
     )
 
 

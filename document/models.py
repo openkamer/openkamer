@@ -34,14 +34,20 @@ class Dossier(models.Model):
 
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)
-    raw_title = models.CharField(max_length=500)
-    raw_type = models.CharField(max_length=200)
+    document_id = models.CharField(max_length=200, blank=True)
+    title_full = models.CharField(max_length=500)
+    title_short = models.CharField(max_length=200)
+    publication_type = models.CharField(max_length=200)
+    submitter = models.CharField(max_length=200)
+    category = models.CharField(max_length=200)
     publisher = models.CharField(max_length=200)
     date_published = models.DateField(blank=True, null=True)
-    document_url = models.URLField(unique=True, blank=True)
 
     def title(self):
         return self.raw_title.split(';')[0]
+
+    def document_url(self):
+        return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
 
     def __str__(self):
         return self.raw_type
@@ -85,21 +91,25 @@ def create_or_update_dossier(dossier_id):
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
         print('create document')
+        document_id = scraper.documents.get_document_id(result['page_url'])
+        metadata = scraper.documents.get_metadata(document_id)
+
         document = Document.objects.create(
             dossier=dossier,
-            raw_type=result['type'],
-            raw_title=result['title'],
-            publisher=result['publisher'],
-            date_published=result['published_date'],
-            document_url=result['page_url'],
+            document_id=document_id,
+            title_full=metadata['title_full'],
+            title_short=metadata['title_short'],
+            publication_type=metadata['publication_type'],
+            submitter=metadata['submitter'],
+            category=metadata['category'],
+            publisher=metadata['publisher'],
+            date_published=metadata['publisher'],
         )
 
-        if 'Kamerstuk' in result['type']:
+        if metadata['is_kamerstuk']:
             print('create kamerstuk')
-            # print(result['type'])
-            items = result['type'].split(' ')
             # print(items)
-            title_parts = result['title'].split(';')
+            title_parts = metadata['title_full'].split(';')
             type_short = ''
             type_long = ''
             if len(title_parts) > 2:
@@ -107,17 +117,12 @@ def create_or_update_dossier(dossier_id):
                 type_long = title_parts[2].strip()
             if "Bijlage" in result['type']:
                 print('BIJLAGE')
-                id_main = str(items[4])
-                id_sub = str(items[6])
                 type_short = 'Bijlage'
                 type_long = 'Bijlage'
-            else:
-                id_main = str(items[2])
-                id_sub = str(items[4])
             Kamerstuk.objects.create(
                 document=document,
-                id_main=id_main,
-                id_sub=id_sub,
+                id_main=dossier_id,
+                id_sub=metadata['id_sub'],
                 type_short=type_short,
                 type_long=type_long,
             )
