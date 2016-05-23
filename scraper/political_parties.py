@@ -24,10 +24,11 @@ def create_parties():
             name_short = name
         # print('name: ' + name)
         # print('short: ' + name_short)
-        if PoliticalParty.find_party(name):
+        party = PoliticalParty.find_party(name)
+        if party:
             print('WARNING: party already exists!')
         else:
             party = PoliticalParty.objects.create(name=name, name_short=name_short)
-            party.update_info('nl', 'nl')
-            party.save()
             print('created: ' + str(party))
+        party.update_info('nl', 'nl')
+        party.save()
