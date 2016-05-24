@@ -4,8 +4,12 @@ python:
 - '3.5'
 install:
 - pip install -r requirements.txt
+- pip install coveralls
 script:
 - python create_local_settings.py
 - python manage.py migrate
+- coverage run website/manage.py test
 notifications:
   email: false
+after_success:
+  coveralls
