@@ -1,0 +1,27 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% block headcontent %}
+<link rel="stylesheet" href="{% static 'css/plots.css' %}" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+<script src="//d3js.org/d3.v3.min.js" type="text/javascript"></script>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-md-12">
+      <div id="plot">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="{% static 'js/plots.js' %}" type="text/javascript"></script>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: white;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.marker {
+    fill: black;
+    stroke: steelblue;
+    stroke-width: 2;
+    shape-rendering: geometricPrecision;
+}

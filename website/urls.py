@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
 from person.views import PersonsView
-from document.views import DossierView, DossiersView, AddDossierView
+from document.views import DossierView, DossiersView, AddDossierView, DossierTimelineView
 from document.views import DocumentView
 from parliament.views import PartiesView, ParliamentMembersView
 
@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^dossiers/$', DossiersView.as_view()),
     url(r'^dossier/(?P<pk>\d+)/$', DossierView.as_view()),
     url(r'^dossier/add/(?P<dossier_id>\d+)/$', AddDossierView.as_view()),
+    url(r'^dossier/timeline/(?P<pk>\d+)/', DossierTimelineView.as_view()),
     url(r'^document/(?P<pk>\d+)/$', DocumentView.as_view()),
     url(r'^bills/$', BillsView.as_view()),
     url(r'^api/', include(website.api)),
