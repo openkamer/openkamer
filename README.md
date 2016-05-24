@@ -1,4 +1,5 @@
 # openkamer
+[![Build Status](https://travis-ci.org/openkamer/openkamer.svg?branch=master)](https://travis-ci.org/openkamer/openkamer)
 
 This is a work in progress...
 
