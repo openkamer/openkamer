@@ -8,7 +8,7 @@ install:
 script:
 - python create_local_settings.py
 - python manage.py migrate
-- coverage run website/manage.py test
+- coverage run manage.py test
 notifications:
   email: false
 after_success:
