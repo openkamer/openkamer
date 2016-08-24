@@ -115,6 +115,9 @@ def create_or_update_dossier(dossier_id):
         else:
             date_published = result['date_published']
 
+        if 'submitter' not in metadata:
+            metadata['submitter'] = 'undefined'
+
         document = Document.objects.create(
             dossier=dossier,
             document_id=document_id,
