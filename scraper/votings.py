@@ -13,6 +13,28 @@ from parliament.models import PoliticalParty
 from voting.models import Bill
 from voting.models import Vote
 
+TWEEDEKAMER_URL = 'https://www.tweedekamer.nl'
+
+
+def get_voting_urls_for_dossier(dossier_nr):
+    search_url = 'https://www.tweedekamer.nl/zoeken'
+    params = {
+        'qry': dossier_nr,
+        'fld_prl_kamerstuk': 'Stemmingsuitslagen',
+        'Type': 'Kamerstukken',
+        'clusterName': 'Stemmingsuitslagen',
+    }
+    page = requests.get(search_url, params)
+    tree = lxml.html.fromstring(page.content)
+    elements = tree.xpath('//div[@class="search-result-content"]/h3/a')
+    print('elements found: ' + str(len(elements)))
+    voting_urls = []
+    for element in elements:
+        voting_url = TWEEDEKAMER_URL + element.get('href')
+        voting_urls.append(voting_url)
+        print(voting_url)
+    return voting_urls
+
 
 def get_bills():
     for i in range(0, 200):
