@@ -32,10 +32,35 @@ class TestExample(TestCase):
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154',
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10153'
         ]
+        expected_results = [
+            {'result': 'Verworpen', 'document_id': '33885-17'},
+            {'result': 'Aangenomen', 'document_id': '33885-30'},
+            {'result': 'Verworpen', 'document_id': '33885-19'},
+            {'result': 'Verworpen', 'document_id': '33885-20'},
+            {'result': 'Eerder ingetrokken (tijdens debat)', 'document_id': '33885-21'},
+            {'result': 'Verworpen', 'document_id': '33885-31'},
+            {'result': 'Aangehouden (tijdens debat)', 'document_id': '33885-23'},
+            {'result': 'Verworpen', 'document_id': '33885-24'},
+            {'result': 'Aangehouden (tijdens debat)', 'document_id': '33885-25'},
+            {'result': 'Verworpen', 'document_id': '33885-26'},
+            {'result': 'Verworpen', 'document_id': '33885-27'},
+            {'result': 'Eerder ingetrokken (tijdens debat)', 'document_id': '33885-28'},
+            {'result': 'Ingetrokken', 'document_id': '33885-14'},
+            {'result': 'Verworpen', 'document_id': '33885-15'},
+            {'result': 'Verworpen', 'document_id': '33885-16'},
+            {'result': 'Verworpen', 'document_id': '33885-10'},
+            {'result': 'Verworpen', 'document_id': '33885-13'},
+            {'result': 'Aangenomen', 'document_id': '33885'}
+        ]
+
+        results = []
         for url in voting_page_urls:
-            votings = scraper.votings.get_votings_for_page(url)
-            for voting in votings:
-                print(voting)
+            results += scraper.votings.get_votings_for_page(url)
+
+        self.assertEqual(len(results), len(expected_results))
+        for i in range(len(results)):
+            print(results[i])
+            self.assertEqual(results[i], expected_results[i])
 
 
 
