@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 import scraper.documents
-from scraper import votings
+import scraper.votings
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -16,14 +16,26 @@ class TestExample(TestCase):
     """ Example test case """
     dossier_nr = 33885
 
-    def test_get_votings_for_dossier(self):
+    def test_get_voting_pages_for_dossier(self):
         """ Example test """
         expected_urls = [
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154',
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10153'
         ]
-        voting_urls = votings.get_voting_urls_for_dossier(self.dossier_nr)
-        self.assertEqual(len(expected_urls), len(voting_urls))
-        for i in range(len(voting_urls)):
-            self.assertEqual(voting_urls[i], expected_urls[i])
+        votings_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr)
+        self.assertEqual(len(expected_urls), len(votings_urls))
+        for i in range(len(votings_urls)):
+            self.assertEqual(votings_urls[i], expected_urls[i])
+
+    def test_get_votings_for_page(self):
+        voting_page_urls = [
+            'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154',
+            'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10153'
+        ]
+        for url in voting_page_urls:
+            votings = scraper.votings.get_votings_for_page(url)
+            for voting in votings:
+                print(voting)
+
+
 

@@ -14,26 +14,48 @@ from voting.models import Bill
 from voting.models import Vote
 
 TWEEDEKAMER_URL = 'https://www.tweedekamer.nl'
+SEARCH_URL = 'https://www.tweedekamer.nl/zoeken'
 
 
-def get_voting_urls_for_dossier(dossier_nr):
-    search_url = 'https://www.tweedekamer.nl/zoeken'
+def get_voting_pages_for_dossier(dossier_nr):
+    """ searches for votings within a dossier, returns a list of urls to pages with votings """
     params = {
         'qry': dossier_nr,
         'fld_prl_kamerstuk': 'Stemmingsuitslagen',
         'Type': 'Kamerstukken',
         'clusterName': 'Stemmingsuitslagen',
     }
-    page = requests.get(search_url, params)
+    page = requests.get(SEARCH_URL, params)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//div[@class="search-result-content"]/h3/a')
-    print('elements found: ' + str(len(elements)))
     voting_urls = []
     for element in elements:
         voting_url = TWEEDEKAMER_URL + element.get('href')
         voting_urls.append(voting_url)
         print(voting_url)
     return voting_urls
+
+
+def get_votings_for_page(votings_page_url):
+    page = requests.get(votings_page_url)
+    tree = lxml.html.fromstring(page.content)
+    result_elements = tree.xpath('//div[@class="search-result-content"]/p[@class="result"]/span')
+    property_elements = tree.xpath('//div[@class="search-result-properties"]/p')
+    document_ids = []
+    for i in range(len(property_elements)):
+        if i%2 == 0:
+            document_ids.append(property_elements[i].text)
+
+    votings = []
+    # print(len(result_elements))
+    assert len(document_ids) == len(result_elements)
+    for i in range(len(result_elements)):
+        voting = {
+            'result': result_elements[i].text.replace('.', ''),
+            'document_id': document_ids[i]
+        }
+        votings.append(voting)
+    return votings
 
 
 def get_bills():
