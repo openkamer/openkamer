@@ -87,7 +87,7 @@ class VotingResults(object):
 
     def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
-        return result_content_elements[0].text
+        return result_content_elements[0].text.replace('.', '')
 
 
 def get_voting_pages_for_dossier(dossier_nr):
