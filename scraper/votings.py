@@ -3,13 +3,6 @@ import requests
 
 import lxml.html
 
-from person.models import Person
-from parliament.models import PartyMember
-from parliament.models import PoliticalParty
-
-from voting.models import Bill
-from voting.models import Vote
-
 logger = logging.getLogger(__name__)
 
 TWEEDEKAMER_URL = 'https://www.tweedekamer.nl'
