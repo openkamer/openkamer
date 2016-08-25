@@ -83,10 +83,10 @@ def create_or_update_dossier(dossier_id):
     return dossier
 
 
-def create_votings(self, dossier_id):
+def create_votings(dossier_id):
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
     for voting_result in voting_results:
-        result = self.get_result_choice(voting_result.get_result())
+        result = get_result_choice(voting_result.get_result())
         if result is None:
             print('ERROR: Could not interpret vote result: ' + voting_result.get_result())
             assert False
@@ -104,7 +104,7 @@ def create_votings(self, dossier_id):
             party = PoliticalParty.find_party(vote.party_name)
             assert party
             voting.models.Vote.objects.create(voting=voting_obj, party=party, number_of_seats=vote.number_of_seats,
-                                              decision=self.get_decision(vote.decision), details=vote.details)
+                                              decision=get_decision(vote.decision), details=vote.details)
 
 
 def get_result_choice(result_string):
