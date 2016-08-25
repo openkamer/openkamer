@@ -55,7 +55,6 @@ class VotingResult(object):
 
     def create_votes_from_table(self):
         table_rows = self.get_table_rows()
-        print('table rows: ' + str(len(table_rows)))
         votes = []
         for row in table_rows:
             vote = Vote(row)
