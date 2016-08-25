@@ -3,8 +3,8 @@ from parliament.models import PoliticalParty
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
-
-import voting.models
+from document.models import Voting
+from document.models import Vote
 
 import scraper.documents
 import scraper.votings
@@ -93,7 +93,7 @@ def create_votings(dossier_id):
         document_id = voting_result.get_document_id()
         id_main = document_id.split('-')[0]
         dossiers = Dossier.objects.filter(dossier_id=id_main)
-        voting_obj = voting.models.Voting(dossier=dossiers[0], date=voting_result.date, result=result)
+        voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result)
         assert dossiers.count() == 1
         if len(document_id.split('-')) == 2:
             id_sub = document_id.split('-')[1]
@@ -103,25 +103,25 @@ def create_votings(dossier_id):
         for vote in voting_result.votes:
             party = PoliticalParty.find_party(vote.party_name)
             assert party
-            voting.models.Vote.objects.create(voting=voting_obj, party=party, number_of_seats=vote.number_of_seats,
+            Vote.objects.create(voting=voting_obj, party=party, number_of_seats=vote.number_of_seats,
                                               decision=get_decision(vote.decision), details=vote.details)
 
 
 def get_result_choice(result_string):
     if 'aangenomen' in result_string.lower():
-        return voting.models.Voting.AANGENOMEN
+        return Voting.AANGENOMEN
     elif 'verworpen' in result_string.lower():
-        return voting.models.Voting.VERWORPEN
+        return Voting.VERWORPEN
     elif 'ingetrokken' in result_string.lower():
-        return voting.models.Voting.INGETROKKEN
+        return Voting.INGETROKKEN
     elif 'aangehouden' in result_string.lower():
-        return voting.models.Voting.AANGEHOUDEN
+        return Voting.AANGEHOUDEN
     return None
 
 
 def get_decision(decision_string):
     if 'for' in decision_string.lower():
-        return voting.models.Vote.FOR
+        return Vote.FOR
     elif 'against' in decision_string.lower():
-        return voting.models.Vote.AGAINST
+        return Vote.AGAINST
     return None
