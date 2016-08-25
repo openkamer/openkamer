@@ -60,8 +60,11 @@ class TestExample(TestCase):
 
         self.assertEqual(len(results), len(expected_results))
         for i in range(len(results)):
+            print('=============================')
             print(results[i])
-            self.assertEqual(results[i], expected_results[i])
+            results[i].print_votes()
+            self.assertEqual(results[i].get_result(), expected_results[i]['result'])
+            self.assertEqual(results[i].get_document_id(), expected_results[i]['document_id'])
 
 
 
