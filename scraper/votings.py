@@ -46,7 +46,7 @@ class VotingResults(object):
         self.votes = self.create_votes_from_table()
 
     def __str__(self):
-        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_voting_result()
+        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_result()
 
     def print_votes(self):
         for vote in self.votes:
@@ -85,7 +85,7 @@ class VotingResults(object):
     def get_date(self):
         return self.get_property_elements()[1].text
 
-    def get_voting_result(self):
+    def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
         return result_content_elements[0].text
 
