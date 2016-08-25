@@ -1,17 +1,15 @@
 from django.contrib import admin
 
-from voting.models import Bill, Vote
+from voting.models import Vote, Voting
 
 
-class BillAdmin(admin.ModelAdmin):
-    model = Bill
-    list_display = ('title', 'author', 'type', 'datetime')
+class VotingAdmin(admin.ModelAdmin):
+    list_display = ('dossier', 'result', 'date', 'kamerstuk')
 
 
 class VoteAdmin(admin.ModelAdmin):
-    model = Vote
-    list_display = ('bill', 'party', 'decision', 'details')
+    list_display = ('voting', 'party', 'number_of_seats', 'details')
 
 
-admin.site.register(Bill, BillAdmin)
+admin.site.register(Voting, VotingAdmin)
 admin.site.register(Vote, VoteAdmin)
