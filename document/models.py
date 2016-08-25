@@ -1,7 +1,5 @@
 from django.db import models
 
-import scraper.documents
-
 
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
@@ -81,74 +79,3 @@ class Kamerstuk(models.Model):
     class Meta:
         verbose_name_plural = 'Kamerstukken'
         ordering = ['id_sub']
-
-
-def create_or_update_dossier(dossier_id):
-    print('create or update dossier')
-    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    if dossiers:
-        dossier = dossiers[0]
-    else:
-        dossier = Dossier.objects.create(dossier_id=dossier_id)
-    search_results = scraper.documents.search_politieknl_dossier(dossier_id)
-    for result in search_results:
-        print('create document for results:')
-
-        # skip documents of some types and/or sources, no models implemente yet
-        # TODO: handle all document types
-        if 'Agenda' in result['type'].split(' ')[0]:
-            print('WARNING: Agenda, skip for now')
-            continue
-        if 'Staatscourant' in result['type']:
-            print('WARNING: Staatscourant, skip for now')
-            continue
-
-        document_id, content_html = scraper.documents.get_document_id_and_content(result['page_url'])
-        if not document_id:
-            print('WARNING: No document id found, will not create document')
-            continue
-
-        metadata = scraper.documents.get_metadata(document_id)
-
-        if metadata['date_published']:
-            date_published = metadata['date_published']
-        else:
-            date_published = result['date_published']
-
-        if 'submitter' not in metadata:
-            metadata['submitter'] = 'undefined'
-
-        document = Document.objects.create(
-            dossier=dossier,
-            document_id=document_id,
-            title_full=metadata['title_full'],
-            title_short=metadata['title_short'],
-            publication_type=metadata['publication_type'],
-            submitter=metadata['submitter'],
-            category=metadata['category'],
-            publisher=metadata['publisher'],
-            date_published=date_published,
-            content_html=content_html,
-        )
-
-        if metadata['is_kamerstuk']:
-            print('create kamerstuk')
-            # print(items)
-            title_parts = metadata['title_full'].split(';')
-            type_short = ''
-            type_long = ''
-            if len(title_parts) > 2:
-                type_short = title_parts[1].strip()
-                type_long = title_parts[2].strip()
-            if "Bijlage" in result['type']:
-                print('BIJLAGE')
-                type_short = 'Bijlage'
-                type_long = 'Bijlage'
-            Kamerstuk.objects.create(
-                document=document,
-                id_main=dossier_id,
-                id_sub=metadata['id_sub'].zfill(2),
-                type_short=type_short,
-                type_long=type_long,
-            )
-    return dossier

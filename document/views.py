@@ -2,7 +2,9 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
-from document.models import Document, Dossier, create_or_update_dossier
+from document.models import Document, Dossier
+
+from website.create import create_or_update_dossier
 
 
 class DocumentsView(TemplateView):
