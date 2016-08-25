@@ -8,7 +8,7 @@ class VotingAdmin(admin.ModelAdmin):
 
 
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ('voting', 'party', 'number_of_seats', 'details')
+    list_display = ('id', 'voting', 'party', 'decision', 'number_of_seats', 'details')
 
 
 admin.site.register(Voting, VotingAdmin)
