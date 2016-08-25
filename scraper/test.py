@@ -12,8 +12,7 @@ import scraper.votings
 # scraper.documents.search_politieknl_dossier(33885)
 
 
-class TestExample(TestCase):
-    """ Example test case """
+class TestVotingScraper(TestCase):
     dossier_nr = 33885
 
     def test_get_voting_pages_for_dossier(self):
