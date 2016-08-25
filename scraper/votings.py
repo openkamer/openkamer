@@ -79,7 +79,7 @@ class VotingResult(object):
         return result_content_elements[0].text.replace('.', '')
 
     def __str__(self):
-        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_result() + ', date: ' + str(self.get_date())
+        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_result() + ', date: ' + str(self.date)
 
     def print_votes(self):
         for vote in self.votes:
