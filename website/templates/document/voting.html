@@ -1,0 +1,43 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12" align="center">
+
+      <h4>Stemming</h4>
+
+      <h5>
+      {% if voting.kamerstuk %}
+        {{ voting.kamerstuk.type_long }}
+      {% else %}
+        {{ voting.dossier.title }}
+      {% endif %}
+      </h5>
+
+      <p>
+        {% include "document/items/voting_result_small.html" %}
+      </p>
+
+  </div>
+</div>
+
+<div class="row">
+  {% for vote in voting.votes %}
+  <div class="col-sm-3" align="center">
+    {% if vote.decision == "FO" %}
+      <h4 class="text-success">{{ vote.party.name_short }}</h4>
+    {% elif vote.decision == "AG" %}
+      <h4 class="text-danger">{{ vote.party.name_short }}</h4>
+    {% else %}
+      <h4>{{ vote.party.name_short }}</h4>
+    {% endif %}
+    {% if vote.party.wikimedia_logo_url %}
+      <p><img class='party-logo-small' src="{{ vote.party.wikimedia_logo_url }}"></p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

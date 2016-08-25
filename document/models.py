@@ -108,6 +108,9 @@ class Voting(models.Model):
     result = models.CharField(max_length=3, choices=CHOICES)
     date = models.DateField(auto_now=False, blank=True)
 
+    def votes(self):
+        return Vote.objects.filter(voting=self)
+
     def __str__(self):
         return 'Dossier: ' + self.dossier.dossier_id + ', result: ' + self.result
 

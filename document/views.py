@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
 from document.models import Document, Dossier
+from document.models import Voting
 
 from website.create import create_or_update_dossier
 
@@ -56,3 +57,13 @@ class AddDossierView(TemplateView):
         url = '/dossier/' + str(dossier.id) + '/'
         return redirect(url)
         # return HttpResponseRedirect()
+
+
+class VotingView(TemplateView):
+    template_name = 'document/voting.html'
+
+    def get_context_data(self, voting_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        voting = Voting.objects.get(id=voting_id)
+        context['voting'] = voting
+        return context
