@@ -2,6 +2,7 @@ import logging
 import requests
 
 import lxml.html
+import dateparser
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +40,9 @@ class Vote(object):
 
 
 class VotingResult(object):
-    def __init__(self, result_tree):
+    def __init__(self, result_tree, date):
         self.result_tree = result_tree
+        self.date = date
         self.votes = self.create_votes_from_table()
 
     def get_property_elements(self):
@@ -72,25 +74,31 @@ class VotingResult(object):
     def get_document_id(self):
         return self.get_property_elements()[0].text
 
-    def get_date(self):
-        return self.get_property_elements()[1].text
-
     def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
         return result_content_elements[0].text.replace('.', '')
 
     def __str__(self):
-        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_result()
+        return 'Voting for doc ' + self.get_document_id() + ', result: ' + self.get_result() + ', date: ' + str(self.get_date())
 
     def print_votes(self):
         for vote in self.votes:
             print(vote)
 
 
-def get_voting_pages_for_dossier(dossier_nr):
+def get_votings_for_dossier(dossier_id):
+    """ get votings for a given dossier """
+    urls = get_voting_pages_for_dossier(dossier_id)
+    results = []
+    for url in urls:
+        results += get_votings_for_page(url)
+    return results
+
+
+def get_voting_pages_for_dossier(dossier_id):
     """ searches for votings within a dossier, returns a list of urls to pages with votings """
     params = {
-        'qry': dossier_nr,
+        'qry': dossier_id,
         'fld_prl_kamerstuk': 'Stemmingsuitslagen',
         'Type': 'Kamerstukken',
         'clusterName': 'Stemmingsuitslagen',
@@ -106,16 +114,18 @@ def get_voting_pages_for_dossier(dossier_nr):
 
 def get_votings_for_page(votings_page_url):
     """
-    get voting results from a votings page
+    get votings from a given votings page
     :param votings_page_url: the url of the votings page, example: https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154
     :return: a list of VotingResult
     """
     page = requests.get(votings_page_url)
     tree = lxml.html.fromstring(page.content)
+    date = tree.xpath('//p[@class="vote-info"]/span[@class="date"]')[0].text
+    date = dateparser.parse(date).date()  # dateparser needed because of Dutch month names
     search_results = tree.xpath('//ul[@class="search-result-list reset"]/li')
 
     votings = []
     for search_result in search_results:
-        result = VotingResult(search_result)
+        result = VotingResult(search_result, date)
         votings.append(result)
     return votings
