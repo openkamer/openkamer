@@ -3,7 +3,6 @@ from django.db import models
 from parliament.models import PoliticalParty
 
 
-
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
 
@@ -15,6 +14,12 @@ class Dossier(models.Model):
 
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
+
+    def voting(self):
+        votings = Voting.objects.filter(dossier=self, kamerstuk=None)
+        if votings.exists():
+            return votings[0]
+        return None
 
     def title(self):
         kamerstukken = self.kamerstukken()
@@ -68,6 +73,12 @@ class Kamerstuk(models.Model):
 
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ' ' + str(self.type_long)
+
+    def voting(self):
+        votings = Voting.objects.filter(kamerstuk=self)
+        if votings.exists():
+            return votings[0]
+        return None
 
     def visible(self):
         if self.type_short == 'Koninklijke boodschap':

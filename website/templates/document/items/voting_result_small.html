@@ -1,0 +1,9 @@
+{% if voting.result == "VER" %}
+  <span class="glyphicon glyphicon-remove" title="Verworpen"></span>
+{% elif voting.result == "AAN" %}
+  <span class="glyphicon glyphicon-ok" title="Aangenomen"></span>
+{% elif voting.result == "ING" %}
+  <span class="glyphicon glyphicon-remove-circle" title="Ingetrokken"></span>
+{% elif voting.result == "AGH" %}
+  <span class="glyphicon glyphicon-repeat" title="Aangehouden"></span>
+{% endif %}
