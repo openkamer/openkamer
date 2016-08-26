@@ -5,11 +5,11 @@
 
       <div class="row">
         <div class="col-xs-4" align="left">
-          <font size="2">{{ kamerstuk.document.date_published|date:"Y-m-d" }}</font>
+          <small>{{ kamerstuk.document.date_published|date:"Y-m-d" }}</small>
         </div>
 
         <div class="col-xs-8" align="right">
-          <font size="2">{{ kamerstuk.document.submitter }}</font>
+          <small>{{ kamerstuk.document.submitter }}</small>
         </div>
       </div>
 
@@ -28,11 +28,11 @@
 
       <div class="row">
         <div class="col-xs-12">
-          <font size="2">
+          <small>
             {% if kamerstuk.type_short !=  kamerstuk.type_long %}
               {{ kamerstuk.type_long }} <br/>
             {% endif %}
-          </font>
+          </small>
         </div>
       </div>
 
@@ -51,7 +51,7 @@
         </div>
 
         <div class="col-xs-4" align="center">
-          <font size="2">{{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}</font>
+          <small>{{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}</small>
         </div>
 
         <div class="col-xs-4" align="right">

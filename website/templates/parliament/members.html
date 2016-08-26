@@ -15,7 +15,7 @@
 
     <p>
       <h5>{{ member.person.fullname }}</h5>
-      <font size="2">{{ member.party.name }} <br/>
+      <small>{{ member.party.name }} <br/>
       {% if member.party.wikimedia_logo_url %}
         <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
       {% endif %}
@@ -26,7 +26,7 @@
       {% if member.person.wikimedia_image_url %}
         | <a href="{{ member.person.wikimedia_image_url }}">image</a>
       {% endif %}
-      </font>
+      </small>
     </p>
 
   </div>
