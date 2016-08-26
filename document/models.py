@@ -1,6 +1,6 @@
 from django.db import models
 
-import scraper.documents
+from parliament.models import PoliticalParty
 
 
 class Dossier(models.Model):
@@ -14,6 +14,12 @@ class Dossier(models.Model):
 
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
+
+    def voting(self):
+        votings = Voting.objects.filter(dossier=self, kamerstuk=None)
+        if votings.exists():
+            return votings[0]
+        return None
 
     def title(self):
         kamerstukken = self.kamerstukken()
@@ -68,6 +74,12 @@ class Kamerstuk(models.Model):
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ' ' + str(self.type_long)
 
+    def voting(self):
+        votings = Voting.objects.filter(kamerstuk=self)
+        if votings.exists():
+            return votings[0]
+        return None
+
     def visible(self):
         if self.type_short == 'Koninklijke boodschap':
             return False
@@ -83,69 +95,68 @@ class Kamerstuk(models.Model):
         ordering = ['id_sub']
 
 
-def create_or_update_dossier(dossier_id):
-    print('create or update dossier')
-    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    if dossiers:
-        dossier = dossiers[0]
-    else:
-        dossier = Dossier.objects.create(dossier_id=dossier_id)
-    search_results = scraper.documents.search_politieknl_dossier(dossier_id)
-    for result in search_results:
-        print('create document for results:')
+class Voting(models.Model):
+    AANGENOMEN = 'AAN'
+    VERWORPEN = 'VER'
+    INGETROKKEN = 'ING'
+    AANGEHOUDEN = 'AGH'
+    CHOICES = (
+        (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'), (AANGEHOUDEN, 'Aangehouden')
+    )
+    dossier = models.ForeignKey(Dossier)
+    kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
+    result = models.CharField(max_length=3, choices=CHOICES)
+    date = models.DateField(auto_now=False, blank=True)
 
-        # skip documents of some types and/or sources, no models implemente yet
-        # TODO: handle all document types
-        if 'Agenda' in result['type'].split(' ')[0]:
-            print('WARNING: Agenda, skip for now')
-            continue
-        if 'Staatscourant' in result['type']:
-            print('WARNING: Staatscourant, skip for now')
-            continue
+    def parties_for_string(self):
+        parties_str = ''
+        for vote in self.votes():
+            if vote.decision == Vote.FOR:
+                parties_str += vote.party.name_short + ', '
+        return parties_str
 
-        document_id, content_html = scraper.documents.get_document_id_and_content(result['page_url'])
-        if not document_id:
-            print('WARNING: No document id found, will not create document')
-            continue
+    def parties_against_string(self):
+        parties_str = ''
+        for vote in self.votes():
+            if vote.decision == Vote.AGAINST:
+                parties_str += vote.party.name_short + ', '
+        return parties_str
 
-        metadata = scraper.documents.get_metadata(document_id)
+    def result_percent(self):
+        n_votes = 0
+        vote_for = 0
+        vote_against = 0
+        for vote in self.votes():
+            n_votes += vote.number_of_seats
+            if vote.decision == Vote.FOR:
+                vote_for += vote.number_of_seats
+            elif vote.decision == Vote.AGAINST:
+                vote_against += vote.number_of_seats
+        if n_votes == 0:
+            return None
+        for_percent = vote_for/n_votes * 100.0
+        against_percent = vote_against/n_votes * 100.0
+        return {'for': for_percent, 'against': against_percent}
 
-        if metadata['date_published']:
-            date_published = metadata['date_published']
-        else:
-            date_published = result['date_published']
+    def votes(self):
+        return Vote.objects.filter(voting=self)
 
-        document = Document.objects.create(
-            dossier=dossier,
-            document_id=document_id,
-            title_full=metadata['title_full'],
-            title_short=metadata['title_short'],
-            publication_type=metadata['publication_type'],
-            submitter=metadata['submitter'],
-            category=metadata['category'],
-            publisher=metadata['publisher'],
-            date_published=date_published,
-            content_html=content_html,
-        )
+    def __str__(self):
+        return 'Dossier: ' + self.dossier.dossier_id + ', result: ' + self.result
 
-        if metadata['is_kamerstuk']:
-            print('create kamerstuk')
-            # print(items)
-            title_parts = metadata['title_full'].split(';')
-            type_short = ''
-            type_long = ''
-            if len(title_parts) > 2:
-                type_short = title_parts[1].strip()
-                type_long = title_parts[2].strip()
-            if "Bijlage" in result['type']:
-                print('BIJLAGE')
-                type_short = 'Bijlage'
-                type_long = 'Bijlage'
-            Kamerstuk.objects.create(
-                document=document,
-                id_main=dossier_id,
-                id_sub=metadata['id_sub'].zfill(2),
-                type_short=type_short,
-                type_long=type_long,
-            )
-    return dossier
+
+class Vote(models.Model):
+    FOR = 'FO'
+    AGAINST = 'AG'
+    CHOICES = (
+        (FOR, 'For'), (AGAINST, 'Against'),
+    )
+
+    voting = models.ForeignKey(Voting)
+    party = models.ForeignKey(PoliticalParty)
+    number_of_seats = models.IntegerField()
+    decision = models.CharField(max_length=2, choices=CHOICES)
+    details = models.CharField(max_length=2000, blank=True, null=False, default='')
+
+    def __str__(self):
+        return str(self.voting) + ' - ' + str(self.party) + ' - ' + str(self.decision)

@@ -1,9 +1,10 @@
 html, body {
-    height:100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-    padding-top: 70px;
+  padding-top: 70px;
 }
 
 .fixed-height-column {
@@ -37,4 +38,23 @@ body {
   padding: 2px;
   overflow: hidden;
   height: 12em;
+}
+
+.progress.progress-small {
+  padding: 0;
+  margin: 0;
+  height: 5px;
+  border-radius: 0px;
+}
+
+.col-progress-bar {
+  margin: 0.5em 0 0 0;
+}
+
+hr.hr-small {
+  margin: 0.1em 0em;
+}
+
+.well.well-small {
+  padding: 0.5em 0.5em 0em 0.5em;
 }

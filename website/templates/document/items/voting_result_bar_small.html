@@ -1,0 +1,6 @@
+<a href="/document/voting/{{ voting.id }}/">
+  <div class="progress progress-small">
+    <div class="progress-bar progress-bar-success" style="width: {{ voting.result_percent.for|floatformat:1 }}%" title="{{ voting.result_percent.for|floatformat:1 }} %"></div>
+    <div class="progress-bar progress-bar-danger" style="width: {{ voting.result_percent.against|floatformat:1 }}%" title="{{ voting.result_percent.against|floatformat:1 }} %"></div>
+  </div>
+</a>

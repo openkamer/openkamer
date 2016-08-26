@@ -1,0 +1,24 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th width="100px">Datum</th>
+      <th class="hidden-xs">Dossier</th>
+      <th class="hidden-xs">Type</th>
+      <th>Title</th>
+      <th>Uitslag</th>
+      <th>Verhouding</th>
+    </tr>
+  </thead>
+<tbody>
+  {% for voting in votings %}
+  <tr>
+    <td><small>{{ voting.date|date:"Y-M-d" }}</small></td>
+    <td class="hidden-xs"><a href="/dossier/{{ voting.dossier.id }}/">{{ voting.dossier.dossier_id }}</a>.{{ voting.kamerstuk.id_sub }}</td>
+    <td class="hidden-xs">{{ voting.kamerstuk.type_short }}</td>
+    <td><a href="/document/voting/{{ voting.id }}/"><small>{{ voting.kamerstuk.type_long }}</small></a></td>
+    <td>{% include "document/items/voting_result_small.html" %}</td>
+    <td>{% include "document/items/voting_result_bar_small.html" %}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from website.create import create_or_update_dossier
+from website.create import create_votings
 
 
 class Command(BaseCommand):
@@ -10,7 +10,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # dossier_id = 33885
-        dossier_id = options['dossier_id'][0]
-        create_or_update_dossier(str(dossier_id))
+        create_votings(options['dossier_id'][0])
+
+
 
 
