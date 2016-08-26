@@ -1,6 +1,7 @@
 from rest_framework import serializers, viewsets
 
 from document.models import Document, Kamerstuk, Dossier
+from document.models import Voting, Vote
 
 
 class DossierSerializer(serializers.HyperlinkedModelSerializer):
@@ -55,4 +56,26 @@ class KamerstukSerializer(serializers.HyperlinkedModelSerializer):
 class KamerstukViewSet(viewsets.ModelViewSet):
     queryset = Kamerstuk.objects.all()
     serializer_class = KamerstukSerializer
+
+
+class VotingSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Voting
+        fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes')
+
+
+class VotingViewSet(viewsets.ModelViewSet):
+    queryset = Voting.objects.all()
+    serializer_class = VotingSerializer
+
+
+class VoteSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Vote
+        fields = ('id', 'voting', 'decision')
+
+
+class VoteViewSet(viewsets.ModelViewSet):
+    queryset = Vote.objects.all()
+    serializer_class = VoteSerializer
 
