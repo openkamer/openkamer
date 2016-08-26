@@ -38,3 +38,8 @@ body {
   overflow: hidden;
   height: 12em;
 }
+
+.progress.progress-small {
+  height: 5px;
+  border-radius: 0px;
+}

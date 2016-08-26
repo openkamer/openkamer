@@ -10,6 +10,7 @@
       <h5>{{ dossier.title }}</h5>
       {% if dossier.voting %}
         {% with voting=dossier.voting %}
+          {% include "document/items/voting_result_bar.html" %}
           {% include "document/items/voting_result_small.html" %}
         {% endwith %}
       {% endif %}
@@ -30,6 +31,7 @@
       {% if kamerstuk.voting %}
         {% with voting=kamerstuk.voting %}
           {% include "document/items/voting_result_small.html" %}
+          {% include "document/items/voting_result_bar_small.html" %}
         {% endwith %}
       {% endif %}
     </h5>
