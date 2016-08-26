@@ -34,17 +34,11 @@ body {
   max-height: 50px;
 }
 
-.kamerstuk-member-column {
-  padding: 2px;
-  overflow: hidden;
-  height: 12em;
-}
-
 .progress.progress-small {
   padding: 0;
   margin: 0;
   height: 5px;
-  border-radius: 0px;
+  border-radius: 0;
 }
 
 .col-progress-bar {
@@ -52,9 +46,13 @@ body {
 }
 
 hr.hr-small {
-  margin: 0.1em 0em;
+  margin: 0.1em 0;
 }
 
 .well.well-small {
-  padding: 0.5em 0.5em 0em 0.5em;
+  padding: 0.5em 0.5em 0 0.5em;
+}
+
+.col-kamerstukken {
+  padding: 0 0.2em;
 }

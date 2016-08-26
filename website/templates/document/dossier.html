@@ -21,37 +21,11 @@
 <hr/>
 
 <div class="row">
+  {% include "document/items/kamerstukken_tiles.html" %}
+</div>
 
-{% for kamerstuk in dossier.kamerstukken %}
-  {% if kamerstuk.visible %}
-  <div class="col-sm-4 kamerstuk-member-column" align="center">
-
-    <h5>
-      <a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
-      {% if kamerstuk.voting %}
-        {% with voting=kamerstuk.voting %}
-          {% include "document/items/voting_result_small.html" %}
-          {% include "document/items/voting_result_bar_small.html" %}
-        {% endwith %}
-      {% endif %}
-    </h5>
-
-    <p>
-    <font size="2">
-      {% if kamerstuk.type_short !=  kamerstuk.type_long %}
-      {{ kamerstuk.type_long }} <br/>
-      {% endif %}
-      <!--{{ kamerstuk.document.title }} <br/>-->
-      <b>{{ kamerstuk.document.date_published|date:"Y-m-d" }} </b> <br/>
-      {{ kamerstuk.document.submitter }} <br/>
-      {{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}<br/>
-    </font>
-    </p>
-
-  </div>
-  {% endif %}
-{% endfor %}
-
+<div class="row hidden">
+  {% include "document/items/kamerstukken_table.html" %}
 </div>
 
 <hr/>
