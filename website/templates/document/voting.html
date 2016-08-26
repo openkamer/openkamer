@@ -6,22 +6,25 @@
 <div class="row">
   <div class="col-lg-12" align="center">
 
-      <h4>Stemming</h4>
+    <h4>Stemming</h4>
 
-      <h5>
-      {% if voting.kamerstuk %}
-        {{ voting.kamerstuk.type_long }}
-      {% else %}
-        {{ voting.dossier.title }}
-      {% endif %}
-      </h5>
+    <h5>
+    {% if voting.kamerstuk %}
+      {{ voting.kamerstuk.type_long }}
+    {% else %}
+      {{ voting.dossier.title }}
+    {% endif %}
+    </h5>
 
-      <p>
-        {% include "document/items/voting_result_small.html" %}
-      </p>
+    <p>
+      {% include "document/items/voting_result_progress_bar.html" %}
+      {% include "document/items/voting_result_small.html" %}
+    </p>
 
   </div>
 </div>
+
+<hr/>
 
 <div class="row">
   {% for vote in voting.votes %}
@@ -33,11 +36,29 @@
     {% else %}
       <h4>{{ vote.party.name_short }}</h4>
     {% endif %}
-    {% if vote.party.wikimedia_logo_url %}
-      <p><img class='party-logo-small' src="{{ vote.party.wikimedia_logo_url }}"></p>
-    {% endif %}
   </div>
   {% endfor %}
 </div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+  {% with document=voting.kamerstuk.document %}
+    {{ document.content_html|safe }}
+  {% endwith %}
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+  {% with document=voting.kamerstuk.document %}
+    {% include "document/items/document_info.html" %}
+  {% endwith %}
+  </div>
+</div>
+
 
 {% endblock %}
