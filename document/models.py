@@ -126,17 +126,16 @@ class Voting(models.Model):
         n_votes = 0
         vote_for = 0
         vote_against = 0
-        for_percent = 0
-        against_percent = 0
         for vote in self.votes():
             n_votes += vote.number_of_seats
             if vote.decision == Vote.FOR:
                 vote_for += vote.number_of_seats
             elif vote.decision == Vote.AGAINST:
                 vote_against += vote.number_of_seats
-        if n_votes > 0:
-            for_percent = vote_for/n_votes * 100.0
-            against_percent = vote_against/n_votes * 100.0
+        if n_votes == 0:
+            return None
+        for_percent = vote_for/n_votes * 100.0
+        against_percent = vote_against/n_votes * 100.0
         return {'for': for_percent, 'against': against_percent}
 
     def votes(self):

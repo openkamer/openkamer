@@ -10,8 +10,8 @@ class DossierSerializer(serializers.HyperlinkedModelSerializer):
                                                     many=True)
 
     kamerstukken = serializers.HyperlinkedRelatedField(read_only=True,
-                                                    view_name='kamerstuk-detail',
-                                                    many=True)
+                                                       view_name='kamerstuk-detail',
+                                                       many=True)
 
     class Meta:
         model = Dossier
@@ -59,6 +59,9 @@ class KamerstukViewSet(viewsets.ModelViewSet):
 
 
 class VotingSerializer(serializers.HyperlinkedModelSerializer):
+    votes = serializers.HyperlinkedRelatedField(read_only=True,
+                                                view_name='vote-detail',
+                                                many=True)
     class Meta:
         model = Voting
         fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes')
@@ -72,7 +75,7 @@ class VotingViewSet(viewsets.ModelViewSet):
 class VoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Vote
-        fields = ('id', 'voting', 'decision')
+        fields = ('id', 'voting', 'decision', 'party', 'number_of_seats', 'details')
 
 
 class VoteViewSet(viewsets.ModelViewSet):
