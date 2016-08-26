@@ -67,3 +67,13 @@ class VotingView(TemplateView):
         voting = Voting.objects.get(id=voting_id)
         context['voting'] = voting
         return context
+
+
+class VotingsView(TemplateView):
+    template_name = 'document/votings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        votings = Voting.objects.all()
+        context['votings'] = votings
+        return context
