@@ -1,5 +1,5 @@
 [run]
-source = website, wikidata, document, parliament, person, scraper, voting
+source = website, wikidata, document, parliament, person, scraper
 
 [report]
 omit =
