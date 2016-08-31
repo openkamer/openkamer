@@ -7,6 +7,7 @@ from document.views import DocumentView
 from document.views import VotingView
 from document.views import VotingsView
 from parliament.views import PartiesView, ParliamentMembersView
+from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
 from website.views import PlotTestView
@@ -28,4 +29,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^stats/testplot/', PlotTestView.as_view()),
+    url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 ]

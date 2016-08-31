@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from stats.views import get_plot_html
+from stats.views import get_example_plot_html
 from django.utils.safestring import mark_safe
 
 
@@ -14,9 +14,9 @@ class HomeView(TemplateView):
 
 
 class PlotTestView(TemplateView):
-    template_name = "website/plot_test.html"
+    template_name = "website/plot_examples.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['plot_html'] = mark_safe(get_plot_html())
+        context['plot_html'] = mark_safe(get_example_plot_html())
         return context
