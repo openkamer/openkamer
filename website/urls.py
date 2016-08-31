@@ -9,6 +9,7 @@ from document.views import VotingsView
 from parliament.views import PartiesView, ParliamentMembersView
 
 from website.views import HomeView
+from website.views import PlotTestView
 import website.api
 
 
@@ -25,4 +26,6 @@ urlpatterns = [
     url(r'^votings/$', VotingsView.as_view()),
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^stats/testplot/', PlotTestView.as_view()),
 ]
