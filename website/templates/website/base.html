@@ -92,11 +92,18 @@
 
   </div>
 
+  <script type="text/javascript">
+  $.ajaxSetup({
+    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+  });
+  </script>
+
   <div class="container">
 
     {% block content %}Empty page{% endblock %}
 
   </div>
+
 
 </body>
 
