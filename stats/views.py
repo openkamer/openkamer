@@ -29,7 +29,7 @@ def get_example_plot_html(number_of_points=30):
 
 def get_example_plot_html_json(request):
     number_of_points = 10
-    if 'number-of-points' in request.POST:
+    if request and 'number-of-points' in request.POST:
         number_of_points = int(request.POST['number-of-points'])
     html = get_example_plot_html(number_of_points)
     response = json.dumps({
