@@ -13,7 +13,7 @@ class HomeView(TemplateView):
         return context
 
 
-class PlotTestView(TemplateView):
+class PlotExampleView(TemplateView):
     template_name = "website/plot_examples.html"
 
     def get_context_data(self, **kwargs):
