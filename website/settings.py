@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     'parliament',
     'document',
     'person',
+    'stats'
 )
 
 MIDDLEWARE_CLASSES = [

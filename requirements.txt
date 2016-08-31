@@ -5,3 +5,4 @@ djangorestframework==3.4.6
 requests==2.11.1
 lxml==3.6.4
 dateparser==0.4.0
+plotly==1.12.9
