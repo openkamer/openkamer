@@ -1,4 +1,4 @@
-django==1.10
+django==1.10.1
 django-bootstrap3==7.0.1
 pillow==3.3.1
 djangorestframework==3.4.6
