@@ -109,6 +109,12 @@ class Voting(models.Model):
     result = models.CharField(max_length=3, choices=CHOICES)
     date = models.DateField(auto_now=False, blank=True)
 
+    def votes(self):
+        return Vote.objects.filter(voting=self)
+
+    def has_result_details(self):
+        return self.votes().count() > 0
+
     def parties_for_string(self):
         parties_str = ''
         for vote in self.votes():
@@ -138,9 +144,6 @@ class Voting(models.Model):
         for_percent = vote_for/n_votes * 100.0
         against_percent = vote_against/n_votes * 100.0
         return {'for': for_percent, 'against': against_percent}
-
-    def votes(self):
-        return Vote.objects.filter(voting=self)
 
     def __str__(self):
         return 'Dossier: ' + self.dossier.dossier_id + ', result: ' + self.result

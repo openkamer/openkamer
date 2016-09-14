@@ -1,4 +1,6 @@
+{% if voting.has_result_details %}
 <div class="progress">
   <div class="progress-bar progress-bar-success" style="width: {{ voting.result_percent.for|floatformat:1 }}%" title="{{ voting.parties_for_string }}">{{ voting.result_percent.for|floatformat:1 }} %</div>
   <div class="progress-bar progress-bar-danger" style="width: {{ voting.result_percent.against|floatformat:1 }}%" title="{{ voting.parties_against_string }}">{{ voting.result_percent.against|floatformat:1 }} %</div>
 </div>
+{% endif %}
