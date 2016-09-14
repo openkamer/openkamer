@@ -3,7 +3,7 @@
 
 This is a work in progress...
 
-A Python 3.3+ and Django 1.9 project.
+A Python 3.4+ and Django 1.10 project.
 
 ## Installation (Linux)
 
