@@ -13,7 +13,8 @@ import scraper.votings
 
 
 class TestVotingScraper(TestCase):
-    dossier_nr = 33885
+    dossier_nr_party_votes = 33885
+    dossier_nr_individual_votes = 33506
 
     def test_get_voting_pages_for_dossier(self):
         """ Example test """
@@ -21,7 +22,7 @@ class TestVotingScraper(TestCase):
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154',
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10153'
         ]
-        votings_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr)
+        votings_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr_party_votes)
         self.assertEqual(len(expected_urls), len(votings_urls))
         for i in range(len(votings_urls)):
             print(votings_urls[i])
@@ -64,6 +65,12 @@ class TestVotingScraper(TestCase):
             results[i].print_votes()
             self.assertEqual(results[i].get_result(), expected_results[i]['result'])
             self.assertEqual(results[i].get_document_id(), expected_results[i]['document_id'])
+
+    def test_get_individual_votes(self):
+        voting_page_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr_individual_votes)
+        results = []
+        for url in voting_page_urls:
+            results += scraper.votings.get_votings_for_page(url)
 
 
 
