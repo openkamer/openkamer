@@ -37,7 +37,7 @@ class KamerstukAdmin(admin.ModelAdmin):
 
 
 class VotingAdmin(admin.ModelAdmin):
-    list_display = ('dossier', 'result', 'date', 'kamerstuk')
+    list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'kamerstuk')
 
 
 class VoteAdmin(admin.ModelAdmin):

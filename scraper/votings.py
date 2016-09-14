@@ -74,6 +74,13 @@ class VotingResult(object):
     def get_document_id(self):
         return self.get_property_elements()[0].text
 
+    def is_dossier_voting(self):
+        """
+        :returns whether the voting is for the whole dossier
+        This is the case if the result has a document id and this document id is the dossier id, without sub-id.
+        """
+        return self.get_document_id() is not None and len(self.get_document_id().split('-')) == 1
+
     def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
         return result_content_elements[0].text.replace('.', '')
@@ -118,6 +125,7 @@ def get_votings_for_page(votings_page_url):
     :param votings_page_url: the url of the votings page, example: https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154
     :return: a list of VotingResult
     """
+    print('get_votings_for_page() - url: ' + votings_page_url)
     page = requests.get(votings_page_url)
     tree = lxml.html.fromstring(page.content)
     date = tree.xpath('//p[@class="vote-info"]/span[@class="date"]')[0].text

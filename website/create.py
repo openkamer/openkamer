@@ -91,14 +91,21 @@ def create_votings(dossier_id):
             print('ERROR: Could not interpret vote result: ' + voting_result.get_result())
             assert False
         document_id = voting_result.get_document_id()
-        id_main = document_id.split('-')[0]
+        if not document_id:
+            print('ERROR: voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
+            id_main = dossier_id
+        else:
+            id_main = document_id.split('-')[0]
         dossiers = Dossier.objects.filter(dossier_id=id_main)
-        voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result)
         assert dossiers.count() == 1
-        if len(document_id.split('-')) == 2:
+        voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result, is_dossier_voting=voting_result.is_dossier_voting())
+        if document_id and len(document_id.split('-')) == 2:
             id_sub = document_id.split('-')[1]
             kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
-            voting_obj.kamerstuk = kamerstukken[0]
+            if kamerstukken.exists():
+                voting_obj.kamerstuk = kamerstukken[0]
+            else:
+                print('WARNING: kamerstuk ' + voting_result.get_document_id() + ' not found in database. Kamerstuk is probably not yet published.')
         voting_obj.save()
         for vote in voting_result.votes:
             party = PoliticalParty.find_party(vote.party_name)

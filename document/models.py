@@ -16,7 +16,7 @@ class Dossier(models.Model):
         return Kamerstuk.objects.filter(document__dossier=self)
 
     def voting(self):
-        votings = Voting.objects.filter(dossier=self, kamerstuk=None)
+        votings = Voting.objects.filter(dossier=self, is_dossier_voting=True)
         if votings.exists():
             return votings[0]
         return None
@@ -105,6 +105,7 @@ class Voting(models.Model):
     )
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
+    is_dossier_voting = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES)
     date = models.DateField(auto_now=False, blank=True)
 
