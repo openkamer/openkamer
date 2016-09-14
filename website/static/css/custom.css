@@ -7,6 +7,18 @@ body {
   padding-top: 70px;
 }
 
+.vertical-spacer-20 {
+    padding: 0;
+    margin: 0;
+    height: 20px;
+}
+
+.vertical-spacer-40 {
+    padding: 0;
+    margin: 0;
+    height: 40px;
+}
+
 .fixed-height-column {
   padding: 2px;
   overflow: hidden;
