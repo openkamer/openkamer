@@ -60,5 +60,5 @@ $ python manage.py test website.test.TestCreateParliament
 
 ##### Create test json fixtures
 ```
-$ python manage.py dumpdata --all --natural-foreign --indent 2 person parliament > website/fixtures/<fixture_name>.json
+$ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament document website > website/fixtures/<fixture_name>.json
 ```
