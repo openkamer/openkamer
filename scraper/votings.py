@@ -16,8 +16,16 @@ class Vote(object):
         self.details = ''
         self.decision = ''
         self.number_of_seats = 0
-        self.party_name = ''
         self.create()
+
+    def create(self):
+        raise NotImplementedError
+
+
+class VoteParty(Vote):
+    def __init__(self, vote_table_row):
+        self.party_name = ''
+        super().__init__(vote_table_row)
 
     def create(self):
         ncol = 0
@@ -39,6 +47,27 @@ class Vote(object):
         return 'Vote: ' + self.party_name + ' (' + str(self.number_of_seats) + '): ' + self.decision
 
 
+class VoteIndividual(Vote):
+    def __init__(self, vote_table_row):
+        self.parliament_member = ''
+        super().__init__(vote_table_row)
+        self.number_of_seats = 1
+
+    def create(self):
+        ncol = 0
+        col_type = {3: 'FOR', 4: 'AGAINST', 5: 'NONE', 6: 'MISTAKE'}
+        for column in self.vote_table_row.iter():
+            if column.tag == 'td':
+                ncol += 1
+            if ncol == 2:
+                self.parliament_member = column.text
+            if 'class' in column.attrib and column.attrib['class'] == 'sel':
+                self.decision = col_type[ncol]
+
+    def __str__(self):
+        return 'Vote: ' + self.parliament_member + ' : ' + self.decision
+
+
 class VotingResult(object):
     def __init__(self, result_tree, date):
         self.result_tree = result_tree
@@ -48,19 +77,33 @@ class VotingResult(object):
     def get_property_elements(self):
         return self.result_tree.xpath('div[@class="search-result-properties"]/p')
 
-    def get_table_rows(self):
+    def get_table_rows_party(self):
         votes_table = self.get_votes_table()
         if votes_table is not None:
             return votes_table.xpath('tbody/tr')
         else:
             return []
 
+    def get_table_rows_individual(self):
+        votes_table = self.get_votes_table()
+        if votes_table is not None:
+            return votes_table.xpath('tbody/tr[@class="individual-vote" or @class="individual-vote last"]')
+        else:
+            return []
+
     def create_votes_from_table(self):
-        table_rows = self.get_table_rows()
         votes = []
-        for row in table_rows:
-            vote = Vote(row)
-            votes.append(vote)
+        if self.is_individual():
+            table_rows = self.get_table_rows_individual()
+            for row in table_rows:
+                vote = VoteIndividual(row)
+                votes.append(vote)
+        else:
+            table_rows = self.get_table_rows_party()
+            for row in table_rows:
+                vote = VoteParty(row)
+                votes.append(vote)
+        print(str(len(votes)) + ' votes created!')
         return votes
 
     def get_votes_table(self):
@@ -80,6 +123,10 @@ class VotingResult(object):
         This is the case if the result has a document id and this document id is the dossier id, without sub-id.
         """
         return self.get_document_id() is not None and len(self.get_document_id().split('-')) == 1
+
+    def is_individual(self):
+        result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
+        return 'hoofdelijk' in result_content_elements[0].text.lower()
 
     def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')

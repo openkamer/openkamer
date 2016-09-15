@@ -19,6 +19,14 @@ class ParliamentMember(models.Model):
     joined = models.DateField(blank=True, null=True)
     left = models.DateField(blank=True, null=True)
 
+    @staticmethod
+    def find(surname, initials=''):
+        person = Person.find(surname, initials)
+        members = ParliamentMember.objects.filter(person=person)
+        if members.exists():
+            return members[0]
+        return None
+
     def party(self):
         memberships = PartyMember.objects.filter(person=self.person)
         if memberships:
@@ -27,7 +35,7 @@ class ParliamentMember(models.Model):
         return None
 
     def __str__(self):
-        return str(self.person) + ' (' + str(self.parliament) + ')'
+        return str(self.person.fullname()) + ' (' + str(self.party().name_short) + ')'
 
 
 class PoliticalParty(models.Model):

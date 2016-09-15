@@ -6,6 +6,7 @@
     "forename": "Fleur",
     "surname": "Agema",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1976-09-16",
     "wikidata_id": "Q467982",
     "wikimedia_image_name": "Fleur-agema-1350918561.jpg",
@@ -19,6 +20,7 @@
     "forename": "Mustafa",
     "surname": "Amhaouch",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1970-06-27",
     "wikidata_id": "Q22001627",
     "wikimedia_image_name": "",
@@ -32,6 +34,7 @@
     "forename": "Khadija",
     "surname": "Arib",
     "surname_prefix": "",
+    "initials": "K.",
     "birthdate": "1960-10-10",
     "wikidata_id": "Q458066",
     "wikimedia_image_name": "30. Khadija Arib.jpg",
@@ -45,6 +48,7 @@
     "forename": "Tamara",
     "surname": "Ark",
     "surname_prefix": "van",
+    "initials": "T.",
     "birthdate": "1974-08-11",
     "wikidata_id": "Q4363961",
     "wikimedia_image_name": "",
@@ -55,9 +59,24 @@
   "model": "person.person",
   "pk": 5,
   "fields": {
+    "forename": "Amma",
+    "surname": "Asante",
+    "surname_prefix": "",
+    "initials": "A.A.",
+    "birthdate": null,
+    "wikidata_id": "Q25834754",
+    "wikimedia_image_name": "36 - Amma Asante.jpg",
+    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/36_-_Amma_Asante.jpg/220px-36_-_Amma_Asante.jpg"
+  }
+},
+{
+  "model": "person.person",
+  "pk": 6,
+  "fields": {
     "forename": "Malik",
     "surname": "Azmani",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1976-01-20",
     "wikidata_id": "Q2798242",
     "wikimedia_image_name": "",
@@ -66,11 +85,12 @@
 },
 {
   "model": "person.person",
-  "pk": 6,
+  "pk": 7,
   "fields": {
     "forename": "Farshad",
     "surname": "Bashir",
     "surname_prefix": "",
+    "initials": "F.",
     "birthdate": "1988-01-14",
     "wikidata_id": "Q2377782",
     "wikimedia_image_name": "Farshad Bashir1.jpg",
@@ -79,11 +99,12 @@
 },
 {
   "model": "person.person",
-  "pk": 7,
+  "pk": 8,
   "fields": {
     "forename": "Harm",
     "surname": "Beertema",
     "surname_prefix": "",
+    "initials": "H.J.",
     "birthdate": "1952-03-09",
     "wikidata_id": "Q2420642",
     "wikimedia_image_name": "",
@@ -92,11 +113,12 @@
 },
 {
   "model": "person.person",
-  "pk": 8,
+  "pk": 9,
   "fields": {
     "forename": "Salima",
     "surname": "Belhaj",
     "surname_prefix": "",
+    "initials": "S.",
     "birthdate": "1978-10-18",
     "wikidata_id": "Q22340717",
     "wikimedia_image_name": "",
@@ -105,11 +127,12 @@
 },
 {
   "model": "person.person",
-  "pk": 9,
+  "pk": 10,
   "fields": {
     "forename": "Ybeltje",
     "surname": "Berckmoes-Duindam",
     "surname_prefix": "",
+    "initials": "Y.",
     "birthdate": "1967-02-11",
     "wikidata_id": "Q2007401",
     "wikimedia_image_name": "",
@@ -118,11 +141,12 @@
 },
 {
   "model": "person.person",
-  "pk": 10,
+  "pk": 11,
   "fields": {
     "forename": "Vera",
     "surname": "Bergkamp",
     "surname_prefix": "",
+    "initials": "V.A.",
     "birthdate": "1971-06-01",
     "wikidata_id": "Q3084300",
     "wikimedia_image_name": "",
@@ -131,11 +155,12 @@
 },
 {
   "model": "person.person",
-  "pk": 11,
+  "pk": 12,
   "fields": {
     "forename": "Roelof",
     "surname": "Bisschop",
     "surname_prefix": "",
+    "initials": "R.",
     "birthdate": "1956-11-30",
     "wikidata_id": "Q224585",
     "wikimedia_image_name": "",
@@ -144,11 +169,12 @@
 },
 {
   "model": "person.person",
-  "pk": 12,
+  "pk": 13,
   "fields": {
     "forename": "Betty",
     "surname": "Boer",
     "surname_prefix": "de",
+    "initials": "B.G.",
     "birthdate": "1971-09-02",
     "wikidata_id": "Q1907117",
     "wikimedia_image_name": "",
@@ -157,11 +183,12 @@
 },
 {
   "model": "person.person",
-  "pk": 13,
+  "pk": 14,
   "fields": {
     "forename": "Harry",
     "surname": "Bommel",
     "surname_prefix": "van",
+    "initials": "H.",
     "birthdate": "1962-06-24",
     "wikidata_id": "Q1586909",
     "wikimedia_image_name": "Harry van Bommel1.jpg",
@@ -170,11 +197,12 @@
 },
 {
   "model": "person.person",
-  "pk": 14,
+  "pk": 15,
   "fields": {
     "forename": "Louis",
     "surname": "Bontes",
     "surname_prefix": "",
+    "initials": "L.",
     "birthdate": "1956-02-28",
     "wikidata_id": "Q545122",
     "wikimedia_image_name": "",
@@ -183,11 +211,12 @@
 },
 {
   "model": "person.person",
-  "pk": 15,
+  "pk": 16,
   "fields": {
     "forename": "Martin",
     "surname": "Bosma",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1964-07-16",
     "wikidata_id": "Q3180577",
     "wikimedia_image_name": "",
@@ -196,11 +225,12 @@
 },
 {
   "model": "person.person",
-  "pk": 16,
+  "pk": 17,
   "fields": {
     "forename": "Remco",
     "surname": "Bosma",
     "surname_prefix": "",
+    "initials": "R.P.G.",
     "birthdate": "1971-06-06",
     "wikidata_id": "Q22927802",
     "wikimedia_image_name": "",
@@ -209,11 +239,12 @@
 },
 {
   "model": "person.person",
-  "pk": 17,
+  "pk": 18,
   "fields": {
     "forename": "Andr\u00e9",
     "surname": "Bosman",
     "surname_prefix": "",
+    "initials": "A.",
     "birthdate": "1965-01-20",
     "wikidata_id": "Q2895887",
     "wikimedia_image_name": "",
@@ -222,11 +253,26 @@
 },
 {
   "model": "person.person",
-  "pk": 18,
+  "pk": 19,
+  "fields": {
+    "forename": "Lea",
+    "surname": "Bouwmeester",
+    "surname_prefix": "",
+    "initials": "L.T.",
+    "birthdate": "1979-10-03",
+    "wikidata_id": "Q510398",
+    "wikimedia_image_name": "18. Lea Bouwmeester.jpg",
+    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/18._Lea_Bouwmeester.jpg/220px-18._Lea_Bouwmeester.jpg"
+  }
+},
+{
+  "model": "person.person",
+  "pk": 20,
   "fields": {
     "forename": "Han",
     "surname": "Broeke",
     "surname_prefix": "ten",
+    "initials": "J.H.",
     "birthdate": "1969-03-02",
     "wikidata_id": "Q2048089",
     "wikimedia_image_name": "Han ten Broeke.jpg",
@@ -235,11 +281,12 @@
 },
 {
   "model": "person.person",
-  "pk": 19,
+  "pk": 21,
   "fields": {
     "forename": "Harm",
     "surname": "Brouwer",
     "surname_prefix": "",
+    "initials": "H.",
     "birthdate": "1957-04-04",
     "wikidata_id": "Q21479696",
     "wikimedia_image_name": "49. Harm Brouwer.jpg",
@@ -248,11 +295,12 @@
 },
 {
   "model": "person.person",
-  "pk": 20,
+  "pk": 22,
   "fields": {
     "forename": "Hanke",
     "surname": "Bruins Slot",
     "surname_prefix": "",
+    "initials": "H.G.J.",
     "birthdate": "1977-10-20",
     "wikidata_id": "Q5165280",
     "wikimedia_image_name": "",
@@ -261,11 +309,12 @@
 },
 {
   "model": "person.person",
-  "pk": 21,
+  "pk": 23,
   "fields": {
     "forename": "Eppo",
     "surname": "Bruins",
     "surname_prefix": "",
+    "initials": "E.E.W.",
     "birthdate": "1969-09-19",
     "wikidata_id": "Q21479701",
     "wikimedia_image_name": "",
@@ -274,11 +323,12 @@
 },
 {
   "model": "person.person",
-  "pk": 22,
+  "pk": 24,
   "fields": {
     "forename": "Brigitte",
     "surname": "Burg",
     "surname_prefix": "van der",
+    "initials": "B.I.",
     "birthdate": "1961-04-07",
     "wikidata_id": "Q2552589",
     "wikimedia_image_name": "",
@@ -287,11 +337,12 @@
 },
 {
   "model": "person.person",
-  "pk": 23,
+  "pk": 25,
   "fields": {
     "forename": "Ingrid",
     "surname": "Caluw\u00e9",
     "surname_prefix": "de",
+    "initials": "I.S.H.",
     "birthdate": "1967-05-27",
     "wikidata_id": "Q1950643",
     "wikimedia_image_name": "",
@@ -300,24 +351,26 @@
 },
 {
   "model": "person.person",
-  "pk": 24,
+  "pk": 26,
   "fields": {
     "forename": "Yasemin",
     "surname": "Cegerek",
     "surname_prefix": "",
-    "birthdate": null,
-    "wikidata_id": "",
-    "wikimedia_image_name": "",
-    "wikimedia_image_url": ""
+    "initials": "Y.",
+    "birthdate": "1977-11-10",
+    "wikidata_id": "Q14584262",
+    "wikimedia_image_name": "44. Yasemin Cegerek.jpg",
+    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/44._Yasemin_Cegerek.jpg/220px-44._Yasemin_Cegerek.jpg"
   }
 },
 {
   "model": "person.person",
-  "pk": 25,
+  "pk": 27,
   "fields": {
     "forename": "Tjeerd",
     "surname": "Dekken",
     "surname_prefix": "van",
+    "initials": "T.R.",
     "birthdate": "1967-05-14",
     "wikidata_id": "Q2318936",
     "wikimedia_image_name": "35. Tjeerd van Dekken.jpg",
@@ -326,11 +379,12 @@
 },
 {
   "model": "person.person",
-  "pk": 26,
+  "pk": 28,
   "fields": {
     "forename": "Tony",
     "surname": "Dijck",
     "surname_prefix": "van",
+    "initials": "A.P.C.",
     "birthdate": null,
     "wikidata_id": "",
     "wikimedia_image_name": "",
@@ -339,11 +393,12 @@
 },
 {
   "model": "person.person",
-  "pk": 27,
+  "pk": 29,
   "fields": {
     "forename": "Jasper",
     "surname": "Dijk",
     "surname_prefix": "van",
+    "initials": "J.J.",
     "birthdate": "1971-04-20",
     "wikidata_id": "Q2478764",
     "wikimedia_image_name": "Jasper van Dijk1.jpg",
@@ -352,24 +407,12 @@
 },
 {
   "model": "person.person",
-  "pk": 28,
-  "fields": {
-    "forename": "Otwin",
-    "surname": "Dijk",
-    "surname_prefix": "van",
-    "birthdate": "1975-04-22",
-    "wikidata_id": "Q428538",
-    "wikimedia_image_name": "31. Otwin van Dijk.jpg",
-    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/31._Otwin_van_Dijk.jpg/220px-31._Otwin_van_Dijk.jpg"
-  }
-},
-{
-  "model": "person.person",
-  "pk": 29,
+  "pk": 30,
   "fields": {
     "forename": "Elbert",
     "surname": "Dijkgraaf",
     "surname_prefix": "",
+    "initials": "E.",
     "birthdate": "1970-01-06",
     "wikidata_id": "Q1299042",
     "wikimedia_image_name": "",
@@ -378,11 +421,12 @@
 },
 {
   "model": "person.person",
-  "pk": 30,
+  "pk": 31,
   "fields": {
     "forename": "Pia",
     "surname": "Dijkstra",
     "surname_prefix": "",
+    "initials": "P.A.",
     "birthdate": "1954-12-09",
     "wikidata_id": "Q2851980",
     "wikimedia_image_name": "Pia Dijkstra.png",
@@ -391,11 +435,12 @@
 },
 {
   "model": "person.person",
-  "pk": 31,
+  "pk": 32,
   "fields": {
     "forename": "Remco",
     "surname": "Dijkstra",
     "surname_prefix": "",
+    "initials": "R.J.",
     "birthdate": "1972-08-18",
     "wikidata_id": "Q1284113",
     "wikimedia_image_name": "Remco-dijkstra-1349031407.jpg",
@@ -404,11 +449,12 @@
 },
 {
   "model": "person.person",
-  "pk": 32,
+  "pk": 33,
   "fields": {
     "forename": "Carla",
     "surname": "Dik-Faber",
     "surname_prefix": "",
+    "initials": "R.K.",
     "birthdate": "1971-05-06",
     "wikidata_id": "Q169515",
     "wikimedia_image_name": "Carla Dik-Faber.jpg",
@@ -417,11 +463,12 @@
 },
 {
   "model": "person.person",
-  "pk": 33,
+  "pk": 34,
   "fields": {
     "forename": "Sjoera",
     "surname": "Dikkers",
     "surname_prefix": "",
+    "initials": "S.W.",
     "birthdate": "1969-07-14",
     "wikidata_id": "Q2310534",
     "wikimedia_image_name": "34. Sjoera Dikkers.jpg",
@@ -430,11 +477,12 @@
 },
 {
   "model": "person.person",
-  "pk": 34,
+  "pk": 35,
   "fields": {
     "forename": "Pieter",
     "surname": "Duisenberg",
     "surname_prefix": "",
+    "initials": "P.J.",
     "birthdate": "1967-06-02",
     "wikidata_id": "Q1994265",
     "wikimedia_image_name": "",
@@ -443,11 +491,12 @@
 },
 {
   "model": "person.person",
-  "pk": 35,
+  "pk": 36,
   "fields": {
     "forename": "Angelien",
     "surname": "Eijsink",
     "surname_prefix": "",
+    "initials": "A.M.C.",
     "birthdate": "1960-04-01",
     "wikidata_id": "Q1960107",
     "wikimedia_image_name": "Angelien Eijsink (25749863700).jpg",
@@ -456,11 +505,12 @@
 },
 {
   "model": "person.person",
-  "pk": 36,
+  "pk": 37,
   "fields": {
     "forename": "Ton",
     "surname": "Elias",
     "surname_prefix": "",
+    "initials": "T.M.Ch.",
     "birthdate": "1955-03-14",
     "wikidata_id": "Q2348473",
     "wikimedia_image_name": "Ton Elias2.jpg",
@@ -469,11 +519,12 @@
 },
 {
   "model": "person.person",
-  "pk": 37,
+  "pk": 38,
   "fields": {
     "forename": "Manon",
     "surname": "Fokke",
     "surname_prefix": "",
+    "initials": "H.",
     "birthdate": "1976-01-16",
     "wikidata_id": "Q428544",
     "wikimedia_image_name": "32. Manon Fokke.jpg",
@@ -482,11 +533,12 @@
 },
 {
   "model": "person.person",
-  "pk": 38,
+  "pk": 39,
   "fields": {
     "forename": "Sietse",
     "surname": "Fritsma",
     "surname_prefix": "",
+    "initials": "S.R.",
     "birthdate": "1972-03-31",
     "wikidata_id": "Q2680236",
     "wikimedia_image_name": "",
@@ -495,11 +547,12 @@
 },
 {
   "model": "person.person",
-  "pk": 39,
+  "pk": 40,
   "fields": {
     "forename": "Henk",
     "surname": "Gerven",
     "surname_prefix": "van",
+    "initials": "H.P.J.",
     "birthdate": "1955-03-11",
     "wikidata_id": "Q746203",
     "wikimedia_image_name": "Henk van Gerven1.jpg",
@@ -508,11 +561,12 @@
 },
 {
   "model": "person.person",
-  "pk": 40,
+  "pk": 41,
   "fields": {
     "forename": "Sharon",
     "surname": "Gesthuizen",
     "surname_prefix": "",
+    "initials": "S.M.J.G.",
     "birthdate": "1976-01-23",
     "wikidata_id": "Q2379296",
     "wikimedia_image_name": "Sharon Gesthuizen1.jpg",
@@ -521,11 +575,12 @@
 },
 {
   "model": "person.person",
-  "pk": 41,
+  "pk": 42,
   "fields": {
     "forename": "Jaco",
     "surname": "Geurts",
     "surname_prefix": "",
+    "initials": "J.L.",
     "birthdate": "1970-07-11",
     "wikidata_id": "Q82761",
     "wikimedia_image_name": "",
@@ -534,11 +589,12 @@
 },
 {
   "model": "person.person",
-  "pk": 42,
+  "pk": 43,
   "fields": {
     "forename": "Machiel",
     "surname": "Graaf",
     "surname_prefix": "de",
+    "initials": "M.",
     "birthdate": "1969-06-26",
     "wikidata_id": "Q2612472",
     "wikimedia_image_name": "Machiel-de-graaf-1350654432.jpg",
@@ -547,11 +603,12 @@
 },
 {
   "model": "person.person",
-  "pk": 43,
+  "pk": 44,
   "fields": {
     "forename": "Rik",
     "surname": "Grashoff",
     "surname_prefix": "",
+    "initials": "H.J.",
     "birthdate": "1961-04-05",
     "wikidata_id": "Q2429720",
     "wikimedia_image_name": "Rik-grashoff-crop-1298907942.jpg",
@@ -560,11 +617,12 @@
 },
 {
   "model": "person.person",
-  "pk": 44,
+  "pk": 45,
   "fields": {
     "forename": "Dion",
     "surname": "Graus",
     "surname_prefix": "",
+    "initials": "D.J.G.",
     "birthdate": "1967-03-19",
     "wikidata_id": "Q2285105",
     "wikimedia_image_name": "Grausdion.JPG",
@@ -573,11 +631,12 @@
 },
 {
   "model": "person.person",
-  "pk": 45,
+  "pk": 46,
   "fields": {
     "forename": "Ed",
     "surname": "Groot",
     "surname_prefix": "",
+    "initials": "V.A.",
     "birthdate": "1957-12-26",
     "wikidata_id": "Q617677",
     "wikimedia_image_name": "23. Ed Groot.jpg",
@@ -586,11 +645,12 @@
 },
 {
   "model": "person.person",
-  "pk": 46,
+  "pk": 47,
   "fields": {
     "forename": "Sultan",
     "surname": "G\u00fcnal-Gezer",
     "surname_prefix": "",
+    "initials": "S.",
     "birthdate": "1961-05-01",
     "wikidata_id": "Q428469",
     "wikimedia_image_name": "Sultan G\u00fcnal-Gezer (25420197713).jpg",
@@ -599,11 +659,12 @@
 },
 {
   "model": "person.person",
-  "pk": 47,
+  "pk": 48,
   "fields": {
     "forename": "Sybrand",
     "surname": "Haersma Buma",
     "surname_prefix": "van",
+    "initials": "S.",
     "birthdate": "1965-07-30",
     "wikidata_id": "Q377266",
     "wikimedia_image_name": "Sybrand van Haersma Buma 2012.jpg",
@@ -612,11 +673,12 @@
 },
 {
   "model": "person.person",
-  "pk": 48,
+  "pk": 49,
   "fields": {
     "forename": "Mark",
     "surname": "Harbers",
     "surname_prefix": "",
+    "initials": "M.G.J.",
     "birthdate": "1969-04-19",
     "wikidata_id": "Q2257536",
     "wikimedia_image_name": "Mark Habers - portrait.jpg",
@@ -625,11 +687,12 @@
 },
 {
   "model": "person.person",
-  "pk": 49,
+  "pk": 50,
   "fields": {
     "forename": "Rudmer",
     "surname": "Heerema",
     "surname_prefix": "",
+    "initials": "R.J.",
     "birthdate": "1978-02-02",
     "wikidata_id": "Q15060597",
     "wikimedia_image_name": "",
@@ -638,11 +701,12 @@
 },
 {
   "model": "person.person",
-  "pk": 50,
+  "pk": 51,
   "fields": {
     "forename": "Pieter",
     "surname": "Heerma",
     "surname_prefix": "",
+    "initials": "P.E.",
     "birthdate": "1977-08-05",
     "wikidata_id": "Q94234",
     "wikimedia_image_name": "",
@@ -651,11 +715,12 @@
 },
 {
   "model": "person.person",
-  "pk": 51,
+  "pk": 52,
   "fields": {
     "forename": "Lilian",
     "surname": "Helder",
     "surname_prefix": "",
+    "initials": "L.M.J.S.",
     "birthdate": "1973-05-30",
     "wikidata_id": "Q2854502",
     "wikimedia_image_name": "",
@@ -664,11 +729,12 @@
 },
 {
   "model": "person.person",
-  "pk": 52,
+  "pk": 53,
   "fields": {
     "forename": "Martijn",
     "surname": "Helvert",
     "surname_prefix": "van",
+    "initials": "M.J.F.",
     "birthdate": "1978-04-07",
     "wikidata_id": "Q18638463",
     "wikimedia_image_name": "",
@@ -677,11 +743,12 @@
 },
 {
   "model": "person.person",
-  "pk": 53,
+  "pk": 54,
   "fields": {
     "forename": "Duco",
     "surname": "Hoogland",
     "surname_prefix": "",
+    "initials": "D.",
     "birthdate": "1984-09-14",
     "wikidata_id": "Q501711",
     "wikimedia_image_name": "41. Duco Hoogland.jpg",
@@ -690,11 +757,12 @@
 },
 {
   "model": "person.person",
-  "pk": 54,
+  "pk": 55,
   "fields": {
     "forename": "Johan",
     "surname": "Houwers",
     "surname_prefix": "",
+    "initials": "J.",
     "birthdate": "1957-10-04",
     "wikidata_id": "Q2453751",
     "wikimedia_image_name": "",
@@ -703,28 +771,16 @@
 },
 {
   "model": "person.person",
-  "pk": 55,
+  "pk": 56,
   "fields": {
     "forename": "Lutz",
     "surname": "Jacobi",
     "surname_prefix": "",
+    "initials": "L.",
     "birthdate": "1955-12-13",
     "wikidata_id": "Q875195",
     "wikimedia_image_name": "11. Lutz Jacobi.jpg",
     "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/11._Lutz_Jacobi.jpg/220px-11._Lutz_Jacobi.jpg"
-  }
-},
-{
-  "model": "person.person",
-  "pk": 56,
-  "fields": {
-    "forename": "Tanja",
-    "surname": "Jadnanansing",
-    "surname_prefix": "",
-    "birthdate": "1967-04-26",
-    "wikidata_id": "Q1949438",
-    "wikimedia_image_name": "04. Tanja Jadnanansing.jpg",
-    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/04._Tanja_Jadnanansing.jpg/220px-04._Tanja_Jadnanansing.jpg"
   }
 },
 {
@@ -734,6 +790,7 @@
     "forename": "Sadet",
     "surname": "Karabulut",
     "surname_prefix": "",
+    "initials": "S.",
     "birthdate": "1975-04-28",
     "wikidata_id": "Q2251998",
     "wikimedia_image_name": "Sadet Karabulut1.jpg",
@@ -747,6 +804,7 @@
     "forename": "Mona",
     "surname": "Keijzer",
     "surname_prefix": "",
+    "initials": "M.C.G.",
     "birthdate": "1968-10-09",
     "wikidata_id": "Q94229",
     "wikimedia_image_name": "",
@@ -760,6 +818,7 @@
     "forename": "John",
     "surname": "Kerstens",
     "surname_prefix": "",
+    "initials": "J.W.M.",
     "birthdate": "1965-01-20",
     "wikidata_id": "Q502110",
     "wikimedia_image_name": "10. John Kerstens.jpg",
@@ -773,6 +832,7 @@
     "forename": "Jesse",
     "surname": "Klaver",
     "surname_prefix": "",
+    "initials": "J.F.",
     "birthdate": "1986-05-01",
     "wikidata_id": "Q2354753",
     "wikimedia_image_name": "Jesse Klaver.jpg",
@@ -786,6 +846,7 @@
     "forename": "Joram",
     "surname": "Klaveren",
     "surname_prefix": "van",
+    "initials": "J.J.",
     "birthdate": "1979-01-23",
     "wikidata_id": "Q1954200",
     "wikimedia_image_name": "Joramklaveren.JPG",
@@ -799,6 +860,7 @@
     "forename": "Norbert",
     "surname": "Klein",
     "surname_prefix": "",
+    "initials": "N.P.M.",
     "birthdate": "1866-10-25",
     "wikidata_id": "Q668073",
     "wikimedia_image_name": "Biskup Norbert Jan Nepomuk Klein.jpg",
@@ -812,6 +874,7 @@
     "forename": "Reinette",
     "surname": "Klever",
     "surname_prefix": "",
+    "initials": "R.J.",
     "birthdate": "1967-07-21",
     "wikidata_id": "Q224863",
     "wikimedia_image_name": "",
@@ -825,6 +888,7 @@
     "forename": "Raymond",
     "surname": "Knops",
     "surname_prefix": "",
+    "initials": "R.W.",
     "birthdate": "1971-11-10",
     "wikidata_id": "Q2125339",
     "wikimedia_image_name": "",
@@ -838,6 +902,7 @@
     "forename": "Nine",
     "surname": "Kooiman",
     "surname_prefix": "",
+    "initials": "C.J.E.",
     "birthdate": "1980-12-09",
     "wikidata_id": "Q1958936",
     "wikimedia_image_name": "Nine Kooiman1.jpg",
@@ -851,6 +916,7 @@
     "forename": "Wouter",
     "surname": "Koolmees",
     "surname_prefix": "",
+    "initials": "W.",
     "birthdate": "1977-03-20",
     "wikidata_id": "Q2595414",
     "wikimedia_image_name": "Wouter-koolmees-1307974459.jpg",
@@ -864,6 +930,7 @@
     "forename": "Fatma",
     "surname": "Ko\u015fer Kaya",
     "surname_prefix": "",
+    "initials": "F.",
     "birthdate": "1968-02-20",
     "wikidata_id": "Q467610",
     "wikimedia_image_name": "Fatma Koser Kaya.jpg",
@@ -877,6 +944,7 @@
     "forename": "Henk",
     "surname": "Krol",
     "surname_prefix": "",
+    "initials": "H.C.M.",
     "birthdate": "1950-04-01",
     "wikidata_id": "Q455186",
     "wikimedia_image_name": "Henk Krol 2013.jpg",
@@ -890,6 +958,7 @@
     "forename": "Attje",
     "surname": "Kuiken",
     "surname_prefix": "",
+    "initials": "A.H.",
     "birthdate": "1977-10-27",
     "wikidata_id": "Q2629616",
     "wikimedia_image_name": "Attje Kuiken (26093154620).jpg",
@@ -903,6 +972,7 @@
     "forename": "Tunahan",
     "surname": "Kuzu",
     "surname_prefix": "",
+    "initials": "T.",
     "birthdate": "1981-06-05",
     "wikidata_id": "Q616635",
     "wikimedia_image_name": "27. Tunahan Kuzu.jpg",
@@ -916,6 +986,7 @@
     "forename": "Roelof",
     "surname": "Laar",
     "surname_prefix": "van",
+    "initials": "R.P.",
     "birthdate": "1981-05-19",
     "wikidata_id": "Q13786091",
     "wikimedia_image_name": "43. Roelof van Laar.jpg",
@@ -929,6 +1000,7 @@
     "forename": "Leendert",
     "surname": "Lange",
     "surname_prefix": "de",
+    "initials": "L.A.",
     "birthdate": "1972-01-01",
     "wikidata_id": "Q19839084",
     "wikimedia_image_name": "",
@@ -942,6 +1014,7 @@
     "forename": "Henk",
     "surname": "Leenders",
     "surname_prefix": "",
+    "initials": "H.J.M.",
     "birthdate": "1955-01-28",
     "wikidata_id": "Q15059632",
     "wikimedia_image_name": "47. Henk Leenders.jpg",
@@ -955,6 +1028,7 @@
     "forename": "Renske",
     "surname": "Leijten",
     "surname_prefix": "",
+    "initials": "R.M.",
     "birthdate": "1979-03-17",
     "wikidata_id": "Q2501822",
     "wikimedia_image_name": "Renske Leijten1.jpg",
@@ -968,6 +1042,7 @@
     "forename": "Roald",
     "surname": "Linde",
     "surname_prefix": "van der",
+    "initials": "R.E.",
     "birthdate": "1968-11-22",
     "wikidata_id": "Q1285211",
     "wikimedia_image_name": "Roald-van-der-linde-1358259526.jpg",
@@ -981,6 +1056,7 @@
     "forename": "Helma",
     "surname": "Lodders",
     "surname_prefix": "",
+    "initials": "W.J.H.",
     "birthdate": "1968-06-21",
     "wikidata_id": "Q507401",
     "wikimedia_image_name": "",
@@ -991,22 +1067,10 @@
   "model": "person.person",
   "pk": 77,
   "fields": {
-    "forename": "Anne-Wil",
-    "surname": "Lucas",
-    "surname_prefix": "",
-    "birthdate": "1975-01-10",
-    "wikidata_id": "Q2008535",
-    "wikimedia_image_name": "Anne-Wil Lucas-Smeerdijk 21-01-2011.jpg",
-    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Anne-Wil_Lucas-Smeerdijk_21-01-2011.jpg/220px-Anne-Wil_Lucas-Smeerdijk_21-01-2011.jpg"
-  }
-},
-{
-  "model": "person.person",
-  "pk": 78,
-  "fields": {
     "forename": "Barry",
     "surname": "Madlener",
     "surname_prefix": "",
+    "initials": "B.",
     "birthdate": "1969-01-06",
     "wikidata_id": "Q545023",
     "wikimedia_image_name": "Madlenerbarry.JPG",
@@ -1015,11 +1079,12 @@
 },
 {
   "model": "person.person",
-  "pk": 79,
+  "pk": 78,
   "fields": {
     "forename": "Marit",
     "surname": "Maij",
     "surname_prefix": "",
+    "initials": "M.E.",
     "birthdate": "1972-01-16",
     "wikidata_id": "Q617451",
     "wikimedia_image_name": "38. Marit Maij.jpg",
@@ -1028,11 +1093,12 @@
 },
 {
   "model": "person.person",
-  "pk": 80,
+  "pk": 79,
   "fields": {
     "forename": "Ahmed",
     "surname": "Marcouch",
     "surname_prefix": "",
+    "initials": "A.",
     "birthdate": "1969-05-02",
     "wikidata_id": "Q401383",
     "wikimedia_image_name": "14. Ahmed Marcouch.jpg",
@@ -1041,11 +1107,12 @@
 },
 {
   "model": "person.person",
-  "pk": 81,
+  "pk": 80,
   "fields": {
     "forename": "Paul",
     "surname": "Meenen",
     "surname_prefix": "van",
+    "initials": "P.H.",
     "birthdate": "1956-01-29",
     "wikidata_id": "Q7154615",
     "wikimedia_image_name": "",
@@ -1054,11 +1121,12 @@
 },
 {
   "model": "person.person",
-  "pk": 82,
+  "pk": 81,
   "fields": {
     "forename": "Arnold",
     "surname": "Merkies",
     "surname_prefix": "",
+    "initials": "A.Z.",
     "birthdate": "1968-12-06",
     "wikidata_id": "Q251781",
     "wikimedia_image_name": "Arnold Merkies1.jpg",
@@ -1067,11 +1135,12 @@
 },
 {
   "model": "person.person",
-  "pk": 83,
+  "pk": 82,
   "fields": {
     "forename": "Anouchka",
     "surname": "Miltenburg",
     "surname_prefix": "van",
+    "initials": "A.",
     "birthdate": "1967-04-20",
     "wikidata_id": "Q510705",
     "wikimedia_image_name": "Anouchka-van-miltenburg-1310465197.jpg",
@@ -1080,11 +1149,12 @@
 },
 {
   "model": "person.person",
-  "pk": 84,
+  "pk": 83,
   "fields": {
     "forename": "Mohammed",
     "surname": "Mohandis",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1985-06-28",
     "wikidata_id": "Q861657",
     "wikimedia_image_name": "33. Mohammed Mohandis.jpg",
@@ -1093,11 +1163,12 @@
 },
 {
   "model": "person.person",
-  "pk": 85,
+  "pk": 84,
   "fields": {
     "forename": "Jacques",
     "surname": "Monasch",
     "surname_prefix": "",
+    "initials": "J.S.",
     "birthdate": "1962-01-04",
     "wikidata_id": "Q2347887",
     "wikimedia_image_name": "19. Jacques Monasch.jpg",
@@ -1106,11 +1177,12 @@
 },
 {
   "model": "person.person",
-  "pk": 86,
+  "pk": 85,
   "fields": {
     "forename": "Perjan",
     "surname": "Moors",
     "surname_prefix": "",
+    "initials": "P.J.M.J.",
     "birthdate": "1967-10-20",
     "wikidata_id": "Q15709851",
     "wikimedia_image_name": "",
@@ -1119,11 +1191,12 @@
 },
 {
   "model": "person.person",
-  "pk": 87,
+  "pk": 86,
   "fields": {
     "forename": "Anne",
     "surname": "Mulder",
     "surname_prefix": "",
+    "initials": "A.",
     "birthdate": "1969-12-14",
     "wikidata_id": "Q976442",
     "wikimedia_image_name": "Anne Mulder.jpg",
@@ -1132,11 +1205,12 @@
 },
 {
   "model": "person.person",
-  "pk": 88,
+  "pk": 87,
   "fields": {
     "forename": "Agnes",
     "surname": "Mulder",
     "surname_prefix": "",
+    "initials": "A.H.",
     "birthdate": "1973-10-21",
     "wikidata_id": "Q94239",
     "wikimedia_image_name": "",
@@ -1145,11 +1219,12 @@
 },
 {
   "model": "person.person",
-  "pk": 89,
+  "pk": 88,
   "fields": {
     "forename": "Helma",
     "surname": "Nepp\u00e9rus",
     "surname_prefix": "",
+    "initials": "H.",
     "birthdate": "1950-06-21",
     "wikidata_id": "Q3144489",
     "wikimedia_image_name": "Helma Nepperus.jpg",
@@ -1158,11 +1233,12 @@
 },
 {
   "model": "person.person",
-  "pk": 90,
+  "pk": 89,
   "fields": {
     "forename": "Henk",
     "surname": "Nijboer",
     "surname_prefix": "",
+    "initials": "H.",
     "birthdate": "1983-03-31",
     "wikidata_id": "Q868648",
     "wikimedia_image_name": "13. Henk Nijboer.jpg",
@@ -1171,11 +1247,12 @@
 },
 {
   "model": "person.person",
-  "pk": 91,
+  "pk": 90,
   "fields": {
     "forename": "Chantal",
     "surname": "Nijkerken-de Haan",
     "surname_prefix": "",
+    "initials": "C.N.A.",
     "birthdate": "1973-09-18",
     "wikidata_id": "Q19830701",
     "wikimedia_image_name": "",
@@ -1184,11 +1261,12 @@
 },
 {
   "model": "person.person",
-  "pk": 92,
+  "pk": 91,
   "fields": {
     "forename": "Michiel",
     "surname": "Nispen",
     "surname_prefix": "van",
+    "initials": "M.",
     "birthdate": "1982-10-14",
     "wikidata_id": "Q16069986",
     "wikimedia_image_name": "",
@@ -1197,11 +1275,12 @@
 },
 {
   "model": "person.person",
-  "pk": 93,
+  "pk": 92,
   "fields": {
     "forename": "Pieter",
     "surname": "Omtzigt",
     "surname_prefix": "",
+    "initials": "P.H.",
     "birthdate": "1974-01-08",
     "wikidata_id": "Q7192814",
     "wikimedia_image_name": "PieterOmtzigt2.jpg",
@@ -1210,11 +1289,12 @@
 },
 {
   "model": "person.person",
-  "pk": 94,
+  "pk": 93,
   "fields": {
     "forename": "Astrid",
     "surname": "Oosenbrug",
     "surname_prefix": "",
+    "initials": "R.F.A.",
     "birthdate": "1968-07-06",
     "wikidata_id": "Q868625",
     "wikimedia_image_name": "Astrid Oosenbrug (25417963994).jpg",
@@ -1223,11 +1303,12 @@
 },
 {
   "model": "person.person",
-  "pk": 95,
+  "pk": 94,
   "fields": {
     "forename": "Foort",
     "surname": "Oosten",
     "surname_prefix": "van",
+    "initials": "F.",
     "birthdate": "1977-06-25",
     "wikidata_id": "Q1285219",
     "wikimedia_image_name": "Foort van Oosten bij het IPO jaarcongres 2014.jpg",
@@ -1236,11 +1317,12 @@
 },
 {
   "model": "person.person",
-  "pk": 96,
+  "pk": 95,
   "fields": {
     "forename": "Sel\u00e7uk",
     "surname": "\u00d6zt\u00fcrk",
     "surname_prefix": "",
+    "initials": "S.",
     "birthdate": "1972-04-08",
     "wikidata_id": "Q868632",
     "wikimedia_image_name": "39. Sel\u00e7uk \u00d6zt\u00fcrk.jpg",
@@ -1249,11 +1331,12 @@
 },
 {
   "model": "person.person",
-  "pk": 97,
+  "pk": 96,
   "fields": {
     "forename": "Alexander",
     "surname": "Pechtold",
     "surname_prefix": "",
+    "initials": "A.",
     "birthdate": "1965-12-16",
     "wikidata_id": "Q1915394",
     "wikimedia_image_name": "Pechtold 29 03 048b (2).jpg",
@@ -1262,11 +1345,12 @@
 },
 {
   "model": "person.person",
-  "pk": 98,
+  "pk": 97,
   "fields": {
     "forename": "Sjoerd",
     "surname": "Potters",
     "surname_prefix": "",
+    "initials": "S.C.C.M.",
     "birthdate": "1974-02-14",
     "wikidata_id": "Q1397836",
     "wikimedia_image_name": "Sjoerd-potters-1362385817.jpg",
@@ -1275,11 +1359,12 @@
 },
 {
   "model": "person.person",
-  "pk": 99,
+  "pk": 98,
   "fields": {
     "forename": "Ronald",
     "surname": "Raak",
     "surname_prefix": "van",
+    "initials": "A.A.G.M.",
     "birthdate": "1969-10-30",
     "wikidata_id": "Q2089254",
     "wikimedia_image_name": "Ronald van Raak1.jpg",
@@ -1288,15 +1373,30 @@
 },
 {
   "model": "person.person",
-  "pk": 100,
+  "pk": 99,
   "fields": {
     "forename": "Jeroen",
     "surname": "Recourt",
     "surname_prefix": "",
+    "initials": "J.",
     "birthdate": "1970-07-04",
     "wikidata_id": "Q2106896",
     "wikimedia_image_name": "21. Jeroen Recourt.jpg",
     "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/21._Jeroen_Recourt.jpg/220px-21._Jeroen_Recourt.jpg"
+  }
+},
+{
+  "model": "person.person",
+  "pk": 100,
+  "fields": {
+    "forename": "Dani\u00ebl",
+    "surname": "Ree",
+    "surname_prefix": "van der",
+    "initials": "D.A.",
+    "birthdate": "1972-01-08",
+    "wikidata_id": "Q26833712",
+    "wikimedia_image_name": "",
+    "wikimedia_image_url": ""
   }
 },
 {
@@ -1306,6 +1406,7 @@
     "forename": "Emile",
     "surname": "Roemer",
     "surname_prefix": "",
+    "initials": "E.G.M.",
     "birthdate": "1962-08-24",
     "wikidata_id": "Q1337248",
     "wikimedia_image_name": "Emile Roemer 2012-1.jpg",
@@ -1319,6 +1420,7 @@
     "forename": "Michel",
     "surname": "Rog",
     "surname_prefix": "",
+    "initials": "M.R.J.",
     "birthdate": "1973-04-03",
     "wikidata_id": "Q129718",
     "wikimedia_image_name": "",
@@ -1332,6 +1434,7 @@
     "forename": "Erik",
     "surname": "Ronnes",
     "surname_prefix": "",
+    "initials": "H.A.G.",
     "birthdate": null,
     "wikidata_id": "Q18692811",
     "wikimedia_image_name": "Erik-ronnes-1422297864.jpg",
@@ -1345,6 +1448,7 @@
     "forename": "Raymond",
     "surname": "Roon",
     "surname_prefix": "de",
+    "initials": "R.",
     "birthdate": "1952-09-01",
     "wikidata_id": "Q1841359",
     "wikimedia_image_name": "",
@@ -1358,6 +1462,7 @@
     "forename": "Arno",
     "surname": "Rutte",
     "surname_prefix": "",
+    "initials": "A.C.L.",
     "birthdate": "1972-04-24",
     "wikidata_id": "Q1396426",
     "wikimedia_image_name": "",
@@ -1371,6 +1476,7 @@
     "forename": "Diederik",
     "surname": "Samsom",
     "surname_prefix": "",
+    "initials": "D.M.",
     "birthdate": "1971-07-10",
     "wikidata_id": "Q560780",
     "wikimedia_image_name": "01. Diederik Samsom.jpg",
@@ -1384,6 +1490,7 @@
     "forename": "Carola",
     "surname": "Schouten",
     "surname_prefix": "",
+    "initials": "C.J.",
     "birthdate": "1977-10-06",
     "wikidata_id": "Q2625041",
     "wikimedia_image_name": "Carola Schouten.jpg",
@@ -1397,6 +1504,7 @@
     "forename": "Anoushka",
     "surname": "Schut-Welkzijn",
     "surname_prefix": "",
+    "initials": "A.",
     "birthdate": "1969-02-06",
     "wikidata_id": "Q1397811",
     "wikimedia_image_name": "",
@@ -1410,6 +1518,7 @@
     "forename": "Gert-Jan",
     "surname": "Segers",
     "surname_prefix": "",
+    "initials": "G.J.M.",
     "birthdate": "1969-07-09",
     "wikidata_id": "Q196276",
     "wikimedia_image_name": "Gert-Jan Segers.jpg",
@@ -1423,6 +1532,7 @@
     "forename": "Michiel",
     "surname": "Servaes",
     "surname_prefix": "",
+    "initials": "M.",
     "birthdate": "1972-02-21",
     "wikidata_id": "Q1194942",
     "wikimedia_image_name": "17. Michiel Servaes.jpg",
@@ -1436,10 +1546,11 @@
     "forename": "Tjitske",
     "surname": "Siderius",
     "surname_prefix": "",
+    "initials": "T.E.",
     "birthdate": "1981-09-24",
     "wikidata_id": "Q14753258",
-    "wikimedia_image_name": "Tjitske Siderius.jpg",
-    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Tjitske_Siderius.jpg/220px-Tjitske_Siderius.jpg"
+    "wikimedia_image_name": "Tjitske Siderius in 2016.jpg",
+    "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Tjitske_Siderius_in_2016.jpg/220px-Tjitske_Siderius_in_2016.jpg"
   }
 },
 {
@@ -1449,6 +1560,7 @@
     "forename": "Sjoerd",
     "surname": "Sjoerdsma",
     "surname_prefix": "",
+    "initials": "S.W.",
     "birthdate": null,
     "wikidata_id": "",
     "wikimedia_image_name": "",
@@ -1462,6 +1574,7 @@
     "forename": "Eric",
     "surname": "Smaling",
     "surname_prefix": "",
+    "initials": "E.M.A.",
     "birthdate": "1957-08-18",
     "wikidata_id": "Q12013388",
     "wikimedia_image_name": "Eric Smaling1.jpg",
@@ -1475,6 +1588,7 @@
     "forename": "Kees",
     "surname": "Staaij",
     "surname_prefix": "van der",
+    "initials": "C.G.",
     "birthdate": "1968-09-12",
     "wikidata_id": "Q731640",
     "wikimedia_image_name": "Kees van der Staaij.jpg",
@@ -1488,6 +1602,7 @@
     "forename": "Karin",
     "surname": "Straus",
     "surname_prefix": "",
+    "initials": "K.C.J.",
     "birthdate": "1971-04-06",
     "wikidata_id": "Q2052110",
     "wikimedia_image_name": "Karin-straus-1306849879.jpg",
@@ -1501,6 +1616,7 @@
     "forename": "Judith",
     "surname": "Swinkels",
     "surname_prefix": "",
+    "initials": "J.C.M.",
     "birthdate": "1961-06-04",
     "wikidata_id": "Q21473948",
     "wikimedia_image_name": "",
@@ -1514,6 +1630,7 @@
     "forename": "Grace",
     "surname": "Tanamal",
     "surname_prefix": "",
+    "initials": "G.S.I.A.",
     "birthdate": "1957-01-10",
     "wikidata_id": "Q1194930",
     "wikimedia_image_name": "Grace Tanamal (26022706605).jpg",
@@ -1527,6 +1644,7 @@
     "forename": "Joost",
     "surname": "Taverne",
     "surname_prefix": "",
+    "initials": "J.",
     "birthdate": "1971-09-22",
     "wikidata_id": "Q1948085",
     "wikimedia_image_name": "",
@@ -1540,6 +1658,7 @@
     "forename": "Fred",
     "surname": "Teeven",
     "surname_prefix": "",
+    "initials": "F.",
     "birthdate": "1958-08-05",
     "wikidata_id": "Q2150230",
     "wikimedia_image_name": "Fred-teeven-portret.jpg",
@@ -1553,6 +1672,7 @@
     "forename": "Ockje",
     "surname": "Tellegen",
     "surname_prefix": "",
+    "initials": "O.C.",
     "birthdate": "1974-10-16",
     "wikidata_id": "Q1532045",
     "wikimedia_image_name": "",
@@ -1566,6 +1686,7 @@
     "forename": "Marianne",
     "surname": "Thieme",
     "surname_prefix": "",
+    "initials": "M.L.",
     "birthdate": "1972-03-06",
     "wikidata_id": "Q463434",
     "wikimedia_image_name": "Mariannethieme.jpg",
@@ -1579,6 +1700,7 @@
     "forename": "Liesbeth",
     "surname": "Tongeren",
     "surname_prefix": "van",
+    "initials": "L.",
     "birthdate": "1958-03-31",
     "wikidata_id": "Q2578260",
     "wikimedia_image_name": "Liesbeth van Tongeren.jpg",
@@ -1592,6 +1714,7 @@
     "forename": "Madeleine",
     "surname": "Toorenburg",
     "surname_prefix": "van",
+    "initials": "M.M.",
     "birthdate": "1968-05-10",
     "wikidata_id": "Q2779827",
     "wikimedia_image_name": "",
@@ -1605,6 +1728,7 @@
     "forename": "Paul",
     "surname": "Ulenbelt",
     "surname_prefix": "",
+    "initials": "P.",
     "birthdate": "1952-04-01",
     "wikidata_id": "Q1815251",
     "wikimedia_image_name": "Paul Ulenbelt1.jpg",
@@ -1618,6 +1742,7 @@
     "forename": "Michiel",
     "surname": "Veen",
     "surname_prefix": "van",
+    "initials": "M.S.",
     "birthdate": "1971-03-20",
     "wikidata_id": "Q1532040",
     "wikimedia_image_name": "",
@@ -1631,6 +1756,7 @@
     "forename": "Stientje",
     "surname": "Veldhoven",
     "surname_prefix": "van",
+    "initials": "S.",
     "birthdate": "1973-06-22",
     "wikidata_id": "Q5090363",
     "wikimedia_image_name": "Stientje-van-veldhoven-1307974693 cr.jpg",
@@ -1644,6 +1770,7 @@
     "forename": "Hayke",
     "surname": "Veldman",
     "surname_prefix": "",
+    "initials": "H.S.",
     "birthdate": "1969-11-05",
     "wikidata_id": "Q17351519",
     "wikimedia_image_name": "Hayke-veldman-1429134379.jpg",
@@ -1657,6 +1784,7 @@
     "forename": "Kees",
     "surname": "Verhoeven",
     "surname_prefix": "",
+    "initials": "K.",
     "birthdate": "1976-04-25",
     "wikidata_id": "Q2197145",
     "wikimedia_image_name": "Kees Verhoeven.jpg",
@@ -1670,6 +1798,7 @@
     "forename": "Roos",
     "surname": "Vermeij",
     "surname_prefix": "",
+    "initials": "R.A.",
     "birthdate": "1968-03-28",
     "wikidata_id": "Q2456351",
     "wikimedia_image_name": "12. Roos Vermeij.jpg",
@@ -1683,7 +1812,8 @@
     "forename": "Joyce",
     "surname": "Vermue",
     "surname_prefix": "",
-    "birthdate": "1984-09-27",
+    "initials": "J.G.P.",
+    "birthdate": "1985-06-22",
     "wikidata_id": "Q21004358",
     "wikimedia_image_name": "48. Joyce Vermue.jpg",
     "wikimedia_image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/48._Joyce_Vermue.jpg/220px-48._Joyce_Vermue.jpg"
@@ -1696,6 +1826,7 @@
     "forename": "Barbara",
     "surname": "Visser",
     "surname_prefix": "",
+    "initials": "B.",
     "birthdate": "1977-08-16",
     "wikidata_id": "Q1397858",
     "wikimedia_image_name": "Barbara Visser.jpg",
@@ -1709,6 +1840,7 @@
     "forename": "Roland",
     "surname": "Vliet",
     "surname_prefix": "van",
+    "initials": "R.A.",
     "birthdate": "1969-11-25",
     "wikidata_id": "Q2508545",
     "wikimedia_image_name": "",
@@ -1722,6 +1854,7 @@
     "forename": "Marith",
     "surname": "Volp",
     "surname_prefix": "",
+    "initials": "M.J.J.",
     "birthdate": null,
     "wikidata_id": "",
     "wikimedia_image_name": "",
@@ -1735,6 +1868,7 @@
     "forename": "Jo\u00ebl",
     "surname": "Voordewind",
     "surname_prefix": "",
+    "initials": "J.S.",
     "birthdate": "1965-07-09",
     "wikidata_id": "Q1824075",
     "wikimedia_image_name": "Jo\u00ebl Voordewind.jpg",
@@ -1748,6 +1882,7 @@
     "forename": "Linda",
     "surname": "Voortman",
     "surname_prefix": "",
+    "initials": "L.G.J.",
     "birthdate": "1979-06-27",
     "wikidata_id": "Q2783559",
     "wikimedia_image_name": "Linda Voortman.jpg",
@@ -1761,6 +1896,7 @@
     "forename": "Jan",
     "surname": "Vos",
     "surname_prefix": "",
+    "initials": "J.C.",
     "birthdate": "1888-04-17",
     "wikidata_id": "Q704521",
     "wikimedia_image_name": "",
@@ -1774,6 +1910,7 @@
     "forename": "Mei Li",
     "surname": "Vos",
     "surname_prefix": "",
+    "initials": "M.L.",
     "birthdate": "1970-03-31",
     "wikidata_id": "Q2343224",
     "wikimedia_image_name": "20. Mei Li Vos.jpg",
@@ -1787,6 +1924,7 @@
     "forename": "Aukje",
     "surname": "Vries",
     "surname_prefix": "de",
+    "initials": "A.",
     "birthdate": "1964-10-21",
     "wikidata_id": "Q1532558",
     "wikimedia_image_name": "",
@@ -1800,6 +1938,7 @@
     "forename": "Albert",
     "surname": "Vries",
     "surname_prefix": "de",
+    "initials": "A.A.",
     "birthdate": "1955-07-10",
     "wikidata_id": "Q1194985",
     "wikimedia_image_name": "29. Albert de Vries.jpg",
@@ -1813,6 +1952,7 @@
     "forename": "Ronald",
     "surname": "Vuijk",
     "surname_prefix": "",
+    "initials": "R.",
     "birthdate": "1965-10-22",
     "wikidata_id": "Q1532545",
     "wikimedia_image_name": "Ronald Vuijk.jpg",
@@ -1826,6 +1966,7 @@
     "forename": "Frank",
     "surname": "Wassenberg",
     "surname_prefix": "",
+    "initials": "F.P.",
     "birthdate": "1966-05-02",
     "wikidata_id": "Q21479756",
     "wikimedia_image_name": "",
@@ -1839,6 +1980,7 @@
     "forename": "Steven",
     "surname": "Weyenberg",
     "surname_prefix": "van",
+    "initials": "S.P.R.A.",
     "birthdate": "1973-03-21",
     "wikidata_id": "Q2481353",
     "wikimedia_image_name": "Steven van Weyenberg.jpg",
@@ -1852,6 +1994,7 @@
     "forename": "Jeroen",
     "surname": "Wijngaarden",
     "surname_prefix": "Van",
+    "initials": "J.",
     "birthdate": "1978-03-29",
     "wikidata_id": "Q17428405",
     "wikimedia_image_name": "Jeroen van wijngaarden-1445779237.JPG",
@@ -1865,6 +2008,7 @@
     "forename": "Geert",
     "surname": "Wilders",
     "surname_prefix": "",
+    "initials": "G.",
     "birthdate": "1963-09-06",
     "wikidata_id": "Q105338",
     "wikimedia_image_name": "Slotdebat verkiezingen (final debate elections) 2006-2 cropped and flipped.jpg",
@@ -1878,6 +2022,7 @@
     "forename": "Agnes",
     "surname": "Wolbert",
     "surname_prefix": "",
+    "initials": "A.G.",
     "birthdate": "1958-08-20",
     "wikidata_id": "Q2472008",
     "wikimedia_image_name": "22. Agnes Wolbert.jpg",
@@ -1891,6 +2036,7 @@
     "forename": "Bas",
     "surname": "Wout",
     "surname_prefix": "van 't",
+    "initials": "B.",
     "birthdate": "1979-04-22",
     "wikidata_id": "Q1662099",
     "wikimedia_image_name": "",
@@ -1904,6 +2050,7 @@
     "forename": "Loes",
     "surname": "Ypma",
     "surname_prefix": "",
+    "initials": "L.",
     "birthdate": "1980-02-20",
     "wikidata_id": "Q1194971",
     "wikimedia_image_name": "Loes Ypma (25930161062).jpg",
@@ -1917,6 +2064,7 @@
     "forename": "Keklik",
     "surname": "Y\u00fccel",
     "surname_prefix": "",
+    "initials": "K.",
     "birthdate": "1968-05-05",
     "wikidata_id": "Q1196006",
     "wikimedia_image_name": "26. Keklik Y\u00fccel.jpg",
@@ -1930,6 +2078,7 @@
     "forename": "Erik",
     "surname": "Ziengs",
     "surname_prefix": "",
+    "initials": "E.",
     "birthdate": "1960-09-27",
     "wikidata_id": "Q733208",
     "wikimedia_image_name": "",
@@ -1943,6 +2092,7 @@
     "forename": "Halbe",
     "surname": "Zijlstra",
     "surname_prefix": "",
+    "initials": "H.",
     "birthdate": "1969-01-21",
     "wikidata_id": "Q1375236",
     "wikimedia_image_name": "Halbe Zijlstra 2012.jpg",
@@ -3726,7 +3876,7 @@
   "pk": 5,
   "fields": {
     "person": 5,
-    "party": 1,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -3736,7 +3886,7 @@
   "pk": 6,
   "fields": {
     "person": 6,
-    "party": 3,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3746,7 +3896,7 @@
   "pk": 7,
   "fields": {
     "person": 7,
-    "party": 5,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -3756,7 +3906,7 @@
   "pk": 8,
   "fields": {
     "person": 8,
-    "party": 6,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -3766,7 +3916,7 @@
   "pk": 9,
   "fields": {
     "person": 9,
-    "party": 1,
+    "party": 6,
     "joined": null,
     "left": null
   }
@@ -3776,7 +3926,7 @@
   "pk": 10,
   "fields": {
     "person": 10,
-    "party": 6,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3786,7 +3936,7 @@
   "pk": 11,
   "fields": {
     "person": 11,
-    "party": 9,
+    "party": 6,
     "joined": null,
     "left": null
   }
@@ -3796,7 +3946,7 @@
   "pk": 12,
   "fields": {
     "person": 12,
-    "party": 1,
+    "party": 9,
     "joined": null,
     "left": null
   }
@@ -3806,7 +3956,7 @@
   "pk": 13,
   "fields": {
     "person": 13,
-    "party": 3,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3816,7 +3966,7 @@
   "pk": 14,
   "fields": {
     "person": 14,
-    "party": 13,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -3826,7 +3976,7 @@
   "pk": 15,
   "fields": {
     "person": 15,
-    "party": 5,
+    "party": 13,
     "joined": null,
     "left": null
   }
@@ -3836,7 +3986,7 @@
   "pk": 16,
   "fields": {
     "person": 16,
-    "party": 1,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -3876,7 +4026,7 @@
   "pk": 20,
   "fields": {
     "person": 20,
-    "party": 4,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3886,7 +4036,7 @@
   "pk": 21,
   "fields": {
     "person": 21,
-    "party": 7,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -3896,7 +4046,7 @@
   "pk": 22,
   "fields": {
     "person": 22,
-    "party": 1,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -3906,7 +4056,7 @@
   "pk": 23,
   "fields": {
     "person": 23,
-    "party": 1,
+    "party": 7,
     "joined": null,
     "left": null
   }
@@ -3916,7 +4066,7 @@
   "pk": 24,
   "fields": {
     "person": 24,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3926,7 +4076,7 @@
   "pk": 25,
   "fields": {
     "person": 25,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -3936,7 +4086,7 @@
   "pk": 26,
   "fields": {
     "person": 26,
-    "party": 5,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -3946,7 +4096,7 @@
   "pk": 27,
   "fields": {
     "person": 27,
-    "party": 3,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -3956,7 +4106,7 @@
   "pk": 28,
   "fields": {
     "person": 28,
-    "party": 2,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -3966,7 +4116,7 @@
   "pk": 29,
   "fields": {
     "person": 29,
-    "party": 9,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -3976,7 +4126,7 @@
   "pk": 30,
   "fields": {
     "person": 30,
-    "party": 6,
+    "party": 9,
     "joined": null,
     "left": null
   }
@@ -3986,7 +4136,7 @@
   "pk": 31,
   "fields": {
     "person": 31,
-    "party": 1,
+    "party": 6,
     "joined": null,
     "left": null
   }
@@ -3996,7 +4146,7 @@
   "pk": 32,
   "fields": {
     "person": 32,
-    "party": 7,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4006,7 +4156,7 @@
   "pk": 33,
   "fields": {
     "person": 33,
-    "party": 2,
+    "party": 7,
     "joined": null,
     "left": null
   }
@@ -4016,7 +4166,7 @@
   "pk": 34,
   "fields": {
     "person": 34,
-    "party": 1,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4026,7 +4176,7 @@
   "pk": 35,
   "fields": {
     "person": 35,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4036,7 +4186,7 @@
   "pk": 36,
   "fields": {
     "person": 36,
-    "party": 1,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4046,7 +4196,7 @@
   "pk": 37,
   "fields": {
     "person": 37,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4056,7 +4206,7 @@
   "pk": 38,
   "fields": {
     "person": 38,
-    "party": 5,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4066,7 +4216,7 @@
   "pk": 39,
   "fields": {
     "person": 39,
-    "party": 3,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -4086,7 +4236,7 @@
   "pk": 41,
   "fields": {
     "person": 41,
-    "party": 4,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -4096,7 +4246,7 @@
   "pk": 42,
   "fields": {
     "person": 42,
-    "party": 5,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4106,7 +4256,7 @@
   "pk": 43,
   "fields": {
     "person": 43,
-    "party": 8,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -4116,7 +4266,7 @@
   "pk": 44,
   "fields": {
     "person": 44,
-    "party": 5,
+    "party": 8,
     "joined": null,
     "left": null
   }
@@ -4126,7 +4276,7 @@
   "pk": 45,
   "fields": {
     "person": 45,
-    "party": 2,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -4146,7 +4296,7 @@
   "pk": 47,
   "fields": {
     "person": 47,
-    "party": 4,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4156,7 +4306,7 @@
   "pk": 48,
   "fields": {
     "person": 48,
-    "party": 1,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4176,7 +4326,7 @@
   "pk": 50,
   "fields": {
     "person": 50,
-    "party": 4,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4186,7 +4336,7 @@
   "pk": 51,
   "fields": {
     "person": 51,
-    "party": 5,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4196,7 +4346,7 @@
   "pk": 52,
   "fields": {
     "person": 52,
-    "party": 4,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -4206,7 +4356,7 @@
   "pk": 53,
   "fields": {
     "person": 53,
-    "party": 2,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4216,7 +4366,7 @@
   "pk": 54,
   "fields": {
     "person": 54,
-    "party": 14,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4226,7 +4376,7 @@
   "pk": 55,
   "fields": {
     "person": 55,
-    "party": 2,
+    "party": 14,
     "joined": null,
     "left": null
   }
@@ -4446,7 +4596,7 @@
   "pk": 77,
   "fields": {
     "person": 77,
-    "party": 1,
+    "party": 5,
     "joined": null,
     "left": null
   }
@@ -4456,7 +4606,7 @@
   "pk": 78,
   "fields": {
     "person": 78,
-    "party": 5,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4476,7 +4626,7 @@
   "pk": 80,
   "fields": {
     "person": 80,
-    "party": 2,
+    "party": 6,
     "joined": null,
     "left": null
   }
@@ -4486,7 +4636,7 @@
   "pk": 81,
   "fields": {
     "person": 81,
-    "party": 6,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -4496,7 +4646,7 @@
   "pk": 82,
   "fields": {
     "person": 82,
-    "party": 3,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4506,7 +4656,7 @@
   "pk": 83,
   "fields": {
     "person": 83,
-    "party": 1,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4526,7 +4676,7 @@
   "pk": 85,
   "fields": {
     "person": 85,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4546,7 +4696,7 @@
   "pk": 87,
   "fields": {
     "person": 87,
-    "party": 1,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4556,7 +4706,7 @@
   "pk": 88,
   "fields": {
     "person": 88,
-    "party": 4,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4566,7 +4716,7 @@
   "pk": 89,
   "fields": {
     "person": 89,
-    "party": 1,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4576,7 +4726,7 @@
   "pk": 90,
   "fields": {
     "person": 90,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4586,7 +4736,7 @@
   "pk": 91,
   "fields": {
     "person": 91,
-    "party": 1,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -4596,7 +4746,7 @@
   "pk": 92,
   "fields": {
     "person": 92,
-    "party": 3,
+    "party": 4,
     "joined": null,
     "left": null
   }
@@ -4606,7 +4756,7 @@
   "pk": 93,
   "fields": {
     "person": 93,
-    "party": 4,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4616,7 +4766,7 @@
   "pk": 94,
   "fields": {
     "person": 94,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4626,7 +4776,7 @@
   "pk": 95,
   "fields": {
     "person": 95,
-    "party": 1,
+    "party": 12,
     "joined": null,
     "left": null
   }
@@ -4636,7 +4786,7 @@
   "pk": 96,
   "fields": {
     "person": 96,
-    "party": 12,
+    "party": 6,
     "joined": null,
     "left": null
   }
@@ -4646,7 +4796,7 @@
   "pk": 97,
   "fields": {
     "person": 97,
-    "party": 6,
+    "party": 1,
     "joined": null,
     "left": null
   }
@@ -4656,7 +4806,7 @@
   "pk": 98,
   "fields": {
     "person": 98,
-    "party": 1,
+    "party": 3,
     "joined": null,
     "left": null
   }
@@ -4666,7 +4816,7 @@
   "pk": 99,
   "fields": {
     "person": 99,
-    "party": 3,
+    "party": 2,
     "joined": null,
     "left": null
   }
@@ -4676,7 +4826,7 @@
   "pk": 100,
   "fields": {
     "person": 100,
-    "party": 2,
+    "party": 1,
     "joined": null,
     "left": null
   }
