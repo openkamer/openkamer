@@ -123,9 +123,12 @@ def create_votes_party(voting, votes):
         VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
                                  decision=get_decision(vote.decision), details=vote.details)
 
+
 def create_votes_individual(voting, votes):
     for vote in votes:
-        parliament_member = ParliamentMember.find(vote.parliament_member)
+        surname = vote.parliament_member.split(',')[0]
+        initials = vote.parliament_member.split(',')[1].replace(' ', '')
+        parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         assert parliament_member
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
                                       decision=get_decision(vote.decision), details=vote.details)
