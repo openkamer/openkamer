@@ -107,12 +107,7 @@ DATABASES = {
 # Allow any settings to be defined in local_settings.py which should be
 # ignored in your version control system allowing for settings to be
 # defined per machine.
-try:
-    from website.local_settings import *
-except ImportError as e:
-    if "local_settings" not in str(e):
-        print("settings error")
-        raise e
+from website.local_settings import *
 
 
 ##############
