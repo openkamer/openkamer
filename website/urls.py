@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^parties/$', PartiesView.as_view()),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
     url(r'^dossiers/$', DossiersView.as_view()),
-    url(r'^dossier/(?P<pk>\d+)/$', DossierView.as_view()),
+    url(r'^dossier/(?P<dossier_pk>\d+)/$', DossierView.as_view()),
     url(r'^dossier/add/(?P<dossier_id>\d+)/$', AddDossierView.as_view()),
     url(r'^document/(?P<pk>\d+)/$', DocumentView.as_view()),
     url(r'^document/voting/(?P<voting_id>\d+)/$', VotingView.as_view()),

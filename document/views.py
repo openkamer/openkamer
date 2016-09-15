@@ -38,9 +38,9 @@ class DossiersView(TemplateView):
 class DossierView(TemplateView):
     template_name = 'document/dossier.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, dossier_pk, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(id=self.kwargs['pk'])
+        context['dossier'] = Dossier.objects.get(id=dossier_pk)
         return context
 
 
