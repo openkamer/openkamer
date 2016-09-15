@@ -1,3 +1,6 @@
+{% load parliament %}
+{% parliament_member_id document.submitter %}
+
 <h4>{{ document.title }}</h4>
 <H5>{{ document.date_published|date:"Y-m-d" }}</H5>
 <h5>Dossier: <a href="/dossier/{{ document.dossier.id }}/">{{ document.dossier.dossier_id }}</a></h5>
