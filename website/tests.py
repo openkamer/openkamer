@@ -106,6 +106,10 @@ class TestWebsite(TestCase):
         response = self.client.get('/parliamentmembers/')
         self.assertEqual(response.status_code, 200)
 
+    def test_plot_example_view(self):
+        response = self.client.get('/stats/exampleplots/')
+        self.assertEqual(response.status_code, 200)
+
     def test_api_homepage(self):
         response = self.client.get('/api/')
         self.assertEqual(response.status_code, 200)
