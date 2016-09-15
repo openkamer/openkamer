@@ -1,3 +1,5 @@
+import re
+
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
 
@@ -128,6 +130,7 @@ def create_votes_individual(voting, votes):
     for vote in votes:
         surname = vote.parliament_member.split(',')[0]
         initials = vote.parliament_member.split(',')[1].replace(' ', '')
+        initials = re.sub(r"\(.*\)", "", initials)  # for members with the same surname, the forename is written behind the initials (example: Doe, B.A.(John))
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         assert parliament_member
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
