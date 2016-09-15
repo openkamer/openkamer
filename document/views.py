@@ -8,15 +8,6 @@ from document.models import Voting
 from website.create import create_or_update_dossier
 
 
-class DocumentsView(TemplateView):
-    template_name = 'document/documents.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['documents'] = Document.objects.all()
-        return context
-
-
 class DocumentView(TemplateView):
     template_name = 'document/document.html'
 
