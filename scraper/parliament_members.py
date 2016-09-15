@@ -22,7 +22,6 @@ def create_members():
         if len(columns) == 8:
             forename = columns[1][0].text
             surname = columns[0][0].text.split(',')[0]
-            print(surname)
             prefix = columns[0][0].text.split('.')[-1].strip()
             initials = columns[0][0].text.split(',')[1].replace(prefix, '').replace(' ', '')
             if Person.person_exists(forename, surname):
