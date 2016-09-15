@@ -17,3 +17,4 @@ class Command(BaseCommand):
         # add a few demo dossiers
         create_or_update_dossier('33885')
         create_or_update_dossier('34344')
+        create_or_update_dossier('33506')
