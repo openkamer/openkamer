@@ -55,7 +55,7 @@ class VoteIndividual(Vote):
                 if ncol == 3:  # for
                     self.decision = 'FOR'
                 if ncol == 4:  # against
-                    self.decision = 'AGIANST'
+                    self.decision = 'AGAINST'
                 if ncol == 5:  # no vote
                     self.decision = 'NONE'
                 if ncol == 6:  # mistake
