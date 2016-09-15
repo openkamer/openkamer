@@ -1,7 +1,7 @@
 from rest_framework import serializers, viewsets
 
 from document.models import Document, Kamerstuk, Dossier
-from document.models import Voting, Vote
+from document.models import Voting, VoteParty, VoteIndividual
 
 
 class DossierSerializer(serializers.HyperlinkedModelSerializer):
@@ -59,12 +59,21 @@ class KamerstukViewSet(viewsets.ModelViewSet):
 
 
 class VotingSerializer(serializers.HyperlinkedModelSerializer):
-    votes = serializers.HyperlinkedRelatedField(read_only=True,
-                                                view_name='vote-detail',
-                                                many=True)
+    votes_party = serializers.HyperlinkedRelatedField(
+        read_only=True,
+        view_name='voteparty-detail',
+        many=True
+    )
+
+    votes_individual = serializers.HyperlinkedRelatedField(
+        read_only=True,
+        view_name='voteindividual-detail',
+        many=True
+    )
+
     class Meta:
         model = Voting
-        fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes')
+        fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes_party', 'votes_individual')
 
 
 class VotingViewSet(viewsets.ModelViewSet):
@@ -72,13 +81,24 @@ class VotingViewSet(viewsets.ModelViewSet):
     serializer_class = VotingSerializer
 
 
-class VoteSerializer(serializers.HyperlinkedModelSerializer):
+class VotePartySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = Vote
+        model = VoteParty
         fields = ('id', 'voting', 'decision', 'party', 'number_of_seats', 'details')
 
 
-class VoteViewSet(viewsets.ModelViewSet):
-    queryset = Vote.objects.all()
-    serializer_class = VoteSerializer
+class VotePartyViewSet(viewsets.ModelViewSet):
+    queryset = VoteParty.objects.all()
+    serializer_class = VotePartySerializer
+
+
+class VoteIndividualSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = VoteIndividual
+        fields = ('id', 'voting', 'decision', 'parliament_member', 'number_of_seats', 'details')
+
+
+class VoteIndividualViewSet(viewsets.ModelViewSet):
+    queryset = VoteIndividual.objects.all()
+    serializer_class = VoteIndividualSerializer
 
