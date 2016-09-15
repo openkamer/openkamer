@@ -1,3 +1,5 @@
+from unidecode import unidecode
+
 from django.db import models
 
 from wikidata import wikidata
@@ -19,16 +21,18 @@ class Person(models.Model):
     @staticmethod
     def find(surname, initials=''):
         print('Person::find() : ' + surname + ' (' + initials + ')')
+        surname = unidecode(surname)
+        initials = unidecode(initials)
         persons = Person.objects.all()
         for person in persons:
             score = 0
-            if surname.lower() == person.surname.lower():
+            if surname.lower() == unidecode(person.surname.lower()):
                 score += 1
-            if surname.lower() == person.surname.lower() + ' ' + person.surname_prefix.lower():
+            if surname.lower() == unidecode(person.surname.lower() + ' ' + person.surname_prefix.lower()):
                 score += 1
-            if surname.lower() == person.surname_prefix.lower() + ' ' + person.surname.lower():
+            if surname.lower() == unidecode(person.surname_prefix.lower() + ' ' + person.surname.lower()):
                 score += 1
-            if initials.lower() == person.initials.lower():
+            if initials.lower() == unidecode(person.initials.lower()):
                 score += 1
             if score >= 2:
                 print('found person for: ' + surname + ', ' + initials + ' : ' + str(person))

@@ -44,3 +44,10 @@ class TestFindParliamentMembers(TestCase):
         surname = 'van Weyenberg'
         member = ParliamentMember.find(surname=surname, initials=initials)
         self.assertEqual(member.person.forename, forename)
+
+    def test_find_member_non_ascii(self):
+        surname = 'Koser Kaya'
+        forename = 'Fatma'
+        initials = 'F.'
+        member = ParliamentMember.find(surname=surname, initials=initials)
+        self.assertEqual(member.person.forename, forename)
