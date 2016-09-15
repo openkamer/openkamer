@@ -51,3 +51,6 @@ class TestFindParliamentMembers(TestCase):
         initials = 'F.'
         member = ParliamentMember.find(surname=surname, initials=initials)
         self.assertEqual(member.person.forename, forename)
+        surname = 'Koşer Kaya'
+        member = ParliamentMember.find(surname=surname, initials=initials)
+        self.assertEqual(member.person.forename, forename)
