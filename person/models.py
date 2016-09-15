@@ -7,13 +7,33 @@ class Person(models.Model):
     forename = models.CharField(max_length=200)
     surname = models.CharField(max_length=200)
     surname_prefix = models.CharField(max_length=200, blank=True, default='')
+    initials = models.CharField(max_length=200, blank=True, default='')
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
 
     def __str__(self):
-        return self.get_full_name()
+        return self.get_full_name() + ' (' + self.initials + ')'
+
+    @staticmethod
+    def find(surname, initials=''):
+        print('Person::find() : ' + surname + ' (' + initials + ')')
+        persons = Person.objects.all()
+        for person in persons:
+            score = 0
+            if surname.lower() == person.surname.lower():
+                score += 1
+            if surname.lower() == person.surname.lower() + ' ' + person.surname_prefix.lower():
+                score += 1
+            if surname.lower() == person.surname_prefix.lower() + ' ' + person.surname.lower():
+                score += 1
+            if initials.lower() == person.initials.lower():
+                score += 1
+            if score >= 2:
+                print('found person for: ' + surname + ', ' + initials + ' : ' + str(person))
+                return person
+        return None
 
     def fullname(self):
         return self.get_full_name()

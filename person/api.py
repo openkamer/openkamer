@@ -11,6 +11,7 @@ class PersonSerializer(serializers.HyperlinkedModelSerializer):
             'forename',
             'surname',
             'surname_prefix',
+            'initials',
             'birthdate',
             'wikidata_id',
             'wikimedia_image_name',
