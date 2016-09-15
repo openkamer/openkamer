@@ -4,6 +4,8 @@ from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
 from document.models import Vote
+from document.models import VoteParty
+from document.models import VoteIndividual
 from document.models import Voting
 
 
@@ -41,7 +43,15 @@ class VotingAdmin(admin.ModelAdmin):
 
 
 class VoteAdmin(admin.ModelAdmin):
+    list_display = ('id', 'voting', 'decision', 'number_of_seats', 'details')
+
+
+class VotePartyAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'party', 'decision', 'number_of_seats', 'details')
+
+
+class VoteIndividualAdmin(admin.ModelAdmin):
+    list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
 
 
 admin.site.register(Dossier)
@@ -49,4 +59,6 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 
 admin.site.register(Vote, VoteAdmin)
+admin.site.register(VoteParty, VotePartyAdmin)
+admin.site.register(VoteIndividual, VoteIndividualAdmin)
 admin.site.register(Voting, VotingAdmin)

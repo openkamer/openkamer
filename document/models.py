@@ -1,6 +1,7 @@
 from django.db import models
 
 from parliament.models import PoliticalParty
+from parliament.models import ParliamentMember
 
 
 class Dossier(models.Model):
@@ -157,10 +158,17 @@ class Vote(models.Model):
     )
 
     voting = models.ForeignKey(Voting)
-    party = models.ForeignKey(PoliticalParty)
     number_of_seats = models.IntegerField()
     decision = models.CharField(max_length=2, choices=CHOICES)
     details = models.CharField(max_length=2000, blank=True, null=False, default='')
 
     def __str__(self):
-        return str(self.voting) + ' - ' + str(self.party) + ' - ' + str(self.decision)
+        return str(self.voting) + ' - ' + str(self.decision)
+
+
+class VoteParty(Vote):
+    party = models.ForeignKey(PoliticalParty)
+
+
+class VoteIndividual(Vote):
+    parliament_member = models.ForeignKey(ParliamentMember)

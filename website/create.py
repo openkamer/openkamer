@@ -1,10 +1,13 @@
 from parliament.models import PoliticalParty
+from parliament.models import ParliamentMember
 
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
 from document.models import Voting
 from document.models import Vote
+from document.models import VoteParty
+from document.models import VoteIndividual
 
 import scraper.documents
 import scraper.votings
@@ -107,11 +110,25 @@ def create_votings(dossier_id):
             else:
                 print('WARNING: kamerstuk ' + voting_result.get_document_id() + ' not found in database. Kamerstuk is probably not yet published.')
         voting_obj.save()
-        for vote in voting_result.votes:
-            party = PoliticalParty.find_party(vote.party_name)
-            assert party
-            Vote.objects.create(voting=voting_obj, party=party, number_of_seats=vote.number_of_seats,
-                                              decision=get_decision(vote.decision), details=vote.details)
+        if voting_result.is_individual():
+            create_votes_individual(voting_obj, voting_result.votes)
+        else:
+            create_votes_party(voting_obj, voting_result.votes)
+
+
+def create_votes_party(voting, votes):
+    for vote in votes:
+        party = PoliticalParty.find_party(vote.party_name)
+        assert party
+        VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
+                                 decision=get_decision(vote.decision), details=vote.details)
+
+def create_votes_individual(voting, votes):
+    for vote in votes:
+        parliament_member = ParliamentMember.find(vote.parliament_member)
+        assert parliament_member
+        VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
+                                      decision=get_decision(vote.decision), details=vote.details)
 
 
 def get_result_choice(result_string):
@@ -127,8 +144,13 @@ def get_result_choice(result_string):
 
 
 def get_decision(decision_string):
-    if 'for' in decision_string.lower():
+    decision_string = decision_string.lower()
+    if 'for' in decision_string:
         return Vote.FOR
-    elif 'against' in decision_string.lower():
+    elif 'against' in decision_string:
         return Vote.AGAINST
+    elif 'none' in decision_string:
+        return Vote.NONE
+    elif 'mistake' in decision_string:
+        return Vote.MISTAKE
     return None

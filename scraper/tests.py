@@ -17,7 +17,6 @@ class TestVotingScraper(TestCase):
     dossier_nr_individual_votes = 33506
 
     def test_get_voting_pages_for_dossier(self):
-        """ Example test """
         expected_urls = [
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154',
             'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10153'
