@@ -8,4 +8,3 @@ omit =
     website/local_settings.py
     website/wsgi.py
     apps.py
-    

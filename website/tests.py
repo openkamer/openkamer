@@ -7,6 +7,7 @@ from scraper import parliament_members
 from parliament.models import ParliamentMember
 
 from document.models import Dossier
+from document.models import Document
 from document.models import Voting
 
 from website.create import create_or_update_dossier
@@ -63,6 +64,10 @@ class TestWebsite(TestCase):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
+    def test_persons_overview(self):
+        response = self.client.get('/persons/')
+        self.assertEqual(response.status_code, 200)
+
     def test_dossiers_overview(self):
         response = self.client.get('/dossiers/')
         self.assertEqual(response.status_code, 200)
@@ -71,6 +76,12 @@ class TestWebsite(TestCase):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
             response = self.client.get('/dossier/' + str(dossier.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
+    def test_document_view(self):
+        documents = Document.objects.all()
+        for document in documents:
+            response = self.client.get('/document/' + str(document.id) + '/')
             self.assertEqual(response.status_code, 200)
 
     def test_votings_overview(self):
