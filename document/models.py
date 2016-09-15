@@ -153,8 +153,10 @@ class Voting(models.Model):
 class Vote(models.Model):
     FOR = 'FO'
     AGAINST = 'AG'
+    NONE = 'NO'
+    MISTAKE = 'MI'
     CHOICES = (
-        (FOR, 'For'), (AGAINST, 'Against'),
+        (FOR, 'For'), (AGAINST, 'Against'), (NONE, 'None'), (MISTAKE, 'Mistake')
     )
 
     voting = models.ForeignKey(Voting)
