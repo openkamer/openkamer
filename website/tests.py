@@ -78,6 +78,10 @@ class TestWebsite(TestCase):
             response = self.client.get('/dossier/' + str(dossier.id) + '/')
             self.assertEqual(response.status_code, 200)
 
+    def test_dossier_add(self):
+        response = self.client.get('/dossier/add/34537/')
+        self.assertEqual(response.status_code, 200)
+
     def test_document_view(self):
         documents = Document.objects.all()
         for document in documents:
