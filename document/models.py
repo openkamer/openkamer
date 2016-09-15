@@ -1,3 +1,4 @@
+from itertools import chain
 from django.db import models
 
 from parliament.models import PoliticalParty
@@ -111,40 +112,57 @@ class Voting(models.Model):
     date = models.DateField(auto_now=False, blank=True)
 
     def votes(self):
-        return Vote.objects.filter(voting=self)
+        return list(chain(self.votes_party(), self.votes_individual()))
+
+    def votes_party(self):
+        return VoteParty.objects.filter(voting=self)
+
+    def votes_individual(self):
+        return VoteIndividual.objects.filter(voting=self)
 
     def has_result_details(self):
-        return self.votes().count() > 0
+        return len(self.votes()) > 0
 
-    def parties_for_string(self):
-        parties_str = ''
+    def entities_for_string(self):
+        entities_str = ''
         for vote in self.votes():
             if vote.decision == Vote.FOR:
-                parties_str += vote.party.name_short + ', '
-        return parties_str
+                entities_str += vote.get_name() + ', '
+        return entities_str
 
-    def parties_against_string(self):
-        parties_str = ''
+    def entities_against_string(self):
+        entities_str = ''
         for vote in self.votes():
             if vote.decision == Vote.AGAINST:
-                parties_str += vote.party.name_short + ', '
-        return parties_str
+                entities_str += vote.get_name() + ', '
+        return entities_str
+
+    def entities_none_string(self):
+        entities_str = ''
+        for vote in self.votes():
+            if vote.decision == Vote.NONE:
+                entities_str += vote.get_name() + ', '
+        return entities_str
 
     def result_percent(self):
         n_votes = 0
         vote_for = 0
         vote_against = 0
+        vote_none = 0
         for vote in self.votes():
             n_votes += vote.number_of_seats
             if vote.decision == Vote.FOR:
                 vote_for += vote.number_of_seats
             elif vote.decision == Vote.AGAINST:
                 vote_against += vote.number_of_seats
+            elif vote.decision == Vote.NONE:
+                vote_none += vote.number_of_seats
         if n_votes == 0:
             return None
         for_percent = vote_for/n_votes * 100.0
         against_percent = vote_against/n_votes * 100.0
-        return {'for': for_percent, 'against': against_percent}
+        no_vote_percent = vote_none/n_votes * 100.0
+        return {'for': for_percent, 'against': against_percent, 'no_vote': no_vote_percent}
 
     def __str__(self):
         return 'Dossier: ' + self.dossier.dossier_id + ', result: ' + self.result
@@ -164,6 +182,9 @@ class Vote(models.Model):
     decision = models.CharField(max_length=2, choices=CHOICES)
     details = models.CharField(max_length=2000, blank=True, null=False, default='')
 
+    def get_name(self):
+        raise NotImplementedError
+
     def __str__(self):
         return str(self.voting) + ' - ' + str(self.decision)
 
@@ -171,6 +192,12 @@ class Vote(models.Model):
 class VoteParty(Vote):
     party = models.ForeignKey(PoliticalParty)
 
+    def get_name(self):
+        return self.party.name
+
 
 class VoteIndividual(Vote):
     parliament_member = models.ForeignKey(ParliamentMember)
+
+    def get_name(self):
+        return str(self.parliament_member)

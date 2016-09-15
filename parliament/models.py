@@ -35,7 +35,7 @@ class ParliamentMember(models.Model):
         return None
 
     def __str__(self):
-        return str(self.person) + ' (' + str(self.parliament) + ')'
+        return str(self.person.fullname()) + ' (' + str(self.party().name_short) + ')'
 
 
 class PoliticalParty(models.Model):
