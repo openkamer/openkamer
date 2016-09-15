@@ -55,7 +55,7 @@ class VoteIndividual(Vote):
 
     def create(self):
         ncol = 0
-        col_type = {3: 'For', 4: 'AGAINST', 5: 'NONE', 6: 'MISTAKE'}
+        col_type = {3: 'FOR', 4: 'AGAINST', 5: 'NONE', 6: 'MISTAKE'}
         for column in self.vote_table_row.iter():
             if column.tag == 'td':
                 ncol += 1
@@ -126,7 +126,6 @@ class VotingResult(object):
 
     def is_individual(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
-        print('is_individual(): ' + result_content_elements[0].text)
         return 'hoofdelijk' in result_content_elements[0].text.lower()
 
     def get_result(self):
