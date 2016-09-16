@@ -1,6 +1,6 @@
 from rest_framework import serializers, viewsets
 
-from document.models import Document, Kamerstuk, Dossier
+from document.models import Document, Kamerstuk, Dossier, Submitter
 from document.models import Voting, VoteParty, VoteIndividual
 
 
@@ -24,6 +24,10 @@ class DossierViewSet(viewsets.ModelViewSet):
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
+    submitters = serializers.HyperlinkedRelatedField(read_only=True,
+                                                     view_name='submitter-detail',
+                                                     many=True)
+
     class Meta:
         model = Document
         fields = (
@@ -34,7 +38,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'title_full',
             'title_short',
             'publication_type',
-            'submitter',
+            'submitters',
             'category',
             'publisher',
             'date_published',
@@ -56,6 +60,17 @@ class KamerstukSerializer(serializers.HyperlinkedModelSerializer):
 class KamerstukViewSet(viewsets.ModelViewSet):
     queryset = Kamerstuk.objects.all()
     serializer_class = KamerstukSerializer
+
+
+class SubmitterSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Submitter
+        fields = ('person', 'document')
+
+
+class SubmitterViewSet(viewsets.ModelViewSet):
+    queryset = Submitter.objects.all()
+    serializer_class = SubmitterSerializer
 
 
 class VotingSerializer(serializers.HyperlinkedModelSerializer):

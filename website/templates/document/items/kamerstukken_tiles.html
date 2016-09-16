@@ -9,7 +9,11 @@
         </div>
 
         <div class="col-xs-8" align="right">
-          <small>{{ kamerstuk.document.submitter }}</small>
+          <small>
+            {% with submitters=kamerstuk.document.submitters %}
+              {% include "document/items/submitters_list.html" %}
+            {% endwith %}
+          </small>
         </div>
       </div>
 

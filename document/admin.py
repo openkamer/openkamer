@@ -3,6 +3,7 @@ from django.contrib import admin
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
+from document.models import Submitter
 from document.models import Vote
 from document.models import VoteParty
 from document.models import VoteIndividual
@@ -38,6 +39,10 @@ class KamerstukAdmin(admin.ModelAdmin):
         return obj.document.date_published
 
 
+class SubmitterAdmin(admin.ModelAdmin):
+    list_display = ('person', 'document')
+
+
 class VotingAdmin(admin.ModelAdmin):
     list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'kamerstuk')
 
@@ -57,6 +62,7 @@ class VoteIndividualAdmin(admin.ModelAdmin):
 admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
+admin.site.register(Submitter, SubmitterAdmin)
 
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)

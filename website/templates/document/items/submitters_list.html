@@ -1,0 +1,4 @@
+
+{% for submitter in submitters %}
+  {{ submitter }}{% if not forloop.last %},{% endif %}
+{% endfor %}

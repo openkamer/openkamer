@@ -1,11 +1,16 @@
 import re
 
+from person.models import Person
+
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
+from parliament.util import parse_name_initials_surname
+from parliament.util import parse_name_surname_initials
 
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
+from document.models import Submitter
 from document.models import Voting
 from document.models import Vote
 from document.models import VoteParty
@@ -57,12 +62,23 @@ def create_or_update_dossier(dossier_id):
             title_full=metadata['title_full'],
             title_short=metadata['title_short'],
             publication_type=metadata['publication_type'],
-            submitter=metadata['submitter'],
             category=metadata['category'],
             publisher=metadata['publisher'],
             date_published=date_published,
             content_html=content_html,
         )
+
+        submitters = metadata['submitter'].split('|')
+        for submitter in submitters:
+            has_initials = len(submitter.split('.')) > 1
+            initials = ''
+            surname = submitter
+            if has_initials:
+                initials, surname = parse_name_initials_surname(submitter)
+            person = Person.find(surname=surname, initials=initials)
+            if not person:
+                person = Person.objects.create(surname=surname, initials=initials)
+            Submitter.objects.create(person=person, document=document)
 
         if metadata['is_kamerstuk']:
             print('create kamerstuk')
@@ -128,9 +144,7 @@ def create_votes_party(voting, votes):
 
 def create_votes_individual(voting, votes):
     for vote in votes:
-        surname = vote.parliament_member.split(',')[0]
-        initials = vote.parliament_member.split(',')[1].replace(' ', '')
-        initials = re.sub(r"\(.*\)", "", initials)  # for members with the same surname, the forename is written behind the initials (example: Doe, B.A.(John))
+        initials, surname = parse_name_surname_initials(vote.parliament_member)
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         assert parliament_member
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
