@@ -1,19 +1,20 @@
 <h4><a href="/person/{{ person.id }}/">{{ person.fullname }}</a></h4>
+
 <table class="table">
   <tr>
-    <td>Voornaam</td>
+    <th>Voornaam</th>
     <td>{{ person.forename }}</td>
   </tr>
   <tr>
-    <td>Achternaam</td>
+    <th>Achternaam</th>
     <td>{{ person.surname_prefix }} {{ person.surname }}</td>
   </tr>
   <tr>
-    <td>Initialen</td>
+    <th>Initialen</th>
     <td>{{ person.initials }}</td>
   </tr>
   <tr>
-    <td>Geboortedatum</td>
+    <th>Geboortedatum</th>
     <td>{{ person.birthdate }}</td>
   </tr>
 </table>
