@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from person.views import PersonsView
+from person.views import PersonsView, PersonView
 from document.views import DossierView, DossiersView, AddDossierView
 from document.views import DocumentView
 from document.views import VotingView
@@ -17,6 +17,7 @@ import website.api
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^persons/$', PersonsView.as_view()),
+    url(r'^person/(?P<person_id>\d+)/$', PersonView.as_view()),
     url(r'^parties/$', PartiesView.as_view()),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
     url(r'^dossiers/$', DossiersView.as_view()),

@@ -5,17 +5,20 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h4>Persons</h4></div>
+    <div align="center"><h3>Personen</h3></div>
   </div>
 </div>
 
-{% for person in persons %}
-<div class="row">
-  {{ person }} <br/>
-  {{ person.birthdate }}
-   <img src="{{ person.wikimedia_image_url }}" width="200px">
+<div class="row" align="center">
+  {% for person in persons %}
+    <div class="col-sm-4">
+      {% include "person/items/person.html" %}
+    </div>
+    {% if forloop.counter|divisibleby:3 %}
+    <div class="clearfix"></div>
+    {% endif %}
+  {% endfor %}
 </div>
-{% endfor %}
 
 <hr/>
 

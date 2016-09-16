@@ -4,6 +4,8 @@ from django.test import Client
 from scraper import political_parties
 from scraper import parliament_members
 
+from person.models import Person
+
 from parliament.models import ParliamentMember
 
 from document.models import Dossier
@@ -67,6 +69,12 @@ class TestWebsite(TestCase):
     def test_persons_overview(self):
         response = self.client.get('/persons/')
         self.assertEqual(response.status_code, 200)
+
+    def test_person_overview(self):
+        persons = Person.objects.all()[:10]
+        for person in persons:
+            response = self.client.get('/person/' + str(person.id) + '/')
+            self.assertEqual(response.status_code, 200)
 
     def test_dossiers_overview(self):
         response = self.client.get('/dossiers/')
