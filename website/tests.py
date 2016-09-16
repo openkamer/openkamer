@@ -142,6 +142,10 @@ class TestWebsite(TestCase):
         response = self.client.get('/api/kamerstuk/')
         self.assertEqual(response.status_code, 200)
 
+    def test_api_submitter(self):
+        response = self.client.get('/api/submitter/')
+        self.assertEqual(response.status_code, 200)
+
     def test_api_dossier(self):
         response = self.client.get('/api/dossier/')
         self.assertEqual(response.status_code, 200)
