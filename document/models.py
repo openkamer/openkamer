@@ -1,6 +1,8 @@
 from itertools import chain
 from django.db import models
 
+from person.models import Person
+
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
 
@@ -47,11 +49,13 @@ class Document(models.Model):
     title_full = models.CharField(max_length=500)
     title_short = models.CharField(max_length=200)
     publication_type = models.CharField(max_length=200, blank=True)
-    submitter = models.CharField(max_length=200, blank=True)
     category = models.CharField(max_length=200, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True)
     content_html = models.CharField(max_length=200000, blank=True)
+
+    def submitters(self):
+        return Submitter.objects.filter(document=self)
 
     def title(self):
         return self.title_full.split(';')[0]
@@ -64,6 +68,14 @@ class Document(models.Model):
 
     class Meta:
         ordering = ['-date_published']
+
+
+class Submitter(models.Model):
+    person = models.ForeignKey(Person)
+    document = models.ForeignKey(Document)
+
+    def __str__(self):
+        return self.person.fullname()
 
 
 class Kamerstuk(models.Model):
