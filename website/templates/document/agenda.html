@@ -1,0 +1,32 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="center"><h3>Document</h3></div>
+    <div align="left">
+      <h4>{{ agenda.document.title }}</h4>
+      <H5>{{ agenda.document.date_published|date:"Y-m-d" }}</H5>
+      <h5>Bron: <a href="{{ agenda.document.document_url }}">{{ agenda.document.document_url }}</a></h5>
+    </div>
+    <h3>Behandelde dossiers</h3>
+{% for item in agendaitems %}
+    <li><a <a href="/dossier/{{ item.dossier.id }}/">{{item.dossier}}</a>
+{% endfor %}
+  </div>
+</div>
+
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="left">
+      {{ document.content_html|safe }}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

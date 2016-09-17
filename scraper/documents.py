@@ -64,6 +64,7 @@ def get_metadata(document_id):
                     metadata[name] += element.get('content')
             else:
                 print('WARNING: more than 1 element found for key: ' + key + ', using first, but more info available!')
+                metadata[name] = elements[0].get('content')
         else:
             metadata[name] = elements[0].get('content')
 
@@ -77,6 +78,19 @@ def get_metadata(document_id):
     for element in elements:
         if element.get('scheme') == 'OVERHEIDop.Parlementair':
             metadata['is_kamerstuk'] = element.get('content') == 'Kamerstuk'
+            
+
+    """ agenda code """
+    metadata['is_agenda'] = False
+    elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
+    for element in elements:
+        if element.get('scheme') == 'OVERHEIDop.Parlementair':
+            metadata['is_agenda'] = element.get('content') == 'Agenda'
+            
+    elements = tree.xpath('/metadata_gegevens/metadata[@name="OVERHEIDop.behandeldDossier"]')
+    metadata['behandelde_dossiers'] = [] 
+    for element in elements:
+        metadata['behandelde_dossiers'].append(element.get('content'))
 
     return metadata
 

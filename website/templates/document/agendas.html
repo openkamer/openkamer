@@ -1,0 +1,27 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Agendas</h3></div>
+    <hr/>
+  </div>
+</div>
+
+{% for agenda in agendas %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="left">
+      <h6><a href="/agenda/{{ agenda.id }}/">{{ agenda.document.title_full }}</a></h6>
+    </div>
+  </div>
+</div>
+
+{% endfor %}
+
+<hr/>
+
+{% endblock %}

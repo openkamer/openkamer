@@ -82,6 +82,21 @@ class Kamerstuk(models.Model):
         verbose_name_plural = 'Kamerstukken'
         ordering = ['id_sub']
 
+class Agenda(models.Model):
+    document = models.ForeignKey(Document)
+    agenda_id = models.CharField(max_length=200, blank=True)
+    
+    def __str__(self):
+        return
+        
+class AgendaItem(models.Model):
+    agenda = models.ForeignKey(Agenda)
+    dossier = models.ForeignKey(Dossier)
+    
+    def __str__(self):
+        return 
+    
+    
 
 def create_or_update_dossier(dossier_id):
     print('create or update dossier')
@@ -148,4 +163,61 @@ def create_or_update_dossier(dossier_id):
                 type_short=type_short,
                 type_long=type_long,
             )
+            
+#        if metadata['publication_type'] == 'Agenda':
+#            Agenda.object.create(
+#            document=document)
+        
     return dossier
+    
+    
+def create_or_update_agenda(agenda_id):
+    agendas = Agenda.objects.filter(agenda_id=agenda_id)
+    if agendas:
+#        pass
+        agenda = agendas[0]
+        agenda.delete()
+        
+    else:
+                
+        metadata = scraper.documents.get_metadata(agenda_id)
+        doc_url = 'https://zoek.officielebekendmakingen.nl/' + agenda_id         
+        document_id, content_html = scraper.documents.get_document_id_and_content(doc_url)
+
+        if metadata['date_published']:
+            date_published = metadata['date_published']
+        
+        if metadata['is_agenda']:
+            document = Document.objects.create(
+                
+                document_id=document_id,
+                title_full=metadata['title_full'],
+                title_short=metadata['title_short'],
+                publication_type=metadata['publication_type'],
+                submitter=metadata['submitter'],
+                category=metadata['category'],
+                publisher=metadata['publisher'],
+                date_published=date_published,
+                content_html=content_html, 
+            )
+            agenda = Agenda.objects.create(
+                agenda_id=agenda_id,
+                document=document,
+            )
+            
+            for n in metadata['behandelde_dossiers']:
+                print("behandeld dossier:",n)
+                dossiers = Dossier.objects.filter(dossier_id=n)
+                if dossiers:
+                    dossier = dossiers[0]
+                else:                
+                    dossier = create_or_update_dossier(n)
+                agenda_item = AgendaItem.objects.create(
+                    agenda=agenda,
+                    dossier = dossier,
+                )
+            
+            
+    
+    return agenda
+    
