@@ -32,8 +32,6 @@ def create_or_update_dossier(dossier_id):
         dossier = Dossier.objects.create(dossier_id=dossier_id)
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
-        print('create document for results:')
-
         # skip documents of some types and/or sources, no models implemented yet
         # TODO: handle all document types
         if 'Staatscourant' in result['type']:
@@ -69,71 +67,82 @@ def create_or_update_dossier(dossier_id):
 
         submitters = metadata['submitter'].split('|')
         for submitter in submitters:
-            has_initials = len(submitter.split('.')) > 1
-            initials = ''
-            surname = submitter
-            if has_initials:
-                initials, surname = parse_name_initials_surname(submitter)
-            person = Person.find(surname=surname, initials=initials)
-            if not person:
-                person = Person.objects.create(surname=surname, initials=initials)
-            Submitter.objects.create(person=person, document=document)
+            create_submitter(document, submitter)
 
         if metadata['is_kamerstuk']:
-            print('create kamerstuk')
-            # print(items)
-            title_parts = metadata['title_full'].split(';')
-            type_short = ''
-            type_long = ''
-            if len(title_parts) > 2:
-                type_short = title_parts[1].strip()
-                type_long = title_parts[2].strip()
-            if "Bijlage" in result['type']:
-                print('BIJLAGE')
-                type_short = 'Bijlage'
-                type_long = 'Bijlage'
-            Kamerstuk.objects.create(
-                document=document,
-                id_main=dossier_id,
-                id_sub=metadata['id_sub'].zfill(2),
-                type_short=type_short,
-                type_long=type_long,
-            )
+            create_kamerstuk(document, dossier_id, metadata, result)
 
         if metadata['is_agenda']:
-            print('create agenda')
-            agenda = Agenda.objects.create(
-                agenda_id=document_id,
-                document=document,
-            )
-            for n in metadata['behandelde_dossiers']:
-
-                dossiers = Dossier.objects.filter(dossier_id=n)
-                if dossiers:
-                    dossier = dossiers[0]
-                    agenda_item = AgendaItem.objects.create(
-                        agenda=agenda,
-                        dossier=dossier,
-                        item_text=n,
-                    )
-                else:
-                    agenda_item = AgendaItem.objects.create(
-                        agenda=agenda,
-                        item_text=n,
-                    )
+            create_agenda(document, metadata)
 
     create_votings(dossier_id)
     return dossier
 
 
+def create_kamerstuk(document, dossier_id, metadata, result):
+    print('create kamerstuk')
+    # print(items)
+    title_parts = metadata['title_full'].split(';')
+    type_short = ''
+    type_long = ''
+    if len(title_parts) > 2:
+        type_short = title_parts[1].strip()
+        type_long = title_parts[2].strip()
+    if "Bijlage" in result['type']:
+        type_short = 'Bijlage'
+        type_long = 'Bijlage'
+    Kamerstuk.objects.create(
+        document=document,
+        id_main=dossier_id,
+        id_sub=metadata['id_sub'].zfill(2),
+        type_short=type_short,
+        type_long=type_long,
+    )
+
+
+def create_submitter(document, submitter):
+    has_initials = len(submitter.split('.')) > 1
+    initials = ''
+    surname = submitter
+    if has_initials:
+        initials, surname = parse_name_initials_surname(submitter)
+    person = Person.find(surname=surname, initials=initials)
+    if not person:
+        person = Person.objects.create(surname=surname, initials=initials)
+    Submitter.objects.create(person=person, document=document)
+
+
+def create_agenda(document, metadata):
+    print('create agenda')
+    agenda = Agenda.objects.create(
+        agenda_id=document.document_id,
+        document=document,
+    )
+    for n in metadata['behandelde_dossiers']:
+        dossiers = Dossier.objects.filter(dossier_id=n)
+        if dossiers:
+            dossier = dossiers[0]
+            agenda_item = AgendaItem.objects.create(
+                agenda=agenda,
+                dossier=dossier,
+                item_text=n,
+            )
+        else:
+            agenda_item = AgendaItem.objects.create(
+                agenda=agenda,
+                item_text=n,
+            )
+    return agenda
+
+
 def create_or_update_agenda(agenda_id):
+    #TODO: implement
     agendas = Agenda.objects.filter(agenda_id=agenda_id)
     if agendas:
         #        pass
         agenda = agendas[0]
         agenda.document.delete()
         agenda.delete()
-
     else:
         pass
 
