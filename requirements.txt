@@ -1,9 +1,9 @@
-django==1.10.1
+django==1.10.2
 django-bootstrap3==7.1.0
-pillow==3.3.1
-djangorestframework==3.4.6
+pillow==3.4.1
+djangorestframework==3.4.7
 requests==2.11.1
 lxml==3.6.4
-dateparser==0.4.0
+dateparser==0.5.0
 plotly==1.12.9
 unidecode==0.4.19
