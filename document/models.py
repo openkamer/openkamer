@@ -84,6 +84,7 @@ class Kamerstuk(models.Model):
     id_sub = models.CharField(max_length=40, blank=True)
     type_short = models.CharField(max_length=40, blank=True)
     type_long = models.CharField(max_length=100, blank=True)
+    original = models.ForeignKey('self', null=True, blank=True)
 
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ' ' + str(self.type_long)
@@ -112,18 +113,18 @@ class Kamerstuk(models.Model):
 class Agenda(models.Model):
     document = models.ForeignKey(Document)
     agenda_id = models.CharField(max_length=200, blank=True)
-    
+
     def __str__(self):
-        return
+        return str(self.document)
 
 
 class AgendaItem(models.Model):
     agenda = models.ForeignKey(Agenda)
     dossier = models.ForeignKey(Dossier, null=True)
     item_text = models.CharField(max_length=100, blank=True)
-    
+
     def __str__(self):
-        return 
+        return str(self.agenda)
 
     
 class Voting(models.Model):
