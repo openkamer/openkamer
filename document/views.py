@@ -3,6 +3,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
 from document.models import Document, Dossier
+from document.models import Agenda, AgendaItem
+from document.models import Document, Dossier
 from document.models import Voting
 
 from website.create import create_or_update_dossier
@@ -32,6 +34,24 @@ class DossierView(TemplateView):
     def get_context_data(self, dossier_pk, **kwargs):
         context = super().get_context_data(**kwargs)
         context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        return context
+
+class AgendasView(TemplateView):
+    template_name = 'document/agendas.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['agendas'] = Agenda.objects.all()
+        return context
+        
+class AgendaView(TemplateView):
+    template_name = 'document/agenda.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agenda = Agenda.objects.get(id=self.kwargs['pk'])
+        context['agenda'] = agenda
+        context['agendaitems'] = AgendaItem.objects.filter(agenda=agenda)
         return context
 
 

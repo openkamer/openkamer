@@ -79,6 +79,18 @@ def get_metadata(document_id):
         if element.get('scheme') == 'OVERHEIDop.Parlementair':
             metadata['is_kamerstuk'] = element.get('content') == 'Kamerstuk'
 
+    """ agenda code """
+    metadata['is_agenda'] = False
+    elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
+    for element in elements:
+        if element.get('scheme') == 'OVERHEIDop.Parlementair':
+            metadata['is_agenda'] = element.get('content') == 'Agenda'
+            
+    elements = tree.xpath('/metadata_gegevens/metadata[@name="OVERHEIDop.behandeldDossier"]')
+    metadata['behandelde_dossiers'] = [] 
+    for element in elements:
+        metadata['behandelde_dossiers'].append(element.get('content'))
+
     return metadata
 
 

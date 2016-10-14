@@ -3,6 +3,7 @@ from django.contrib import admin
 
 from person.views import PersonsView, PersonView
 from document.views import DossierView, DossiersView, AddDossierView
+from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import VotingView
 from document.views import VotingsView
@@ -21,6 +22,8 @@ urlpatterns = [
     url(r'^parties/$', PartiesView.as_view()),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
     url(r'^dossiers/$', DossiersView.as_view()),
+    url(r'^agendas/$', AgendasView.as_view()),
+    url(r'^agenda/(?P<pk>\d+)/$', AgendaView.as_view()),
     url(r'^dossier/(?P<dossier_pk>\d+)/$', DossierView.as_view()),
     url(r'^dossier/add/(?P<dossier_id>\d+)/$', AddDossierView.as_view()),
     url(r'^document/(?P<pk>\d+)/$', DocumentView.as_view()),

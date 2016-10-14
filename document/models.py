@@ -109,6 +109,23 @@ class Kamerstuk(models.Model):
         ordering = ['id_sub']
 
 
+class Agenda(models.Model):
+    document = models.ForeignKey(Document)
+    agenda_id = models.CharField(max_length=200, blank=True)
+    
+    def __str__(self):
+        return
+
+
+class AgendaItem(models.Model):
+    agenda = models.ForeignKey(Agenda)
+    dossier = models.ForeignKey(Dossier, null=True)
+    item_text = models.CharField(max_length=100, blank=True)
+    
+    def __str__(self):
+        return 
+
+    
 class Voting(models.Model):
     AANGENOMEN = 'AAN'
     VERWORPEN = 'VER'
