@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import re
 
@@ -6,9 +7,11 @@ import lxml
 import lxml.html
 import lxml.etree
 
+logger = logging.getLogger(__name__)
+
 
 def get_document_id_and_content(url):
-    print('get document id for url: ' + url)
+    logger.info('get document id for url: ' + url)
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
@@ -29,11 +32,10 @@ def get_document_id_and_content(url):
 
 
 def get_metadata(document_id):
-    print('get metadata url for document id: ' + str(document_id))
+    logger.info('get metadata url for document id: ' + str(document_id))
     xml_url = 'https://zoek.officielebekendmakingen.nl/' + document_id + '/metadata.xml'
-    print('get metadata url: ' + xml_url)
+    logger.info('get metadata url: ' + xml_url)
     page = requests.get(xml_url)
-    print('server responded')
     tree = lxml.etree.fromstring(page.content)
     attributes_transtable = {
         'OVERHEIDop.dossiernummer': 'dossier_id',
@@ -52,7 +54,7 @@ def get_metadata(document_id):
     for key, name in attributes_transtable.items():
         elements = tree.xpath('/metadata_gegevens/metadata[@name="' + key + '"]')
         if not elements:
-            print('WARNING: ' + key + ' was not found')
+            logger.warning('' + key + ' was not found')
             metadata[name] = ''
             continue
         if len(elements) > 1:
@@ -62,7 +64,7 @@ def get_metadata(document_id):
                 if metadata[name]:
                     metadata[name] += '|'
                 metadata[name] += element.get('content')
-                print('WARNING: more than 1 element found for key: ' + key + '!')
+                logger.warning('more than 1 element found for key: ' + key + '!')
         else:
             metadata[name] = elements[0].get('content')
 
@@ -82,21 +84,18 @@ def get_metadata(document_id):
 
 def search_politieknl_dossier(dossier_id):
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/' + str(dossier_id)
-
     page = requests.get(dossier_url)
     tree = lxml.html.fromstring(page.content)
     element = tree.xpath('//p[@class="info marge-onder"]/strong')
     n_publications = int(element[0].text)
-    print(str(n_publications) + ' results found')
+    logger.info(str(n_publications) + ' results found')
     element = tree.xpath('//dl[@class ="zoek-resulaten-info"]//dd')
     dossier_number = int(element[1].text)
     assert element[1].getprevious().text == 'Dossiernummer:'
-    print(dossier_number)
-
     results = []
     pagnr = 1
     while len(results) < n_publications:
-        print('reading page: '  + str(pagnr))
+        logger.info('reading page: ' + str(pagnr))
         params = {
             '_page': pagnr,
             'sorttype': 1,
@@ -129,11 +128,4 @@ def search_politieknl_dossier(dossier_id):
                 'page_url': page_url,
             }
             results.append(result)
-
-        print('------')
-        print(result['type'])
-        print(result['title'])
-        print(result['date_published'])
-        print(result['publisher'])
-        print(result['page_url'])
     return results
