@@ -33,6 +33,7 @@ class KamerstukAdmin(admin.ModelAdmin):
         'type_short',
         'type_long',
         'document_date',
+        'original',
     )
 
     def document_date(self, obj):
