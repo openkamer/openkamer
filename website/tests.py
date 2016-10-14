@@ -8,6 +8,7 @@ from person.models import Person
 
 from parliament.models import ParliamentMember
 
+from document.models import Agenda
 from document.models import Dossier
 from document.models import Document
 from document.models import Voting
@@ -94,6 +95,12 @@ class TestWebsite(TestCase):
         documents = Document.objects.all()
         for document in documents:
             response = self.client.get('/document/' + str(document.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
+    def test_agenda_view(self):
+        agendas = Agenda.objects.all()
+        for agenda in agendas:
+            response = self.client.get('/agenda/' + str(agenda.id) + '/')
             self.assertEqual(response.status_code, 200)
 
     def test_votings_overview(self):
