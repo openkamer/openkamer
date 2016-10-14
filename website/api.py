@@ -4,7 +4,8 @@ from rest_framework import routers
 from person.api import PersonViewSet
 from parliament.api import ParliamentViewSet, ParliamentMemberViewSet
 from parliament.api import PoliticalPartyViewSet, PartyMemberViewSet
-from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet
+from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet, SubmitterViewSet
+from document.api import VotingViewSet, VotePartyViewSet, VoteIndividualViewSet
 
 router = routers.DefaultRouter()
 router.register(r'person', PersonViewSet)
@@ -14,7 +15,11 @@ router.register(r'party', PoliticalPartyViewSet)
 router.register(r'partymember', PartyMemberViewSet)
 router.register(r'document', DocumentViewSet)
 router.register(r'kamerstuk', KamerstukViewSet)
+router.register(r'submitter', SubmitterViewSet)
 router.register(r'dossier', DossierViewSet)
+router.register(r'voting', VotingViewSet)
+router.register(r'voteparty', VotePartyViewSet)
+router.register(r'voteindividual', VoteIndividualViewSet)
 
 urlpatterns = [
     url(r'', include(router.urls)),

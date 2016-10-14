@@ -3,9 +3,9 @@
 
 This is a work in progress...
 
-A Python 3.3+ and Django 1.9 project.
+A Python 3.4+ and Django 1.10 project.
 
-### Installation (Linux)
+## Installation (Linux)
 
 Get the code and enter the project directory,
 ```
@@ -29,7 +29,7 @@ $ python manage.py createsuperuser
 ```
 
 ### Create demo data
-Creating data can take several minutes and mostly depends on response time of external sources,
+Creating data (scraping) can take several minutes and mostly depends on response time of external sources,
 ```
 $ python manage.py create_data
 ```
@@ -42,3 +42,23 @@ $ source env/bin/activate
 ```
 
 openkamers is now available at http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
+
+## Development
+
+### Testing
+
+##### Run tests
+Run all tests,
+```
+$ python manage.py test
+```
+
+Run specific tests (example),
+```
+$ python manage.py test website.test.TestCreateParliament
+```
+
+##### Create test json fixtures
+```
+$ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament document website > website/fixtures/<fixture_name>.json
+```

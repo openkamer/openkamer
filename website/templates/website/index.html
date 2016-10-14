@@ -3,10 +3,44 @@
 {% load bootstrap3 %}
 {% block content %}
 
+<div class="vertical-spacer-40"></div>
+
 <div class="row">
 
-  <div class="col-lg-12">
-    <div align="center"><h4>Home</h4></div>
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="/dossiers/">
+        <h3><span class="glyphicon glyphicon-folder-open"></span></h3>
+        <h3>Dossiers</h3>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="/votings/">
+        <h3><span class="glyphicon glyphicon-pencil"></span></h3>
+        <h3>Stemmingen</h3>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="/parties/">
+        <h3><span class="glyphicon glyphicon-leaf"></span></h3>
+        <h3>Partijen</h3>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="/parliamentmembers/">
+        <h3><span class="glyphicon glyphicon-user"></span></h3>
+        <h3>Kamerleden</h3>
+      </a>
+    </div>
   </div>
 
 </div>

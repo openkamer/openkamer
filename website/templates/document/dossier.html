@@ -8,6 +8,12 @@
     <div align="center">
       <h4>Dossier {{ dossier.dossier_id }}</h4>
       <h5>{{ dossier.title }}</h5>
+      {% if dossier.voting %}
+        {% with voting=dossier.voting %}
+          {% include "document/items/voting_result_bar.html" %}
+          {% include "document/items/voting_result_small.html" %}
+        {% endwith %}
+      {% endif %}
     </div>
   </div>
 </div>
@@ -15,30 +21,11 @@
 <hr/>
 
 <div class="row">
+  {% include "document/items/kamerstukken_tiles.html" %}
+</div>
 
-{% for kamerstuk in dossier.kamerstukken %}
-  {% if kamerstuk.visible %}
-  <div class="col-sm-4 kamerstuk-member-column" align="center">
-    <p>
-      <!--{% if kamerstuk.voorstelwet %}-->
-       <!--voorstaelwet-->
-      <!--{% endif %}-->
-      <h5><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a></h5>
-      <font size="2">
-        {% if kamerstuk.type_short !=  kamerstuk.type_long %}
-        {{ kamerstuk.type_long }} <br/>
-        {% endif %}
-        <!--{{ kamerstuk.document.title }} <br/>-->
-        <b>{{ kamerstuk.document.date_published|date:"Y-m-d" }} </b> <br/>
-        {{ kamerstuk.document.submitter }} <br/>
-        {{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}<br/>
-      </font>
-    </p>
-
-  </div>
-  {% endif %}
-{% endfor %}
-
+<div class="row hidden">
+  {% include "document/items/kamerstukken_table.html" %}
 </div>
 
 <hr/>

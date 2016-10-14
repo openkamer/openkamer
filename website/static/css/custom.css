@@ -1,9 +1,22 @@
 html, body {
-    height:100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
-    padding-top: 70px;
+  padding-top: 70px;
+}
+
+.vertical-spacer-20 {
+    padding: 0;
+    margin: 0;
+    height: 20px;
+}
+
+.vertical-spacer-40 {
+    padding: 0;
+    margin: 0;
+    height: 40px;
 }
 
 .fixed-height-column {
@@ -33,8 +46,25 @@ body {
   max-height: 50px;
 }
 
-.kamerstuk-member-column {
-  padding: 2px;
-  overflow: hidden;
-  height: 12em;
+.progress.progress-small {
+  padding: 0;
+  margin: 0;
+  height: 5px;
+  border-radius: 0;
+}
+
+.col-progress-bar {
+  margin: 0.5em 0 0 0;
+}
+
+hr.hr-small {
+  margin: 0.1em 0;
+}
+
+.well.well-small {
+  padding: 0.5em 0.5em 0 0.5em;
+}
+
+.col-kamerstukken {
+  padding: 0 0.2em;
 }

@@ -1,0 +1,4 @@
+
+{% for submitter in submitters %}
+  <a href="/person/{{ submitter.person.id }}/">{{ submitter }}</a>{% if not forloop.last %},{% endif %}
+{% endfor %}

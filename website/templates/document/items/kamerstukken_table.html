@@ -1,0 +1,47 @@
+<div class="col-12-lg">
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th width="100px">Datum</th>
+      <th width="200px">Type</th>
+      <th>Onderwerp</th>
+      <th>Kamerstuk</th>
+      <th width="150px">Indieners</th>
+      <th>Uitslag</th>
+      <th>Verhouding</th>
+    </tr>
+  </thead>
+<tbody>
+  {% for kamerstuk in dossier.kamerstukken %}
+    {% if kamerstuk.visible %}
+    <tr>
+      <td><small>{{ kamerstuk.document.date_published|date:"Y-m-d" }}</small></td>
+      <td><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a></td>
+      <td>
+        {% if kamerstuk.type_short !=  kamerstuk.type_long %}
+          <small>{{ kamerstuk.type_long }}</small>
+        {% endif %}
+      </td>
+      <td>{{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}</td>
+      <td>
+        {% with submitters=kamerstuk.document.submitters %}
+          {% include "document/items/submitters_list.html" %}
+        {% endwith %}
+      </td>
+      {% if kamerstuk.voting %}
+        {% with voting=kamerstuk.voting %}
+        <td align="center">{% include "document/items/voting_result_small.html" %}</td>
+        <td align="center">{% include "document/items/voting_result_bar_small.html" %}</td>
+        {% endwith %}
+      {% else %}
+        <td align="center">-</td>
+        <td align="center">-</td>
+      {% endif %}
+    </tr>
+    {% endif %}
+  {% endfor %}
+</tbody>
+</table>
+
+</div>

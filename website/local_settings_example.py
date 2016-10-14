@@ -25,3 +25,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 
 #MEDIA_URL = 'http://www.<your-domain>.com/static/media/'
 MEDIA_URL = '/static/media/'
+
+
+# PIWIK
+PIWIK_URL = ''  # optional, without trailing slash
+PIWIK_SITE_ID = 0

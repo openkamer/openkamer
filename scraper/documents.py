@@ -56,15 +56,13 @@ def get_metadata(document_id):
             metadata[name] = ''
             continue
         if len(elements) > 1:
-            if name == 'category':
-                metadata[name] = ''
-                for element in elements:
-                    if metadata[name]:
-                        metadata[name] += ' | '
-                    metadata[name] += element.get('content')
-            else:
-                print('WARNING: more than 1 element found for key: ' + key + ', using first, but more info available!')
-                metadata[name] = elements[0].get('content')
+            # if name == 'category' or name == 'submitter':
+            metadata[name] = ''
+            for element in elements:
+                if metadata[name]:
+                    metadata[name] += '|'
+                metadata[name] += element.get('content')
+                print('WARNING: more than 1 element found for key: ' + key + '!')
         else:
             metadata[name] = elements[0].get('content')
 
@@ -78,7 +76,6 @@ def get_metadata(document_id):
     for element in elements:
         if element.get('scheme') == 'OVERHEIDop.Parlementair':
             metadata['is_kamerstuk'] = element.get('content') == 'Kamerstuk'
-            
 
     """ agenda code """
     metadata['is_agenda'] = False

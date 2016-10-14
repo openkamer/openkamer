@@ -1,0 +1,10 @@
+<h4>{{ document.title }}</h4>
+<H5>{{ document.date_published|date:"Y-m-d" }}</H5>
+<h5>Dossier: <a href="/dossier/{{ document.dossier.id }}/">{{ document.dossier.dossier_id }}</a></h5>
+<h5>Indiener(s):
+  {% with submitters=document.submitters %}
+    {% include "document/items/submitters_list.html" %}
+  {% endwith %}
+</h5>
+<h5>Categorie: {{ document.category }}</h5>
+<h5>Bron: <a href="{{ document.document_url }}">{{ document.document_url }}</a></h5>

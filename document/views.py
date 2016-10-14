@@ -2,17 +2,12 @@ from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
-from document.models import Document, Dossier, create_or_update_dossier
+from document.models import Document, Dossier
 from document.models import Agenda, AgendaItem
+from document.models import Document, Dossier
+from document.models import Voting
 
-
-class DocumentsView(TemplateView):
-    template_name = 'document/documents.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['documents'] = Document.objects.all()
-        return context
+from website.create import create_or_update_dossier
 
 
 class DocumentView(TemplateView):
@@ -36,9 +31,9 @@ class DossiersView(TemplateView):
 class DossierView(TemplateView):
     template_name = 'document/dossier.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, dossier_pk, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(id=self.kwargs['pk'])
+        context['dossier'] = Dossier.objects.get(id=dossier_pk)
         return context
 
 class AgendasView(TemplateView):
@@ -73,3 +68,23 @@ class AddDossierView(TemplateView):
         url = '/dossier/' + str(dossier.id) + '/'
         return redirect(url)
         # return HttpResponseRedirect()
+
+
+class VotingView(TemplateView):
+    template_name = 'document/voting.html'
+
+    def get_context_data(self, voting_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        voting = Voting.objects.get(id=voting_id)
+        context['voting'] = voting
+        return context
+
+
+class VotingsView(TemplateView):
+    template_name = 'document/votings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        votings = Voting.objects.all()
+        context['votings'] = votings
+        return context

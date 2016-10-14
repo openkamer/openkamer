@@ -20,10 +20,10 @@ def create_members():
     for row in rows:
         columns = row.xpath("td")
         if len(columns) == 8:
-            surname = columns[0][0].text.split(',')[0]
-            print(surname)
-            prefix = columns[0][0].text.split('.')[-1].strip()
             forename = columns[1][0].text
+            surname = columns[0][0].text.split(',')[0]
+            prefix = columns[0][0].text.split('.')[-1].strip()
+            initials = columns[0][0].text.split(',')[1].replace(prefix, '').replace(' ', '')
             if Person.person_exists(forename, surname):
                 person = Person.objects.get(forename=forename, surname=surname)
             else:
@@ -31,6 +31,7 @@ def create_members():
                     forename=forename,
                     surname=surname,
                     surname_prefix=prefix,
+                    initials=initials
                 )
             party_name = columns[2][0].text
             party = PoliticalParty.get_party(party_name)

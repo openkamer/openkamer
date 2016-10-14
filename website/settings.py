@@ -1,5 +1,5 @@
 """
-Django settings for voting project.
+Django settings for openkamer project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -22,13 +22,13 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 'debug_toolbar',
-    'bootstrap3', #bootstrap3 see: https://github.com/dyve/django-bootstrap3
+    'bootstrap3',
     'rest_framework',
     'website',
     'parliament',
     'document',
     'person',
-    'voting',
+    'stats'
 )
 
 MIDDLEWARE_CLASSES = [
@@ -53,10 +53,11 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.core.context_processors.static',
-                'django.core.context_processors.media',
+                'website.context_processors.piwik'
             ],
         },
     },
@@ -99,7 +100,14 @@ DATABASES = {
 }
 
 
-STATIC_URL = '/static/'
+##################
+# LOCAL SETTINGS #
+##################
+
+# Allow any settings to be defined in local_settings.py which should be
+# ignored in your version control system allowing for settings to be
+# defined per machine.
+from website.local_settings import *
 
 
 ##############
@@ -115,17 +123,3 @@ BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-2',
     'horizontal_field_class': 'col-md-4',
 }
-
-##################
-# LOCAL SETTINGS #
-##################
-
-# Allow any settings to be defined in local_settings.py which should be
-# ignored in your version control system allowing for settings to be
-# defined per machine.
-try:
-    from website.local_settings import *
-except ImportError as e:
-    if "local_settings" not in str(e):
-        print("settings error")
-        raise e

@@ -1,0 +1,46 @@
+<div class="row">
+  {% for voting in votings %}
+  <div class="col-sm-4 well well-small">
+    <div class="row">
+      <div class="col-xs-3">
+        <small>{{ voting.date|date:"Y-M-d" }}</small>
+      </div>
+
+      <div class="col-xs-6" align="center">
+        <h5>{{ voting.kamerstuk.type_short }}</h5>
+      </div>
+
+      <div class="col-xs-3" align="right">
+        {% include "document/items/voting_result_small.html" %}
+      </div>
+    </div>
+
+    <hr class="hr hr-small"/>
+
+    <div class="row" align="center">
+      <div class="col-sm-12">
+        <a href="/document/voting/{{ voting.id }}/"><small>{{ voting.kamerstuk.type_long }}</small></a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12 col-progress-bar">
+        {% include "document/items/voting_result_bar_small.html" %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-4">
+      </div>
+
+      <div class="col-xs-4" align="center">
+      </div>
+
+      <div class="col-xs-4" align="right">
+        <a href="/dossier/{{ voting.dossier.id }}/"><small>{{ voting.dossier.dossier_id }}</small></a><small>.{{ voting.kamerstuk.id_sub }}</small>
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+</div>

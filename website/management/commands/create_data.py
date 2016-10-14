@@ -4,7 +4,7 @@ import scraper.political_parties
 import scraper.parliament_members
 
 from person.models import Person
-from document.models import create_or_update_dossier
+from website.create import create_or_update_dossier
 
 
 class Command(BaseCommand):
@@ -17,3 +17,4 @@ class Command(BaseCommand):
         # add a few demo dossiers
         create_or_update_dossier('33885')
         create_or_update_dossier('34344')
+        create_or_update_dossier('33506')

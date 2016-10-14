@@ -1,0 +1,7 @@
+{% if voting.has_result_details %}
+<div class="progress">
+  <div class="progress-bar progress-bar-success" style="width: {{ voting.result_percent.for|floatformat:1 }}%" title="{{ voting.entities_for_string }}">{{ voting.result_percent.for|floatformat:1 }} %</div>
+  <div class="progress-bar progress-bar-danger" style="width: {{ voting.result_percent.against|floatformat:1 }}%" title="{{ voting.entities_against_string }}">{{ voting.result_percent.against|floatformat:1 }} %</div>
+  <div class="progress-bar progress-bar-warning" style="width: {{ voting.result_percent.no_vote|floatformat:1 }}%" title="{{ voting.entities_none_string }}"></div>
+</div>
+{% endif %}

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 
-from voting.models import Bill
+from stats.views import get_example_plot_html
+from django.utils.safestring import mark_safe
 
 
 class HomeView(TemplateView):
@@ -12,14 +13,10 @@ class HomeView(TemplateView):
         return context
 
 
-class BillsView(TemplateView):
-    template_name = "website/bills.html"
-    context_object_name = "bills"
+class PlotExampleView(TemplateView):
+    template_name = "website/plot_examples.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        bills = Bill.objects.all()
-        for bill in bills:
-            bill.votes = bill.get_votes()
-        context['bills'] = bills
+        context['plot_html'] = mark_safe(get_example_plot_html())
         return context

@@ -1,0 +1,74 @@
+{% for kamerstuk in dossier.kamerstukken %}
+  {% if kamerstuk.visible %}
+  <div class="col-sm-4 col-kamerstukken" align="center">
+    <div class="well well-small">
+
+      <div class="row">
+        <div class="col-xs-4" align="left">
+          <small>{{ kamerstuk.document.date_published|date:"Y-m-d" }}</small>
+        </div>
+
+        <div class="col-xs-8" align="right">
+          <small>
+            {% with submitters=kamerstuk.document.submitters %}
+              {% include "document/items/submitters_list.html" %}
+            {% endwith %}
+          </small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <h5>
+            <a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
+            {% if kamerstuk.voting %}
+              {% with voting=kamerstuk.voting %}
+              {% include "document/items/voting_result_small.html" %}
+              {% endwith %}
+            {% endif %}
+          </h5>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <small>
+            {% if kamerstuk.type_short !=  kamerstuk.type_long %}
+              {{ kamerstuk.type_long }} <br/>
+            {% endif %}
+          </small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-progress-bar">
+            {% if kamerstuk.voting %}
+              {% with voting=kamerstuk.voting %}
+              {% include "document/items/voting_result_bar_small.html" %}
+              {% endwith %}
+            {% endif %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-4">
+        </div>
+
+        <div class="col-xs-4" align="center">
+          <small>{{ kamerstuk.id_main }}.{{ kamerstuk.id_sub }}</small>
+        </div>
+
+        <div class="col-xs-4" align="right">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  {% if forloop.counter|divisibleby:3 %}
+  <div class="clearfix"></div>
+  {% endif %}
+
+  {% endif %}
+{% endfor %}
