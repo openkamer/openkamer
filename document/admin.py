@@ -13,11 +13,10 @@ from document.models import Voting
 class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
-        'dossier_id',
+        'dossier',
         'title_short',
         'date_published',
         'publication_type',
-        'submitter',
         'category',
         'publisher',
         'document_url',
@@ -33,7 +32,7 @@ class KamerstukAdmin(admin.ModelAdmin):
         'type_short',
         'type_long',
         'document_date',
-        'original',
+        'original_id',
     )
 
     def document_date(self, obj):

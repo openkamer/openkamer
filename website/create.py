@@ -1,4 +1,6 @@
+import logging
 import re
+
 
 from person.models import Person
 
@@ -20,6 +22,8 @@ from document.models import VoteIndividual
 
 import scraper.documents
 import scraper.votings
+
+logger = logging.getLogger(__name__)
 
 
 def create_or_update_dossier(dossier_id):
@@ -81,22 +85,29 @@ def create_or_update_dossier(dossier_id):
 
 def create_kamerstuk(document, dossier_id, metadata, result):
     print('create kamerstuk')
-    # print(items)
     title_parts = metadata['title_full'].split(';')
     type_short = ''
     type_long = ''
+    original_id = ''
     if len(title_parts) > 2:
         type_short = title_parts[1].strip()
         type_long = title_parts[2].strip()
     if "Bijlage" in result['type']:
         type_short = 'Bijlage'
         type_long = 'Bijlage'
+    if 'gewijzigd' in type_short.lower():
+        logger.info('type long' + str(type_long))
+        result_dossier = re.search(r"t.v.v.\s*(?P<dossier_id>[0-9]*)", type_long)
+        result_document = re.search(r"nr.\s*(?P<document_id>[0-9]*)", type_long)
+        if result_dossier and result_document and 'dossier_id' in result_dossier.groupdict() and 'document_id' in result_document.groupdict():
+            original_id = result_dossier.group('dossier_id') + '.' + result_document.group('document_id')
     Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
         id_sub=metadata['id_sub'].zfill(2),
         type_short=type_short,
         type_long=type_long,
+        original_id=original_id
     )
 
 
@@ -118,20 +129,23 @@ def create_agenda(document, metadata):
         agenda_id=document.document_id,
         document=document,
     )
+    agenda_items = []
     for n in metadata['behandelde_dossiers']:
         dossiers = Dossier.objects.filter(dossier_id=n)
         if dossiers:
             dossier = dossiers[0]
-            agenda_item = AgendaItem.objects.create(
+            agenda_item = AgendaItem(
                 agenda=agenda,
                 dossier=dossier,
                 item_text=n,
             )
         else:
-            agenda_item = AgendaItem.objects.create(
+            agenda_item = AgendaItem(
                 agenda=agenda,
                 item_text=n,
             )
+        agenda_items.append(agenda_item)
+    AgendaItem.objects.bulk_create(agenda_items)
     return agenda
 
 

@@ -1,13 +1,17 @@
+import logging
+
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
-from document.models import Document, Dossier
+from document.models import Document, Dossier, Kamerstuk
 from document.models import Agenda, AgendaItem
 from document.models import Document, Dossier
 from document.models import Voting
 
 from website.create import create_or_update_dossier
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentView(TemplateView):
@@ -36,6 +40,7 @@ class DossierView(TemplateView):
         context['dossier'] = Dossier.objects.get(id=dossier_pk)
         return context
 
+
 class AgendasView(TemplateView):
     template_name = 'document/agendas.html'
 
@@ -43,7 +48,8 @@ class AgendasView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['agendas'] = Agenda.objects.all()
         return context
-        
+
+
 class AgendaView(TemplateView):
     template_name = 'document/agenda.html'
 

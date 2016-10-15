@@ -1,3 +1,5 @@
+import logging
+
 from itertools import chain
 from django.db import models
 
@@ -5,6 +7,8 @@ from person.models import Person
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
+
+logger = logging.getLogger(__name__)
 
 
 class Dossier(models.Model):
@@ -84,10 +88,13 @@ class Kamerstuk(models.Model):
     id_sub = models.CharField(max_length=40, blank=True)
     type_short = models.CharField(max_length=40, blank=True)
     type_long = models.CharField(max_length=100, blank=True)
-    original = models.ForeignKey('self', null=True, blank=True)
+    original_id = models.CharField(max_length=40, blank=True)  # format: 33885.22
 
     def __str__(self):
-        return str(self.id_main) + '.' + str(self.id_sub) + ' ' + str(self.type_long)
+        return str(self.id_main) + '.' + str(self.id_sub) + ': ' + str(self.type_long)
+
+    def id_full(self):
+        return str(self.id_main) + '.' + str(self.id_sub)
 
     def voting(self):
         votings = Voting.objects.filter(kamerstuk=self)
@@ -104,6 +111,19 @@ class Kamerstuk(models.Model):
         if self.type_short == 'Voorstel van wet':
             return True
         return False
+
+    def original(self):
+        if not self.original_id:
+            return None
+        ids = self.original_id.split('.')
+        kamerstukken = Kamerstuk.objects.filter(id_main=ids[0], id_sub=ids[1])
+        if kamerstukken.exists():
+            return kamerstukken[0]
+        return None
+
+    def modifications(self):
+        stukken = Kamerstuk.objects.filter(original_id=self.id_full())
+        return stukken
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'

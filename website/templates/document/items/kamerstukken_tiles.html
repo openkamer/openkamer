@@ -59,6 +59,17 @@
         </div>
 
         <div class="col-xs-4" align="right">
+          <small>
+            {% if kamerstuk.original %}
+              <strong>origineel</strong>: <a href="/document/{{ kamerstuk.original.document.id }}/">{{ kamerstuk.original.id_main }}.{{ kamerstuk.original.id_sub }} </a>
+            {% endif %}
+            {% if kamerstuk.modifications %}
+              <strong>wijzigingen:</strong>
+              {% for modification in kamerstuk.modifications %}
+                <a href="/document/{{ modification.document.id }}/">{{ modification.id_main }}.{{ modification.id_sub }}</a><br>
+              {% endfor %}
+            {% endif %}
+          </small>
         </div>
       </div>
 
