@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 def create_or_update_dossier(dossier_id):
     # TODO: do not create new documents if they already exist; update!
-    logger.info('dossier id: ' + dossier_id)
+    logger.info('BEGIN - dossier id: ' + str(dossier_id))
     dossiers = Dossier.objects.filter(dossier_id=dossier_id)
     if dossiers:
         dossier = dossiers[0]
@@ -80,12 +80,12 @@ def create_or_update_dossier(dossier_id):
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
-    logger.info('END, dossier id: ' + dossier_id)
+    logger.info('END - dossier id: ' + dossier_id)
     return dossier
 
 
 def create_kamerstuk(document, dossier_id, metadata, result):
-    logger.info('create kamerstuk')
+    logger.info('BEGIN')
     logger.info('document: ' + str(document))
     title_parts = metadata['title_full'].split(';')
     type_short = ''
@@ -103,7 +103,11 @@ def create_kamerstuk(document, dossier_id, metadata, result):
         result_document = re.search(r"nr.\s*(?P<document_id>[0-9]*)", type_long)
         if result_dossier and result_document and 'dossier_id' in result_dossier.groupdict() and 'document_id' in result_document.groupdict():
             original_id = result_dossier.group('dossier_id') + '.' + result_document.group('document_id')
-    Kamerstuk.objects.create(
+    if type_short == '':
+        type_short = document.title_short
+    if type_long == '':
+        type_long = document.title_full
+    stuk = Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
         id_sub=metadata['id_sub'].zfill(2),
@@ -111,6 +115,8 @@ def create_kamerstuk(document, dossier_id, metadata, result):
         type_long=type_long,
         original_id=original_id
     )
+    logger.info('kamerstuk created: ' + str(stuk))
+    logger.info('END')
 
 
 def create_submitter(document, submitter):
