@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 def create_or_update_dossier(dossier_id):
     # TODO: do not create new documents if they already exist; update!
-    print('create or update dossier')
+    logger.info('dossier id: ' + dossier_id)
     dossiers = Dossier.objects.filter(dossier_id=dossier_id)
     if dossiers:
         dossier = dossiers[0]
@@ -39,12 +39,12 @@ def create_or_update_dossier(dossier_id):
         # skip documents of some types and/or sources, no models implemented yet
         # TODO: handle all document types
         if 'Staatscourant' in result['type']:
-            print('WARNING: Staatscourant, skip for now')
+            logger.info('Staatscourant, skip for now')
             continue
 
         document_id, content_html = scraper.documents.get_document_id_and_content(result['page_url'])
         if not document_id:
-            print('WARNING: No document id found, will not create document')
+            logger.warning('No document id found, will not create document')
             continue
 
         metadata = scraper.documents.get_metadata(document_id)
@@ -84,7 +84,7 @@ def create_or_update_dossier(dossier_id):
 
 
 def create_kamerstuk(document, dossier_id, metadata, result):
-    print('create kamerstuk')
+    logger.info('create kamerstuk')
     title_parts = metadata['title_full'].split(';')
     type_short = ''
     type_long = ''
@@ -124,7 +124,7 @@ def create_submitter(document, submitter):
 
 
 def create_agenda(document, metadata):
-    print('create agenda')
+    logger.info('create agenda')
     agenda = Agenda.objects.create(
         agenda_id=document.document_id,
         document=document,
@@ -164,15 +164,16 @@ def create_or_update_agenda(agenda_id):
 
 
 def create_votings(dossier_id):
+    logger.info('dossier id: ' + dossier_id)
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
     for voting_result in voting_results:
         result = get_result_choice(voting_result.get_result())
         if result is None:
-            print('ERROR: Could not interpret vote result: ' + voting_result.get_result())
+            logger.error('Could not interpret vote result: ' + voting_result.get_result())
             assert False
         document_id = voting_result.get_document_id()
         if not document_id:
-            print('ERROR: voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
+            logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
             id_main = dossier_id
         else:
             id_main = document_id.split('-')[0]
@@ -185,7 +186,7 @@ def create_votings(dossier_id):
             if kamerstukken.exists():
                 voting_obj.kamerstuk = kamerstukken[0]
             else:
-                print('WARNING: kamerstuk ' + voting_result.get_document_id() + ' not found in database. Kamerstuk is probably not yet published.')
+                logger.warning('Kamerstuk ' + voting_result.get_document_id() + ' not found in database. Kamerstuk is probably not yet published.')
         voting_obj.save()
         if voting_result.is_individual():
             create_votes_individual(voting_obj, voting_result.votes)
@@ -205,7 +206,13 @@ def create_votes_individual(voting, votes):
     for vote in votes:
         initials, surname = parse_name_surname_initials(vote.parliament_member)
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
-        assert parliament_member
+        if not parliament_member:
+            logger.error('parliament member not found for vote: ' + str(vote))
+            if voting.kamerstuk:
+                logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
+            else:
+                logger.error('voting.kamerstuk does not exist')
+            assert False
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
                                       decision=get_decision(vote.decision), details=vote.details)
 
