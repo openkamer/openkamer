@@ -1,3 +1,4 @@
+import logging
 import re
 
 import requests
@@ -5,8 +6,11 @@ import lxml.html
 
 from parliament.models import PoliticalParty
 
+logger = logging.getLogger(__name__)
+
 
 def create_parties():
+    logger.info('START')
     url = 'https://www.tweedekamer.nl/kamerleden/fracties'
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
@@ -22,13 +26,12 @@ def create_parties():
             name = columns[0]
             name = re.sub(r'\(.+?\)', '', name).strip()
             name_short = name
-        # print('name: ' + name)
-        # print('short: ' + name_short)
         party = PoliticalParty.find_party(name)
         if party:
-            print('WARNING: party already exists!')
+            logger.warning('party ' + name + ' already exists!')
         else:
             party = PoliticalParty.objects.create(name=name, name_short=name_short)
-            print('created: ' + str(party))
+            logger.info('created: ' + str(party))
         party.update_info('nl', 'nl')
         party.save()
+    logger.info('END')

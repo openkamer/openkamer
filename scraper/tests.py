@@ -24,7 +24,7 @@ class TestVotingScraper(TestCase):
         votings_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr_party_votes)
         self.assertEqual(len(expected_urls), len(votings_urls))
         for i in range(len(votings_urls)):
-            print(votings_urls[i])
+            # print(votings_urls[i])
             self.assertEqual(votings_urls[i], expected_urls[i])
 
     def test_get_votings_for_page(self):
@@ -59,9 +59,9 @@ class TestVotingScraper(TestCase):
 
         self.assertEqual(len(results), len(expected_results))
         for i in range(len(results)):
-            print('=============================')
-            print(results[i])
-            results[i].print_votes()
+            # print('=============================')
+            # print(results[i])
+            # results[i].print_votes()
             self.assertEqual(results[i].get_result(), expected_results[i]['result'])
             self.assertEqual(results[i].get_document_id(), expected_results[i]['document_id'])
 

@@ -22,7 +22,7 @@ def get_document_id_and_content(url):
         if not elements:
             return None, ''
         document_id = elements[0].get('content')
-    print('document id: ' + document_id)
+    logger.info('document id: ' + document_id)
     elements = tree.xpath('//div[@class="stuk"]')
     if elements:
         content_html = lxml.etree.tostring(elements[0])

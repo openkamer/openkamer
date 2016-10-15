@@ -1,8 +1,11 @@
+import logging
 from unidecode import unidecode
 
 from django.db import models
 
 from wikidata import wikidata
+
+logger = logging.getLogger(__name__)
 
 
 class Person(models.Model):
@@ -20,7 +23,7 @@ class Person(models.Model):
 
     @staticmethod
     def find(surname, initials=''):
-        print('Person::find() : ' + surname + ' (' + initials + ')')
+        logger.info('surname: ' + surname + ', initials: ' + initials)
         surname = unidecode(surname)
         initials = unidecode(initials)
         persons = Person.objects.all()
@@ -35,7 +38,7 @@ class Person(models.Model):
             if initials.lower() == unidecode(person.initials.lower()):
                 score += 1
             if score >= 2:
-                print('found person for: ' + surname + ', ' + initials + ' : ' + str(person))
+                logger.info('person found: ' + surname + ', ' + initials + ' : ' + str(person))
                 return person
         return None
 
@@ -61,11 +64,11 @@ class Person(models.Model):
             person.save()
 
     def update_info(self, language='en'):
-        print('get info from wikidata for ' + self.get_full_name())
+        logger.info('get info from wikidata for ' + self.get_full_name())
         wikidata_id = wikidata.search_wikidata_id(self.get_full_name(), language)
         if not wikidata_id:
             return
-        print(wikidata_id)
+        logger.info('wikidata id: ' + wikidata_id)
         self.wikidata_id = wikidata_id
         birthdate = wikidata.get_birth_date(self.wikidata_id)
         if birthdate:

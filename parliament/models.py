@@ -1,8 +1,12 @@
+import logging
+
 from django.db import models
 
 from wikidata import wikidata
 
 from person.models import Person
+
+logger = logging.getLogger(__name__)
 
 
 class Parliament(models.Model):
@@ -21,10 +25,12 @@ class ParliamentMember(models.Model):
 
     @staticmethod
     def find(surname, initials=''):
+        logger.info('surname: ' + surname + ', initials: ' + initials)
         person = Person.find(surname, initials)
         members = ParliamentMember.objects.filter(person=person)
         if members.exists():
             return members[0]
+        logger.info('ParliamentMember not found.')
         return None
 
     def party(self):
@@ -58,7 +64,7 @@ class PoliticalParty(models.Model):
         :param top_level_domain: the top level domain of the party website, also used to determine country
         """
         if top_level_domain[0] == '.':
-            print("Warning: top level domain should not start with a dot (use 'com' instead of '.com')" )
+            logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
         wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
         if not wikidata_ids:
             return
@@ -74,11 +80,10 @@ class PoliticalParty(models.Model):
                     break
         self.wikidata_id = wikidata_id
         self.wikipedia_url = wikidata.get_wikipedia_url(wikidata_id, language)
-        print(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
+        logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         logo_filename = wikidata.get_logo_filename(self.wikidata_id)
         inception_date = wikidata.get_inception(self.wikidata_id)
         if inception_date:
-            print(inception_date)
             self.founded = inception_date
         if logo_filename:
             self.wikimedia_logo_url = wikidata.get_wikimedia_image_url(logo_filename)

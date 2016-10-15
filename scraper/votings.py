@@ -103,7 +103,7 @@ class VotingResult(object):
             for row in table_rows:
                 vote = VoteParty(row)
                 votes.append(vote)
-        print(str(len(votes)) + ' votes created!')
+        logger.info(str(len(votes)) + ' votes created!')
         return votes
 
     def get_votes_table(self):
@@ -111,7 +111,7 @@ class VotingResult(object):
         if len(votes_tables):
             return self.result_tree.xpath('div[@class="vote-result"]/table')[0]
         else:
-            print('WARNING: no votes table found')
+            logger.warning('no votes table found')
             return None
 
     def get_document_id(self):
@@ -172,7 +172,7 @@ def get_votings_for_page(votings_page_url):
     :param votings_page_url: the url of the votings page, example: https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154
     :return: a list of VotingResult
     """
-    print('get_votings_for_page() - url: ' + votings_page_url)
+    logger.info('url: ' + votings_page_url)
     page = requests.get(votings_page_url)
     tree = lxml.html.fromstring(page.content)
     date = tree.xpath('//p[@class="vote-info"]/span[@class="date"]')[0].text

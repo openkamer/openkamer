@@ -1,4 +1,6 @@
 import requests
+import logging
+
 import lxml.html
 
 from person.models import Person
@@ -6,6 +8,8 @@ from parliament.models import Parliament
 from parliament.models import PoliticalParty
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
+
+logger = logging.getLogger(__name__)
 
 
 def create_members():
@@ -45,9 +49,9 @@ def create_members():
             #     sex = Member.FEMALE
             party_member = PartyMember.objects.create(person=person, party=party)
             parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
-            print("new person: " + str(person))
-            print("new party member: " + str(party_member))
-            print("new parliament member: " + str(parliament_member))
+            logger.info("new person: " + str(person))
+            logger.info("new party member: " + str(party_member))
+            logger.info("new parliament member: " + str(parliament_member))
 
 
 def get_or_create_tweede_kamer():
