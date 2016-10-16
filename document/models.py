@@ -116,13 +116,21 @@ class Kamerstuk(models.Model):
         if not self.original_id:
             return None
         ids = self.original_id.split('.')
+        if ids[1] == 'voorstel_van_wet':
+            kamerstukken = Kamerstuk.objects.filter(id_main=ids[0])
+            for stuk in kamerstukken:
+                if 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
+                    return stuk
         kamerstukken = Kamerstuk.objects.filter(id_main=ids[0], id_sub=ids[1])
         if kamerstukken.exists():
             return kamerstukken[0]
         return None
 
     def modifications(self):
-        stukken = Kamerstuk.objects.filter(original_id=self.id_full())
+        if self.voorstelwet():
+            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet')
+        else:
+            stukken = Kamerstuk.objects.filter(original_id=self.id_full())
         return stukken
 
     class Meta:

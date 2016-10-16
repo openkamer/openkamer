@@ -97,16 +97,11 @@ def create_kamerstuk(document, dossier_id, metadata, result):
     if "Bijlage" in result['type']:
         type_short = 'Bijlage'
         type_long = 'Bijlage'
-    if 'gewijzigd' in type_short.lower():
-        logger.info('type long' + str(type_long))
-        result_dossier = re.search(r"t.v.v.\s*(?P<dossier_id>[0-9]*)", type_long)
-        result_document = re.search(r"nr.\s*(?P<document_id>[0-9]*)", type_long)
-        if result_dossier and result_document and 'dossier_id' in result_dossier.groupdict() and 'document_id' in result_document.groupdict():
-            original_id = result_dossier.group('dossier_id') + '.' + result_document.group('document_id')
     if type_short == '':
         type_short = document.title_short
     if type_long == '':
         type_long = document.title_full
+    original_id = find_original_kamerstuk_id(dossier_id, type_long)
     stuk = Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
@@ -117,6 +112,26 @@ def create_kamerstuk(document, dossier_id, metadata, result):
     )
     logger.info('kamerstuk created: ' + str(stuk))
     logger.info('END')
+
+
+def find_original_kamerstuk_id(dossier_id, type_long):
+    if 'gewijzigd' not in type_long.lower():
+        return ''
+    result_dossier = re.search(r"t.v.v.\s*(?P<main_id>[0-9]*)", type_long)
+    result_document = re.search(r"nr.\s*(?P<sub_id>[0-9]*)", type_long)
+    main_id = ''
+    sub_id = ''
+    if result_dossier and 'main_id' in result_dossier.groupdict():
+        main_id = result_dossier.group('main_id')
+    if result_document and 'sub_id' in result_document.groupdict():
+        sub_id = result_document.group('sub_id')
+    if main_id and sub_id:
+        return main_id + '.' + sub_id
+    elif sub_id:
+        return str(dossier_id) + '.' + sub_id
+    elif 'voorstel van wet' in type_long.lower():
+        return str(dossier_id) + '.voorstel_van_wet'
+    return ''
 
 
 def create_submitter(document, submitter):
