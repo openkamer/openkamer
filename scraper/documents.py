@@ -10,6 +10,54 @@ import lxml.etree
 logger = logging.getLogger(__name__)
 
 
+def get_dossier_ids_wetsvoorstellen_initiatief(max_results=None):
+    logger.info('BEGIN')
+    dossier_ids = get_wetsvoorstellen_dossier_ids('Initiatiefwetsvoorstellen', max_results)
+    logger.info('END')
+    return dossier_ids
+
+
+def get_dossier_ids_wetsvoorstellen_regering(max_results=None):
+    logger.info('BEGIN')
+    dossier_ids = get_wetsvoorstellen_dossier_ids('Wetsvoorstellen+regering', max_results)
+    logger.info('END')
+    return dossier_ids
+
+
+def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
+    url = 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen'
+    # these parameters cannot be percent encoded, and can thus not be part of the params variable
+    url += '?clusterName=' + subsubcategorie + '&fld_tk_subsubcategorie=' + subsubcategorie
+    params = {
+        'qry': '*',
+        'fld_tk_categorie': 'Kamerstukken',
+        'fld_tk_subcategorie': 'Wetsvoorstellen',
+        'srt': 'date;desc;date',
+        'Type': 'Wetsvoorstellen',
+        'sta': '1'
+    }
+    dossier_ids = []
+    new_dossiers_found = True
+    start = 1
+    while new_dossiers_found:
+        print('start at: ' + str(start))
+        params['sta'] = str(start)
+        page = requests.get(url, params)
+        print(page.request.url)
+        # print(page.content)
+        tree = lxml.html.fromstring(page.content)
+        elements = tree.xpath('//div[@class="search-result-properties"]/p')
+        new_dossiers_found = len(elements) != 0
+        for element in elements:
+            if 'class' not in element.attrib:
+                print(element.text.split('-')[0])
+                dossier_ids.append(element.text.split('-')[0])  # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
+                start += 1
+                if len(dossier_ids) >= max_results:
+                    return dossier_ids
+    return dossier_ids
+
+
 def get_document_id_and_content(url):
     logger.info('get document id for url: ' + url)
     page = requests.get(url)
@@ -101,7 +149,7 @@ def search_politieknl_dossier(dossier_id):
     element = tree.xpath('//p[@class="info marge-onder"]/strong')
     n_publications = int(element[0].text)
     logger.info(str(n_publications) + ' results found')
-    element = tree.xpath('//dl[@class ="zoek-resulaten-info"]//dd')
+    element = tree.xpath('//dl[@class="zoek-resulaten-info"]//dd')
     dossier_number = int(element[1].text)
     assert element[1].getprevious().text == 'Dossiernummer:'
     results = []
