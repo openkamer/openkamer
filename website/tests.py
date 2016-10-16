@@ -14,6 +14,7 @@ from document.models import Document
 from document.models import Voting
 
 from website.create import create_or_update_dossier
+from website.create import find_original_kamerstuk_id
 
 
 class TestCreateParliament(TestCase):
@@ -52,6 +53,34 @@ class TestFindParliamentMembers(TestCase):
         surname = 'Koşer Kaya'
         member = ParliamentMember.find(surname=surname, initials=initials)
         self.assertEqual(member.person.forename, forename)
+
+
+class TestFindOriginalKamerstukId(TestCase):
+    dossier_id = 33885
+
+    def test_find_original_motie(self):
+        expected_result = '33885.18'
+        title = 'Gewijzigde motie van het lid Segers c.s. (t.v.v. 33885, nr.18) over de bevoegdheden van de Koninklijke Marechaussee'
+        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        self.assertEqual(original_id, expected_result)
+
+    def test_find_original_amendement(self):
+        title = 'Gewijzigd amendement van het lid Oskam ter vervanging van nr. 9 waarmee een verbod op illegaal pooierschap in het wetboek van strafrecht wordt geintroduceerd'
+        expected_result = '33885.9'
+        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        self.assertEqual(original_id, expected_result)
+
+    def test_find_original_voorstel_van_wet(self):
+        title = 'Wijziging van de Wet regulering prostitutie en bestrijding misstanden seksbranche; Gewijzigd voorstel van wet '
+        expected_result = '33885.voorstel_van_wet'
+        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        self.assertEqual(original_id, expected_result)
+
+    def test_find_original_none(self):
+        title = 'Motie van de leden Volp en Kooiman over monitoring van het nulbeleid'
+        expected_result = ''
+        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        self.assertEqual(original_id, expected_result)
 
 
 class TestWebsite(TestCase):
