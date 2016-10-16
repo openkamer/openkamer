@@ -173,7 +173,7 @@ def create_or_update_agenda(agenda_id):
 
 
 def create_votings(dossier_id):
-    logger.info('dossier id: ' + dossier_id)
+    logger.info('dossier id: ' + str(dossier_id))
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
     for voting_result in voting_results:
         result = get_result_choice(voting_result.get_result())
