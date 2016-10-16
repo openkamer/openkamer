@@ -12,6 +12,27 @@ import scraper.votings
 # scraper.documents.search_politieknl_dossier(33885)
 
 
+class TestWetsvoorstellenDossierScraper(TestCase):
+    max_results = 40
+
+    def test_get_initiatief_wetsvoorstellen_dossier_ids(self):
+        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
+        print('initiatief wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
+        self.assertEqual(len(dossier_ids), self.max_results)
+        # with open('wetsvoorstellen_initiatief_dossier_ids.txt', 'w') as fileout:
+        #     for dossier_id in dossier_ids:
+        #         fileout.write(dossier_id + '\n')
+
+    def test_get_regering_wetsvoorstellen_dossier_ids(self):
+        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
+        print('regering wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
+        self.assertEqual(len(dossier_ids), self.max_results)
+        # with open('wetsvoorstellen_regering_dossier_ids.txt', 'w') as fileout:
+        #     for dossier_id in dossier_ids:
+        #         fileout.write(dossier_id + '\n')
+
+
+
 class TestVotingScraper(TestCase):
     dossier_nr_party_votes = 33885
     dossier_nr_individual_votes = 33506
