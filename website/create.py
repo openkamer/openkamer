@@ -80,7 +80,7 @@ def create_or_update_dossier(dossier_id):
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
-    logger.info('END - dossier id: ' + dossier_id)
+    logger.info('END - dossier id: ' + str(dossier_id))
     return dossier
 
 
