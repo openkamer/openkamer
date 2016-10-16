@@ -15,20 +15,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Application definition
 INSTALLED_APPS = (
+    'website',
+    'stats',
+    'scraper',
+    'document',
+    'parliament',
+    'person',
+    # 'debug_toolbar',
+    'bootstrap3',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'debug_toolbar',
-    'bootstrap3',
-    'rest_framework',
-    'website',
-    'parliament',
-    'document',
-    'person',
-    'stats'
 )
 
 MIDDLEWARE_CLASSES = [
@@ -195,6 +196,11 @@ LOGGING = {
             'level': 'ERROR',
         },
         'website': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'scraper': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
             'level': 'DEBUG',
