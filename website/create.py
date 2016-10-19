@@ -1,8 +1,9 @@
 import logging
 import re
 
-
 from person.models import Person
+
+from government.models import Government
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
@@ -20,10 +21,23 @@ from document.models import Vote
 from document.models import VoteParty
 from document.models import VoteIndividual
 
+import scraper.government
 import scraper.documents
 import scraper.votings
 
 logger = logging.getLogger(__name__)
+
+
+def create_governments():
+    # Rutte II : Q1638648
+    government_ids = ['Q1638648']
+    for gov_id in government_ids:
+        gov_info = scraper.government.get_government(gov_id)
+        Government.objects.create(
+            name=gov_info['name'],
+            date_formed=gov_info['inception'],
+            wikidata_id=gov_id
+        )
 
 
 def create_or_update_dossier(dossier_id):
