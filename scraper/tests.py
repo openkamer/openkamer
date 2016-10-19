@@ -1,4 +1,5 @@
 import json
+import datetime
 from django.test import TestCase
 
 import scraper.documents
@@ -18,13 +19,15 @@ class TestGovernmentScraper(TestCase):
     rutte_2_wikidata_id = 'Q1638648'
 
     def test(self):
-        item_json = scraper.government.get_government(self.rutte_2_wikidata_id)
-        # print(json.dumps(item_json, sort_keys=True, indent=4))
+        government = scraper.government.get_government(self.rutte_2_wikidata_id)
+        print(government)
+        self.assertEqual(government['name'], 'Kabinet-Rutte II')
+        self.assertEqual(government['inception'], datetime.date(2012, 11, 5))
 
     def test_get_members(self):
-        scraper.government.get_government_members(self.rutte_2_wikidata_id)
-        # for member in members:
-        #     print(member)
+        members = scraper.government.get_government_members(self.rutte_2_wikidata_id)
+        for member in members:
+            print(member)
 
 
 class TestWetsvoorstellenDossierScraper(TestCase):
