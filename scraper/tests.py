@@ -1,7 +1,9 @@
+import json
 from django.test import TestCase
 
 import scraper.documents
 import scraper.votings
+import scraper.government
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -10,6 +12,19 @@ import scraper.votings
 # scraper.documents.get_document_id(page_url)
 
 # scraper.documents.search_politieknl_dossier(33885)
+
+
+class TestGovernmentScraper(TestCase):
+    rutte_2_wikidata_id = 'Q1638648'
+
+    def test(self):
+        item_json = scraper.government.get_government(self.rutte_2_wikidata_id)
+        # print(json.dumps(item_json, sort_keys=True, indent=4))
+
+    def test_get_members(self):
+        scraper.government.get_government_members(self.rutte_2_wikidata_id)
+        # for member in members:
+        #     print(member)
 
 
 class TestWetsvoorstellenDossierScraper(TestCase):
@@ -30,7 +45,6 @@ class TestWetsvoorstellenDossierScraper(TestCase):
         #     for dossier_id in dossier_ids:
         #         fileout.write(dossier_id + '\n')
         self.assertEqual(len(dossier_ids), self.max_results)
-
 
 
 class TestVotingScraper(TestCase):

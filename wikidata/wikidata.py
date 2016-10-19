@@ -54,6 +54,14 @@ def get_claims(id):
     return item['claims']
 
 
+def get_label(id, language='en'):
+    item = get_item(id, props='labels')
+    if not 'labels' in item:
+        return ''
+    title = item['labels'][language]['value']
+    return title
+
+
 def get_wikipedia_url(id, language='en'):
     site = language + 'wiki'
     item = get_item(id, sites=site, props='sitelinks')
@@ -116,12 +124,7 @@ def get_birth_date(id):
     claims = get_claims(id)
     if 'P569' in claims:  # date of birth
         birthdate = claims['P569'][0]['mainsnak']['datavalue']['value']['time']
-        try:
-            birthdate = datetime.strptime(birthdate[1:11], '%Y-%m-%d')
-            return birthdate.date()
-        except ValueError as error:
-            print(error)
-            return None
+        return get_date(birthdate)
     return None
 
 
@@ -129,10 +132,21 @@ def get_inception(id):
     claims = get_claims(id)
     if 'P571' in claims:
         inception = claims['P571'][0]['mainsnak']['datavalue']['value']['time']
-        try:
-            inception = datetime.strptime(inception[1:11], '%Y-%m-%d')
-            return inception.date()
-        except ValueError as error:
-            print(error)
-            return None
+        return get_date(inception)
     return None
+
+
+def get_parts(id):
+    claims = get_claims(id)
+    if 'P527' in claims:
+        return claims['P527']  # has part
+    return None
+
+
+def get_date(date_str):
+    try:
+        birthdate = datetime.strptime(date_str[1:11], '%Y-%m-%d')
+        return birthdate.date()
+    except ValueError as error:
+        print(error)
+        return None
