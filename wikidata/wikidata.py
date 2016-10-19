@@ -81,6 +81,13 @@ def get_country_id(id):
     return None
 
 
+def get_given_name(id):
+    claims = get_claims(id)
+    if 'P735' in claims:
+        return get_label(claims['P735'][0]['mainsnak']['datavalue']['value']['id'])
+    return ''
+
+
 def get_official_website(id):
     claims = get_claims(id)
     if 'P856' in claims:

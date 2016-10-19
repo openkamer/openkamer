@@ -22,6 +22,9 @@ class Ministry(models.Model):
     name = models.CharField(max_length=200)
     government = models.ForeignKey(Government)
 
+    def __str__(self):
+        return str(self.name)
+
 
 class GovernmentPosition(models.Model):
     MINISTER = 'MIN'

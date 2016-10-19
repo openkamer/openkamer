@@ -7,6 +7,26 @@ from django.test import TestCase
 from person.models import Person
 
 
+class TestNamePrefix(TestCase):
+
+    def test_find_name_prefix(self):
+        name = 'Ard van der Steur'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van der')
+        name = 'Ard van derSteur'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van')
+        name = 'Ard van de Steur'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van de')
+        name = 'Ard van Steur'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van')
+        name = 'Gerard \'t Hooft'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, '\'t')
+
+
 class TestCreatePerson(TestCase):
 
     def test_create_person(self):

@@ -1,6 +1,8 @@
 import logging
 import re
 
+from wikidata import wikidata
+
 from person.models import Person
 
 from government.models import Government
@@ -51,7 +53,17 @@ def create_government_members(government):
         if 'ministry' in member:
             ministry, created = Ministry.objects.get_or_create(name=member['ministry'].lower(), government=government)
         position = GovernmentPosition.objects.create(ministry=ministry, position=GovernmentPosition.find_position_type(member['position']))
-        person = Person.objects.create(surname=member['name'])
+        forename = wikidata.get_given_name(member['wikidata_id'])
+        surname = member['name'].replace(forename, '').strip()
+        prefix = Person.find_prefix(surname)
+        if prefix:
+            surname = surname.replace(prefix + ' ', '')
+        person = Person.objects.create(
+            forename=forename,
+            surname=surname,
+            surname_prefix=prefix,
+            wikidata_id=member['wikidata_id']
+        )
         start_date = government.date_formed
         if 'start_date' in member:
             start_date = member['start_date']

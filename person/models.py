@@ -8,6 +8,21 @@ from wikidata import wikidata
 logger = logging.getLogger(__name__)
 
 
+NAME_PREFIXES = [
+    'van der',
+    'van den',
+    'van de',
+    'in het'
+    'van',
+    'de',
+    'het',
+    '\'t',
+    'der',
+    'ter',
+    'te',
+]
+
+
 class Person(models.Model):
     forename = models.CharField(max_length=200)
     surname = models.CharField(max_length=200)
@@ -20,6 +35,15 @@ class Person(models.Model):
 
     def __str__(self):
         return self.get_full_name() + ' (' + self.initials + ')'
+
+    @staticmethod
+    def find_prefix(name):
+        name_prefix = ''
+        for prefix in NAME_PREFIXES:
+            if prefix + ' ' in name:
+                name_prefix = prefix
+                break
+        return name_prefix
 
     @staticmethod
     def find(surname, initials=''):
