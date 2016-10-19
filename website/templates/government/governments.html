@@ -1,0 +1,37 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap3 %}
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Kabinetten</h3></div>
+  </div>
+</div>
+
+<div class="row">
+{% for government in governments %}
+  <div class="col-sm-3" align="center">
+    <p>
+      <h4>{{ government.name }}</h4>
+    </p>
+    <p>
+      {{ government.date_formed }}
+      <br/>
+      {{ government.wikidata_id }}
+    </p>
+  </div>
+{% endfor %}
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h5><a href="/api/government/">Government API</a></h5></div>
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}
