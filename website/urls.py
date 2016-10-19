@@ -7,6 +7,7 @@ from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import VotingView
 from document.views import VotingsView
+from government.views import GovernmentsView
 from parliament.views import PartiesView, ParliamentMembersView
 from stats.views import get_example_plot_html_json
 
@@ -21,6 +22,8 @@ urlpatterns = [
     url(r'^person/(?P<person_id>\d+)/$', PersonView.as_view()),
     url(r'^parties/$', PartiesView.as_view()),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
+    url(r'^governments/$', GovernmentsView.as_view()),
+
     url(r'^dossiers/$', DossiersView.as_view()),
     url(r'^agendas/$', AgendasView.as_view()),
     url(r'^agenda/(?P<pk>\d+)/$', AgendaView.as_view()),
@@ -29,6 +32,7 @@ urlpatterns = [
     url(r'^document/(?P<pk>\d+)/$', DocumentView.as_view()),
     url(r'^document/voting/(?P<voting_id>\d+)/$', VotingView.as_view()),
     url(r'^votings/$', VotingsView.as_view()),
+
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
 

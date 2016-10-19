@@ -20,6 +20,7 @@ INSTALLED_APPS = (
     'scraper',
     'document',
     'parliament',
+    'government',
     'person',
     # 'debug_toolbar',
     'bootstrap3',
@@ -206,6 +207,11 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'parliament': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'government': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
             'level': 'DEBUG',
