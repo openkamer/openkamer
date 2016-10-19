@@ -4,6 +4,9 @@ import re
 from person.models import Person
 
 from government.models import Government
+from government.models import Ministry
+from government.models import GovernmentPosition
+from government.models import GovernmentMember
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
@@ -33,10 +36,33 @@ def create_governments():
     government_ids = ['Q1638648']
     for gov_id in government_ids:
         gov_info = scraper.government.get_government(gov_id)
-        Government.objects.create(
+        government, created = Government.objects.get_or_create(
             name=gov_info['name'],
             date_formed=gov_info['inception'],
             wikidata_id=gov_id
+        )
+        create_government_members(government)
+
+
+def create_government_members(government):
+    members = scraper.government.get_government_members(government.wikidata_id)
+    for member in members:
+        ministry = None
+        if 'ministry' in member:
+            ministry, created = Ministry.objects.get_or_create(name=member['ministry'].lower(), government=government)
+        position = GovernmentPosition.objects.create(ministry=ministry, position=GovernmentPosition.find_position_type(member['position']))
+        person = Person.objects.create(surname=member['name'])
+        start_date = government.date_formed
+        if 'start_date' in member:
+            start_date = member['start_date']
+        end_date = None
+        if 'end_date' in member:
+            end_date = member['end_date']
+        GovernmentMember.objects.get_or_create(
+            person=person,
+            position=position,
+            start_date=start_date,
+            end_date=end_date
         )
 
 
