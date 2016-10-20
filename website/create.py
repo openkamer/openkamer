@@ -52,8 +52,17 @@ def create_government_members(government):
         ministry = None
         if 'ministry' in member:
             ministry, created = Ministry.objects.get_or_create(name=member['ministry'].lower(), government=government)
-        position = GovernmentPosition.objects.create(ministry=ministry, position=GovernmentPosition.find_position_type(member['position']))
+        position_type = GovernmentPosition.find_position_type(member['position'])
+        positions = GovernmentPosition.objects.filter(ministry=ministry, position=position_type, government=government)
+        if positions.exists():
+            if positions.count() > 1:
+                logger.error('more than one GovernmentPosition found for ministry: ' + str(ministry) + ' and position: ' + str(position_type))
+            position = positions[0]
+        else:
+            position = GovernmentPosition.objects.create(ministry=ministry, position=position_type)
         forename = wikidata.get_given_name(member['wikidata_id'])
+        if not forename:
+            forename = member['name'].split(' ')[0]
         surname = member['name'].replace(forename, '').strip()
         prefix = Person.find_prefix(surname)
         if prefix:
@@ -64,6 +73,9 @@ def create_government_members(government):
             surname_prefix=prefix,
             wikidata_id=member['wikidata_id']
         )
+        person.update_info()
+        person.save()
+        assert person.wikidata_id == member['wikidata_id']
         start_date = government.date_formed
         if 'start_date' in member:
             start_date = member['start_date']
