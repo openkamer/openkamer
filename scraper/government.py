@@ -30,25 +30,25 @@ def get_government_members(government_wikidata_id):
                 item_id = prop['datavalue']['value']['id']
                 # print(item_id)
                 item_label = wikidata.get_label(item_id, language='nl')
+                item_label = item_label.lower()
                 member['properties'].append(item_label)
-                if 'ministerie' in item_label.lower():
-                    member['ministry'] = item_label.lower().replace('ministerie van', '').strip()
-                elif 'minister voor' in item_label.lower():
-                    member['ministry'] = item_label.lower().replace('minister voor', '').strip()
-                if 'minister-president' in item_label.lower():
-                    member['position'] = 'minister-president'
-                elif 'viceminister' in item_label.lower():
-                    member['position'] = 'viceminister-president'
-                elif 'staatssecretaris' in item_label.lower():
-                    member['position'] = 'staatssecretaris'
-                elif 'minister' in item_label.lower():
-                    member['position'] = 'minister'
+                if 'ministerie' in item_label:
+                    member['ministry'] = item_label.replace('ministerie van', '').strip()
+                elif 'minister voor' in item_label:
+                    member['ministry'] = item_label.replace('minister voor', '').strip()
+                elif 'position' not in member:
+                    if 'viceminister' in item_label or 'vicepremier' in item_label:
+                        member['position'] = 'viceminister-president'
+                    elif 'minister-president' in item_label or 'premier' in item_label:
+                        member['position'] = 'minister-president'
+                    elif 'staatssecretaris' in item_label:
+                        member['position'] = 'staatssecretaris'
+                    elif 'minister' in item_label:
+                        member['position'] = 'minister'
             if prop['property'] == 'P580':  # start time
                 member['start_date'] = wikidata.get_date(prop['datavalue']['value']['time'])
-                # print(member['start_date'])
             if prop['property'] == 'P582':  # end time
                 member['end_date'] = wikidata.get_date(prop['datavalue']['value']['time'])
-                # print(member['end_date'])
         logger.info(member)
         members.append(member)
     logger.info('END')
