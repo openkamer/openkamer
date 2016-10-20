@@ -1,6 +1,6 @@
 django==1.10.2
 django-bootstrap3==7.1.0
-pillow==3.4.1
+pillow==3.4.2
 djangorestframework==3.5.0
 requests==2.11.1
 lxml==3.6.4
