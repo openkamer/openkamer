@@ -32,6 +32,7 @@ class Person(models.Model):
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
+    parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.get_full_name() + ' (' + self.initials + ')'
@@ -109,6 +110,10 @@ class Person(models.Model):
         if image_filename:
             self.wikimedia_image_name = image_filename
             self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
+        self.parlement_and_politiek_id = wikidata.get_parlement_and_politiek_id(self.wikidata_id)
 
     def get_wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
+
+    def parlement_and_politiek_url(self):
+        return 'https://www.parlement.com/id/' + self.parlement_and_politiek_id + '/'
