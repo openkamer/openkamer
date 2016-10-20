@@ -41,9 +41,9 @@
 
       <small>
       {% for position in ministry.positions %}
-        {% if position.members_inactive %} {{ position }}<br/> {% endif %}
+        {% if position.members_inactive %} <b>{{ position }}</b><br/> {% endif %}
         {% for member in position.members_inactive %}
-          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a> ({{ member.start_date }} - {{ member.end_date }}) <br/>
+          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a> ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }}) <br/>
         {% endfor %}
       {% endfor %}
       </small>
