@@ -1,6 +1,10 @@
+import logging
+
 from django.views.generic import TemplateView
 
 from government.models import Government
+
+logger = logging.getLogger(__name__)
 
 
 class GovernmentsView(TemplateView):
@@ -18,4 +22,20 @@ class GovernmentView(TemplateView):
     def get_context_data(self, government_id, **kwargs):
         context = super().get_context_data(**kwargs)
         context['government'] = Government.objects.get(id=government_id)
+        return context
+
+
+class GovernmentCurrentView(TemplateView):
+    template_name = 'government/government.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        governments = Government.objects.filter(date_dissolved=None)
+        if governments.exists():
+            government = governments[0]
+            if governments.count() > 1:
+                logger.error('more than 1 current government found')
+        else:
+            government = None
+        context['government'] = government
         return context
