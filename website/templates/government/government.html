@@ -21,8 +21,8 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h4>Minister-president: {{ government.prime_minister.person.fullname }}</h4></div>
-    <div align="center"><h5>Viceminister-president: {{ government.deputy_prime_minister.person.fullname }}</h5></div>
+    <div align="center"><h4>Minister-president: <a href="/person/{{ government.prime_minister.person.id }}/">{{ government.prime_minister.person.fullname }}</a></h4></div>
+    <div align="center"><h5>Viceminister-president: <a href="/person/{{ government.deputy_prime_minister.person.id }}/">{{ government.deputy_prime_minister.person.fullname }}</a></h5></div>
   </div>
 </div>
 
