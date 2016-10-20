@@ -12,7 +12,7 @@ NAME_PREFIXES = [
     'van der',
     'van den',
     'van de',
-    'in het'
+    'in het',
     'van',
     'de',
     'het',
