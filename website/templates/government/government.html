@@ -34,7 +34,7 @@
     <div class="well">
       <h4>{{ ministry.name }}</h4>
       {% for position in ministry.positions %}
-        {{ position }}: {{ position.member_current.person.fullname }} <br/>
+        {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a><br/>
       {% endfor %}
 
       <hr/>
@@ -43,7 +43,7 @@
       {% for position in ministry.positions %}
         {% if position.members_inactive %} {{ position }}<br/> {% endif %}
         {% for member in position.members_inactive %}
-          {{ member.person.fullname }} ({{ member.start_date }} - {{ member.end_date }}) <br/>
+          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a> ({{ member.start_date }} - {{ member.end_date }}) <br/>
         {% endfor %}
       {% endfor %}
       </small>
