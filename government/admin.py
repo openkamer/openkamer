@@ -14,16 +14,6 @@ class GovernmentAdmin(admin.ModelAdmin):
     )
 
 
-class GovernmentMemberAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'person',
-        'position',
-        'start_date',
-        'end_date'
-    )
-
-
 class MinistryAdmin(admin.ModelAdmin):
     list_display = (
         'id',
@@ -36,9 +26,19 @@ class GovernmentPositionAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'position',
-        'ministry'
+        'ministry',
+        'government'
     )
 
+
+class GovernmentMemberAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'person',
+        'position',
+        'start_date',
+        'end_date'
+    )
 
 admin.site.register(Government, GovernmentAdmin)
 admin.site.register(GovernmentMember, GovernmentMemberAdmin)
