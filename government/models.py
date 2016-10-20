@@ -2,8 +2,6 @@ import logging
 
 from django.db import models
 
-from wikidata import wikidata
-
 from person.models import Person
 
 logger = logging.getLogger(__name__)
