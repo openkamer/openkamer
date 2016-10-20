@@ -59,7 +59,7 @@ def create_government_members(government):
                 logger.error('more than one GovernmentPosition found for ministry: ' + str(ministry) + ' and position: ' + str(position_type))
             position = positions[0]
         else:
-            position = GovernmentPosition.objects.create(ministry=ministry, position=position_type)
+            position = GovernmentPosition.objects.create(ministry=ministry, position=position_type, government=government)
         forename = wikidata.get_given_name(member['wikidata_id'])
         if not forename:
             forename = member['name'].split(' ')[0]
