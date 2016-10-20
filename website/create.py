@@ -65,22 +65,26 @@ def create_government_members(government):
             position = positions[0]
         else:
             position = GovernmentPosition.objects.create(ministry=ministry, position=position_type, government=government)
-        forename = wikidata.get_given_name(member['wikidata_id'])
-        if not forename:
-            forename = member['name'].split(' ')[0]
-        surname = member['name'].replace(forename, '').strip()
-        prefix = Person.find_prefix(surname)
-        if prefix:
-            surname = surname.replace(prefix + ' ', '')
-        person = Person.objects.create(
-            forename=forename,
-            surname=surname,
-            surname_prefix=prefix,
-            wikidata_id=member['wikidata_id']
-        )
-        person.update_info()
-        person.save()
-        assert person.wikidata_id == member['wikidata_id']
+        persons = Person.objects.filter(wikidata_id=member['wikidata_id'])
+        if persons.exsits():
+            person = persons[0]
+        else:
+            forename = wikidata.get_given_name(member['wikidata_id'])
+            if not forename:
+                forename = member['name'].split(' ')[0]
+            surname = member['name'].replace(forename, '').strip()
+            prefix = Person.find_prefix(surname)
+            if prefix:
+                surname = surname.replace(prefix + ' ', '')
+            person = Person.objects.create(
+                forename=forename,
+                surname=surname,
+                surname_prefix=prefix,
+                wikidata_id=member['wikidata_id']
+            )
+            person.update_info()
+            person.save()
+            assert person.wikidata_id == member['wikidata_id']
         start_date = government.date_formed
         if 'start_date' in member:
             start_date = member['start_date']
