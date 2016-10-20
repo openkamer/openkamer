@@ -36,14 +36,18 @@ logger = logging.getLogger(__name__)
 def create_governments():
     # Rutte II : Q1638648
     government_ids = ['Q1638648']
-    for gov_id in government_ids:
-        gov_info = scraper.government.get_government(gov_id)
-        government, created = Government.objects.get_or_create(
-            name=gov_info['name'],
-            date_formed=gov_info['inception'],
-            wikidata_id=gov_id
-        )
-        create_government_members(government)
+    for wikidata_id in government_ids:
+        create_government(wikidata_id)
+
+
+def create_government(wikidata_id):
+    gov_info = scraper.government.get_government(wikidata_id)
+    government, created = Government.objects.get_or_create(
+        name=gov_info['name'],
+        date_formed=gov_info['inception'],
+        wikidata_id=wikidata_id
+    )
+    create_government_members(government)
 
 
 def create_government_members(government):
