@@ -22,7 +22,8 @@ def get_government_members(government_wikidata_id):
         member['properties'] = []
         member['wikidata_id'] = part['mainsnak']['datavalue']['value']['id']
         member['wikipedia_url'] = wikidata.get_wikipedia_url(member['wikidata_id'], language='nl')
-        member['name'] = wikidata.get_item(member['wikidata_id'])['labels']['nl']['value']
+        member['name'] = wikidata.get_label(member['wikidata_id'], 'nl')
+        member['parlement_and_politiek_id'] = wikidata.get_parlement_and_politiek_id(member['wikidata_id'])
         for prop_id in part['qualifiers']:
             prop = part['qualifiers'][prop_id][0]
             # print(json.dumps(prop, sort_keys=True, indent=4))

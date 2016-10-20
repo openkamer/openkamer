@@ -7,7 +7,23 @@ from django.test import TestCase
 from person.models import Person
 
 
-class TestNamePrefix(TestCase):
+class TestFindName(TestCase):
+
+    def test_find_by_fullname(self):
+        p1 = Person.objects.create(forename='Jan Peter', surname='Balkenende', initials='J.P.')
+        p2 = Person.objects.create(forename='Jan', surname='Balkenende', initials='J.')
+        p3 = Person.objects.create(forename='Jan', surname='Balkenende', surname_prefix='van', initials='J.')
+        p4 = Person.objects.create(forename='Jan Peter', surname='Balkenende', surname_prefix='van', initials='J.P.')
+        p_found = Person.find_by_fullname('Jan Peter Balkenende')
+        self.assertEqual(p1.id, p_found.id)
+        p_found = Person.find_by_fullname('Jan Balkenende')
+        self.assertEqual(p2.id, p_found.id)
+        p_found = Person.find_by_fullname('Jan van Balkenende')
+        self.assertEqual(p3.id, p_found.id)
+        p_found = Person.find_by_fullname('Jan Peter van Balkenende')
+        self.assertEqual(p4.id, p_found.id)
+        p_found = Person.find_by_fullname('Jan Jaap van Balkenende')
+        self.assertEqual(None, p_found)
 
     def test_find_name_prefix(self):
         name = 'Ard van der Steur'

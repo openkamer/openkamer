@@ -157,3 +157,10 @@ def get_date(date_str):
     except ValueError as error:
         print(error)
         return None
+
+
+def get_parlement_and_politiek_id(id):
+    claims = get_claims(id)
+    if 'P1749' in claims:
+        return claims['P1749'][0]['mainsnak']['datavalue']['value']
+    return None

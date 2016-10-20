@@ -2,6 +2,8 @@ import json
 import datetime
 from django.test import TestCase
 
+from wikidata import wikidata
+
 import scraper.documents
 import scraper.votings
 import scraper.government
@@ -28,6 +30,12 @@ class TestGovernmentScraper(TestCase):
         members = scraper.government.get_government_members(self.rutte_2_wikidata_id)
         for member in members:
             print(member)
+
+    def test_get_parlement_and_politiek_id(self):
+        person_wikidata_id = 'Q32681'
+        expected_id = 'vg09llk9rzrp'
+        parlement_id = wikidata.get_parlement_and_politiek_id(person_wikidata_id)
+        self.assertEqual(parlement_id, expected_id)
 
 
 class TestWetsvoorstellenDossierScraper(TestCase):

@@ -28,7 +28,8 @@ class TestCreateParliament(TestCase):
 class TestCreateGovernment(TestCase):
 
     def test_create_parliament(self):
-        government = create_government('Q1638648')
+        rutte_2_wikidata_id = 'Q1638648'
+        government = create_government(rutte_2_wikidata_id)
         self.assertEqual(government.name, 'Kabinet-Rutte II')
 
 
