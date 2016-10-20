@@ -15,6 +15,7 @@ from document.models import Voting
 
 from website.create import create_or_update_dossier
 from website.create import find_original_kamerstuk_id
+from website.create import create_government
 
 
 class TestCreateParliament(TestCase):
@@ -22,6 +23,13 @@ class TestCreateParliament(TestCase):
     def test_create_parliament(self):
         political_parties.create_parties()
         parliament_members.create_members()
+
+
+class TestCreateGovernment(TestCase):
+
+    def test_create_parliament(self):
+        government = create_government('Q1638648')
+        self.assertEqual(government.name, 'Kabinet-Rutte II')
 
 
 class TestFindParliamentMembers(TestCase):

@@ -48,6 +48,7 @@ def create_government(wikidata_id):
         wikidata_id=wikidata_id
     )
     create_government_members(government)
+    return government
 
 
 def create_government_members(government):
