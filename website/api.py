@@ -9,15 +9,19 @@ from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet, Subm
 from document.api import VotingViewSet, VotePartyViewSet, VoteIndividualViewSet
 
 router = routers.DefaultRouter()
+
 router.register(r'person', PersonViewSet)
+
 router.register(r'parliament', ParliamentViewSet)
 router.register(r'parliamentmember', ParliamentMemberViewSet)
 router.register(r'party', PoliticalPartyViewSet)
 router.register(r'partymember', PartyMemberViewSet)
+
 router.register(r'government', GovernmentViewSet)
 router.register(r'ministry', MinistryViewSet)
 router.register(r'governmentposition', GovernmentPositionViewSet)
 router.register(r'governmentmember', GovernmentMemberViewSet)
+
 router.register(r'document', DocumentViewSet)
 router.register(r'kamerstuk', KamerstukViewSet)
 router.register(r'submitter', SubmitterViewSet)
