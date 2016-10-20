@@ -4,7 +4,16 @@ from parliament.models import Person
 
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('fullname', 'forename', 'surname', 'surname_prefix', 'initials', 'birthdate', 'wikidata_id')
+    list_display = (
+        'fullname',
+        'forename',
+        'surname',
+        'surname_prefix',
+        'initials',
+        'birthdate',
+        'wikidata_id',
+        'parlement_and_politiek_id',
+    )
 
 
 admin.site.register(Person, PersonAdmin)
