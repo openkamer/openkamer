@@ -66,6 +66,14 @@ class Person(models.Model):
                 return person
         return None
 
+    @staticmethod
+    def find_by_fullname(fullname):
+        persons = Person.objects.all()
+        for person in persons:
+            if person.fullname() == fullname:
+                return person
+        return None
+
     def fullname(self):
         return self.get_full_name()
 
