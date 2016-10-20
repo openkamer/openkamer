@@ -66,7 +66,7 @@ def create_government_members(government):
         else:
             position = GovernmentPosition.objects.create(ministry=ministry, position=position_type, government=government)
         persons = Person.objects.filter(wikidata_id=member['wikidata_id'])
-        if persons.exsits():
+        if persons.exists():
             person = persons[0]
         else:
             forename = wikidata.get_given_name(member['wikidata_id'])
