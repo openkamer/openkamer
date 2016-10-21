@@ -7,6 +7,7 @@ from scraper import parliament_members
 from person.models import Person
 
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
 
 from document.models import Agenda
 from document.models import Dossier
@@ -26,12 +27,20 @@ class TestCreateParliament(TestCase):
 
 
 class TestCreateGovernment(TestCase):
+    fixtures = ['parliament_2016.json']
 
-    def test_create_parliament(self):
+    def test_create_government(self):
         rutte_2_wikidata_id = 'Q1638648'
-        government = create_government(rutte_2_wikidata_id)
+        government = create_government(rutte_2_wikidata_id, max_members=4)
         self.assertEqual(government.name, 'Kabinet-Rutte II')
-
+        members = government.members()
+        persons = []
+        for member in members:
+            print(member)
+            persons.append(member.person)
+        party_members = PartyMember.objects.filter(person__in=persons)
+        for party_member in party_members:
+            print(party_member)
 
 class TestFindParliamentMembers(TestCase):
     fixtures = ['parliament_2016.json']
