@@ -13,7 +13,7 @@ def get_government(government_wikidata_id):
     return government
 
 
-def get_government_members(government_wikidata_id):
+def get_government_members(government_wikidata_id, max_members=None):
     logger.info('BEGIN')
     parts = wikidata.get_parts(government_wikidata_id)
     members = []
@@ -52,5 +52,7 @@ def get_government_members(government_wikidata_id):
                 member['end_date'] = wikidata.get_date(prop['datavalue']['value']['time'])
         logger.info(member)
         members.append(member)
+        if max_members and  len(members) >= max_members:
+            break;
     logger.info('END')
     return members
