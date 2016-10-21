@@ -12,24 +12,30 @@
 <div class="row">
 {% for member in members %}
   <div class="col-sm-3 party-member-column" align="center">
+    <div class="well">
 
-    <p>
-      <h5>{{ member.person.fullname }}</h5>
-      <small>{{ member.party.name }} <br/>
-      {% if member.party.wikimedia_logo_url %}
-        <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
-      {% endif %}
-        <a href="/api/parliamentmember/{{ member.id }}/">API</a>
-      {% if member.person.wikidata_id %}
-        | <a href="https://www.wikidata.org/wiki/{{ member.person.wikidata_id }}">wikidata</a>
-      {% endif %}
-      {% if member.person.wikimedia_image_url %}
-        | <a href="{{ member.person.wikimedia_image_url }}">image</a>
-      {% endif %}
-      </small>
-    </p>
+      <p>
+        <h5><a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a></h5>
+        <small><a href="/party/{{ member.party.id }}/">{{ member.party.name_short }}</a> <br/>
+        {% if member.party.wikimedia_logo_url %}
+          <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
+        {% endif %}
+          <a href="/api/parliamentmember/{{ member.id }}/">API</a>
+        {% if member.person.wikidata_id %}
+          | <a href="https://www.wikidata.org/wiki/{{ member.person.wikidata_id }}">wikidata</a>
+        {% endif %}
+        {% if member.person.wikimedia_image_url %}
+          | <a href="{{ member.person.wikimedia_image_url }}">image</a>
+        {% endif %}
+        </small>
+      </p>
 
+    </div>
   </div>
+
+  {% if forloop.counter|divisibleby:4 %}
+  <div class="clearfix"></div>
+  {% endif %}
 {% endfor %}
 </div>
 
