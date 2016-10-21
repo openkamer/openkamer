@@ -33,15 +33,15 @@ class ParliamentMember(models.Model):
         logger.info('ParliamentMember not found.')
         return None
 
-    def party(self):
+    def party_current(self):
         memberships = PartyMember.objects.filter(person=self.person)
-        if memberships:
-            assert memberships.count() == 1
-            return memberships[0].party
+        for member in memberships:
+            if member.left is None:
+                return member.party
         return None
 
     def __str__(self):
-        return str(self.person.fullname()) + ' (' + str(self.party().name_short) + ')'
+        return str(self.person.fullname()) + ' (' + str(self.party_current().name_short) + ')'
 
 
 class PoliticalParty(models.Model):
