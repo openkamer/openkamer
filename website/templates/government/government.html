@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% load openkamer %}
+
 {% block content %}
 
 <div class="subnav subnav-default subnav-fixed-top">
@@ -34,7 +36,11 @@
     <div class="well">
       <h4>{{ ministry.name }}</h4>
       {% for position in ministry.positions %}
-        {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a><br/>
+
+        {% get_current_party position.member_current.person.id as party %}
+        {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a>
+        ({{ party.name_short }})
+        <br/>
       {% endfor %}
 
       <hr/>
@@ -43,7 +49,11 @@
       {% for position in ministry.positions %}
         {% if position.members_inactive %} <b>{{ position }}</b><br/> {% endif %}
         {% for member in position.members_inactive %}
-          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a> ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }}) <br/>
+          {% get_current_party member.person.id as party %}
+          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
+          ({{ party.name_short }})
+          ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }})
+          <br/>
         {% endfor %}
       {% endfor %}
       </small>
