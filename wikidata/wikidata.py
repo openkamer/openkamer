@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import urllib.parse
 
 import requests
@@ -164,3 +165,23 @@ def get_parlement_and_politiek_id(id):
     if 'P1749' in claims:
         return claims['P1749'][0]['mainsnak']['datavalue']['value']
     return None
+
+
+def get_political_party_memberships(id):
+    claims = get_claims(id)
+    if 'P102' not in claims:
+        return []
+    memberships = []
+    political_parties = claims['P102']
+    # print(json.dumps(political_parties, sort_keys=True, indent=4))
+    for party in political_parties:
+        member_info = {'wikidata_id': party['mainsnak']['datavalue']['value']['id']}
+        member_info['start_date'] = None
+        member_info['end_date'] = None
+        if 'qualifiers' in party and 'P580' in party['qualifiers']:
+            member_info['start_date'] = get_date(party['qualifiers']['P580'][0]['datavalue']['value']['time'])
+        if 'qualifiers' in party and 'P582' in party['qualifiers']:
+            member_info['end_date'] = get_date(party['qualifiers']['P582'][0]['datavalue']['value']['time'])
+        print(member_info)
+        memberships.append(member_info)
+    return memberships
