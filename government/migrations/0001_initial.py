@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             name='GovernmentPosition',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('position', models.CharField(choices=[('MIN', 'Minister'), ('SOS', 'Secretary of State'), ('PMI', 'Prime Minister'), ('DPM', 'Deputy Prime Minister')], max_length=3)),
+                ('position', models.CharField(choices=[('MIN', 'Minister'), ('SOS', 'Staatssecretaris'), ('PMI', 'Minister-president'), ('DPM', 'Viceminister-president')], max_length=3)),
                 ('government', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='government.Government')),
             ],
         ),

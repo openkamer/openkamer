@@ -71,9 +71,9 @@ class GovernmentPosition(models.Model):
     DEPUTY_PRIME_MINISTER = 'DPM'
     GOVERNMENT_POSITIONS = (
         (MINISTER, 'Minister'),
-        (SECRETARY_OF_STATE, 'Secretary of State'),
-        (PRIME_MINISTER, 'Prime Minister'),
-        (DEPUTY_PRIME_MINISTER, 'Deputy Prime Minister'),
+        (SECRETARY_OF_STATE, 'Staatssecretaris'),
+        (PRIME_MINISTER, 'Minister-president'),
+        (DEPUTY_PRIME_MINISTER, 'Viceminister-president'),
     )
     position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS)
     ministry = models.ForeignKey(Ministry, blank=True, null=True)
