@@ -349,11 +349,11 @@ def create_votes_individual(voting, votes):
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         if not parliament_member:
             logger.error('parliament member not found for vote: ' + str(vote))
+            logger.error('creating vote with empty parliament member')
             if voting.kamerstuk:
                 logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
             else:
                 logger.error('voting.kamerstuk does not exist')
-            assert False
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
                                       decision=get_decision(vote.decision), details=vote.details)
 

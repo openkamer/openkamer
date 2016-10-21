@@ -255,7 +255,7 @@ class VoteParty(Vote):
 
 
 class VoteIndividual(Vote):
-    parliament_member = models.ForeignKey(ParliamentMember)
+    parliament_member = models.ForeignKey(ParliamentMember, blank=True, null=True)
 
     def get_name(self):
         return str(self.parliament_member)
