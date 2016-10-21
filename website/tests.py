@@ -6,7 +6,10 @@ from scraper import parliament_members
 
 from person.models import Person
 
+from government.models import Government
+
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
 
 from document.models import Agenda
 from document.models import Dossier
@@ -15,6 +18,7 @@ from document.models import Voting
 
 from website.create import create_or_update_dossier
 from website.create import find_original_kamerstuk_id
+from website.create import create_government
 
 
 class TestCreateParliament(TestCase):
@@ -22,6 +26,45 @@ class TestCreateParliament(TestCase):
     def test_create_parliament(self):
         political_parties.create_parties()
         parliament_members.create_members()
+
+
+class TestCreateGovernment(TestCase):
+    fixtures = ['parliament_2016.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        rutte_2_wikidata_id = 'Q1638648'
+        government = create_government(rutte_2_wikidata_id, max_members=4)
+
+    def test_government_data(self):
+        government = Government.objects.all()[0]
+        self.assertEqual(government.name, 'Kabinet-Rutte II')
+        members = government.members()
+        persons = []
+        for member in members:
+            persons.append(member.person)
+        party_members = PartyMember.objects.filter(person__in=persons)
+        self.assertTrue(len(party_members) >= len(persons))
+
+    def test_governements_view(self):
+        response = self.client.get('/governments/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_governement_view(self):
+        governments = Government.objects.all()
+        for government in governments:
+            response = self.client.get('/government/' + str(government.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
+    def test_api_governement(self):
+        response = self.client.get('/api/government/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/ministry/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/governmentmember/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/governmentposition/')
+        self.assertEqual(response.status_code, 200)
 
 
 class TestFindParliamentMembers(TestCase):

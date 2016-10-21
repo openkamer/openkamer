@@ -9,3 +9,4 @@ openkamer.sqlite
 local_settings.py
 
 /website/static/media/*
+/openkamer.sqliteOLD

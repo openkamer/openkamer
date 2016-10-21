@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import urllib.parse
 
 import requests
@@ -54,6 +55,14 @@ def get_claims(id):
     return item['claims']
 
 
+def get_label(id, language='en'):
+    item = get_item(id, props='labels')
+    if not 'labels' in item:
+        return ''
+    title = item['labels'][language]['value']
+    return title
+
+
 def get_wikipedia_url(id, language='en'):
     site = language + 'wiki'
     item = get_item(id, sites=site, props='sitelinks')
@@ -71,6 +80,13 @@ def get_country_id(id):
     if 'P17' in claims:
         return claims['P17'][0]['mainsnak']['datavalue']['value']['numeric-id']
     return None
+
+
+def get_given_name(id):
+    claims = get_claims(id)
+    if 'P735' in claims:
+        return get_label(claims['P735'][0]['mainsnak']['datavalue']['value']['id'])
+    return ''
 
 
 def get_official_website(id):
@@ -107,7 +123,7 @@ def get_wikimedia_image_url(filename, image_width_px=220):
     response = requests.get(url, params)
     response_json = response.json()
     pages = response_json['query']['pages']
-    for page in pages.values():
+    for page in pages.values():  #TODO: rewrite, does not loop
         wikimedia_image_url = page['imageinfo'][0]['thumburl']
         return wikimedia_image_url
 
@@ -116,12 +132,7 @@ def get_birth_date(id):
     claims = get_claims(id)
     if 'P569' in claims:  # date of birth
         birthdate = claims['P569'][0]['mainsnak']['datavalue']['value']['time']
-        try:
-            birthdate = datetime.strptime(birthdate[1:11], '%Y-%m-%d')
-            return birthdate.date()
-        except ValueError as error:
-            print(error)
-            return None
+        return get_date(birthdate)
     return None
 
 
@@ -129,10 +140,47 @@ def get_inception(id):
     claims = get_claims(id)
     if 'P571' in claims:
         inception = claims['P571'][0]['mainsnak']['datavalue']['value']['time']
-        try:
-            inception = datetime.strptime(inception[1:11], '%Y-%m-%d')
-            return inception.date()
-        except ValueError as error:
-            print(error)
-            return None
+        return get_date(inception)
     return None
+
+
+def get_parts(id):
+    claims = get_claims(id)
+    if 'P527' in claims:
+        return claims['P527']  # has part
+    return None
+
+
+def get_date(date_str):
+    try:
+        date = datetime.strptime(date_str[1:11], '%Y-%m-%d')
+        return date.date()
+    except ValueError as error:
+        print(error)
+        return None
+
+
+def get_parlement_and_politiek_id(id):
+    claims = get_claims(id)
+    if 'P1749' in claims:
+        return claims['P1749'][0]['mainsnak']['datavalue']['value']
+    return ''
+
+
+def get_political_party_memberships(id):
+    claims = get_claims(id)
+    if 'P102' not in claims:
+        return []
+    memberships = []
+    political_parties = claims['P102']
+    # print(json.dumps(political_parties, sort_keys=True, indent=4))
+    for party in political_parties:
+        member_info = {'wikidata_id': party['mainsnak']['datavalue']['value']['id']}
+        member_info['start_date'] = None
+        member_info['end_date'] = None
+        if 'qualifiers' in party and 'P580' in party['qualifiers']:
+            member_info['start_date'] = get_date(party['qualifiers']['P580'][0]['datavalue']['value']['time'])
+        if 'qualifiers' in party and 'P582' in party['qualifiers']:
+            member_info['end_date'] = get_date(party['qualifiers']['P582'][0]['datavalue']['value']['time'])
+        memberships.append(member_info)
+    return memberships

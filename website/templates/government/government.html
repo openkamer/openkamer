@@ -1,0 +1,91 @@
+{% extends "website/base.html" %}
+
+{% load openkamer %}
+
+{% block content %}
+
+<div class="subnav subnav-default subnav-fixed-top">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="/governments/">historische kabinetten</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>{{ government.name }}</h3></div>
+    <div align="center"><h4>{{ government.date_formed|date:"Y-m-d" }} - {% if government.date_dissolved %} {{ goverment.date_dissolved|date:"Y-m-d" }} {% else %} heden {% endif %}</h4></div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h4>Minister-president: <a href="/person/{{ government.prime_minister.person.id }}/">{{ government.prime_minister.person.fullname }}</a></h4></div>
+    <div align="center"><h5>Viceminister-president: <a href="/person/{{ government.deputy_prime_minister.person.id }}/">{{ government.deputy_prime_minister.person.fullname }}</a></h5></div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+{% for ministry in government.ministries %}
+  <div class="col-sm-6 col-md-6 col-lg-4" align="center">
+    <div class="well">
+      <h4>{{ ministry.name }}</h4>
+      {% for position in ministry.positions %}
+
+        {% get_current_party position.member_current.person.id as party %}
+        {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a>
+        (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+        <br/>
+      {% endfor %}
+
+      <hr/>
+
+      <small>
+      {% for position in ministry.positions %}
+        {% if position.members_inactive %} <b>{{ position }}</b><br/> {% endif %}
+        {% for member in position.members_inactive %}
+          {% get_current_party member.person.id as party %}
+          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
+          (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+          ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }})
+          <br/>
+        {% endfor %}
+      {% endfor %}
+      </small>
+    </div>
+  </div>
+
+  {% if forloop.counter|divisibleby:3 %}
+  <div class="hidden-sm hidden-md clearfix"></div>
+  {% endif %}
+
+  {% if forloop.counter|divisibleby:2 %}
+  <div class="hidden-lg clearfix"></div>
+  {% endif %}
+
+
+{% endfor %}
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h5>APIs</h5>
+      <h5><a href="/api/government/">Government</a></h5>
+      <h5><a href="/api/governmentmember/">Government Member</a></h5>
+      <h5><a href="/api/ministry/">Ministry</a></h5>
+      <h5><a href="/api/governmentposition/">Government Position</a></h5>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}

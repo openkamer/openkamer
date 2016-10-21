@@ -1,0 +1,59 @@
+{% extends "website/base.html" %}
+
+{% block content %}
+
+<div class="row" align="center">
+  <div class="col-md-12">
+      <h4>{{ party.name_short }}</h4>
+  </div>
+</div>
+
+<div class="row" align="center">
+  <div class="col-md-6 col-md-offset-3">
+
+    <table class="table">
+      <tr>
+        <th>Naam</th>
+        <td>{{ party.name }}</td>
+      </tr>
+      <tr>
+        <th>Korte naam</th>
+        <td>{{ party.name_short }}</td>
+      </tr>
+      <tr>
+        <th>Logo</th>
+        <td>{% include "parliament/items/party_logo.html" %}</td>
+      </tr>
+      <tr>
+        <th>Opgericht</th>
+        <td>{{ party.founded }}</td>
+      </tr>
+      <tr>
+        <th>Partij website</th>
+        <td><a href="{{ party.official_website_url }}" target="_blank">{{ party.official_website_url }}</a></td>
+      </tr>
+      <tr>
+        <th>Wikidata</th>
+        <td><a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">https://www.wikidata.org/wiki/{{ party.wikidata_id }}</a></td>
+      </tr>
+      <tr>
+        <th>API</th>
+        <td><a href="/api/party/{{ party.id }}/">link</a></td>
+      </tr>
+    </table>
+
+  </div>
+</div>
+
+<hr/>
+
+<div class="row" align="center">
+  <h4>Leden</h4>
+  {% for member in party.members_current %}
+  <div class="col-md-4">
+    <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,10 +1,17 @@
 import logging
 import re
 
+from wikidata import wikidata
 
 from person.models import Person
 
+from government.models import Government
+from government.models import Ministry
+from government.models import GovernmentPosition
+from government.models import GovernmentMember
+
 from parliament.models import PoliticalParty
+from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 from parliament.util import parse_name_initials_surname
 from parliament.util import parse_name_surname_initials
@@ -20,10 +27,120 @@ from document.models import Vote
 from document.models import VoteParty
 from document.models import VoteIndividual
 
+import scraper.government
 import scraper.documents
 import scraper.votings
+import scraper.persons
 
 logger = logging.getLogger(__name__)
+
+
+def create_governments():
+    # Rutte II : Q1638648
+    government_ids = ['Q1638648']
+    for wikidata_id in government_ids:
+        create_government(wikidata_id)
+
+
+def create_government(wikidata_id, max_members=None):
+    gov_info = scraper.government.get_government(wikidata_id)
+    government, created = Government.objects.get_or_create(
+        name=gov_info['name'],
+        date_formed=gov_info['inception'],
+        wikidata_id=wikidata_id
+    )
+    create_government_members(government, max_members=max_members)
+    return government
+
+
+def create_government_members(government, max_members=None):
+    members_created = []
+    members = scraper.government.get_government_members(government.wikidata_id, max_members=max_members)
+    for member in members:
+        ministry = create_ministry(government, member)
+        position = create_government_position(government, member, ministry)
+        person = create_person(member['wikidata_id'], member['name'])
+        gov_member = create_goverment_member(government, member, person, position)
+        members_created.append(gov_member)
+    return members_created
+
+
+def create_ministry(government, member):
+    ministry = None
+    if 'ministry' in member:
+        ministry, created = Ministry.objects.get_or_create(name=member['ministry'].lower(), government=government)
+    return ministry
+
+
+def create_goverment_member(government, member, person, position):
+    start_date = government.date_formed
+    if 'start_date' in member:
+        start_date = member['start_date']
+    end_date = None
+    if 'end_date' in member:
+        end_date = member['end_date']
+    member = GovernmentMember.objects.get_or_create(
+        person=person,
+        position=position,
+        start_date=start_date,
+        end_date=end_date
+    )
+    return member
+
+
+def create_person(wikidata_id, fullname):
+    persons = Person.objects.filter(wikidata_id=wikidata_id)
+    if persons.exists():
+        person = persons[0]
+    else:
+        forename = wikidata.get_given_name(wikidata_id)
+        if not forename:
+            forename = fullname.split(' ')[0]
+        surname = fullname.replace(forename, '').strip()
+        prefix = Person.find_prefix(surname)
+        if prefix:
+            surname = surname.replace(prefix + ' ', '')
+        person = Person.objects.create(
+            forename=forename,
+            surname=surname,
+            surname_prefix=prefix,
+            wikidata_id=wikidata_id
+        )
+        person.update_info()
+        person.save()
+        if person.parlement_and_politiek_id:
+            person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+            person.save()
+        assert person.wikidata_id == wikidata_id
+    party_members = PartyMember.objects.filter(person=person)
+    if not party_members.exists():
+        memberships = wikidata.get_political_party_memberships(wikidata_id)
+        for membership in memberships:
+            parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
+            if parties.exists():
+                party = parties[0]
+            else:
+                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
+                continue
+            PartyMember.objects.create(
+                person=person,
+                party=party,
+                joined=membership['start_date'],
+                left=membership['end_date']
+            )
+    return person
+
+
+def create_government_position(government, member, ministry):
+    position_type = GovernmentPosition.find_position_type(member['position'])
+    positions = GovernmentPosition.objects.filter(ministry=ministry, position=position_type, government=government)
+    if positions.exists():
+        if positions.count() > 1:
+            logger.error('more than one GovernmentPosition found for ministry: ' + str(ministry) + ' and position: ' + str(position_type))
+        position = positions[0]
+    else:
+        position = GovernmentPosition.objects.create(ministry=ministry, position=position_type, government=government)
+    return position
 
 
 def create_or_update_dossier(dossier_id):
@@ -232,11 +349,11 @@ def create_votes_individual(voting, votes):
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         if not parliament_member:
             logger.error('parliament member not found for vote: ' + str(vote))
+            logger.error('creating vote with empty parliament member')
             if voting.kamerstuk:
                 logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
             else:
                 logger.error('voting.kamerstuk does not exist')
-            assert False
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
                                       decision=get_decision(vote.decision), details=vote.details)
 

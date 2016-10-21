@@ -35,9 +35,9 @@ class ParliamentMember(models.Model):
 
     def party(self):
         memberships = PartyMember.objects.filter(person=self.person)
-        if memberships:
-            assert memberships.count() == 1
-            return memberships[0].party
+        for member in memberships:
+            if member.left is None:
+                return member.party
         return None
 
     def __str__(self):
@@ -56,6 +56,9 @@ class PoliticalParty(models.Model):
 
     def __str__(self):
         return str(self.name) + ' (' + str(self.name_short) + ')'
+
+    def members_current(self):
+        return PartyMember.objects.filter(party=self, left=None)
 
     def update_info(self, language='en', top_level_domain='com'):
         """

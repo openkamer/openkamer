@@ -1,0 +1,5 @@
+{% if party.wikimedia_logo_url %}
+  <img class='party-logo' src="{{ party.wikimedia_logo_url }}">
+{% else %}
+  <small>Logo missing, add it at <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a>.</small>
+{% endif %}

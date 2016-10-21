@@ -1,7 +1,13 @@
+import json
+import datetime
 from django.test import TestCase
+
+from wikidata import wikidata
 
 import scraper.documents
 import scraper.votings
+import scraper.government
+import scraper.persons
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -10,6 +16,40 @@ import scraper.votings
 # scraper.documents.get_document_id(page_url)
 
 # scraper.documents.search_politieknl_dossier(33885)
+
+
+class TestPersonInfoScraper(TestCase):
+
+    def test_inititals(self):
+        parlement_and_politiek_id = 'vg09llk9rzrp'
+        initials_expected = 'F.C.G.M.'
+        initials = scraper.persons.get_initials(parlement_and_politiek_id)
+        self.assertEqual(initials, initials_expected)
+        parlement_and_politiek_id = 'vg09lll5uqzx'
+        initials_expected = 'S.A.M.'
+        initials = scraper.persons.get_initials(parlement_and_politiek_id)
+        self.assertEqual(initials, initials_expected)
+
+
+class TestGovernmentScraper(TestCase):
+    rutte_2_wikidata_id = 'Q1638648'
+
+    def test(self):
+        government = scraper.government.get_government(self.rutte_2_wikidata_id)
+        print(government)
+        self.assertEqual(government['name'], 'Kabinet-Rutte II')
+        self.assertEqual(government['inception'], datetime.date(2012, 11, 5))
+
+    def test_get_members(self):
+        members = scraper.government.get_government_members(self.rutte_2_wikidata_id)
+        for member in members:
+            print(member)
+
+    def test_get_parlement_and_politiek_id(self):
+        person_wikidata_id = 'Q32681'
+        expected_id = 'vg09llk9rzrp'
+        parlement_id = wikidata.get_parlement_and_politiek_id(person_wikidata_id)
+        self.assertEqual(parlement_id, expected_id)
 
 
 class TestWetsvoorstellenDossierScraper(TestCase):
@@ -30,7 +70,6 @@ class TestWetsvoorstellenDossierScraper(TestCase):
         #     for dossier_id in dossier_ids:
         #         fileout.write(dossier_id + '\n')
         self.assertEqual(len(dossier_ids), self.max_results)
-
 
 
 class TestVotingScraper(TestCase):

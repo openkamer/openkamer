@@ -8,6 +8,21 @@ from wikidata import wikidata
 logger = logging.getLogger(__name__)
 
 
+NAME_PREFIXES = [
+    'van der',
+    'van den',
+    'van de',
+    'in het',
+    'van',
+    'de',
+    'het',
+    '\'t',
+    'der',
+    'ter',
+    'te',
+]
+
+
 class Person(models.Model):
     forename = models.CharField(max_length=200)
     surname = models.CharField(max_length=200)
@@ -17,9 +32,19 @@ class Person(models.Model):
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
+    parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.get_full_name() + ' (' + self.initials + ')'
+
+    @staticmethod
+    def find_prefix(name):
+        name_prefix = ''
+        for prefix in NAME_PREFIXES:
+            if prefix + ' ' in name:
+                name_prefix = prefix
+                break
+        return name_prefix
 
     @staticmethod
     def find(surname, initials=''):
@@ -39,6 +64,14 @@ class Person(models.Model):
                 score += 1
             if score >= 2:
                 logger.info('person found: ' + surname + ', ' + initials + ' : ' + str(person))
+                return person
+        return None
+
+    @staticmethod
+    def find_by_fullname(fullname):
+        persons = Person.objects.all()
+        for person in persons:
+            if person.fullname() == fullname:
                 return person
         return None
 
@@ -77,6 +110,10 @@ class Person(models.Model):
         if image_filename:
             self.wikimedia_image_name = image_filename
             self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
+        self.parlement_and_politiek_id = wikidata.get_parlement_and_politiek_id(self.wikidata_id)
 
     def get_wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
+
+    def parlement_and_politiek_url(self):
+        return 'https://www.parlement.com/id/' + self.parlement_and_politiek_id + '/'
