@@ -30,6 +30,7 @@ from document.models import VoteIndividual
 import scraper.government
 import scraper.documents
 import scraper.votings
+import scraper.persons
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,9 @@ def create_person(wikidata_id, fullname):
         )
         person.update_info()
         person.save()
+        if person.parlement_and_politiek_id:
+            person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+            person.save()
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
