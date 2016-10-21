@@ -7,6 +7,7 @@ from wikidata import wikidata
 import scraper.documents
 import scraper.votings
 import scraper.government
+import scraper.persons
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -15,6 +16,19 @@ import scraper.government
 # scraper.documents.get_document_id(page_url)
 
 # scraper.documents.search_politieknl_dossier(33885)
+
+
+class TestPersonInfoScraper(TestCase):
+
+    def test_inititals(self):
+        parlement_and_politiek_id = 'vg09llk9rzrp'
+        initials_expected = 'F.C.G.M.'
+        initials = scraper.persons.get_initials(parlement_and_politiek_id)
+        self.assertEqual(initials, initials_expected)
+        parlement_and_politiek_id = 'vg09lll5uqzx'
+        initials_expected = 'S.A.M.'
+        initials = scraper.persons.get_initials(parlement_and_politiek_id)
+        self.assertEqual(initials, initials_expected)
 
 
 class TestGovernmentScraper(TestCase):
