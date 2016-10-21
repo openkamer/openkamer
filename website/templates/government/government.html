@@ -39,7 +39,7 @@
 
         {% get_current_party position.member_current.person.id as party %}
         {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a>
-        ({{ party.name_short }})
+        (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
         <br/>
       {% endfor %}
 
@@ -51,7 +51,7 @@
         {% for member in position.members_inactive %}
           {% get_current_party member.person.id as party %}
           <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
-          ({{ party.name_short }})
+          (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
           ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }})
           <br/>
         {% endfor %}
