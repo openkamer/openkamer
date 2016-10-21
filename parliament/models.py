@@ -57,6 +57,9 @@ class PoliticalParty(models.Model):
     def __str__(self):
         return str(self.name) + ' (' + str(self.name_short) + ')'
 
+    def members_current(self):
+        return PartyMember.objects.filter(party=self, left=None)
+
     def update_info(self, language='en', top_level_domain='com'):
         """
         update the model derived info

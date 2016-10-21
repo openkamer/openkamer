@@ -10,7 +10,8 @@ from document.views import VotingsView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
-from parliament.views import PartiesView, ParliamentMembersView
+from parliament.views import PartiesView, PartyView
+from parliament.views import ParliamentMembersView
 from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
@@ -22,7 +23,9 @@ urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^persons/$', PersonsView.as_view()),
     url(r'^person/(?P<person_id>\d+)/$', PersonView.as_view()),
+
     url(r'^parties/$', PartiesView.as_view()),
+    url(r'^party/(?P<party_id>\d+)/$', PartyView.as_view()),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
 
     url(r'^governments/$', GovernmentsView.as_view()),

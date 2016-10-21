@@ -13,15 +13,11 @@
 {% for party in parties %}
   <div class="col-sm-3 fixed-height-column" align="center">
     <p>
-      <h4>{{ party.name_short }}</h4>
+      <h4><a href="/party/{{ party.id }}/">{{ party.name_short }}</a></h4>
       <small>{{ party.name }}</small>
     </p>
     <p>
-    {% if party.wikimedia_logo_url %}
-      <img class='party-logo' src="{{ party.wikimedia_logo_url }}">
-    {% else %}
-      <small>Logo missing, add it at <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a>.</small>
-    {% endif %}
+    {% include "parliament/items/party_logo.html" %}
     </p>
     <p><small>
     {% if party.founded %}
@@ -31,9 +27,9 @@
       <a href="{{ party.wikipedia_url }}">wikipedia</a> |
     {% endif %}
     {% if party.official_website_url %}
-      <a href="{{ party.official_website_url }}">website</a> |
+      <a href="{{ party.official_website_url }}" target="_blank">website</a> |
     {% endif %}
-    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}">wikidata</a> <br/>
+    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a> <br/>
     <a href="/api/party/{{ party.id }}/">API</a>
     </small></p>
   </div>
