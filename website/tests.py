@@ -6,6 +6,8 @@ from scraper import parliament_members
 
 from person.models import Person
 
+from government.models import Government
+
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
 
@@ -29,18 +31,41 @@ class TestCreateParliament(TestCase):
 class TestCreateGovernment(TestCase):
     fixtures = ['parliament_2016.json']
 
-    def test_create_government(self):
+    @classmethod
+    def setUpTestData(cls):
         rutte_2_wikidata_id = 'Q1638648'
         government = create_government(rutte_2_wikidata_id, max_members=4)
+
+    def test_government_data(self):
+        government = Government.objects.all()[0]
         self.assertEqual(government.name, 'Kabinet-Rutte II')
         members = government.members()
         persons = []
         for member in members:
-            print(member)
             persons.append(member.person)
         party_members = PartyMember.objects.filter(person__in=persons)
-        for party_member in party_members:
-            print(party_member)
+        self.assertTrue(len(party_members) >= len(persons))
+
+    def test_governements_view(self):
+        response = self.client.get('/governments/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_governement_view(self):
+        governments = Government.objects.all()
+        for government in governments:
+            response = self.client.get('/government/' + str(government.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
+    def test_api_governement(self):
+        response = self.client.get('/api/government/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/ministry/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/governmentmember/')
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get('/api/governmentposition/')
+        self.assertEqual(response.status_code, 200)
+
 
 class TestFindParliamentMembers(TestCase):
     fixtures = ['parliament_2016.json']
