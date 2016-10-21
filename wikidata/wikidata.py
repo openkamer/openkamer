@@ -123,7 +123,7 @@ def get_wikimedia_image_url(filename, image_width_px=220):
     response = requests.get(url, params)
     response_json = response.json()
     pages = response_json['query']['pages']
-    for page in pages.values():
+    for page in pages.values():  #TODO: rewrite, does not loop
         wikimedia_image_url = page['imageinfo'][0]['thumburl']
         return wikimedia_image_url
 
@@ -153,8 +153,8 @@ def get_parts(id):
 
 def get_date(date_str):
     try:
-        birthdate = datetime.strptime(date_str[1:11], '%Y-%m-%d')
-        return birthdate.date()
+        date = datetime.strptime(date_str[1:11], '%Y-%m-%d')
+        return date.date()
     except ValueError as error:
         print(error)
         return None
@@ -164,7 +164,7 @@ def get_parlement_and_politiek_id(id):
     claims = get_claims(id)
     if 'P1749' in claims:
         return claims['P1749'][0]['mainsnak']['datavalue']['value']
-    return None
+    return ''
 
 
 def get_political_party_memberships(id):
@@ -182,6 +182,5 @@ def get_political_party_memberships(id):
             member_info['start_date'] = get_date(party['qualifiers']['P580'][0]['datavalue']['value']['time'])
         if 'qualifiers' in party and 'P582' in party['qualifiers']:
             member_info['end_date'] = get_date(party['qualifiers']['P582'][0]['datavalue']['value']['time'])
-        print(member_info)
         memberships.append(member_info)
     return memberships
