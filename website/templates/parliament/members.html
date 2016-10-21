@@ -16,9 +16,9 @@
 
       <p>
         <h5><a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a></h5>
-        <small><a href="/party/{{ member.party_current.id }}/">{{ member.party_current.name_short }}</a> <br/>
-        {% if member.party_current.wikimedia_logo_url %}
-          <img class='party-logo-small' src="{{ member.party_current.wikimedia_logo_url }}"> <br/>
+        <small><a href="/party/{{ member.party.id }}/">{{ member.party.name_short }}</a> <br/>
+        {% if member.party.wikimedia_logo_url %}
+          <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
         {% endif %}
           <a href="/api/parliamentmember/{{ member.id }}/">API</a>
         {% if member.person.wikidata_id %}

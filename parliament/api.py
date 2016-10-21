@@ -17,7 +17,7 @@ class ParliamentMemberSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ParliamentMember
-        fields = ('id', 'person', 'party_current', 'parliament', 'joined', 'left')
+        fields = ('id', 'person', 'party', 'parliament', 'joined', 'left')
 
 
 class PoliticalPartySerializer(serializers.HyperlinkedModelSerializer):
