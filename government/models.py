@@ -14,16 +14,22 @@ class Government(models.Model):
     wikidata_id = models.CharField(max_length=200, blank=True)
 
     def prime_minister(self):
-        return GovernmentPosition.objects.filter(
+        pms = GovernmentPosition.objects.filter(
             position=GovernmentPosition.PRIME_MINISTER,
             government=self
-        )[0].member_current()
+        )
+        if pms.exists():
+            return pms[0].member_current()
+        return None
 
     def deputy_prime_minister(self):
-        return GovernmentPosition.objects.filter(
+        deputies = GovernmentPosition.objects.filter(
             position=GovernmentPosition.DEPUTY_PRIME_MINISTER,
             government=self
-        )[0].member_current()
+        )
+        if deputies.exists():
+            return deputies[0].member_current()
+        return None
 
     def members_current(self):
         members = []
