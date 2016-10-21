@@ -1,6 +1,9 @@
 from rest_framework import serializers, viewsets
 
-from parliament.models import Parliament, ParliamentMember, PartyMember, PoliticalParty
+from parliament.models import Parliament
+from parliament.models import ParliamentMember
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
 
 
 class ParliamentSerializer(serializers.HyperlinkedModelSerializer):
@@ -14,7 +17,7 @@ class ParliamentMemberSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ParliamentMember
-        fields = ('id', 'person', 'party', 'parliament', 'joined', 'left')
+        fields = ('id', 'person', 'party_current', 'parliament', 'joined', 'left')
 
 
 class PoliticalPartySerializer(serializers.HyperlinkedModelSerializer):
