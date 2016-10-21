@@ -25,6 +25,21 @@ class Government(models.Model):
             government=self
         )[0].member_current()
 
+    def members_current(self):
+        members = []
+        positions = GovernmentPosition.objects.filter(government=self)
+        for position in positions:
+            members.append(position.member_current())
+        return members
+
+    def members(self):
+        members = []
+        positions = GovernmentPosition.objects.filter(government=self)
+        for position in positions:
+            for mem in position.members():
+                members.append(mem)
+        return members
+
     def ministries(self):
         return Ministry.objects.filter(government=self)
 
