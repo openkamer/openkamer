@@ -10,6 +10,7 @@ from government.models import Government
 
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
+from parliament.models import PoliticalParty
 
 from document.models import Agenda
 from document.models import Dossier
@@ -188,6 +189,12 @@ class TestWebsite(TestCase):
     def test_parties_overview(self):
         response = self.client.get('/parties/')
         self.assertEqual(response.status_code, 200)
+
+    def test_party_view(self):
+        parties = PoliticalParty.objects.all()
+        for party in parties:
+            response = self.client.get('/party/' + str(party.id) + '/')
+            self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):
         response = self.client.get('/parliamentmembers/')
