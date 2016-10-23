@@ -1,6 +1,8 @@
 {% extends "website/base.html" %}
 
 {% load staticfiles %}
+{% load openkamer %}
+
 {% block headcontent %}
   <link rel="stylesheet" href="/static/css/timeline.css"> <!-- Resource style -->
   <script src="/static/js/modernizr.js"></script> <!-- Modernizr -->
@@ -39,12 +41,22 @@
     {% else %}
       <div class="cd-timeline-img bg-info text-center">
     {% endif %}
-		    <span style="font-size:24px; color:white;" class="glyphicon glyphicon-file"></span>
-		  </div> <!-- cd-timeline-img -->
+
+    {% get_kamerstuk_icon_name kamerstuk.id as iconname %}
+        <span style="font-size:24px; color:white;" class="fa {{ iconname }}"></span>
+      </div> <!-- cd-timeline-img -->
 
 		<div class="cd-timeline-content">
-			<h2>{{ kamerstuk.type_short }}</h2>
-			<p>{{ kamerstuk.type_long }}</p>
+      <h2>{{ kamerstuk.type_short }}</h2>
+      <p>{{ kamerstuk.type_long }}</p>
+      {% with submitters=kamerstuk.document.submitters %}
+        <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
+      {% endwith %}
+      {% if kamerstuk.voting %}
+        {% with voting=kamerstuk.voting %}
+        {% include "document/items/voting_result_bar_small.html" %}
+        {% endwith %}
+      {% endif %}
 			<!-- <a href="#0" class="cd-read-more">Read more</a> -->
 			<span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
 		</div> <!-- cd-timeline-content -->
@@ -54,8 +66,6 @@
 </section>
 
 </div>
-
-<hr/>
 
 <script src="{% static 'js/timeline.js' %}"></script>
 

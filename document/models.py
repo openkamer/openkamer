@@ -90,8 +90,27 @@ class Kamerstuk(models.Model):
     type_long = models.CharField(max_length=100, blank=True)
     original_id = models.CharField(max_length=40, blank=True)  # format: 33885.22
 
+    MOTIE = 'Motie'
+    AMENDEMENT = 'Amendement'
+    WETSVOORSTEL = 'Wetsvoorstel'
+    VERSLAG = 'Verslag'
+    NOTA = 'Nota'
+
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ': ' + str(self.type_long)
+
+    def type(self):
+        if 'nota' in self.type_short.lower():
+            return Kamerstuk.NOTA
+        elif 'motie' in self.type_short.lower():
+            return Kamerstuk.MOTIE
+        elif 'amendement' in self.type_short.lower():
+            return Kamerstuk.AMENDEMENT
+        elif self.voorstelwet():
+            return Kamerstuk.WETSVOORSTEL
+        elif 'verslag' in self.type_short.lower():
+            return Kamerstuk.VERSLAG
+        return None
 
     def id_full(self):
         return str(self.id_main) + '.' + str(self.id_sub)
@@ -108,7 +127,7 @@ class Kamerstuk(models.Model):
         return True
 
     def voorstelwet(self):
-        if self.type_short == 'Voorstel van wet':
+        if 'voorstel van wet' in self.type_short.lower():
             return True
         return False
 
