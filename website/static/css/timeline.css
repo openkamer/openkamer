@@ -4,7 +4,7 @@ Modules - reusable parts of our design
 -------------------------------- */
 .cd-container {
   /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
-  width: 90%;
+  width: 95%;
   max-width: 1170px;
   margin: 0 auto;
 }
@@ -18,7 +18,7 @@ Modules - reusable parts of our design
 #cd-timeline {
   position: relative;
   padding: 2em 0;
-  margin-top: 2em;
+  margin-top: 0;
   margin-bottom: 2em;
 }
 #cd-timeline::before {
@@ -31,11 +31,7 @@ Modules - reusable parts of our design
   width: 4px;
   background: #d7e4ed;
 }
-@media only screen and (min-width: 1170px) {
-  #cd-timeline {
-    margin-top: 3em;
-    margin-bottom: 3em;
-  }
+@media only screen and (min-width: 768px) {
   #cd-timeline::before {
     left: 50%;
     margin-left: -2px;
@@ -44,7 +40,7 @@ Modules - reusable parts of our design
 
 .cd-timeline-block {
   position: relative;
-  margin: 2em 0;
+  margin: 0;
 }
 .cd-timeline-block:after {
   content: "";
@@ -57,9 +53,10 @@ Modules - reusable parts of our design
 .cd-timeline-block:last-child {
   margin-bottom: 0;
 }
-@media only screen and (min-width: 1170px) {
+
+@media only screen and (min-width: 768px) {
   .cd-timeline-block {
-    margin: 4em 0;
+    margin: 0;
   }
   .cd-timeline-block:first-child {
     margin-top: 0;
@@ -97,7 +94,8 @@ Modules - reusable parts of our design
 .cd-timeline-img.cd-location {
   background: #f0ca45;
 }
-@media only screen and (min-width: 1170px) {
+
+@media only screen and (min-width: 768px) {
   .cd-timeline-img {
     width: 60px;
     height: 60px;
@@ -178,9 +176,10 @@ Modules - reusable parts of our design
 .cd-timeline-content {
   position: relative;
   margin-left: 60px;
-  background: white;
+  margin-bottom: 1em;
+  background-color: #f7f7f7;
   border-radius: 0.25em;
-  padding: 1em;
+  padding: 0.4em 0.8em;
   box-shadow: 0 3px 0 #d7e4ed;
 }
 .cd-timeline-content:after {
@@ -189,11 +188,13 @@ Modules - reusable parts of our design
   clear: both;
 }
 .cd-timeline-content h2 {
-  color: #303e49;
+  margin: 10px 0 10px 0;
+  font-size: 18px;
+  font-size: 1.4rem;
 }
 .cd-timeline-content p, .cd-timeline-content .cd-read-more, .cd-timeline-content .cd-date {
-  font-size: 13px;
-  font-size: 0.8125rem;
+  font-size: 16px;
+  font-size: 1.25rem;
 }
 .cd-timeline-content .cd-read-more, .cd-timeline-content .cd-date {
   display: inline-block;
@@ -215,7 +216,6 @@ Modules - reusable parts of our design
 .cd-timeline-content .cd-date {
   float: left;
   padding: .8em 0;
-  opacity: .7;
 }
 .cd-timeline-content::before {
   content: '';
@@ -225,33 +225,19 @@ Modules - reusable parts of our design
   height: 0;
   width: 0;
   border: 7px solid transparent;
-  border-right: 7px solid white;
+  border-right: 7px solid #f7f7f7;
 }
 @media only screen and (min-width: 768px) {
-  .cd-timeline-content h2 {
-    font-size: 20px;
-    font-size: 1.25rem;
-  }
-  .cd-timeline-content p {
-    font-size: 16px;
-    font-size: 1rem;
-  }
-  .cd-timeline-content .cd-read-more, .cd-timeline-content .cd-date {
-    font-size: 14px;
-    font-size: 0.875rem;
-  }
-}
-@media only screen and (min-width: 1170px) {
   .cd-timeline-content {
     margin-left: 0;
-    padding: 1.6em;
+    padding: 0.4em 0.8em;
     width: 45%;
   }
   .cd-timeline-content::before {
     top: 24px;
     left: 100%;
     border-color: transparent;
-    border-left-color: white;
+    border-left-color: #f7f7f7;
   }
   .cd-timeline-content .cd-read-more {
     float: left;
@@ -261,8 +247,8 @@ Modules - reusable parts of our design
     width: 100%;
     left: 122%;
     top: 6px;
-    font-size: 16px;
-    font-size: 1rem;
+    font-size: 18px;
+    font-size: 1.4rem;
   }
   .cd-timeline-block:nth-child(even) .cd-timeline-content {
     float: right;
@@ -272,7 +258,7 @@ Modules - reusable parts of our design
     left: auto;
     right: 100%;
     border-color: transparent;
-    border-right-color: white;
+    border-right-color: #f7f7f7;
   }
   .cd-timeline-block:nth-child(even) .cd-timeline-content .cd-read-more {
     float: right;
@@ -293,7 +279,7 @@ Modules - reusable parts of our design
   }
 }
 
-@media only screen and (min-width: 1170px) {
+@media only screen and (min-width: 768px) {
   /* inverse bounce effect on even content blocks */
   .cssanimations .cd-timeline-block:nth-child(even) .cd-timeline-content.bounce-in {
     -webkit-animation: cd-bounce-2-inverse 0.6s;

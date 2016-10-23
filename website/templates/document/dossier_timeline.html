@@ -30,10 +30,10 @@
 			<img src="img/cd-icon-picture.svg" alt="Picture">
 		</div> <!-- cd-timeline-img -->
 
-		<div class="cd-timeline-content well">
+		<div class="cd-timeline-content">
 			<h2>{{ kamerstuk.type_short }}</h2>
 			<p>{{ kamerstuk.type_long }}</p>
-			<a href="#0" class="cd-read-more">Read more</a>
+			<!-- <a href="#0" class="cd-read-more">Read more</a> -->
 			<span class="cd-date">{{ kamerstuk.document.date_published|date:"Y-m-d" }}</span>
 		</div> <!-- cd-timeline-content -->
 	</div> <!-- cd-timeline-block -->
@@ -45,7 +45,7 @@
 
 <hr/>
 
-<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/timeline.js' %}"></script>
 
 {% endblock %}
 </body>
