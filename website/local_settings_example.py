@@ -9,6 +9,7 @@ DEBUG = True
 # SECURITY WARNING: Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
+LANGUAGE_CODE = 'nl-NL'
 TIME_ZONE = "Europe/Amsterdam"
 
 ALLOWED_HOSTS = ['*']
