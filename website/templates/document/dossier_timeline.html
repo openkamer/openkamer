@@ -14,7 +14,7 @@
 <div class="row">
   <div class="col-lg-12">
     <div align="center">
-      <h4>Timeline</h4>
+      <h4>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h4>
       <h5>{{ dossier.title }}</h>
     </div>
   </div>
@@ -47,7 +47,7 @@
       </div> <!-- cd-timeline-img -->
 
 		<div class="cd-timeline-content">
-      <h2>{{ kamerstuk.type_short }}</h2>
+      <h2><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a></h2>
       <p>{{ kamerstuk.type_long }}</p>
       {% with submitters=kamerstuk.document.submitters %}
         <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
