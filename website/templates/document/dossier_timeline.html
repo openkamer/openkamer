@@ -1,0 +1,52 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+{% block headcontent %}
+  <link rel="stylesheet" href="/static/css/timeline.css"> <!-- Resource style -->
+  <script src="/static/js/modernizr.js"></script> <!-- Modernizr -->
+{% endblock %}
+
+{% block content %}
+<body>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h4>Timeline</h4>
+      <h5>{{ dossier.title }}</h>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+<section id="cd-timeline" class="cd-container">
+  {% for kamerstuk in dossier.kamerstukken.reverse %}
+
+	<div class="cd-timeline-block">
+		<div class="cd-timeline-img cd-picture">
+			<img src="img/cd-icon-picture.svg" alt="Picture">
+		</div> <!-- cd-timeline-img -->
+
+		<div class="cd-timeline-content well">
+			<h2>{{ kamerstuk.type_short }}</h2>
+			<p>{{ kamerstuk.type_long }}</p>
+			<a href="#0" class="cd-read-more">Read more</a>
+			<span class="cd-date">{{ kamerstuk.document.date_published|date:"Y-m-d" }}</span>
+		</div> <!-- cd-timeline-content -->
+	</div> <!-- cd-timeline-block -->
+
+  {% endfor %}
+</section>
+
+</div>
+
+<hr/>
+
+<script src="{% static 'js/main.js' %}"></script>
+
+{% endblock %}
+</body>
+</html>
