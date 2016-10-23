@@ -30,20 +30,20 @@
 	<div class="cd-timeline-block">
     {% if kamerstuk.voting %}
       {% if kamerstuk.voting.result == "VER" %}
-      <div class="cd-timeline-img bg-danger" align="center">
+      <div class="cd-timeline-img bg-danger text-center">
       {% elif kamerstuk.voting.result == "AAN" %}
-      <div class="cd-timeline-img bg-success" align="center">
+      <div class="cd-timeline-img bg-success text-center">
       {% elif kamerstuk.voting.result == "ING" %}
-      <div class="cd-timeline-img bg-warning" align="center">
+      <div class="cd-timeline-img bg-warning text-center">
       {% elif kamerstuk.voting.result == "AGH" %}
-      <div class="cd-timeline-img bg-warning" align="center">
+      <div class="cd-timeline-img bg-warning text-center">
       {% endif %}
     {% else %}
       <div class="cd-timeline-img bg-info text-center">
     {% endif %}
 
     {% get_kamerstuk_icon_name kamerstuk.id as iconname %}
-        <span style="font-size:24px; color:white;" class="fa {{ iconname }}"></span>
+        <span style="font-size:24px;" class="fa {{ iconname }}"></span>
       </div> <!-- cd-timeline-img -->
 
 		<div class="cd-timeline-content">
