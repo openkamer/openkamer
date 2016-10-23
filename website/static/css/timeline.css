@@ -213,9 +213,9 @@ Modules - reusable parts of our design
 .no-touch .cd-timeline-content .cd-read-more:hover {
   background-color: #bac4cb;
 }
-.cd-timeline-content .cd-date {
+.cd-timeline-content.cd-date {
   float: left;
-  padding: .8em 0;
+  padding: .2em 0;
 }
 .cd-timeline-content::before {
   content: '';
