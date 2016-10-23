@@ -73,25 +73,25 @@ Modules - reusable parts of our design
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  box-shadow: 0 0 0 4px white, inset 0 2px 0 rgba(0, 0, 0, 0.08), 0 3px 0 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 0 4px #d7e4ed;
 }
-.cd-timeline-img img {
+.cd-timeline-img span {
   display: block;
-  width: 24px;
-  height: 24px;
+  /*width: 24px;*/
+  /*height: 24px;*/
   position: relative;
-  left: 50%;
+  /*left: 50%;*/
   top: 50%;
-  margin-left: -12px;
+  /*margin-left: -12px;*/
   margin-top: -12px;
 }
-.cd-timeline-img.cd-picture {
-  background: #75ce66;
+.cd-timeline-img.cd-green {
+  background: green;
 }
-.cd-timeline-img.cd-movie {
-  background: #c03b44;
+.cd-timeline-img.cd-red {
+  background: red;
 }
-.cd-timeline-img.cd-location {
+.cd-timeline-img.cd-orange {
   background: #f0ca45;
 }
 

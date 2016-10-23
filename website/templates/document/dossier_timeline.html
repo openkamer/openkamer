@@ -26,9 +26,21 @@
   {% for kamerstuk in dossier.kamerstukken.reverse %}
 
 	<div class="cd-timeline-block">
-		<div class="cd-timeline-img cd-picture">
-			<img src="img/cd-icon-picture.svg" alt="Picture">
-		</div> <!-- cd-timeline-img -->
+    {% if kamerstuk.voting %}
+      {% if kamerstuk.voting.result == "VER" %}
+      <div class="cd-timeline-img bg-danger" align="center">
+      {% elif kamerstuk.voting.result == "AAN" %}
+      <div class="cd-timeline-img bg-success" align="center">
+      {% elif kamerstuk.voting.result == "ING" %}
+      <div class="cd-timeline-img bg-warning" align="center">
+      {% elif kamerstuk.voting.result == "AGH" %}
+      <div class="cd-timeline-img bg-warning" align="center">
+      {% endif %}
+    {% else %}
+      <div class="cd-timeline-img bg-info text-center">
+    {% endif %}
+		    <span style="font-size:24px; color:white;" class="glyphicon glyphicon-file"></span>
+		  </div> <!-- cd-timeline-img -->
 
 		<div class="cd-timeline-content">
 			<h2>{{ kamerstuk.type_short }}</h2>
