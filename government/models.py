@@ -46,6 +46,14 @@ class Government(models.Model):
                 members.append(mem)
         return members
 
+    def ministers_without_portfolio(self):
+        members = []
+        positions = GovernmentPosition.objects.filter(position=GovernmentPosition.MINISTER_WO_PORTFOLIO, government=self)
+        for position in positions:
+            for mem in position.members():
+                members.append(mem)
+        return members
+
     def ministries(self):
         return Ministry.objects.filter(government=self)
 
@@ -72,6 +80,7 @@ class GovernmentPosition(models.Model):
     DEPUTY_PRIME_MINISTER = 'DPM'
     GOVERNMENT_POSITIONS = (
         (MINISTER, 'Minister'),
+        (MINISTER_WO_PORTFOLIO, 'Minister zonder portefeuille'),
         (SECRETARY_OF_STATE, 'Staatssecretaris'),
         (PRIME_MINISTER, 'Minister-president'),
         (DEPUTY_PRIME_MINISTER, 'Viceminister-president'),

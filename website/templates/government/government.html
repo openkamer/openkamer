@@ -68,8 +68,28 @@
   <div class="hidden-lg clearfix"></div>
   {% endif %}
 
-
 {% endfor %}
+
+  {% if government.ministers_without_portfolio %}
+  <div class="col-sm-6 col-md-6 col-lg-4" align="center">
+    <div class="well">
+
+      <h4>ministers zonder portefeuille <a href="https://nl.wikipedia.org/wiki/Minister_zonder_portefeuille" target="_blank" title="In Nederland is een minister zonder portefeuille verantwoordelijk voor een bepaald beleidsterrein, maar heeft niet de leiding over een departement. Ministers zonder portefeuille hebben, anders dan staatssecretarissen, zitting in de ministerraad en kunnen dus ook meestemmen over alle beslissingen."><span class="glyphicon glyphicon-info-sign"></span></a></h4>
+
+      {% for minister in government.ministers_without_portfolio %}
+        {{ minister.position.extra_info }}: <a href="/person/{{ minister.person.id }}/">{{ minister.person.fullname }}</a>
+        {% get_current_party minister.person.id as party %}
+        (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+        {% if minister.end_date %}
+        ({{ minister.start_date|date:"d b Y" }} - {{ minister.end_date|date:"d b Y" }})
+        {% endif %}
+        <br/>
+      {% endfor %}
+
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 
 <hr/>
