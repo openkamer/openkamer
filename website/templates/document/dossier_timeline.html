@@ -25,9 +25,42 @@
 <div class="row">
 
 <section id="cd-timeline" class="cd-container">
+
+  	<div class="cd-timeline-block">
+
+      {% if dossier.voting %}
+      {% get_voting_result_bg_color dossier.voting.id as voting_result_class %}
+      {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+      <div class="cd-timeline-img text-center {{ voting_result_class }}">
+        <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
+      </div>
+      {% else %}
+      <div class="cd-timeline-img text-center bg-info">
+        <span style="font-size:24px;" class="fa fa-spinner"></span>
+      </div>
+      {% endif %}
+
+      <div class="cd-timeline-content">
+        {% if dossier.voting %}
+        <h2>Dit wetsvoorstel is {{ dossier.voting.get_result_display }}</h2>
+        {% else %}
+        <h2>Dit wetsvoorstel is nog in behandeling.</h2>
+        {% endif %}
+
+        <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>
+
+        {% if dossier.voting %}
+          {% with voting=dossier.voting %}
+            {% include "document/items/voting_result_bar.html" %}
+          {% endwith %}
+        {% endif %}
+      </div>
+
+	</div>
+
   {% for kamerstuk in dossier.kamerstukken.reverse %}
 
-	<div class="cd-timeline-block">
+	<div id="{{ kamerstuk.id_full }}" class="cd-timeline-block">
       {% get_kamerstuk_timeline_bg_color kamerstuk.id as bgclass %}
       <div class="cd-timeline-img text-center {{ bgclass }}">
         {% get_kamerstuk_icon_name kamerstuk.id as iconname %}

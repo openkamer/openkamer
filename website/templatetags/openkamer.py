@@ -49,3 +49,35 @@ def get_kamerstuk_timeline_bg_color(kamerstuk_id):
     elif voting.result == Voting.AANGEHOUDEN:
         return 'bg-warning'
     return 'bg-info'
+
+
+@register.assignment_tag
+def get_voting_result_bg_color(voting_id):
+    voting = Voting.objects.get(id=voting_id)
+    if not voting:
+        return 'bg-info'
+    if voting.result == Voting.VERWORPEN:
+        return 'bg-danger'
+    elif voting.result == Voting.AANGENOMEN:
+        return 'bg-success'
+    elif voting.result == Voting.INGETROKKEN:
+        return 'bg-warning'
+    elif voting.result == Voting.AANGEHOUDEN:
+        return 'bg-warning'
+    return 'bg-info'
+
+
+@register.assignment_tag
+def get_voting_result_icon(voting_id):
+    voting = Voting.objects.get(id=voting_id)
+    if not voting:
+        return 'fa-spinner'
+    if voting.result == Voting.VERWORPEN:
+        return 'fa-times'
+    elif voting.result == Voting.AANGENOMEN:
+        return 'fa-check'
+    elif voting.result == Voting.INGETROKKEN:
+        return 'fa-undo'
+    elif voting.result == Voting.AANGEHOUDEN:
+        return 'fa-pause'
+    return 'fa-spinner'

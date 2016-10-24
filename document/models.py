@@ -26,6 +26,8 @@ class Dossier(models.Model):
     def voting(self):
         votings = Voting.objects.filter(dossier=self, is_dossier_voting=True)
         if votings.exists():
+            if votings.count() > 1:
+                logger.error('more than one dossier voting found for dossier ' + str(self.dossier_id))
             return votings[0]
         return None
 
@@ -130,7 +132,6 @@ class Kamerstuk(models.Model):
         if 'voorstel van wet' in self.type_short.lower():
             return True
         return False
-
 
     def original(self):
         if not self.original_id:
@@ -271,7 +272,7 @@ class VoteParty(Vote):
     party = models.ForeignKey(PoliticalParty)
 
     def get_name(self):
-        return self.party.name
+        return self.party.name_short
 
 
 class VoteIndividual(Vote):
