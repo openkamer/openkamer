@@ -66,6 +66,7 @@ class Ministry(models.Model):
 
 class GovernmentPosition(models.Model):
     MINISTER = 'MIN'
+    MINISTER_WO_PORTFOLIO = 'MWP'
     SECRETARY_OF_STATE = 'SOS'
     PRIME_MINISTER = 'PMI'
     DEPUTY_PRIME_MINISTER = 'DPM'
@@ -78,6 +79,7 @@ class GovernmentPosition(models.Model):
     position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS)
     ministry = models.ForeignKey(Ministry, blank=True, null=True)
     government = models.ForeignKey(Government, blank=True, null=True)
+    extra_info = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.get_position_display()
@@ -108,6 +110,8 @@ class GovernmentPosition(models.Model):
             return GovernmentPosition.DEPUTY_PRIME_MINISTER
         elif 'minister-president' in position_str:
             return GovernmentPosition.PRIME_MINISTER
+        elif 'minister zonder portefeuille' in position_str:
+            return GovernmentPosition.MINISTER_WO_PORTFOLIO
         elif 'minister' in position_str:
             return GovernmentPosition.MINISTER
         elif 'staatssecretaris' in position_str:

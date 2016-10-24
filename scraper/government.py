@@ -7,10 +7,11 @@ logger = logging.getLogger(__name__)
 
 
 def get_government(government_wikidata_id):
-    government = {}
-    government['name'] = wikidata.get_label(government_wikidata_id, language='nl')
-    government['inception'] = wikidata.get_inception(government_wikidata_id)
-    return government
+    return {
+        'name': wikidata.get_label(government_wikidata_id, language='nl'),
+        'start_date': wikidata.get_start_time(government_wikidata_id),
+        'end_date': wikidata.get_end_time(government_wikidata_id),
+    }
 
 
 def get_government_members(government_wikidata_id, max_members=None):
@@ -19,6 +20,7 @@ def get_government_members(government_wikidata_id, max_members=None):
     members = []
     for part in parts:
         member = {}
+        member['position_name'] = ''  # used for ministers without portfolio
         member['properties'] = []
         member['wikidata_id'] = part['mainsnak']['datavalue']['value']['id']
         member['wikipedia_url'] = wikidata.get_wikipedia_url(member['wikidata_id'], language='nl')
@@ -36,7 +38,7 @@ def get_government_members(government_wikidata_id, max_members=None):
                 if 'ministerie' in item_label:
                     member['ministry'] = item_label.replace('ministerie van', '').strip()
                 elif 'minister voor' in item_label:
-                    member['ministry'] = item_label.replace('minister voor', '').strip()
+                    member['position_name'] = item_label.replace('minister voor', '').strip()
                 elif 'position' not in member:
                     if 'viceminister' in item_label or 'vicepremier' in item_label:
                         member['position'] = 'viceminister-president'
@@ -44,6 +46,8 @@ def get_government_members(government_wikidata_id, max_members=None):
                         member['position'] = 'minister-president'
                     elif 'staatssecretaris' in item_label:
                         member['position'] = 'staatssecretaris'
+                    elif 'minister zonder portefeuille' in item_label:
+                        member['position'] = 'minister zonder portefeuille'
                     elif 'minister' in item_label:
                         member['position'] = 'minister'
             if prop['property'] == 'P580':  # start time

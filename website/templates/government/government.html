@@ -15,7 +15,7 @@
 <div class="row">
   <div class="col-lg-12">
     <div align="center"><h3>{{ government.name }}</h3></div>
-    <div align="center"><h4>{{ government.date_formed|date:"Y-m-d" }} - {% if government.date_dissolved %} {{ goverment.date_dissolved|date:"Y-m-d" }} {% else %} heden {% endif %}</h4></div>
+    <div align="center"><h4>{{ government.date_formed|date:"j F Y" }} - {% if government.date_dissolved %} {{ government.date_dissolved|date:"j F Y" }} {% else %} heden {% endif %}</h4></div>
   </div>
 </div>
 
@@ -52,7 +52,7 @@
           {% get_current_party member.person.id as party %}
           <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
           (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
-          ({{ member.start_date|date:"Y-m-d" }} - {{ member.end_date|date:"Y-m-d" }})
+          ({{ member.start_date|date:"d b Y" }} - {{ member.end_date|date:"d b Y" }})
           <br/>
         {% endfor %}
       {% endfor %}
