@@ -38,7 +38,7 @@ class TestGovernmentScraper(TestCase):
         government = scraper.government.get_government(self.rutte_2_wikidata_id)
         print(government)
         self.assertEqual(government['name'], 'Kabinet-Rutte II')
-        self.assertEqual(government['inception'], datetime.date(2012, 11, 5))
+        self.assertEqual(government['start_date'], datetime.date(2012, 11, 5))
 
     def test_get_members(self):
         members = scraper.government.get_government_members(self.rutte_2_wikidata_id)

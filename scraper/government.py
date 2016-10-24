@@ -57,6 +57,6 @@ def get_government_members(government_wikidata_id, max_members=None):
         logger.info(member)
         members.append(member)
         if max_members and  len(members) >= max_members:
-            break;
+            break
     logger.info('END')
     return members
