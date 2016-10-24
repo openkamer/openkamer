@@ -149,7 +149,7 @@ class Kamerstuk(models.Model):
 
     def modifications(self):
         if self.voorstelwet():
-            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet')
+            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet').exclude(id=self.id)
         else:
             stukken = Kamerstuk.objects.filter(original_id=self.id_full())
         return stukken
