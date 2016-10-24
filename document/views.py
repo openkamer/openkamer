@@ -1,7 +1,9 @@
 import logging
+import json
 
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from document.models import Document, Dossier, Kamerstuk
@@ -48,6 +50,42 @@ class DossierTimelineView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['dossier'] = Dossier.objects.get(id=dossier_pk)
         return context
+
+
+class DossierTimelineHorizontalView(TemplateView):
+    template_name = 'document/dossier_timeline_horizontal.html'
+
+    def get_context_data(self, dossier_pk, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        return context
+
+
+def get_dossier_timeline_json(request):
+    events = []
+    dossier = Dossier.objects.get(id=request.POST['dossier_pk'])
+    for kamerstuk in dossier.kamerstukken():
+        published = kamerstuk.document.date_published
+        start_date = {
+            'year': published.year,
+            'month': published.month,
+            'day': published.day
+        }
+        text = {
+            'headline': kamerstuk.type_short,
+            'text': kamerstuk.type_long
+        }
+        event = {
+            'start_date': start_date,
+            'text': text
+        }
+        events.append(event)
+    timeline_info = {
+        'events': events
+    }
+    timeline_json = json.dumps(timeline_info, sort_keys=True, indent=4)
+    # print(timeline_json)
+    return HttpResponse(timeline_json, content_type='application/json')
 
 
 class AgendasView(TemplateView):

@@ -15,7 +15,7 @@
   <div class="col-lg-12">
     <div align="center">
       <h4>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h4>
-      <h5>{{ dossier.title }}</h>
+      <h5>{{ dossier.title }}</h5>
     </div>
   </div>
 </div>
@@ -57,7 +57,6 @@
         {% include "document/items/voting_result_bar_small.html" %}
         {% endwith %}
       {% endif %}
-			<!-- <a href="#0" class="cd-read-more">Read more</a> -->
 			<span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
 		</div> <!-- cd-timeline-content -->
 	</div> <!-- cd-timeline-block -->
@@ -70,5 +69,3 @@
 <script src="{% static 'js/timeline.js' %}"></script>
 
 {% endblock %}
-</body>
-</html>
