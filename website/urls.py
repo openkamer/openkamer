@@ -6,7 +6,6 @@ from document.views import DossiersView
 from document.views import DossierView, AddDossierView
 from document.views import DossierTimelineView
 from document.views import DossierTimelineHorizontalView
-from document.views import get_dossier_timeline_json
 from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import VotingView
@@ -19,7 +18,9 @@ from parliament.views import ParliamentMembersView
 from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
+from website.views import get_dossier_timeline_json
 from website.views import PlotExampleView
+
 import website.api
 
 

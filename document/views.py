@@ -61,33 +61,6 @@ class DossierTimelineHorizontalView(TemplateView):
         return context
 
 
-def get_dossier_timeline_json(request):
-    events = []
-    dossier = Dossier.objects.get(id=request.POST['dossier_pk'])
-    for kamerstuk in dossier.kamerstukken():
-        published = kamerstuk.document.date_published
-        start_date = {
-            'year': published.year,
-            'month': published.month,
-            'day': published.day
-        }
-        text = {
-            'headline': kamerstuk.type_short,
-            'text': kamerstuk.type_long
-        }
-        event = {
-            'start_date': start_date,
-            'text': text
-        }
-        events.append(event)
-    timeline_info = {
-        'events': events
-    }
-    timeline_json = json.dumps(timeline_info, sort_keys=True, indent=4)
-    # print(timeline_json)
-    return HttpResponse(timeline_json, content_type='application/json')
-
-
 class AgendasView(TemplateView):
     template_name = 'document/agendas.html'
 
