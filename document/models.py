@@ -59,7 +59,7 @@ class Document(models.Model):
     content_html = models.CharField(max_length=200000, blank=True)
 
     def submitters(self):
-        return Submitter.objects.filter(document=self)
+        return Submitter.objects.filter(document=self).exclude(person__surname='')
 
     def title(self):
         return self.title_full.split(';')[0]
@@ -130,6 +130,7 @@ class Kamerstuk(models.Model):
         if 'voorstel van wet' in self.type_short.lower():
             return True
         return False
+
 
     def original(self):
         if not self.original_id:
