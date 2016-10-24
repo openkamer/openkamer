@@ -2,6 +2,7 @@ import datetime
 from django import template
 
 from document.models import Kamerstuk
+from document.models import Voting
 from parliament.models import PartyMember
 
 register = template.Library()
@@ -31,3 +32,20 @@ def get_kamerstuk_icon_name(kamerstuk_id):
         # return 'fa-sticky-note'
         return 'fa-bullhorn'
     return 'fa-file-text'
+
+
+@register.assignment_tag
+def get_kamerstuk_timeline_bg_color(kamerstuk_id):
+    kamerstuk = Kamerstuk.objects.get(id=kamerstuk_id)
+    voting = kamerstuk.voting()
+    if not voting:
+        return 'bg-info'
+    if voting.result == Voting.VERWORPEN:
+        return 'bg-danger'
+    elif voting.result == Voting.AANGENOMEN:
+        return 'bg-success'
+    elif voting.result == Voting.INGETROKKEN:
+        return 'bg-warning'
+    elif voting.result == Voting.AANGEHOUDEN:
+        return 'bg-warning'
+    return 'bg-info'
