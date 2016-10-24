@@ -40,8 +40,12 @@
         <p>{{ kamerstuk.type_long }}</p>
 
         {% with submitters=kamerstuk.document.submitters %}
+        {% if submitters %}
         <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
+        {% endif %}
         {% endwith %}
+
+        <p>{% include "document/items/kamerstuk_modifications.html" %}</p>
 
         {% if kamerstuk.voting %}
           {% with voting=kamerstuk.voting %}
