@@ -1,4 +1,8 @@
+{% load openkamer %}
 
 {% for submitter in submitters %}
-  <a href="/person/{{ submitter.person.id }}/">{{ submitter }}</a>{% if not forloop.last %},{% endif %}
+  <a href="/person/{{ submitter.person.id }}/">{{ submitter }}</a>
+  {% get_current_party submitter.person.id as party %}
+  (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+  {% if not forloop.last %},{% endif %}
 {% endfor %}
