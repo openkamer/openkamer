@@ -27,7 +27,8 @@ class GovernmentPositionAdmin(admin.ModelAdmin):
         'id',
         'position',
         'ministry',
-        'government'
+        'government',
+        'extra_info'
     )
 
 

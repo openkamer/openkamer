@@ -36,8 +36,9 @@ logger = logging.getLogger(__name__)
 
 
 def create_governments():
+    # Rutte I : Q168828
     # Rutte II : Q1638648
-    government_ids = ['Q1638648']
+    government_ids = ['Q1638648', 'Q168828']
     for wikidata_id in government_ids:
         create_government(wikidata_id)
 
@@ -46,7 +47,8 @@ def create_government(wikidata_id, max_members=None):
     gov_info = scraper.government.get_government(wikidata_id)
     government, created = Government.objects.get_or_create(
         name=gov_info['name'],
-        date_formed=gov_info['inception'],
+        date_formed=gov_info['start_date'],
+        date_dissolved=gov_info['end_date'],
         wikidata_id=wikidata_id
     )
     create_government_members(government, max_members=max_members)
@@ -133,13 +135,23 @@ def create_person(wikidata_id, fullname):
 
 def create_government_position(government, member, ministry):
     position_type = GovernmentPosition.find_position_type(member['position'])
-    positions = GovernmentPosition.objects.filter(ministry=ministry, position=position_type, government=government)
+    positions = GovernmentPosition.objects.filter(
+        ministry=ministry,
+        position=position_type,
+        government=government,
+        extra_info=member['position_name'],
+    )
     if positions.exists():
         if positions.count() > 1:
             logger.error('more than one GovernmentPosition found for ministry: ' + str(ministry) + ' and position: ' + str(position_type))
         position = positions[0]
     else:
-        position = GovernmentPosition.objects.create(ministry=ministry, position=position_type, government=government)
+        position = GovernmentPosition.objects.create(
+            ministry=ministry,
+            position=position_type,
+            government=government,
+            extra_info=member['position_name'],
+        )
     return position
 
 

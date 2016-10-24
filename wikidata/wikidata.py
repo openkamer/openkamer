@@ -144,6 +144,22 @@ def get_inception(id):
     return None
 
 
+def get_start_time(id):
+    claims = get_claims(id)
+    if 'P580' in claims:
+        start_time = claims['P580'][0]['mainsnak']['datavalue']['value']['time']
+        return get_date(start_time)
+    return None
+
+
+def get_end_time(id):
+    claims = get_claims(id)
+    if 'P582' in claims:
+        end_time = claims['P582'][0]['mainsnak']['datavalue']['value']['time']
+        return get_date(end_time)
+    return None
+
+
 def get_parts(id):
     claims = get_claims(id)
     if 'P527' in claims:

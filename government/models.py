@@ -46,6 +46,14 @@ class Government(models.Model):
                 members.append(mem)
         return members
 
+    def ministers_without_portfolio(self):
+        members = []
+        positions = GovernmentPosition.objects.filter(position=GovernmentPosition.MINISTER_WO_PORTFOLIO, government=self)
+        for position in positions:
+            for mem in position.members():
+                members.append(mem)
+        return members
+
     def ministries(self):
         return Ministry.objects.filter(government=self)
 
@@ -66,11 +74,13 @@ class Ministry(models.Model):
 
 class GovernmentPosition(models.Model):
     MINISTER = 'MIN'
+    MINISTER_WO_PORTFOLIO = 'MWP'
     SECRETARY_OF_STATE = 'SOS'
     PRIME_MINISTER = 'PMI'
     DEPUTY_PRIME_MINISTER = 'DPM'
     GOVERNMENT_POSITIONS = (
         (MINISTER, 'Minister'),
+        (MINISTER_WO_PORTFOLIO, 'Minister zonder portefeuille'),
         (SECRETARY_OF_STATE, 'Staatssecretaris'),
         (PRIME_MINISTER, 'Minister-president'),
         (DEPUTY_PRIME_MINISTER, 'Viceminister-president'),
@@ -78,6 +88,7 @@ class GovernmentPosition(models.Model):
     position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS)
     ministry = models.ForeignKey(Ministry, blank=True, null=True)
     government = models.ForeignKey(Government, blank=True, null=True)
+    extra_info = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.get_position_display()
@@ -108,6 +119,8 @@ class GovernmentPosition(models.Model):
             return GovernmentPosition.DEPUTY_PRIME_MINISTER
         elif 'minister-president' in position_str:
             return GovernmentPosition.PRIME_MINISTER
+        elif 'minister zonder portefeuille' in position_str:
+            return GovernmentPosition.MINISTER_WO_PORTFOLIO
         elif 'minister' in position_str:
             return GovernmentPosition.MINISTER
         elif 'staatssecretaris' in position_str:
