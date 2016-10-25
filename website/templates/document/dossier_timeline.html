@@ -72,7 +72,13 @@
         <div class="kamertuk-id-timeline-container">
           {{ kamerstuk.id_full }}
         </div>
-        <h2><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a></h2>
+        <h2><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
+        {% if kamerstuk.voting %}
+          {% with voting=kamerstuk.voting %}
+          {% include "document/items/voting_result_small.html" %}
+          {% endwith %}
+        {% endif %}
+        </h2>
         <p>{{ kamerstuk.type_long }}</p>
 
         {% with submitters=kamerstuk.document.submitters %}
