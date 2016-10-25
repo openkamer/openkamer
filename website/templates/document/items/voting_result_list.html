@@ -1,0 +1,55 @@
+
+{% if dossier.voting.votes_party %}
+
+{% for vote in dossier.voting.votes_for %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Voor:</strong>
+  {% endif %}
+  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+{% endfor %}
+<br/>
+{% for vote in dossier.voting.votes_against %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Tegen:</strong>
+  {% endif %}
+  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+{% endfor %}
+<br/>
+{% for vote in dossier.voting.votes_none %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Niet gestemd:</strong>
+  {% endif %}
+  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+{% endfor %}
+
+{% else %}
+
+{% for vote in dossier.voting.votes_for %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Voor:</strong>
+  {% endif %}
+  <small><a href="/person/{{ vote.parliament_member.person.id }}/">{{ vote.parliament_member.person.surname }}</a>{% if not forloop.last %},{% endif %}</small>
+{% endfor %}
+<br/>
+{% for vote in dossier.voting.votes_against %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Tegen:</strong>
+  {% endif %}
+  <small><a href="/person/{{ vote.parliament_member.person.id }}/">{{ vote.parliament_member.person.surname }}</a>{% if not forloop.last %},{% endif %}</small>
+{% endfor %}
+<br/>
+{% for vote in dossier.voting.votes_none %}
+  {% if forloop.counter0 == 0 %}
+    <strong>Niet gestemd:</strong>
+  {% endif %}
+  <small>
+  {% if vote.parliament_member %}
+  <a href="/person/{{ vote.parliament_member.person.id }}/">{{ vote.parliament_member.person.surname }}</a>{% if not forloop.last %},{% endif %}
+  {% else %}
+    onbekend kamerlid
+  {% endif %}
+  </small>
+{% endfor %}
+
+
+{% endif %}

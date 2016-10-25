@@ -203,6 +203,24 @@ class Voting(models.Model):
     def votes(self):
         return list(chain(self.votes_party(), self.votes_individual()))
 
+    def votes_for(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.FOR),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.FOR)
+        ))
+
+    def votes_against(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.AGAINST),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.AGAINST)
+        ))
+
+    def votes_none(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.NONE),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.NONE)
+        ))
+
     def votes_party(self):
         return VoteParty.objects.filter(voting=self)
 
