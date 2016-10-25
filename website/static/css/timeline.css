@@ -203,12 +203,13 @@ Modules - reusable parts of our design
   margin: 1em 0;
   line-height: 1.6;
 }
-.cd-timeline-content .cd-read-more {
-  float: right;
-  padding: .8em 1em;
-  background: #acb7c0;
-  color: white;
-  border-radius: 0.25em;
+.kamertuk-id-timeline-container {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  text-align:right;
+  font-size: 14px;
+  font-size: 1.25rem;
 }
 .no-touch .cd-timeline-content .cd-read-more:hover {
   background-color: #bac4cb;
@@ -239,9 +240,6 @@ Modules - reusable parts of our design
     border-color: transparent;
     border-left-color: #f7f7f7;
   }
-  .cd-timeline-content .cd-read-more {
-    float: left;
-  }
   .cd-timeline-content .cd-date {
     position: absolute;
     width: 100%;
@@ -260,7 +258,7 @@ Modules - reusable parts of our design
     border-color: transparent;
     border-right-color: #f7f7f7;
   }
-  .cd-timeline-block:nth-child(even) .cd-timeline-content .cd-read-more {
+  .cd-timeline-block:nth-child(even) .cd-timeline-content {
     float: right;
   }
   .cd-timeline-block:nth-child(even) .cd-timeline-content .cd-date {
