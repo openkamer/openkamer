@@ -6,17 +6,20 @@
 <html>
 
 <head>
-  
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>openkamer - De Tweede Kamer inzichtelijk</title>
-  
+
+  {% block headcontent %}{% endblock %}
+
   {# Load CSS and JavaScript #}
   {% bootstrap_css %}
-  
+
   <link rel="stylesheet" href="{% static 'css/custom.css' %}" type="text/css">
+  <link rel="stylesheet" href="{% static 'fonts/font-awesome-4.6.3/css/font-awesome.min.css' %}" type="text/css">
   <script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
 
   {% bootstrap_javascript %}
@@ -40,9 +43,6 @@
   <!-- End Piwik Code -->
   {% endif %}
 
-
-{% block headcontent %}{% endblock %}
-
 </head>
 
 <body>
@@ -62,18 +62,18 @@
       <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
 
-          <li><a href="/dossiers/">Dossiers</a></li>
+          <li><a href="/dossiers/">Wetsvoorstellen</a></li>
 
           <li><a href="/votings/">Stemmingen</a></li>
 
-          <li><a href="/government/current/">Kabinet</a></li>
 
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Kamer <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Overig <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="/agendas/">Agendas</a></li>
-              <li><a href="/parties/">Partijen</a></li>
+              <li><a href="/government/current/">Kabinet</a></li>
               <li><a href="/parliamentmembers/">Kamerleden</a></li>
+              <li><a href="/parties/">Partijen</a></li>
             </ul>
           </li>
 
@@ -112,4 +112,4 @@
 
 </body>
 
-</html> 
+</html>

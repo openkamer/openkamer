@@ -1,0 +1,116 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+{% load openkamer %}
+
+{% block headcontent %}
+  <link rel="stylesheet" href="/static/css/timeline.css"> <!-- Resource style -->
+  <script src="/static/js/modernizr.js"></script> <!-- Modernizr -->
+{% endblock %}
+
+{% block content %}
+
+<div class="subnav subnav-default">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="/dossier/timeline/{{ dossier.id }}/">Verticale Tijdlijn</a></li>
+      <li><a href="/dossier/timeline/horizontal/{{ dossier.id }}/">Horizontale Tijdlijn</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
+      <h4>{{ dossier.title }}</h4>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+
+<section id="cd-timeline" class="cd-container">
+
+  <div class="cd-timeline-block">
+
+    {% if dossier.voting %}
+    {% get_voting_result_bg_color dossier.voting.id as voting_result_class %}
+    {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+    <div class="cd-timeline-img text-center {{ voting_result_class }}">
+      <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
+    </div>
+    {% else %}
+    <div class="cd-timeline-img text-center bg-info">
+      <span style="font-size:24px;" class="fa fa-spinner"></span>
+    </div>
+    {% endif %}
+
+    <div class="cd-timeline-content">
+      {% if dossier.voting %}
+      <h2>Dit wetsvoorstel is {{ dossier.voting.get_result_display }}</h2>
+        {% with voting=dossier.voting %}
+          {% include "document/items/voting_result_bar.html" %}
+        {% endwith %}
+        {% include "document/items/voting_result_list.html" %}
+      {% else %}
+      <h2>Dit wetsvoorstel is nog in behandeling.</h2>
+      {% endif %}
+
+      <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>
+
+    </div>
+
+  </div> <!-- cd-timeline-block -->
+
+  {% for kamerstuk in dossier.kamerstukken.reverse %}
+
+	<div class="cd-timeline-block">
+      <a class="anchor" id="{{ kamerstuk.id_full }}"></a>
+      {% get_kamerstuk_timeline_bg_color kamerstuk.id as bgclass %}
+      <div class="cd-timeline-img text-center {{ bgclass }}">
+        {% get_kamerstuk_icon_name kamerstuk.id as icon_name %}
+        <span style="font-size:24px;" class="fa {{ icon_name }}"></span>
+      </div> <!-- cd-timeline-img -->
+
+      <div class="cd-timeline-content">
+        <div class="kamertuk-id-timeline-container">
+          {{ kamerstuk.id_full }}
+        </div>
+        <h2><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
+        {% if kamerstuk.voting %}
+          {% with voting=kamerstuk.voting %}
+          {% include "document/items/voting_result_small.html" %}
+          {% endwith %}
+        {% endif %}
+        </h2>
+        <p>{{ kamerstuk.type_long }}</p>
+
+        {% with submitters=kamerstuk.document.submitters %}
+        {% if submitters %}
+        <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
+        {% endif %}
+        {% endwith %}
+
+        <p>{% include "document/items/kamerstuk_modifications.html" %}</p>
+
+        {% if kamerstuk.voting %}
+          {% with voting=kamerstuk.voting %}
+          {% include "document/items/voting_result_bar_small.html" %}
+          {% endwith %}
+        {% endif %}
+
+        <span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
+
+      </div> <!-- cd-timeline-content -->
+
+	</div> <!-- cd-timeline-block -->
+
+  {% endfor %}
+</section>
+
+</div>
+
+<script src="{% static 'js/timeline.js' %}"></script>
+
+{% endblock %}

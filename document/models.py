@@ -8,6 +8,8 @@ from person.models import Person
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
 
+from government.models import GovernmentMember
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +28,8 @@ class Dossier(models.Model):
     def voting(self):
         votings = Voting.objects.filter(dossier=self, is_dossier_voting=True)
         if votings.exists():
+            if votings.count() > 1:
+                logger.error('more than one dossier voting found for dossier ' + str(self.dossier_id))
             return votings[0]
         return None
 
@@ -59,7 +63,7 @@ class Document(models.Model):
     content_html = models.CharField(max_length=200000, blank=True)
 
     def submitters(self):
-        return Submitter.objects.filter(document=self)
+        return Submitter.objects.filter(document=self).exclude(person__surname='')
 
     def title(self):
         return self.title_full.split(';')[0]
@@ -81,6 +85,14 @@ class Submitter(models.Model):
     def __str__(self):
         return self.person.fullname()
 
+    def government_member(self):
+        """ :returns the government member of this person when the documented was published """
+        date = self.document.date_published
+        gms = GovernmentMember.objects.filter(person=self.person, start_date__lte=date).order_by('-end_date')
+        if gms.exists():
+            return gms[0]
+        return None
+
 
 class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
@@ -90,8 +102,27 @@ class Kamerstuk(models.Model):
     type_long = models.CharField(max_length=100, blank=True)
     original_id = models.CharField(max_length=40, blank=True)  # format: 33885.22
 
+    MOTIE = 'Motie'
+    AMENDEMENT = 'Amendement'
+    WETSVOORSTEL = 'Wetsvoorstel'
+    VERSLAG = 'Verslag'
+    NOTA = 'Nota'
+
     def __str__(self):
         return str(self.id_main) + '.' + str(self.id_sub) + ': ' + str(self.type_long)
+
+    def type(self):
+        if 'nota' in self.type_short.lower():
+            return Kamerstuk.NOTA
+        elif 'motie' in self.type_short.lower():
+            return Kamerstuk.MOTIE
+        elif 'amendement' in self.type_short.lower():
+            return Kamerstuk.AMENDEMENT
+        elif self.voorstelwet():
+            return Kamerstuk.WETSVOORSTEL
+        elif 'verslag' in self.type_short.lower():
+            return Kamerstuk.VERSLAG
+        return None
 
     def id_full(self):
         return str(self.id_main) + '.' + str(self.id_sub)
@@ -108,7 +139,7 @@ class Kamerstuk(models.Model):
         return True
 
     def voorstelwet(self):
-        if self.type_short == 'Voorstel van wet':
+        if 'voorstel van wet' in self.type_short.lower():
             return True
         return False
 
@@ -128,7 +159,7 @@ class Kamerstuk(models.Model):
 
     def modifications(self):
         if self.voorstelwet():
-            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet')
+            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet').exclude(id=self.id)
         else:
             stukken = Kamerstuk.objects.filter(original_id=self.id_full())
         return stukken
@@ -171,6 +202,24 @@ class Voting(models.Model):
 
     def votes(self):
         return list(chain(self.votes_party(), self.votes_individual()))
+
+    def votes_for(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.FOR),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.FOR)
+        ))
+
+    def votes_against(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.AGAINST),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.AGAINST)
+        ))
+
+    def votes_none(self):
+        return list(chain(
+            VoteParty.objects.filter(voting=self, decision=Vote.NONE),
+            VoteIndividual.objects.filter(voting=self, decision=Vote.NONE)
+        ))
 
     def votes_party(self):
         return VoteParty.objects.filter(voting=self)
@@ -251,7 +300,7 @@ class VoteParty(Vote):
     party = models.ForeignKey(PoliticalParty)
 
     def get_name(self):
-        return self.party.name
+        return self.party.name_short
 
 
 class VoteIndividual(Vote):

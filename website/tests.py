@@ -160,6 +160,18 @@ class TestWebsite(TestCase):
             response = self.client.get('/dossier/' + str(dossier.id) + '/')
             self.assertEqual(response.status_code, 200)
 
+    def test_timeline_views(self):
+        dossiers = Dossier.objects.all()
+        for dossier in dossiers:
+            response = self.client.get('/dossier/timeline/' + str(dossier.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
+    def test_timeline_horizontal_views(self):
+        dossiers = Dossier.objects.all()
+        for dossier in dossiers:
+            response = self.client.get('/dossier/timeline/horizontal/' + str(dossier.id) + '/')
+            self.assertEqual(response.status_code, 200)
+
     def test_dossier_add(self):
         response = self.client.get('/dossier/add/34537/', follow=True)
         self.assertEqual(response.status_code, 200)

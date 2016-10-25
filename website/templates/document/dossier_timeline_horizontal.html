@@ -1,0 +1,72 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+{% load openkamer %}
+
+{% block headcontent %}
+  <link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+  <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="subnav subnav-default">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="/dossier/timeline/{{ dossier.id }}/">Verticale Tijdlijn</a></li>
+      <li class="active"><a href="/dossier/timeline/horizontal/{{ dossier.id }}/">Horizontale Tijdlijn</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
+      <h4>{{ dossier.title }}</h4>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div id='timeline-embed' style="width: 100%; height: 500px"></div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+</div>
+
+<script type="text/javascript">
+$(window).ready(function() {
+  var options = {
+    initial_zoom: 1,
+    timenav_height: 230,
+    scale_factor: 1,
+    timenav_position: "top",
+    start_at_end: true,
+    language: 'nl',
+    marker_height_min: 30,
+    marker_width_min: 10
+  }
+
+  $.post(
+    "/dossier/timeline/horizontal/json/",
+    {
+      dossier_pk : {{ dossier.id }}
+    },
+    function(timeline_json) {
+      timeline = new TL.Timeline('timeline-embed', timeline_json, options);
+    },
+    "json"
+  );
+})
+</script>
+
+
+{% endblock %}
+

@@ -1,7 +1,14 @@
+import json
+
+from django.http import HttpResponse
 from django.views.generic import TemplateView
+from django.utils.safestring import mark_safe
+from django.utils import timezone
+
+from document.models import Dossier
+from government.models import Government
 
 from stats.views import get_example_plot_html
-from django.utils.safestring import mark_safe
 
 
 class HomeView(TemplateView):
@@ -11,6 +18,54 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+
+def create_timeline_date(date):
+    return {
+        'year': date.year,
+        'month': date.month,
+        'day': date.day
+    }
+
+
+def get_dossier_timeline_json(request):
+    governments = Government.objects.all()
+    eras = []
+    for government in governments:
+        if government.date_dissolved:
+            end_date = government.date_dissolved
+        else:
+            end_date = timezone.now()
+        text = {
+            'headline': government.name,
+            'text': government.name
+        }
+        era = {
+            'start_date': create_timeline_date(government.date_formed),
+            'end_date': create_timeline_date(end_date),
+            'text': text
+        }
+        eras.append(era)
+    dossier = Dossier.objects.get(id=request.POST['dossier_pk'])
+    events = []
+    for kamerstuk in dossier.kamerstukken():
+        text = {
+            'headline': kamerstuk.type_short,
+            'text': kamerstuk.type_long
+        }
+        event = {
+            'start_date': create_timeline_date(kamerstuk.document.date_published),
+            'text': text
+        }
+        events.append(event)
+    timeline_info = {
+        'events': events,
+        'eras': eras
+    }
+    timeline_json = json.dumps(timeline_info, sort_keys=True, indent=4)
+    # print(timeline_json)
+    return HttpResponse(timeline_json, content_type='application/json')
+
 
 
 class PlotExampleView(TemplateView):

@@ -1,7 +1,9 @@
 import logging
+import json
 
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import redirect
 
 from document.models import Document, Dossier, Kamerstuk
@@ -34,6 +36,24 @@ class DossiersView(TemplateView):
 
 class DossierView(TemplateView):
     template_name = 'document/dossier.html'
+
+    def get_context_data(self, dossier_pk, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        return context
+
+
+class DossierTimelineView(TemplateView):
+    template_name = 'document/dossier_timeline.html'
+
+    def get_context_data(self, dossier_pk, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        return context
+
+
+class DossierTimelineHorizontalView(TemplateView):
+    template_name = 'document/dossier_timeline_horizontal.html'
 
     def get_context_data(self, dossier_pk, **kwargs):
         context = super().get_context_data(**kwargs)
