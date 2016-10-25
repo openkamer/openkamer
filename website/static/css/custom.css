@@ -6,6 +6,13 @@ body {
   padding-top: 70px;
 }
 
+a.anchor {
+    display: block;
+    position: relative;
+    top: -70px;
+    visibility: hidden;
+}
+
 .vertical-spacer-20 {
     padding: 0;
     margin: 0;

@@ -60,11 +60,12 @@
 
   {% for kamerstuk in dossier.kamerstukken.reverse %}
 
-	<div id="{{ kamerstuk.id_full }}" class="cd-timeline-block">
+	<div class="cd-timeline-block">
+      <a class="anchor" id="{{ kamerstuk.id_full }}"></a>
       {% get_kamerstuk_timeline_bg_color kamerstuk.id as bgclass %}
       <div class="cd-timeline-img text-center {{ bgclass }}">
-        {% get_kamerstuk_icon_name kamerstuk.id as iconname %}
-        <span style="font-size:24px;" class="fa {{ iconname }}"></span>
+        {% get_kamerstuk_icon_name kamerstuk.id as icon_name %}
+        <span style="font-size:24px;" class="fa {{ icon_name }}"></span>
       </div> <!-- cd-timeline-img -->
 
       <div class="cd-timeline-content">
