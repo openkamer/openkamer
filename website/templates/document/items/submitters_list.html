@@ -6,6 +6,8 @@
     ({{ submitter.government_member.position.get_position_display|lower }} {{ submitter.government_member.position.ministry }})
   {% endif %}
   {% get_current_party submitter.person.id as party %}
+  {% if party %}
   (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+  {% endif %}
   {% if not forloop.last %},{% endif %}
 {% endfor %}
