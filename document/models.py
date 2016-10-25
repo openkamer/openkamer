@@ -8,6 +8,8 @@ from person.models import Person
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
 
+from government.models import GovernmentMember
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,6 +84,14 @@ class Submitter(models.Model):
 
     def __str__(self):
         return self.person.fullname()
+
+    def government_member(self):
+        """ :returns the government member of this person when the documented was published """
+        date = self.document.date_published
+        gms = GovernmentMember.objects.filter(person=self.person, start_date__lte=date).order_by('-end_date')
+        if gms.exists():
+            return gms[0]
+        return None
 
 
 class Kamerstuk(models.Model):
