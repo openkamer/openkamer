@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
 
+    class Meta:
+        ordering = ['-dossier_id']
+
     def __str__(self):
         return str(self.dossier_id)
 
@@ -24,6 +27,12 @@ class Dossier(models.Model):
 
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
+
+    def start_date(self):
+        documents = Document.objects.filter(dossier=self).order_by('date_published')
+        if documents.exists():
+            return documents[0].date_published
+        return None
 
     def voting(self):
         votings = Voting.objects.filter(dossier=self, is_dossier_voting=True)

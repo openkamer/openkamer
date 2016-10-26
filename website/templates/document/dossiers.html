@@ -9,17 +9,37 @@
   </div>
 </div>
 
-{% for dossier in dossiers %}
-
 <div class="row">
-  <div class="col-lg-12">
-    <div align="left">
-      <h6><a href="/dossier/timeline/{{ dossier.id }}/">{{ dossier.title }}</a> ({{ dossier.dossier_id }})</h6>
+  {% for dossier in dossiers %}
+  <div class="col-md-6">
+    <div class="well well-small" align="left">
+
+      <h6><a href="/dossier/timeline/{{ dossier.id }}/">{{ dossier.title }}</a></h6>
+      <div class="row">
+        <div class="col-md-12">
+          {% with voting=dossier.voting %}
+            {% include "document/items/voting_result_bar_small.html" %}
+          {% endwith %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          {{ dossier.start_date }}
+        </div>
+        <div class="col-md-6" align="right">
+          {{ dossier.dossier_id }}
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-{% endfor %}
+  {% if forloop.counter|divisibleby:2 %}
+  <div class="clearfix"></div>
+  {% endif %}
+
+  {% endfor %}
+</div>
 
 <hr/>
 
