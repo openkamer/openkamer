@@ -104,14 +104,14 @@ class TestFindOriginalKamerstukId(TestCase):
     dossier_id = 33885
 
     def test_find_original_motie(self):
-        expected_result = '33885.18'
+        expected_result = '33885-18'
         title = 'Gewijzigde motie van het lid Segers c.s. (t.v.v. 33885, nr.18) over de bevoegdheden van de Koninklijke Marechaussee'
         original_id = find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
     def test_find_original_amendement(self):
         title = 'Gewijzigd amendement van het lid Oskam ter vervanging van nr. 9 waarmee een verbod op illegaal pooierschap in het wetboek van strafrecht wordt geintroduceerd'
-        expected_result = '33885.9'
+        expected_result = '33885-9'
         original_id = find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
