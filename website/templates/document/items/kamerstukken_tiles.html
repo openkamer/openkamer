@@ -20,7 +20,7 @@
       <div class="row">
         <div class="col-xs-12">
           <h5>
-            <a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
+            <a href="{% url 'document' kamerstuk.document.document_id %}">{{ kamerstuk.type_short }}</a>
             {% if kamerstuk.voting %}
               {% with voting=kamerstuk.voting %}
               {% include "document/items/voting_result_small.html" %}

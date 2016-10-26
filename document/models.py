@@ -118,7 +118,7 @@ class Kamerstuk(models.Model):
     NOTA = 'Nota'
 
     def __str__(self):
-        return str(self.id_main) + '.' + str(self.id_sub) + ': ' + str(self.type_long)
+        return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
 
     def type(self):
         if 'nota' in self.type_short.lower():
@@ -134,7 +134,7 @@ class Kamerstuk(models.Model):
         return None
 
     def id_full(self):
-        return str(self.id_main) + '.' + str(self.id_sub)
+        return str(self.id_main) + '-' + str(self.id_sub)
 
     def voting(self):
         votings = Voting.objects.filter(kamerstuk=self)

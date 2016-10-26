@@ -13,8 +13,8 @@
 <div class="subnav subnav-default">
   <div class="container">
     <ul class="nav navbar-nav">
-      <li class="active"><a href="/dossier/timeline/{{ dossier.id }}/">Verticale Tijdlijn</a></li>
-      <li><a href="/dossier/timeline/horizontal/{{ dossier.id }}/">Horizontale Tijdlijn</a></li>
+      <li class="active"><a href="{% url 'dossier-timeline' dossier.dossier_id %}">Verticale Tijdlijn</a></li>
+      <li><a href="{% url 'dossier-timeline-horizontal' dossier.dossier_id %}">Horizontale Tijdlijn</a></li>
     </ul>
   </div>
 </div>
@@ -77,7 +77,7 @@
         <div class="kamertuk-id-timeline-container">
           {{ kamerstuk.id_full }}
         </div>
-        <h2><a href="/document/{{ kamerstuk.document.id }}/">{{ kamerstuk.type_short }}</a>
+        <h2><a href="{% url 'document' kamerstuk.document.document_id %}">{{ kamerstuk.type_short }}</a>
         {% if kamerstuk.voting %}
           {% with voting=kamerstuk.voting %}
           {% include "document/items/voting_result_small.html" %}

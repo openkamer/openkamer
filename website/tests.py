@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.test import Client
+from django.urls import reverse
 
 from scraper import political_parties
 from scraper import parliament_members
@@ -151,35 +152,31 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_dossiers_overview(self):
-        response = self.client.get('/dossiers/')
+        response = self.client.get(reverse('dossiers'))
         self.assertEqual(response.status_code, 200)
 
     def test_dossier_views(self):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
-            response = self.client.get('/dossier/' + str(dossier.id) + '/')
+            response = self.client.get(reverse('dossier-tiles', args=(dossier.dossier_id,)))
             self.assertEqual(response.status_code, 200)
 
     def test_timeline_views(self):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
-            response = self.client.get('/dossier/timeline/' + str(dossier.id) + '/')
+            response = self.client.get(reverse('dossier-timeline', args=(dossier.dossier_id,)))
             self.assertEqual(response.status_code, 200)
 
     def test_timeline_horizontal_views(self):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
-            response = self.client.get('/dossier/timeline/horizontal/' + str(dossier.id) + '/')
+            response = self.client.get(reverse('dossier-timeline-horizontal', args=(dossier.dossier_id,)))
             self.assertEqual(response.status_code, 200)
-
-    def test_dossier_add(self):
-        response = self.client.get('/dossier/add/34537/', follow=True)
-        self.assertEqual(response.status_code, 200)
 
     def test_document_view(self):
         documents = Document.objects.all()
         for document in documents:
-            response = self.client.get('/document/' + str(document.id) + '/')
+            response = self.client.get(reverse('document', args=(document.document_id,)))
             self.assertEqual(response.status_code, 200)
 
     def test_agenda_view(self):
@@ -189,7 +186,7 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_votings_overview(self):
-        response = self.client.get('/votings/')
+        response = self.client.get(reverse('votings'))
         self.assertEqual(response.status_code, 200)
 
     def test_voting_view(self):

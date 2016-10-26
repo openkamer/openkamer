@@ -13,7 +13,7 @@
     </div>
     <h3>Behandelde dossiers</h3>
 {% for item in agendaitems %}
-    <li>{% if item.dossier %}<a href="/dossier/{{ item.dossier.id }}/">{% endif %} {{item.item_text}}</a>
+    <li>{% if item.dossier %}<a href="{% url 'dossier-timeline' item.dossier.dossier_id %}">{% endif %} {{item.item_text}}</a>
 {% endfor %}
   </div>
 </div>

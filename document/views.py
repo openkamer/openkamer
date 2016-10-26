@@ -4,6 +4,7 @@ import json
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.urls import reverse
 from django.shortcuts import redirect
 
 from document.models import Document, Dossier, Kamerstuk
@@ -19,9 +20,9 @@ logger = logging.getLogger(__name__)
 class DocumentView(TemplateView):
     template_name = 'document/document.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, document_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['document'] = Document.objects.get(id=self.kwargs['pk'])
+        context['document'] = Document.objects.get(document_id=document_id)
         return context
 
 
@@ -37,27 +38,27 @@ class DossiersView(TemplateView):
 class DossierView(TemplateView):
     template_name = 'document/dossier.html'
 
-    def get_context_data(self, dossier_pk, **kwargs):
+    def get_context_data(self, dossier_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
         return context
 
 
 class DossierTimelineView(TemplateView):
     template_name = 'document/dossier_timeline.html'
 
-    def get_context_data(self, dossier_pk, **kwargs):
+    def get_context_data(self, dossier_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
         return context
 
 
 class DossierTimelineHorizontalView(TemplateView):
     template_name = 'document/dossier_timeline_horizontal.html'
 
-    def get_context_data(self, dossier_pk, **kwargs):
+    def get_context_data(self, dossier_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(id=dossier_pk)
+        context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
         return context
 
 
@@ -91,8 +92,7 @@ class AddDossierView(TemplateView):
             dossier = dossiers[0]
         else:
             dossier = create_or_update_dossier(self.kwargs['dossier_id'])
-        url = '/dossier/' + str(dossier.id) + '/'
-        return redirect(url)
+        return redirect(reverse('dossier', args=(dossier.dossier_id)))
         # return HttpResponseRedirect()
 
 

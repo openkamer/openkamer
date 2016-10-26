@@ -255,9 +255,9 @@ def find_original_kamerstuk_id(dossier_id, type_long):
     if result_document and 'sub_id' in result_document.groupdict():
         sub_id = result_document.group('sub_id')
     if main_id and sub_id:
-        return main_id + '.' + sub_id
+        return main_id + '-' + sub_id
     elif sub_id:
-        return str(dossier_id) + '.' + sub_id
+        return str(dossier_id) + '-' + sub_id
     elif 'voorstel van wet' in type_long.lower():
         return str(dossier_id) + '.voorstel_van_wet'
     return ''

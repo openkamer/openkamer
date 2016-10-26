@@ -37,7 +37,7 @@
       </div>
 
       <div class="col-xs-4" align="right">
-        <a href="/dossier/{{ voting.dossier.id }}/"><small>{{ voting.dossier.dossier_id }}</small></a><small>.{{ voting.kamerstuk.id_sub }}</small>
+        <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}"><small>{{ voting.dossier.dossier_id }}</small></a><small>.{{ voting.kamerstuk.id_sub }}</small>
       </div>
     </div>
 

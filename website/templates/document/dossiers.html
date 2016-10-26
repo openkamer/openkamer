@@ -14,7 +14,7 @@
   <div class="col-md-6">
     <div class="well well-small" align="left">
 
-      <h6><a href="/dossier/timeline/{{ dossier.id }}/">{{ dossier.title }}</a></h6>
+      <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
       <div class="row">
         <div class="col-md-12">
           {% with voting=dossier.voting %}
