@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^person/(?P<person_id>\d+)/$', PersonView.as_view()),
 
     url(r'^parties/$', PartiesView.as_view()),
-    url(r'^party/(?P<party_id>\d+)/$', PartyView.as_view()),
+    url(r'^party/(?P<party_name_short>.*)/$', PartyView.as_view(), name='party'),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
 
     url(r'^governments/$', GovernmentsView.as_view()),

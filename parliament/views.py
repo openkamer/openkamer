@@ -16,9 +16,9 @@ class PartiesView(TemplateView):
 class PartyView(TemplateView):
     template_name = 'parliament/party.html'
 
-    def get_context_data(self, party_id, **kwargs):
+    def get_context_data(self, party_name_short, **kwargs):
         context = super().get_context_data(**kwargs)
-        party = PoliticalParty.objects.get(id=party_id)
+        party = PoliticalParty.objects.get(name_short=party_name_short)
         context['party'] = party
         return context
 

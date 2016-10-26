@@ -202,7 +202,7 @@ class TestWebsite(TestCase):
     def test_party_view(self):
         parties = PoliticalParty.objects.all()
         for party in parties:
-            response = self.client.get('/party/' + str(party.id) + '/')
+            response = self.client.get(reverse('party', args=(party.name_short,)))
             self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):

@@ -12,7 +12,7 @@
 {% for party in parties %}
   <div class="col-sm-3 fixed-height-column" align="center">
     <p>
-      <h4><a href="/party/{{ party.id }}/">{{ party.name_short }}</a></h4>
+      <h4><a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a></h4>
       <small>{{ party.name }}</small>
     </p>
     <p>
@@ -29,7 +29,7 @@
       <a href="{{ party.official_website_url }}" target="_blank">website</a> |
     {% endif %}
     <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a> <br/>
-    <a href="/api/party/{{ party.id }}/">API</a>
+    <a href="{% url 'party' party.name_short %}">API</a>
     </small></p>
   </div>
 {% endfor %}

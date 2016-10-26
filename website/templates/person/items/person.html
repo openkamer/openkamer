@@ -23,7 +23,7 @@
   </tr>
   <tr>
     <th>Politieke Partij</th>
-    <td><a href="/party/{{ party.id }}/">{{ party.name_short }}</a></td>
+    <td><a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a></td>
   </tr>
   <tr>
     <th>Parlement en Politiek</th>

@@ -7,7 +7,7 @@
   {% endif %}
   {% get_current_party submitter.person.id as party %}
   {% if party %}
-  (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+  (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
   {% endif %}
   {% if not forloop.last %},{% endif %}
 {% endfor %}

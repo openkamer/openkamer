@@ -5,21 +5,21 @@
   {% if forloop.counter0 == 0 %}
     <strong>Voor:</strong>
   {% endif %}
-  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+  <a href="{% url 'party' vote.party.name_short %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
 {% endfor %}
 <br/>
 {% for vote in dossier.voting.votes_against %}
   {% if forloop.counter0 == 0 %}
     <strong>Tegen:</strong>
   {% endif %}
-  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+  <a href="{% url 'party' vote.party.name_short %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
 {% endfor %}
 <br/>
 {% for vote in dossier.voting.votes_none %}
   {% if forloop.counter0 == 0 %}
     <strong>Niet gestemd:</strong>
   {% endif %}
-  <a href="/party/{{ vote.party.id }}/">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+  <a href="{% url 'party' vote.party.name_short %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
 {% endfor %}
 
 {% else %}

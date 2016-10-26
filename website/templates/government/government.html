@@ -39,7 +39,7 @@
 
         {% get_current_party position.member_current.person.id as party %}
         {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a>
-        (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+        (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
         <br/>
       {% endfor %}
 
@@ -51,7 +51,7 @@
         {% for member in position.members_inactive %}
           {% get_current_party member.person.id as party %}
           <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
-          (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+          (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
           ({{ member.start_date|date:"d b Y" }} - {{ member.end_date|date:"d b Y" }})
           <br/>
         {% endfor %}
@@ -79,7 +79,7 @@
       {% for minister in government.ministers_without_portfolio %}
         {{ minister.position.extra_info }}: <a href="/person/{{ minister.person.id }}/">{{ minister.person.fullname }}</a>
         {% get_current_party minister.person.id as party %}
-        (<a href="/party/{{ party.id }}/">{{ party.name_short }}</a>)
+        (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
         {% if minister.end_date %}
         ({{ minister.start_date|date:"d b Y" }} - {{ minister.end_date|date:"d b Y" }})
         {% endif %}
