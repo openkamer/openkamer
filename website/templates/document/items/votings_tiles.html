@@ -19,7 +19,11 @@
 
     <div class="row" align="center">
       <div class="col-sm-12">
-        <a href="/document/voting/{{ voting.id }}/"><small>{{ voting.kamerstuk.type_long }}</small></a>
+        {% if voting.kamerstuk %}
+        <a href="{% url 'kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}"><small>{{ voting.kamerstuk.type_long }}</small></a>
+        {% else %}
+        <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}"><small>{{ voting.dossier.title }}</small></a>
+        {% endif %}
       </div>
     </div>
 

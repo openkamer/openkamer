@@ -26,6 +26,15 @@ class DocumentView(TemplateView):
         return context
 
 
+class KamerstukView(TemplateView):
+    template_name = 'document/kamerstuk.html'
+
+    def get_context_data(self, dossier_id, sub_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['kamerstuk'] = Kamerstuk.objects.get(id_main=dossier_id, id_sub=sub_id)
+        return context
+
+
 class DossiersView(TemplateView):
     template_name = 'document/dossiers.html'
 

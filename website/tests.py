@@ -16,6 +16,7 @@ from parliament.models import PoliticalParty
 from document.models import Agenda
 from document.models import Dossier
 from document.models import Document
+from document.models import Kamerstuk
 from document.models import Voting
 
 from website.create import create_or_update_dossier
@@ -177,6 +178,12 @@ class TestWebsite(TestCase):
         documents = Document.objects.all()
         for document in documents:
             response = self.client.get(reverse('document', args=(document.document_id,)))
+            self.assertEqual(response.status_code, 200)
+
+    def test_kamerstuk_view(self):
+        kamerstukken = Kamerstuk.objects.all()
+        for kamerstuk in kamerstukken:
+            response = self.client.get(reverse('kamerstuk', args=(kamerstuk.id_main, kamerstuk.id_sub,)))
             self.assertEqual(response.status_code, 200)
 
     def test_agenda_view(self):
