@@ -34,9 +34,9 @@ urlpatterns = [
     url(r'^party/(?P<party_name_short>.*)/$', PartyView.as_view(), name='party'),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
 
-    url(r'^governments/$', GovernmentsView.as_view()),
-    url(r'^government/current/$', GovernmentCurrentView.as_view()),
-    url(r'^government/(?P<government_id>\d+)/$', GovernmentView.as_view()),
+    url(r'^governments/$', GovernmentsView.as_view(), name='governments'),
+    url(r'^government/current/$', GovernmentCurrentView.as_view(), name='government-current'),
+    url(r'^government/(?P<government_name>.*)/$', GovernmentView.as_view(), name='government'),
 
     url(r'^dossiers/$', DossiersView.as_view(), name='dossiers'),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),

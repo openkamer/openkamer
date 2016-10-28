@@ -19,9 +19,9 @@ class GovernmentsView(TemplateView):
 class GovernmentView(TemplateView):
     template_name = 'government/government.html'
 
-    def get_context_data(self, government_id, **kwargs):
+    def get_context_data(self, government_name, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['government'] = Government.objects.get(id=government_id)
+        context['government'] = Government.objects.get(name=government_name)
         return context
 
 

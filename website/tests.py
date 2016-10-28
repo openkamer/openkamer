@@ -50,7 +50,7 @@ class TestCreateGovernment(TestCase):
         self.assertTrue(len(party_members) >= len(persons))
 
     def test_governements_view(self):
-        response = self.client.get('/governments/')
+        response = self.client.get(reverse('governments'))
         self.assertEqual(response.status_code, 200)
 
     def test_governement_view(self):
