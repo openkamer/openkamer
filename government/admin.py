@@ -10,7 +10,8 @@ class GovernmentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'wikidata_id'
+        'wikidata_id',
+        'slug'
     )
 
 

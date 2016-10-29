@@ -2,6 +2,7 @@ import logging
 from unidecode import unidecode
 
 from django.db import models
+from django.utils.text import slugify
 
 from wikidata import wikidata
 
@@ -33,9 +34,14 @@ class Person(models.Model):
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
     parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
+    slug = models.SlugField(max_length=250, default='')
 
     def __str__(self):
         return self.get_full_name() + ' (' + self.initials + ')'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.fullname())
+        super().save(*args, **kwargs)
 
     @staticmethod
     def find_prefix(name):

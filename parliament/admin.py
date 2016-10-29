@@ -10,6 +10,7 @@ class PoliticalPartyAdmin(admin.ModelAdmin):
         'name_short',
         'founded',
         'dissolved',
+        'slug',
         'wikidata_id',
         'wikimedia_logo_url',
         'wikipedia_url',

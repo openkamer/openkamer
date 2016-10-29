@@ -51,7 +51,7 @@
   <h4>Leden</h4>
   {% for member in party.members_current %}
   <div class="col-md-4">
-    <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
+    <a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a>
   </div>
   {% endfor %}
 </div>

@@ -1,6 +1,7 @@
 import logging
 
 from django.db import models
+from django.utils.text import slugify
 
 from person.models import Person
 
@@ -12,6 +13,11 @@ class Government(models.Model):
     date_formed = models.DateField()
     date_dissolved = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
+    slug = models.SlugField(max_length=250, default='')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def prime_minister(self):
         pms = GovernmentPosition.objects.filter(

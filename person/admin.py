@@ -10,6 +10,7 @@ class PersonAdmin(admin.ModelAdmin):
         'surname',
         'surname_prefix',
         'initials',
+        'slug',
         'birthdate',
         'wikidata_id',
         'parlement_and_politiek_id',

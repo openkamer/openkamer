@@ -16,7 +16,7 @@ class PersonsView(TemplateView):
 class PersonView(TemplateView):
     template_name = 'person/person.html'
 
-    def get_context_data(self, person_id, **kwargs):
+    def get_context_data(self, slug, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['person'] = Person.objects.get(id=person_id)
+        context['person'] = Person.objects.get(slug=slug)
         return context

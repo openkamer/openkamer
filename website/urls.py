@@ -28,15 +28,15 @@ import website.api
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^persons/$', PersonsView.as_view()),
-    url(r'^person/(?P<person_id>\d+)/$', PersonView.as_view()),
+    url(r'^person/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
 
     url(r'^parties/$', PartiesView.as_view(), name='parties'),
-    url(r'^party/(?P<party_name_short>.*)/$', PartyView.as_view(), name='party'),
+    url(r'^party/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
     url(r'^parliamentmembers/$', ParliamentMembersView.as_view()),
 
     url(r'^governments/$', GovernmentsView.as_view(), name='governments'),
     url(r'^government/current/$', GovernmentCurrentView.as_view(), name='government-current'),
-    url(r'^government/(?P<government_name>.*)/$', GovernmentView.as_view(), name='government'),
+    url(r'^government/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
     url(r'^dossiers/$', DossiersView.as_view(), name='dossiers'),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),

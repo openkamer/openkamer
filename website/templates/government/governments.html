@@ -12,7 +12,7 @@
 {% for government in governments %}
   <div class="col-sm-3" align="center">
     <p>
-      <h4><a href="{% url 'government' government.name %}">{{ government.name }}</a></h4>
+      <h4><a href="{% url 'government' government.slug %}">{{ government.name }}</a></h4>
     </p>
     <p>
       {{ government.date_formed }}

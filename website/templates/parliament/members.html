@@ -14,8 +14,8 @@
     <div class="well">
 
       <p>
-        <h5><a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a></h5>
-        <small><a href="{% url 'party' member.party.name_short %}">{{ member.party.name_short }}</a> <br/>
+        <h5><a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a></h5>
+        <small><a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a> <br/>
         {% if member.party.wikimedia_logo_url %}
           <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
         {% endif %}

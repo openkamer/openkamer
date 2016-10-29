@@ -58,3 +58,4 @@ class TestCreatePerson(TestCase):
         response = requests.get(person.wikimedia_image_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(person.birthdate, date(1967, 2, 14))
+        self.assertEqual(person.slug, 'mark-rutte')

@@ -23,8 +23,8 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h4>Minister-president: <a href="/person/{{ government.prime_minister.person.id }}/">{{ government.prime_minister.person.fullname }}</a></h4></div>
-    <div align="center"><h5>Viceminister-president: <a href="/person/{{ government.deputy_prime_minister.person.id }}/">{{ government.deputy_prime_minister.person.fullname }}</a></h5></div>
+    <div align="center"><h4>Minister-president: <a href="{% url 'person' government.prime_minister.person.slug %}">{{ government.prime_minister.person.fullname }}</a></h4></div>
+    <div align="center"><h5>Viceminister-president: <a href="{% url 'person' government.prime_minister.person.slug %}">{{ government.deputy_prime_minister.person.fullname }}</a></h5></div>
   </div>
 </div>
 
@@ -38,8 +38,8 @@
       {% for position in ministry.positions %}
 
         {% get_current_party position.member_current.person.id as party %}
-        {{ position }}: <a href="/person/{{ position.member_current.person.id }}/">{{ position.member_current.person.fullname }}</a>
-        (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
+        {{ position }}: <a href="{% url 'person' position.member_current.person.slug %}">{{ position.member_current.person.fullname }}</a>
+        (<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>)
         <br/>
       {% endfor %}
 
@@ -50,8 +50,8 @@
         {% if position.members_inactive %} <b>{{ position }}</b><br/> {% endif %}
         {% for member in position.members_inactive %}
           {% get_current_party member.person.id as party %}
-          <a href="/person/{{ member.person.id }}/">{{ member.person.fullname }}</a>
-          (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
+          <a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a>
+          (<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>)
           ({{ member.start_date|date:"d b Y" }} - {{ member.end_date|date:"d b Y" }})
           <br/>
         {% endfor %}
@@ -77,9 +77,9 @@
       <h4>ministers zonder portefeuille <a href="https://nl.wikipedia.org/wiki/Minister_zonder_portefeuille" target="_blank" title="In Nederland is een minister zonder portefeuille verantwoordelijk voor een bepaald beleidsterrein, maar heeft niet de leiding over een departement. Ministers zonder portefeuille hebben, anders dan staatssecretarissen, zitting in de ministerraad en kunnen dus ook meestemmen over alle beslissingen."><span class="glyphicon glyphicon-info-sign"></span></a></h4>
 
       {% for minister in government.ministers_without_portfolio %}
-        {{ minister.position.extra_info }}: <a href="/person/{{ minister.person.id }}/">{{ minister.person.fullname }}</a>
+        {{ minister.position.extra_info }}: <a href="{% url 'person' minister.person.slug %}">{{ minister.person.fullname }}</a>
         {% get_current_party minister.person.id as party %}
-        (<a href="{% url 'party' party.name_short %}">{{ party.name_short }}</a>)
+        (<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>)
         {% if minister.end_date %}
         ({{ minister.start_date|date:"d b Y" }} - {{ minister.end_date|date:"d b Y" }})
         {% endif %}

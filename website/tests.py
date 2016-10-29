@@ -56,7 +56,7 @@ class TestCreateGovernment(TestCase):
     def test_governement_view(self):
         governments = Government.objects.all()
         for government in governments:
-            response = self.client.get('/government/' + str(government.id) + '/')
+            response = self.client.get(reverse('government', args=(government.slug,)))
             self.assertEqual(response.status_code, 200)
 
     def test_api_governement(self):
@@ -149,7 +149,7 @@ class TestWebsite(TestCase):
     def test_person_overview(self):
         persons = Person.objects.all()[:10]
         for person in persons:
-            response = self.client.get('/person/' + str(person.id) + '/')
+            response = self.client.get(reverse('person', args=(person.slug,)))
             self.assertEqual(response.status_code, 200)
 
     def test_dossiers_overview(self):
@@ -209,7 +209,7 @@ class TestWebsite(TestCase):
     def test_party_view(self):
         parties = PoliticalParty.objects.all()
         for party in parties:
-            response = self.client.get(reverse('party', args=(party.name_short,)))
+            response = self.client.get(reverse('party', args=(party.slug,)))
             self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):

@@ -1,6 +1,7 @@
 import logging
 
 from django.db import models
+from django.utils.text import slugify
 
 from wikidata import wikidata
 
@@ -53,9 +54,14 @@ class PoliticalParty(models.Model):
     wikimedia_logo_url = models.URLField(blank=True)
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
+    slug = models.SlugField(max_length=250, default='')
 
     def __str__(self):
         return str(self.name) + ' (' + str(self.name_short) + ')'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name_short)
+        super().save(*args, **kwargs)
 
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
