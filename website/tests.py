@@ -32,7 +32,7 @@ class TestCreateParliament(TestCase):
 
 
 class TestCreateGovernment(TestCase):
-    fixtures = ['parliament_2016.json']
+    fixtures = ['person.json', 'parliament.json']
 
     @classmethod
     def setUpTestData(cls):
@@ -71,7 +71,7 @@ class TestCreateGovernment(TestCase):
 
 
 class TestFindParliamentMembers(TestCase):
-    fixtures = ['parliament_2016.json']
+    fixtures = ['person.json', 'parliament.json']
 
     def test_find_member(self):
         surname = 'Zijlstra'
@@ -130,7 +130,7 @@ class TestFindOriginalKamerstukId(TestCase):
 
 
 class TestWebsite(TestCase):
-    fixtures = ['parliament_2016.json']
+    fixtures = ['person.json', 'parliament.json', 'government.json']
 
     @classmethod
     def setUpTestData(cls):
@@ -203,7 +203,7 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_parties_overview(self):
-        response = self.client.get('/parties/')
+        response = self.client.get(reverse('parties'))
         self.assertEqual(response.status_code, 200)
 
     def test_party_view(self):

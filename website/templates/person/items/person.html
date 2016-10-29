@@ -23,11 +23,15 @@
   </tr>
   <tr>
     <th>Politieke Partij</th>
+    {% if party %}
     <td><a href="{% url 'party' party.slug %}">{{ party.name_short }}</a></td>
+    {% else %}
+    <td>onbekend</td>
+    {% endif %}
   </tr>
   <tr>
     <th>Parlement en Politiek</th>
-    <td>{% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">link</a>{% else %} unbekend {% endif %}</td>
+    <td>{% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">link</a>{% else %} onbekend {% endif %}</td>
   </tr>
 </table>
 <img src="{{ person.wikimedia_image_url }}" height="200px">

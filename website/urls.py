@@ -27,7 +27,7 @@ import website.api
 
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
-    url(r'^persons/$', PersonsView.as_view(), name='persons'),
+    url(r'^personen/$', PersonsView.as_view(), name='persons'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),

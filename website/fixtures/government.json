@@ -1,0 +1,1152 @@
+[
+{
+  "model": "government.government",
+  "pk": 1,
+  "fields": {
+    "name": "Kabinet-Rutte II",
+    "date_formed": "2012-11-05",
+    "date_dissolved": null,
+    "wikidata_id": "Q1638648",
+    "slug": "kabinet-rutte-ii"
+  }
+},
+{
+  "model": "government.government",
+  "pk": 2,
+  "fields": {
+    "name": "Kabinet-Rutte I",
+    "date_formed": "2010-10-14",
+    "date_dissolved": "2012-11-05",
+    "wikidata_id": "Q168828",
+    "slug": "kabinet-rutte-i"
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 1,
+  "fields": {
+    "name": "binnenlandse zaken en koninkrijksrelaties",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 2,
+  "fields": {
+    "name": "defensie",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 3,
+  "fields": {
+    "name": "economische zaken",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 4,
+  "fields": {
+    "name": "financi\u00ebn",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 5,
+  "fields": {
+    "name": "infrastructuur en milieu",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 6,
+  "fields": {
+    "name": "onderwijs, cultuur en wetenschap",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 7,
+  "fields": {
+    "name": "veiligheid en justitie",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 8,
+  "fields": {
+    "name": "volksgezondheid, welzijn en sport",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 9,
+  "fields": {
+    "name": "sociale zaken en werkgelegenheid",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 10,
+  "fields": {
+    "name": "algemene zaken",
+    "government": 1
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 11,
+  "fields": {
+    "name": "binnenlandse zaken en koninkrijksrelaties",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 12,
+  "fields": {
+    "name": "buitenlandse zaken",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 13,
+  "fields": {
+    "name": "defensie",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 14,
+  "fields": {
+    "name": "economische zaken",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 15,
+  "fields": {
+    "name": "financi\u00ebn",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 16,
+  "fields": {
+    "name": "infrastructuur en milieu",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 17,
+  "fields": {
+    "name": "onderwijs, cultuur en wetenschap",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 18,
+  "fields": {
+    "name": "sociale zaken en werkgelegenheid",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 19,
+  "fields": {
+    "name": "veiligheid en justitie",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 20,
+  "fields": {
+    "name": "volksgezondheid, welzijn en sport",
+    "government": 2
+  }
+},
+{
+  "model": "government.ministry",
+  "pk": 21,
+  "fields": {
+    "name": "algemene zaken",
+    "government": 2
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 1,
+  "fields": {
+    "position": "PMI",
+    "ministry": null,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 2,
+  "fields": {
+    "position": "MIN",
+    "ministry": 1,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 3,
+  "fields": {
+    "position": "MIN",
+    "ministry": null,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 4,
+  "fields": {
+    "position": "MWP",
+    "ministry": null,
+    "government": 1,
+    "extra_info": "buitenlandse handel en ontwikkelingssamenwerking"
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 5,
+  "fields": {
+    "position": "MIN",
+    "ministry": 2,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 6,
+  "fields": {
+    "position": "MIN",
+    "ministry": 3,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 7,
+  "fields": {
+    "position": "MIN",
+    "ministry": 4,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 8,
+  "fields": {
+    "position": "MIN",
+    "ministry": 5,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 9,
+  "fields": {
+    "position": "MIN",
+    "ministry": 6,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 10,
+  "fields": {
+    "position": "DPM",
+    "ministry": null,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 11,
+  "fields": {
+    "position": "MIN",
+    "ministry": 7,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 12,
+  "fields": {
+    "position": "MIN",
+    "ministry": 8,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 13,
+  "fields": {
+    "position": "MWP",
+    "ministry": null,
+    "government": 1,
+    "extra_info": "wonen en rijksdienst"
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 14,
+  "fields": {
+    "position": "SOS",
+    "ministry": 7,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 15,
+  "fields": {
+    "position": "SOS",
+    "ministry": 6,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 16,
+  "fields": {
+    "position": "SOS",
+    "ministry": 4,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 17,
+  "fields": {
+    "position": "SOS",
+    "ministry": 5,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 18,
+  "fields": {
+    "position": "MIN",
+    "ministry": 9,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 19,
+  "fields": {
+    "position": "SOS",
+    "ministry": 9,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 20,
+  "fields": {
+    "position": "SOS",
+    "ministry": 8,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 21,
+  "fields": {
+    "position": "MIN",
+    "ministry": 10,
+    "government": 1,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 22,
+  "fields": {
+    "position": "PMI",
+    "ministry": null,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 23,
+  "fields": {
+    "position": "MIN",
+    "ministry": 11,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 24,
+  "fields": {
+    "position": "MIN",
+    "ministry": 12,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 25,
+  "fields": {
+    "position": "MIN",
+    "ministry": 13,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 26,
+  "fields": {
+    "position": "MIN",
+    "ministry": 14,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 27,
+  "fields": {
+    "position": "MIN",
+    "ministry": 15,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 28,
+  "fields": {
+    "position": "MWP",
+    "ministry": null,
+    "government": 2,
+    "extra_info": "immigratie, integratie en asiel"
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 29,
+  "fields": {
+    "position": "MIN",
+    "ministry": 16,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 30,
+  "fields": {
+    "position": "MIN",
+    "ministry": 17,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 31,
+  "fields": {
+    "position": "MIN",
+    "ministry": 18,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 32,
+  "fields": {
+    "position": "MIN",
+    "ministry": 19,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 33,
+  "fields": {
+    "position": "MIN",
+    "ministry": 20,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 34,
+  "fields": {
+    "position": "SOS",
+    "ministry": 12,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 35,
+  "fields": {
+    "position": "SOS",
+    "ministry": 14,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 36,
+  "fields": {
+    "position": "SOS",
+    "ministry": 15,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 37,
+  "fields": {
+    "position": "SOS",
+    "ministry": 16,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 38,
+  "fields": {
+    "position": "SOS",
+    "ministry": 17,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 39,
+  "fields": {
+    "position": "SOS",
+    "ministry": 18,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 40,
+  "fields": {
+    "position": "SOS",
+    "ministry": 19,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 41,
+  "fields": {
+    "position": "SOS",
+    "ministry": 20,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 42,
+  "fields": {
+    "position": "DPM",
+    "ministry": null,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentposition",
+  "pk": 43,
+  "fields": {
+    "position": "MIN",
+    "ministry": 21,
+    "government": 2,
+    "extra_info": ""
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 1,
+  "fields": {
+    "person": 1,
+    "position": 1,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 2,
+  "fields": {
+    "person": 2,
+    "position": 2,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 3,
+  "fields": {
+    "person": 3,
+    "position": 3,
+    "start_date": "2012-11-05",
+    "end_date": "2014-10-17"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 4,
+  "fields": {
+    "person": 4,
+    "position": 3,
+    "start_date": "2014-10-17",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 5,
+  "fields": {
+    "person": 5,
+    "position": 4,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 6,
+  "fields": {
+    "person": 6,
+    "position": 5,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 7,
+  "fields": {
+    "person": 7,
+    "position": 6,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 8,
+  "fields": {
+    "person": 8,
+    "position": 7,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 9,
+  "fields": {
+    "person": 9,
+    "position": 8,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 10,
+  "fields": {
+    "person": 10,
+    "position": 9,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 11,
+  "fields": {
+    "person": 11,
+    "position": 10,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 12,
+  "fields": {
+    "person": 12,
+    "position": 11,
+    "start_date": "2012-11-05",
+    "end_date": "2015-03-09"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 13,
+  "fields": {
+    "person": 13,
+    "position": 12,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 14,
+  "fields": {
+    "person": 14,
+    "position": 13,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 15,
+  "fields": {
+    "person": 15,
+    "position": 11,
+    "start_date": "2015-03-20",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 16,
+  "fields": {
+    "person": 14,
+    "position": 11,
+    "start_date": "2015-03-10",
+    "end_date": "2015-03-20"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 17,
+  "fields": {
+    "person": 16,
+    "position": 14,
+    "start_date": "2012-11-05",
+    "end_date": "2015-03-09"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 18,
+  "fields": {
+    "person": 17,
+    "position": 14,
+    "start_date": "2015-03-20",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 19,
+  "fields": {
+    "person": 18,
+    "position": 15,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 20,
+  "fields": {
+    "person": 19,
+    "position": 16,
+    "start_date": "2012-11-05",
+    "end_date": "2014-01-30"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 21,
+  "fields": {
+    "person": 20,
+    "position": 16,
+    "start_date": "2014-02-04",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 22,
+  "fields": {
+    "person": 21,
+    "position": 17,
+    "start_date": "2015-11-05",
+    "end_date": "2015-10-28"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 23,
+  "fields": {
+    "person": 22,
+    "position": 17,
+    "start_date": "2015-11-03",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 24,
+  "fields": {
+    "person": 23,
+    "position": 17,
+    "start_date": "2012-11-05",
+    "end_date": "2012-12-06"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 25,
+  "fields": {
+    "person": 22,
+    "position": 17,
+    "start_date": "2012-12-18",
+    "end_date": "2015-11-03"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 26,
+  "fields": {
+    "person": 24,
+    "position": 17,
+    "start_date": "2015-11-03",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 27,
+  "fields": {
+    "person": 11,
+    "position": 18,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 28,
+  "fields": {
+    "person": 25,
+    "position": 19,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 29,
+  "fields": {
+    "person": 26,
+    "position": 20,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 30,
+  "fields": {
+    "person": 1,
+    "position": 21,
+    "start_date": "2012-11-05",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 31,
+  "fields": {
+    "person": 1,
+    "position": 22,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 32,
+  "fields": {
+    "person": 27,
+    "position": 23,
+    "start_date": "2010-10-14",
+    "end_date": "2011-12-16"
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 33,
+  "fields": {
+    "person": 28,
+    "position": 23,
+    "start_date": "2011-12-16",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 34,
+  "fields": {
+    "person": 29,
+    "position": 24,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 35,
+  "fields": {
+    "person": 30,
+    "position": 25,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 36,
+  "fields": {
+    "person": 31,
+    "position": 26,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 37,
+  "fields": {
+    "person": 32,
+    "position": 27,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 38,
+  "fields": {
+    "person": 33,
+    "position": 28,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 39,
+  "fields": {
+    "person": 9,
+    "position": 29,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 40,
+  "fields": {
+    "person": 34,
+    "position": 30,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 41,
+  "fields": {
+    "person": 7,
+    "position": 31,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 42,
+  "fields": {
+    "person": 12,
+    "position": 32,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 43,
+  "fields": {
+    "person": 13,
+    "position": 33,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 44,
+  "fields": {
+    "person": 35,
+    "position": 34,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 45,
+  "fields": {
+    "person": 36,
+    "position": 35,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 46,
+  "fields": {
+    "person": 19,
+    "position": 36,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 47,
+  "fields": {
+    "person": 37,
+    "position": 37,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 48,
+  "fields": {
+    "person": 38,
+    "position": 38,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 49,
+  "fields": {
+    "person": 39,
+    "position": 39,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 50,
+  "fields": {
+    "person": 16,
+    "position": 40,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 51,
+  "fields": {
+    "person": 40,
+    "position": 41,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 52,
+  "fields": {
+    "person": 31,
+    "position": 42,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+},
+{
+  "model": "government.governmentmember",
+  "pk": 53,
+  "fields": {
+    "person": 1,
+    "position": 43,
+    "start_date": "2010-10-14",
+    "end_date": null
+  }
+}
+]
