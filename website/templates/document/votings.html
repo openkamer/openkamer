@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% load bootstrap_pagination %}
+
 {% block content %}
 
 <div class="row">
@@ -19,6 +21,8 @@
     {% include "document/items/votings_tiles.html" %}
   </div>
 </div>
+
+<div class="row" align="center">{% bootstrap_paginate votings %}</div>
 
 <hr/>
 

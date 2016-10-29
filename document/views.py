@@ -1,6 +1,7 @@
 import logging
 import json
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import TemplateView
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -11,7 +12,9 @@ from document.models import Document, Dossier, Kamerstuk
 from document.models import Agenda, AgendaItem
 from document.models import Document, Dossier
 from document.models import Voting
+from document import settings
 
+# TODO: remove dependency on website
 from website.create import create_or_update_dossier
 
 logger = logging.getLogger(__name__)
@@ -40,7 +43,15 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossiers'] = Dossier.objects.all()
+        paginator = Paginator(Dossier.objects.all(), settings.DOSSIERS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            dossiers = paginator.page(page)
+        except PageNotAnInteger:
+            dossiers = paginator.page(1)
+        except EmptyPage:
+            dossiers = paginator.page(paginator.num_pages)
+        context['dossiers'] = dossiers
         return context
 
 
@@ -120,6 +131,13 @@ class VotingsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        votings = Voting.objects.all()
+        paginator = Paginator(Voting.objects.all(), settings.VOTINGS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            votings = paginator.page(page)
+        except PageNotAnInteger:
+            votings = paginator.page(1)
+        except EmptyPage:
+            votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
         return context

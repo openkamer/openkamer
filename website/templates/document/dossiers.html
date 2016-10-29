@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% load bootstrap_pagination %}
+
 {% block content %}
 
 <div class="row">
@@ -40,6 +42,8 @@
 
   {% endfor %}
 </div>
+
+<div class="row" align="center">{% bootstrap_paginate dossiers %}</div>
 
 <hr/>
 

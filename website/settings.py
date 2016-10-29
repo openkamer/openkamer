@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     'person',
     # 'debug_toolbar',
     'bootstrap3',
+    'bootstrap_pagination',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',

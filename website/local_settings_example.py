@@ -27,6 +27,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 #MEDIA_URL = 'http://www.<your-domain>.com/static/media/'
 MEDIA_URL = '/static/media/'
 
+# DOCUMENT
+DOSSIERS_PER_PAGE = 20
+VOTINGS_PER_PAGE = 50
 
 # PIWIK
 PIWIK_URL = ''  # optional, without trailing slash
