@@ -118,7 +118,7 @@ class TestFindOriginalKamerstukId(TestCase):
 
     def test_find_original_voorstel_van_wet(self):
         title = 'Wijziging van de Wet regulering prostitutie en bestrijding misstanden seksbranche; Gewijzigd voorstel van wet '
-        expected_result = '33885.voorstel_van_wet'
+        expected_result = '33885-voorstel_van_wet'
         original_id = find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 

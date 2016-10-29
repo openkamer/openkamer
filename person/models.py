@@ -40,7 +40,10 @@ class Person(models.Model):
         return self.get_full_name() + ' (' + self.initials + ')'
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.fullname())
+        name = self.fullname()
+        if name.strip() == '':
+            name = 'unknown'
+        self.slug = slugify(name)
         super().save(*args, **kwargs)
 
     @staticmethod

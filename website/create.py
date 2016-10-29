@@ -219,7 +219,6 @@ def create_kamerstuk(document, dossier_id, metadata, result):
     title_parts = metadata['title_full'].split(';')
     type_short = ''
     type_long = ''
-    original_id = ''
     if len(title_parts) > 2:
         type_short = title_parts[1].strip()
         type_long = title_parts[2].strip()
@@ -259,7 +258,7 @@ def find_original_kamerstuk_id(dossier_id, type_long):
     elif sub_id:
         return str(dossier_id) + '-' + sub_id
     elif 'voorstel van wet' in type_long.lower():
-        return str(dossier_id) + '.voorstel_van_wet'
+        return str(dossier_id) + '-voorstel_van_wet'
     return ''
 
 

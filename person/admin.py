@@ -5,6 +5,7 @@ from parliament.models import Person
 
 class PersonAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'fullname',
         'forename',
         'surname',

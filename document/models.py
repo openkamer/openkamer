@@ -109,7 +109,7 @@ class Kamerstuk(models.Model):
     id_sub = models.CharField(max_length=40, blank=True)
     type_short = models.CharField(max_length=40, blank=True)
     type_long = models.CharField(max_length=100, blank=True)
-    original_id = models.CharField(max_length=40, blank=True)  # format: 33885.22
+    original_id = models.CharField(max_length=40, blank=True)  # format: 33885-22
 
     MOTIE = 'Motie'
     AMENDEMENT = 'Amendement'
@@ -155,7 +155,7 @@ class Kamerstuk(models.Model):
     def original(self):
         if not self.original_id:
             return None
-        ids = self.original_id.split('.')
+        ids = self.original_id.split('-')
         if ids[1] == 'voorstel_van_wet':
             kamerstukken = Kamerstuk.objects.filter(id_main=ids[0])
             for stuk in kamerstukken:
@@ -168,7 +168,7 @@ class Kamerstuk(models.Model):
 
     def modifications(self):
         if self.voorstelwet():
-            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'.voorstel_van_wet').exclude(id=self.id)
+            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'-voorstel_van_wet').exclude(id=self.id)
         else:
             stukken = Kamerstuk.objects.filter(original_id=self.id_full())
         return stukken
