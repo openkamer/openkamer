@@ -143,7 +143,7 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_persons_overview(self):
-        response = self.client.get('/persons/')
+        response = self.client.get(reverse('person'))
         self.assertEqual(response.status_code, 200)
 
     def test_person_overview(self):
@@ -213,7 +213,7 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):
-        response = self.client.get('/parliamentmembers/')
+        response = self.client.get(reverse('parliament-members'))
         self.assertEqual(response.status_code, 200)
 
     def test_plot_example_view(self):
