@@ -21,8 +21,10 @@
       <div class="col-sm-12">
         {% if voting.kamerstuk %}
         <a href="{% url 'kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}"><small>{{ voting.kamerstuk.type_long }}</small></a>
-        {% else %}
+        {% elif voting.is_dossier_voting %}
         <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}"><small>{{ voting.dossier.title }}</small></a>
+        {% else %}
+        <small class="text-danger">kamerstuk ontbreekt</small>
         {% endif %}
       </div>
     </div>
