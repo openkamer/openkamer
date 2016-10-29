@@ -1,6 +1,8 @@
 import logging
 import re
 
+from django.db import transaction
+
 from wikidata import wikidata
 
 from person.models import Person
@@ -35,6 +37,7 @@ import scraper.persons
 logger = logging.getLogger(__name__)
 
 
+@transaction.atomic
 def create_governments():
     # Rutte I : Q168828
     # Rutte II : Q1638648
@@ -43,6 +46,7 @@ def create_governments():
         create_government(wikidata_id)
 
 
+@transaction.atomic
 def create_government(wikidata_id, max_members=None):
     gov_info = scraper.government.get_government(wikidata_id)
     government, created = Government.objects.get_or_create(
@@ -55,6 +59,7 @@ def create_government(wikidata_id, max_members=None):
     return government
 
 
+@transaction.atomic
 def create_government_members(government, max_members=None):
     members_created = []
     members = scraper.government.get_government_members(government.wikidata_id, max_members=max_members)
@@ -67,6 +72,7 @@ def create_government_members(government, max_members=None):
     return members_created
 
 
+@transaction.atomic
 def create_ministry(government, member):
     ministry = None
     if 'ministry' in member:
@@ -74,6 +80,7 @@ def create_ministry(government, member):
     return ministry
 
 
+@transaction.atomic
 def create_goverment_member(government, member, person, position):
     start_date = government.date_formed
     if 'start_date' in member:
@@ -90,6 +97,7 @@ def create_goverment_member(government, member, person, position):
     return member
 
 
+@transaction.atomic
 def create_person(wikidata_id, fullname):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
     if persons.exists():
@@ -133,6 +141,7 @@ def create_person(wikidata_id, fullname):
     return person
 
 
+@transaction.atomic
 def create_government_position(government, member, ministry):
     position_type = GovernmentPosition.find_position_type(member['position'])
     positions = GovernmentPosition.objects.filter(
@@ -155,14 +164,13 @@ def create_government_position(government, member, ministry):
     return position
 
 
+@transaction.atomic
 def create_or_update_dossier(dossier_id):
-    # TODO: do not create new documents if they already exist; update!
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
     dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    if dossiers:
-        dossier = dossiers[0]
-    else:
-        dossier = Dossier.objects.create(dossier_id=dossier_id)
+    for dossier in dossiers:
+        dossier.delete()
+    dossier = Dossier.objects.create(dossier_id=dossier_id)
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
         # skip documents of some types and/or sources, no models implemented yet
@@ -213,6 +221,7 @@ def create_or_update_dossier(dossier_id):
     return dossier
 
 
+@transaction.atomic
 def create_kamerstuk(document, dossier_id, metadata, result):
     logger.info('BEGIN')
     logger.info('document: ' + str(document))
@@ -262,6 +271,7 @@ def find_original_kamerstuk_id(dossier_id, type_long):
     return ''
 
 
+@transaction.atomic
 def create_submitter(document, submitter):
     has_initials = len(submitter.split('.')) > 1
     initials = ''
@@ -275,6 +285,7 @@ def create_submitter(document, submitter):
     Submitter.objects.create(person=person, document=document)
 
 
+@transaction.atomic
 def create_agenda(document, metadata):
     logger.info('create agenda')
     agenda = Agenda.objects.create(
@@ -315,6 +326,7 @@ def create_or_update_agenda(agenda_id):
     return
 
 
+@transaction.atomic
 def create_votings(dossier_id):
     logger.info('dossier id: ' + str(dossier_id))
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
@@ -347,6 +359,7 @@ def create_votings(dossier_id):
             create_votes_party(voting_obj, voting_result.votes)
 
 
+@transaction.atomic
 def create_votes_party(voting, votes):
     for vote in votes:
         party = PoliticalParty.find_party(vote.party_name)
@@ -355,6 +368,7 @@ def create_votes_party(voting, votes):
                                  decision=get_decision(vote.decision), details=vote.details)
 
 
+@transaction.atomic
 def create_votes_individual(voting, votes):
     for vote in votes:
         initials, surname = parse_name_surname_initials(vote.parliament_member)
