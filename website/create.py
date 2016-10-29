@@ -191,6 +191,11 @@ def create_or_update_dossier(dossier_id):
     dossier = Dossier.objects.create(dossier_id=dossier_id)
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
+        # skip eerste kamer documents, first focus on the tweede kamer
+        # TODO: handle eerste kamer documents
+        if 'eerste kamer' in result['publisher'].lower():
+            logger.info('skipping Eerste Kamer document')
+            continue
         # skip documents of some types and/or sources, no models implemented yet
         # TODO: handle all document types
         if 'Staatscourant' in result['type']:
