@@ -129,6 +129,24 @@ class TestFindOriginalKamerstukId(TestCase):
         self.assertEqual(original_id, expected_result)
 
 
+class TestPersonView(TestCase):
+    fixtures = ['person.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+
+    def test_persons_overview(self):
+        response = self.client.get(reverse('persons'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_person_overview(self):
+        persons = Person.objects.all()[:10]
+        for person in persons:
+            response = self.client.get(reverse('person', args=(person.slug,)))
+            self.assertEqual(response.status_code, 200)
+
+
 class TestWebsite(TestCase):
     fixtures = ['person.json', 'parliament.json', 'government.json']
 
@@ -143,7 +161,7 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_persons_overview(self):
-        response = self.client.get(reverse('person'))
+        response = self.client.get(reverse('persons'))
         self.assertEqual(response.status_code, 200)
 
     def test_person_overview(self):
