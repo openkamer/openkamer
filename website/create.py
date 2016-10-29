@@ -1,5 +1,7 @@
 import logging
 import re
+import traceback
+from requests.exceptions import ConnectionError, ConnectTimeout
 
 from django.db import transaction
 
@@ -162,6 +164,22 @@ def create_government_position(government, member, ministry):
             extra_info=member['position_name'],
         )
     return position
+
+
+def create_dossier_retry_on_error(dossier_id, max_tries=3):
+    dossier_id = str(dossier_id)
+    tries = 0
+    while True:
+        try:
+            tries += 1
+            create_or_update_dossier(dossier_id)
+        except (ConnectionError, ConnectTimeout) as e:
+            logger.error(traceback.format_exc())
+            if tries < max_tries:
+                logger.error('trying again!')
+                continue
+            logger.error('max tries reached, skipping dossier: ' + dossier_id)
+        break
 
 
 @transaction.atomic
