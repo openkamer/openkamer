@@ -43,9 +43,11 @@
 
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
+  {% if voting.kamerstuk %}
   {% with document=voting.kamerstuk.document %}
     {{ document.content_html|safe }}
   {% endwith %}
+  {% endif %}
   </div>
 </div>
 
@@ -53,9 +55,11 @@
 
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
+  {% if voting.kamerstuk %}
   {% with document=voting.kamerstuk.document %}
     {% include "document/items/document_info.html" %}
   {% endwith %}
+  {% endif %}
   </div>
 </div>
 
