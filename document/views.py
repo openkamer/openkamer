@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect
 
+from document.models import BesluitenLijst
 from document.models import Document, Dossier, Kamerstuk
 from document.models import Agenda, AgendaItem
 from document.models import Document, Dossier
@@ -140,4 +141,22 @@ class VotingsView(TemplateView):
         except EmptyPage:
             votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
+        return context
+
+
+class BesluitenLijstenView(TemplateView):
+    template_name = 'document/besluitenlijsten.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['besluitenlijsten'] = BesluitenLijst.objects.all()
+        return context
+
+
+class BesluitenLijstView(TemplateView):
+    template_name = 'document/besluitenlijst.html'
+
+    def get_context_data(self, activity_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['besluitenlijst'] = BesluitenLijst.objects.get(activity_id=activity_id)
         return context

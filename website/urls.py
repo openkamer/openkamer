@@ -2,6 +2,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 from person.views import PersonsView, PersonView
+from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersView
 from document.views import DossierView, AddDossierView
 from document.views import DossierTimelineView
@@ -50,6 +51,8 @@ urlpatterns = [
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
     url(r'^document/voting/(?P<voting_id>\d+)/$', VotingView.as_view()),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
+    url(r'^besluitenlijsten/$', BesluitenLijstenView.as_view(), name='besluitenlijsten'),
+    url(r'^besluitenlijst/(?P<activity_id>.*)/$', BesluitenLijstView.as_view(), name='besluitenlijst'),
     url(r'^stemmingen/$', VotingsView.as_view(), name='votings'),
 
     url(r'^api/', include(website.api)),
