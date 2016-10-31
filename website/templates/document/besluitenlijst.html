@@ -11,6 +11,12 @@
     <h5>Voortouwcommissie: {{ besluitenlijst.commission }}</h5>
     <h5>Activiteitnummer: {{ besluitenlijst.activity_id }}</h5>
     <h5>Bron: <a href="{{ besluitenlijst.url }}">{{ besluitenlijst.url }}</a> [PDF]</h5>
+    <h5>
+      Behandelde dossiers:
+      {% for dossier_id in besluitenlijst.related_dossier_ids %}
+        {{ dossier_id }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </h5>
     <hr/>
   </div>
 </div>
@@ -46,6 +52,18 @@
             </div>
           </div>
           {% endfor %}
+
+          {% if case.related_document_ids %}
+          <div class="row">
+            <div class="col-sm-11 col-sm-offset-1">
+              <strong>Gerelateerde documenten:</strong>
+              {% for document_id in case.related_document_id_list %}
+                {{ document_id }}
+              {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
 
         </div>
       </div>

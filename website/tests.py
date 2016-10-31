@@ -75,7 +75,9 @@ class TestCreateBesluitenLijst(TestCase):
 
     def test_create_besluitenlijst_from_url(self):
         url = 'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf'
-        create_besluitenlijst(url)
+        besluitenlijst = create_besluitenlijst(url)
+        dossier_ids = besluitenlijst.related_dossier_ids()
+        # print(dossier_ids)
 
 
 class TestFindParliamentMembers(TestCase):

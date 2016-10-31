@@ -474,3 +474,4 @@ def create_besluitenlijst(url):
                 related_document_ids=case.create_str_list(case.related_document_ids, BesluitItemCase.SEP_CHAR),
             )
     logger.info('END')
+    return besluiten_lijst

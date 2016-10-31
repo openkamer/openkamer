@@ -127,8 +127,8 @@ def create_besluit_items(text):
 def besluitenlijst_pdf_to_text(filepath):
     text = pdf_to_text(filepath)
     text = format_text(text)
-    with open('data/lijst.txt', 'w') as fileout:
-        fileout.write(text)
+    # with open('data/lijst.txt', 'w') as fileout:
+    #     fileout.write(text)
     return text
 
 

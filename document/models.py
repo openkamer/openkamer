@@ -329,6 +329,18 @@ class BesluitenLijst(models.Model):
     def items(self):
         return BesluitItem.objects.filter(besluiten_lijst=self)
 
+    def cases_all(self):
+        return BesluitItemCase.objects.filter(besluit_item__in=self.items())
+
+    def related_dossier_ids(self):
+        dossier_ids = []
+        for case in self.cases_all():
+            document_ids = case.related_document_id_list()
+            for doc_id in document_ids:
+                if doc_id:
+                    dossier_ids.append(doc_id.split('-')[0])
+        return dossier_ids
+
 
 class BesluitItem(models.Model):
     title = models.CharField(max_length=300)
