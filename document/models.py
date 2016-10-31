@@ -345,15 +345,16 @@ class BesluitItemCase(models.Model):
     notes = models.CharField(max_length=500)
     related_commissions = models.CharField(max_length=500)
     related_document_ids = models.CharField(max_length=300)
+    SEP_CHAR = '|'
 
     def decision_list(self):
-        return self.decisions.split('|')
+        return self.decisions.split(self.SEP_CHAR)
 
     def note_list(self):
-        return self.notes.split('|')
+        return self.notes.split(self.SEP_CHAR)
 
     def related_commission_list(self):
-        return self.related_commissions.split('|')
+        return self.related_commissions.split(self.SEP_CHAR)
 
     def related_document_id_list(self):
-        return self.related_document_ids.split('|')
+        return self.related_document_ids.split(self.SEP_CHAR)

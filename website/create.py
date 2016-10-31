@@ -1,7 +1,10 @@
 import logging
 import re
+import os
 import traceback
+import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
+
 
 from django.db import transaction
 
@@ -22,6 +25,9 @@ from parliament.util import parse_name_surname_initials
 
 from document.models import Agenda
 from document.models import AgendaItem
+from document.models import BesluitenLijst
+from document.models import BesluitItem
+from document.models import BesluitItemCase
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -31,10 +37,11 @@ from document.models import Vote
 from document.models import VoteParty
 from document.models import VoteIndividual
 
-import scraper.government
+import scraper.besluitenlijst
 import scraper.documents
-import scraper.votings
+import scraper.government
 import scraper.persons
+import scraper.votings
 
 logger = logging.getLogger(__name__)
 
@@ -430,3 +437,40 @@ def get_decision(decision_string):
     elif 'mistake' in decision_string:
         return Vote.MISTAKE
     return None
+
+
+@transaction.atomic
+def create_besluitenlijst(url):
+    logger.info('BEGIN')
+    logger.info('url: ' + url)
+    filename = url.split('/')[-1]
+    filepath = 'data/tmp/' + filename
+    with open(filepath, 'wb') as pdffile:
+        response = requests.get(url)
+        pdffile.write(response.content)
+    text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filepath)
+    os.remove(filepath)
+    bl = scraper.besluitenlijst.create_besluitenlijst(text)
+    besluiten_lijst = BesluitenLijst.objects.create(
+        title=bl.title,
+        commission=bl.voortouwcommissie,
+        activity_id=bl.activiteitnummer,
+        date_published=bl.date_published,
+        url=url
+    )
+
+    for item in bl.items:
+        besluit_item = BesluitItem.objects.create(
+            title=item.title,
+            besluiten_lijst=besluiten_lijst
+        )
+        for case in item.cases:
+            BesluitItemCase.objects.create(
+                title=case.title,
+                besluit_item = besluit_item,
+                decisions=case.create_str_list(case.decisions, BesluitItemCase.SEP_CHAR),
+                notes=case.create_str_list(case.notes, BesluitItemCase.SEP_CHAR),
+                related_commissions=case.create_str_list(case.volgcommissies, BesluitItemCase.SEP_CHAR),
+                related_document_ids=case.create_str_list(case.related_document_ids, BesluitItemCase.SEP_CHAR),
+            )
+    logger.info('END')

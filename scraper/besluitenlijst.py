@@ -1,5 +1,7 @@
 import re
 from io import StringIO
+import datetime
+import locale
 
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
@@ -15,27 +17,37 @@ class BesluitenLijst(object):
         self.title = self.get_title(text)
         self.voortouwcommissie = self.get_voortouwcommissie(text)
         self.activiteitnummer = self.get_activiteitnummer(text)
-        self.url = ''
-        self.date_published = None
+        self.date_published = self.get_date_published(text)
         self.items = create_besluit_items(text)
+        self.url = ''
 
     def __str__(self):
-        return self.title + '\n' + self.voortouwcommissie + '\n' + self.activiteitnummer
+        return self.title + '\n' + self.voortouwcommissie + '\n' + self.activiteitnummer + '\n' + str(self.date_published)
 
     @staticmethod
     def get_title(text):
-        pattern = 'Document:\s+(.*)'
-        return re.findall(pattern, text)[0]
+        pattern = 'Document:\s{0,}(.*)'
+        return re.findall(pattern, text)[0].strip()
 
     @staticmethod
     def get_voortouwcommissie(text):
-        pattern = 'Voortouwcommissie:\s+(.*)'
-        return re.findall(pattern, text)[0]
+        pattern = 'Voortouwcommissie:\s{0,}(.*)'
+        return re.findall(pattern, text)[0].strip()
 
     @staticmethod
     def get_activiteitnummer(text):
-        pattern = 'Activiteitnummer:\s+(.*)'
-        return re.findall(pattern, text)[0]
+        pattern = 'Activiteitnummer:\s{0,}(.*)'
+        return re.findall(pattern, text)[0].strip()
+
+    @staticmethod
+    def get_date_published(text):
+        pattern = '\d{1,2}\s\w+\s\d{4}'
+        result = re.findall(pattern, text)[0]  # first date is publication date
+        lc_saved = locale.getlocale(locale.LC_TIME)
+        locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
+        date_published = datetime.datetime.strptime(result, '%d %B %Y').date()
+        locale.setlocale(locale.LC_TIME, lc_saved)
+        return date_published
 
 
 class BesluitItem(object):
@@ -58,6 +70,15 @@ class BesluitItemCase(object):
         self.notes = []
         self.extra = ''
         self.volgcommissies = []
+
+    @staticmethod
+    def create_str_list(list_data, sep_char='|'):
+        str = ''
+        for index, decision in enumerate(list_data):
+            str += decision
+            if index < (len(list_data)-1):
+                str += sep_char
+        return str
 
     @staticmethod
     def get_related_document_ids(text):
@@ -106,8 +127,8 @@ def create_besluit_items(text):
 def besluitenlijst_pdf_to_text(filepath):
     text = pdf_to_text(filepath)
     text = format_text(text)
-    # with open('data/lijst.txt', 'w') as fileout:
-    #     fileout.write(text)
+    with open('data/lijst.txt', 'w') as fileout:
+        fileout.write(text)
     return text
 
 
@@ -117,12 +138,12 @@ def create_besluitenlijst(text):
 
 
 def find_agendapunten(text):
-    pattern = "\d+\.\s+Agendapunt:(.*)"
+    pattern = "\d{1,3}\.\s{0,}Agendapunt:(.*)"
     return find_items(pattern, text)
 
 
 def find_cases(text):
-    pattern = "Zaak:\s+(.*)"
+    pattern = "Zaak:(.*)"
     return find_items(pattern, text)
 
 
@@ -204,7 +225,7 @@ def format_whitespaces(text):
 
 
 def format_agendapunten(text):
-    pattern = "\d+\.\s+Agendapunt:"
+    pattern = "\d{1,3}\.\s{0,}Agendapunt:"
     return re.sub(
         pattern=pattern,
         repl=add_double_new_line,
@@ -213,7 +234,7 @@ def format_agendapunten(text):
 
 
 def remove_page_numbers(text):
-    pattern = r'\n\s+\d+\s+\n'
+    pattern = r'\s+\d+\s+\n'
     return re.sub(
         pattern=pattern,
         repl='\n\n',

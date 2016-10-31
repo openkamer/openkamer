@@ -22,6 +22,7 @@ from document.models import Voting
 from website.create import create_or_update_dossier
 from website.create import find_original_kamerstuk_id
 from website.create import create_government
+from website.create import create_besluitenlijst
 
 
 class TestCreateParliament(TestCase):
@@ -68,6 +69,13 @@ class TestCreateGovernment(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/api/governmentposition/')
         self.assertEqual(response.status_code, 200)
+
+
+class TestCreateBesluitenLijst(TestCase):
+
+    def test_create_besluitenlijst_from_url(self):
+        url = 'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf'
+        create_besluitenlijst(url)
 
 
 class TestFindParliamentMembers(TestCase):
