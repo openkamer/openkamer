@@ -66,7 +66,7 @@ class TestBesluitenlijstScraper(TestCase):
         text = self.add_line_before('Volgcommissie\(s\):', text)
         text = self.add_line_before('Griffier:', text)
         text = self.add_line_before('Activiteitnummer:', text)
-        # text = self.remove_page_numbers(text)
+        text = self.remove_page_numbers(text)
         with open('data/lijst.txt', 'w') as fileout:
             fileout.write(text)
         print(text)
