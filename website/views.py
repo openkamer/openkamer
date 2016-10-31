@@ -67,7 +67,6 @@ def get_dossier_timeline_json(request):
     return HttpResponse(timeline_json, content_type='application/json')
 
 
-
 class PlotExampleView(TemplateView):
     template_name = "website/plot_examples.html"
 
