@@ -63,12 +63,19 @@ class BesluitItem(object):
 
 
 class BesluitItemCase(object):
-    def __init__(self):
-        self.title = ''
+    def __init__(self, title):
+        self.title = title
+        self.related_document_ids = self.get_related_document_ids(title)
         self.decisions = []
         self.notes = []
         self.extra = ''
         self.volgcommissies = []
+
+    @staticmethod
+    def get_related_document_ids(text):
+        pattern = "[0-9]{5}-[0-9]{1,2}"
+        document_ids = re.findall(pattern, text)
+        return document_ids
 
     def print(self):
         print('Zaak: ' + self.title)
@@ -78,6 +85,8 @@ class BesluitItemCase(object):
         print(self.notes)
         print('volgcommissies:')
         print(self.volgcommissies)
+        print('related documents:')
+        print(self.related_document_ids)
 
 
 def create_besluit_items(text):
@@ -89,8 +98,7 @@ def create_besluit_items(text):
         besluit_text = text[punt['start']:punt['end']]
         cases = find_cases(besluit_text)
         for case in cases:
-            item_case = BesluitItemCase()
-            item_case.title = case['title']
+            item_case = BesluitItemCase(case['title'])
             case_text = besluit_text[case['start']:case['end']]
             decisions = find_decisions(case_text)
             for decision in decisions:
