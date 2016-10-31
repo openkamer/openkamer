@@ -189,3 +189,34 @@ def search_politieknl_dossier(dossier_id):
             }
             results.append(result)
     return results
+
+
+def besluitenlijst_pdf_to_text():
+    # based on http://stackoverflow.com/a/26495057/607041
+    from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+    from pdfminer.converter import TextConverter
+    from pdfminer.layout import LAParams
+    from pdfminer.pdfpage import PDFPage
+    from io import StringIO
+
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    codec = 'utf-8'
+    # laparams = LAParams()
+    laparams = None
+    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
+    with open('data/besluitenlijst_example1.pdf', 'rb') as filein:
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        password = ""
+        maxpages = 0
+        caching = True
+        pagenos=set()
+
+        for page in PDFPage.get_pages(filein, pagenos, maxpages=maxpages, password=password, caching=caching, check_extractable=True):
+            interpreter.process_page(page)
+
+        text = retstr.getvalue()
+
+        device.close()
+        retstr.close()
+    return text
