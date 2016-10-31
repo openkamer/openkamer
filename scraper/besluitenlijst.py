@@ -25,29 +25,17 @@ class BesluitenLijst(object):
     @staticmethod
     def get_title(text):
         pattern = 'Document:\s+(.*)'
-        titles = re.findall(
-            pattern=pattern,
-            string=text
-        )
-        return titles[0]
+        return re.findall(pattern, text)[0]
 
     @staticmethod
     def get_voortouwcommissie(text):
         pattern = 'Voortouwcommissie:\s+(.*)'
-        titles = re.findall(
-            pattern=pattern,
-            string=text
-        )
-        return titles[0]
+        return re.findall(pattern, text)[0]
 
     @staticmethod
     def get_activiteitnummer(text):
         pattern = 'Activiteitnummer:\s+(.*)'
-        titles = re.findall(
-            pattern=pattern,
-            string=text
-        )
-        return titles[0]
+        return re.findall(pattern, text)[0]
 
 
 class BesluitItem(object):
@@ -154,10 +142,7 @@ def find_volgcommissies(text):
 
 
 def find_items(pattern, text):
-    matches = re.finditer(
-        pattern=pattern,
-        string=text
-    )
+    matches = re.finditer(pattern, text)
     items = []
     matches = list(matches)
     for index, obj in enumerate(matches):
@@ -211,41 +196,37 @@ def format_text(text):
 
 def format_whitespaces(text):
     pattern = "\s{4,}"
-    result = re.sub(
+    return re.sub(
         pattern=pattern,
         repl='\n\n',
         string=text
     )
-    return result
 
 
 def format_agendapunten(text):
     pattern = "\d+\.\s+Agendapunt:"
-    result = re.sub(
+    return re.sub(
         pattern=pattern,
         repl=add_double_new_line,
         string=text
     )
-    return result
 
 
 def remove_page_numbers(text):
     pattern = r'\n\s+\d+\s+\n'
-    result = re.sub(
+    return re.sub(
         pattern=pattern,
         repl='\n\n',
         string=text
     )
-    return result
 
 
 def add_line_before(pattern, text):
-    result = re.sub(
+    return re.sub(
         pattern=pattern,
         repl=add_new_line,
         string=text
     )
-    return result
 
 
 def add_new_line(matchobj):
