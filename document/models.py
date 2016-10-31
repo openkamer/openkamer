@@ -326,10 +326,16 @@ class BesluitenLijst(models.Model):
     date_published = models.DateField()
     url = models.URLField()
 
+    def items(self):
+        return BesluitItem.objects.filter(besluiten_lijst=self)
+
 
 class BesluitItem(models.Model):
     title = models.CharField(max_length=300)
     besluiten_lijst = models.ForeignKey(BesluitenLijst)
+
+    def cases(self):
+        return BesluitItemCase.objects.filter(besluit_item=self)
 
 
 class BesluitItemCase(models.Model):
@@ -339,3 +345,15 @@ class BesluitItemCase(models.Model):
     notes = models.CharField(max_length=500)
     related_commissions = models.CharField(max_length=500)
     related_document_ids = models.CharField(max_length=300)
+
+    def decision_list(self):
+        return self.decisions.split('|')
+
+    def note_list(self):
+        return self.notes.split('|')
+
+    def related_commission_list(self):
+        return self.related_commissions.split('|')
+
+    def related_document_id_list(self):
+        return self.related_document_ids.split('|')
