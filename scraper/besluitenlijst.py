@@ -6,15 +6,48 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 
+# TODO: compile regex in this module to improve performance
+
 
 class BesluitenLijst(object):
-    def __init__(self):
-        self.title = ''
+    def __init__(self, text):
+        self.text = text
+        self.title = self.get_title(text)
+        self.voortouwcommissie = self.get_voortouwcommissie(text)
+        self.activiteitnummer = self.get_activiteitnummer(text)
         self.url = ''
-        self.voortouwcommissie = ''
         self.date_published = None
-        self.items = []
-        self.activiteitnummer = ''
+        self.items = create_besluit_items(text)
+
+    def __str__(self):
+        return self.title + '\n' + self.voortouwcommissie + '\n' + self.activiteitnummer
+
+    @staticmethod
+    def get_title(text):
+        pattern = 'Document:\s+(.*)'
+        titles = re.findall(
+            pattern=pattern,
+            string=text
+        )
+        return titles[0]
+
+    @staticmethod
+    def get_voortouwcommissie(text):
+        pattern = 'Voortouwcommissie:\s+(.*)'
+        titles = re.findall(
+            pattern=pattern,
+            string=text
+        )
+        return titles[0]
+
+    @staticmethod
+    def get_activiteitnummer(text):
+        pattern = 'Activiteitnummer:\s+(.*)'
+        titles = re.findall(
+            pattern=pattern,
+            string=text
+        )
+        return titles[0]
 
 
 class BesluitItem(object):
@@ -47,18 +80,10 @@ class BesluitItemCase(object):
         print(self.volgcommissies)
 
 
-def besluitenlijst_pdf_to_text(filepath):
-    text = pdf_to_text(filepath)
-    text = format_text(text)
-    # with open('data/lijst.txt', 'w') as fileout:
-    #     fileout.write(text)
-    return text
-
-
-def find_besluit_items(text):
+def create_besluit_items(text):
     punten = find_agendapunten(text)
+    besluit_items = []
     for punt in punten:
-        print('===============================')
         besluit = BesluitItem()
         besluit.title = punt['title']
         besluit_text = text[punt['start']:punt['end']]
@@ -77,7 +102,22 @@ def find_besluit_items(text):
             for volgcommissie in volgcommissies:
                 item_case.volgcommissies.append(volgcommissie['title'])
             besluit.cases.append(item_case)
-        besluit.print()
+        # besluit.print()
+        besluit_items.append(besluit)
+    return besluit_items
+
+
+def besluitenlijst_pdf_to_text(filepath):
+    text = pdf_to_text(filepath)
+    text = format_text(text)
+    # with open('data/lijst.txt', 'w') as fileout:
+    #     fileout.write(text)
+    return text
+
+
+def create_besluitenlijst(text):
+    obj = BesluitenLijst(text)
+    return obj
 
 
 def find_agendapunten(text):
@@ -124,8 +164,6 @@ def find_items(pattern, text):
         }
         items.append(item)
     return items
-
-
 
 
 def pdf_to_text(filepath):
