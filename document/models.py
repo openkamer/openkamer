@@ -317,3 +317,25 @@ class VoteIndividual(Vote):
 
     def get_name(self):
         return str(self.parliament_member)
+
+
+class BesluitenLijst(models.Model):
+    title = models.CharField(max_length=300)
+    commission = models.CharField(max_length=50)
+    activity_id = models.CharField(max_length=100)
+    date_published = models.DateField()
+    url = models.URLField()
+
+
+class BesluitItem(models.Model):
+    title = models.CharField(max_length=300)
+    besluiten_lijst = models.ForeignKey(BesluitenLijst)
+
+
+class BesluitItemCase(models.Model):
+    title = models.CharField(max_length=300)
+    besluit_item = models.ForeignKey(BesluitItem)
+    decisions = models.CharField(max_length=500)
+    notes = models.CharField(max_length=500)
+    related_commissions = models.CharField(max_length=500)
+    related_document_ids = models.CharField(max_length=300)
