@@ -34,6 +34,19 @@ class TestBesluitenlijstScraper(TestCase):
     def test_find_agendapunten(self):
         scraper.besluitenlijst.find_agendapunten(self.text)
 
+    def test_find_cases(self):
+        text = """Zaak:  Brief derden - Veiligheidsregio Midden- en West-Brabant te Breda - 27 maart 2009  Uitnodiging voor een werkbezoek aan de Veiligheidsregio Midden- en West-Brabant - 2009Z05892
+Besluit: Overlaten aan individuele leden / fracties."""
+        cases = scraper.besluitenlijst.find_cases(text)
+        print(cases)
+
+    def test_find_case_decisions(self):
+        punten = scraper.besluitenlijst.find_agendapunten(self.text)
+        cases = scraper.besluitenlijst.find_cases(self.text)
+        decisions = scraper.besluitenlijst.find_decisions(self.text)
+
+    def test_find_besluit_items(self):
+        items = scraper.besluitenlijst.find_besluit_items(self.text)
 
 class TestPersonInfoScraper(TestCase):
 

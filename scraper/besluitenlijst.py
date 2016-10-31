@@ -10,6 +10,7 @@ from pdfminer.pdfpage import PDFPage
 class BesluitenLijst(object):
     def __init__(self):
         self.title = ''
+        self.url = ''
         self.voortouwcommissie = ''
         self.date_published = None
         self.items = []
@@ -21,6 +22,12 @@ class BesluitItem(object):
         self.title = ''
         self.cases = []
 
+    def print(self):
+        print('Agendapunt: ' + self.title)
+        for case in self.cases:
+            print('------------')
+            case.print()
+
 
 class BesluitItemCase(object):
     def __init__(self):
@@ -30,34 +37,95 @@ class BesluitItemCase(object):
         self.extra = ''
         self.volgcommissies = []
 
+    def print(self):
+        print('Zaak: ' + self.title)
+        print('decisions:')
+        print(self.decisions)
+        print('notes:')
+        print(self.notes)
+        print('volgcommissies:')
+        print(self.volgcommissies)
+
 
 def besluitenlijst_pdf_to_text(filepath):
     text = pdf_to_text(filepath)
     text = format_text(text)
-    with open('data/lijst.txt', 'w') as fileout:
-        fileout.write(text)
+    # with open('data/lijst.txt', 'w') as fileout:
+    #     fileout.write(text)
     return text
 
 
+def find_besluit_items(text):
+    punten = find_agendapunten(text)
+    for punt in punten:
+        print('===============================')
+        besluit = BesluitItem()
+        besluit.title = punt['title']
+        besluit_text = text[punt['start']:punt['end']]
+        cases = find_cases(besluit_text)
+        for case in cases:
+            item_case = BesluitItemCase()
+            item_case.title = case['title']
+            case_text = besluit_text[case['start']:case['end']]
+            decisions = find_decisions(case_text)
+            for decision in decisions:
+                item_case.decisions.append(decision['title'])
+            notes = find_notes(case_text)
+            for note in notes:
+                item_case.notes.append(note['title'])
+            volgcommissies = find_volgcommissies(case_text)
+            for volgcommissie in volgcommissies:
+                item_case.volgcommissies.append(volgcommissie['title'])
+            besluit.cases.append(item_case)
+        besluit.print()
+
+
 def find_agendapunten(text):
-    pattern = "(\d+\.\s+Agendapunt:)(.*)"
+    pattern = "\d+\.\s+Agendapunt:(.*)"
+    return find_items(pattern, text)
+
+
+def find_cases(text):
+    pattern = "Zaak:\s+(.*)"
+    return find_items(pattern, text)
+
+
+def find_decisions(text):
+    pattern = "Besluit:(.*)"
+    return find_items(pattern, text)
+
+
+def find_notes(text):
+    pattern = "Noot:(.*)"
+    return find_items(pattern, text)
+
+
+def find_volgcommissies(text):
+    pattern = "Volgcommissie\(s\):(.*)"
+    return find_items(pattern, text)
+
+
+def find_items(pattern, text):
     matches = re.finditer(
         pattern=pattern,
         string=text
     )
-    punten = []
-    previous = None
-    for match in matches:
-        if previous:
-            punt ={
-                'title': previous.group(2).strip(),
-                'start': previous.span()[0],
-                'end': match.span()[0]
-            }
-            print(punt)
-            punten.append(punt)
-        previous = match
-    return punten
+    items = []
+    matches = list(matches)
+    for index, obj in enumerate(matches):
+        if index < (len(matches)-1):
+            end = matches[index+1].span()[0]
+        else:
+            end = len(text)
+        item ={
+            'title': obj.group(1).strip(),
+            'start': obj.span()[0],
+            'end': end
+        }
+        items.append(item)
+    return items
+
+
 
 
 def pdf_to_text(filepath):
