@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from document.models import BesluitenLijst
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
@@ -40,6 +41,17 @@ class KamerstukAdmin(admin.ModelAdmin):
         return obj.document.date_published
 
 
+class BesluitenLijstAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'title',
+        'date_published',
+        'commission',
+        'activity_id',
+        'url',
+    )
+
+
 class SubmitterAdmin(admin.ModelAdmin):
     list_display = ('person', 'document')
 
@@ -64,6 +76,8 @@ admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
+
+admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)
