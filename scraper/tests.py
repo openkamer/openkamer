@@ -10,6 +10,7 @@ import scraper.documents
 import scraper.votings
 import scraper.government
 import scraper.persons
+import scraper.besluitenlijst
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -21,72 +22,17 @@ import scraper.persons
 
 
 class TestBesluitenlijstScraper(TestCase):
+    filename = 'data/besluitenlijst_example1.pdf'
 
-    def test_regex(self):
-        test_str = "FIN          Overig     20.   Agendapunt: Brief ombudsman Rotterdam inzake griffierecht in huisvuilzaken     Zaak:  Brief regering"
-        pattern = "\d+\.\s+Agendapunt"
-        # result = re.split(pattern=pattern, string=test_str)
-        result = re.sub(pattern=pattern, repl=TestBesluitenlijstScraper.add_new_line, string=test_str)
-        print(result)
+    @classmethod
+    def setUpTestData(cls):
+        cls.text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(cls.filename)
 
-    def format_whitespaces(self, text):
-        pattern = "\s{4,}"
-        result = re.sub(
-            pattern=pattern,
-            repl='\n\n',
-            string=text
-        )
-        return result
+    def test_pdf_to_text(self):
+        text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(self.filename)
 
-    def format_agendapunten(self, text):
-        pattern = "\d+\.\s+Agendapunt:"
-        result = re.sub(
-            pattern=pattern,
-            repl=TestBesluitenlijstScraper.add_double_new_line,
-            string=text
-        )
-        return result
-
-    def remove_page_numbers(self, text):
-        pattern = r'\n\s+\d+\s+\n'
-        result = re.sub(
-            pattern=pattern,
-            repl='\n\n',
-            string=text
-        )
-        return result
-
-    def test_test(self):
-        text = scraper.documents.besluitenlijst_pdf_to_text()
-        text = self.format_whitespaces(text)
-        text = self.format_agendapunten(text)
-        text = self.add_line_before('Zaak:', text)
-        text = self.add_line_before('Besluit:', text)
-        text = self.add_line_before('Noot:', text)
-        text = self.add_line_before('Volgcommissie\(s\):', text)
-        text = self.add_line_before('Griffier:', text)
-        text = self.add_line_before('Activiteitnummer:', text)
-        text = self.remove_page_numbers(text)
-        with open('data/lijst.txt', 'w') as fileout:
-            fileout.write(text)
-        print(text)
-
-    @staticmethod
-    def add_line_before(pattern, text):
-        result = re.sub(
-            pattern=pattern,
-            repl=TestBesluitenlijstScraper.add_new_line,
-            string=text
-        )
-        return result
-
-    @staticmethod
-    def add_new_line(matchobj):
-        return '\n' + matchobj.group(0)
-
-    @staticmethod
-    def add_double_new_line(matchobj):
-        return '\n\n' + matchobj.group(0)
+    def test_find_agendapunten(self):
+        scraper.besluitenlijst.find_agendapunten(self.text)
 
 
 class TestPersonInfoScraper(TestCase):
