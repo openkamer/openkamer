@@ -194,9 +194,7 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 @transaction.atomic
 def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
-    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    for dossier in dossiers:
-        dossier.delete()
+    Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier = Dossier.objects.create(dossier_id=dossier_id)
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
