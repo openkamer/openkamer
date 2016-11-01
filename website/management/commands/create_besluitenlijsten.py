@@ -22,4 +22,8 @@ class Command(BaseCommand):
                 try:
                     create_besluitenlijst(url)
                 except PDFSyntaxError as e:
-                    logger.error('failed to donwload and parse besluitenlijst with url: ' + url)
+                    logger.error('failed to download and parse besluitenlijst with url: ' + url)
+                except TypeError as e:
+                    # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
+                    logger.error(traceback.format_exc())
+                    logger.error('error while converting besluitenlijst pdf to text')
