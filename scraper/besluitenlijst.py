@@ -1,14 +1,74 @@
-import re
-from io import StringIO
 import datetime
 import locale
+import logging
+import re
+import requests
+from io import StringIO
+
+import lxml
 
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 
+logger = logging.getLogger(__name__)
+
 # TODO: compile regex in this module to improve performance
+
+
+def get_voortouwcommissies_besluiten_urls():
+    logger.info('BEGIN')
+    url = 'https://www.tweedekamer.nl/kamerstukken/besluitenlijsten'
+    commissions = []
+    page = requests.get(url)
+    tree = lxml.html.fromstring(page.content)
+    elements = tree.xpath('//div[@class="filter-container"]/ul/li/a')
+    elements += tree.xpath('//div[@class="filter-container"]/div[@class="readmore"]/ul/li/a')
+    for element in elements:
+        if 'Besluitenlijsten' in element.attrib['href']:
+            commission = {
+                'name': re.findall("(.*)\(\d+\)", element.text)[0].strip(),
+                'url': url + element.attrib['href']
+            }
+            logger.info('commision url added for: ' + commission['name'])
+            commissions.append(commission)
+    logger.info('END')
+    return commissions
+
+
+def get_besluitenlijsten_urls(overview_url, max_results=None, ignore_agendas=True):
+    logger.info('BEGIN')
+    logger.info('url ' + overview_url)
+    ulrs = []
+    new_url_found = True
+    start = 1
+    while new_url_found:
+        logger.info('start at: ' + str(start))
+        url = overview_url + '&sta=' + str(start)
+        page = requests.get(url)
+        tree = lxml.html.fromstring(page.content)
+        elements = tree.xpath('//ul[@class="decisionlist"]/li/a')
+        new_url_found = len(elements) != 0
+        for element in elements:
+            is_agenda_document = False
+            for span in element.iter('span'):
+                if 'class' not in span.attrib:
+                    title = span.text.strip()
+                    if 'agenda' in title.lower():
+                        is_agenda_document = True
+                        break
+            start += 1
+            pdf_url = 'https://www.tweedekamer.nl' + element.attrib['href']
+            if not (ignore_agendas and is_agenda_document):
+                logger.info(pdf_url)
+                ulrs.append(pdf_url)
+            else:
+                logger.info('ignoring besluitenlijst agenda')
+            if max_results and len(ulrs) >= max_results:
+                return ulrs
+    logger.info('END')
+    return ulrs
 
 
 class BesluitenLijst(object):
@@ -27,17 +87,17 @@ class BesluitenLijst(object):
     @staticmethod
     def get_title(text):
         pattern = 'Document:\s{0,}(.*)'
-        return re.findall(pattern, text)[0].strip()
+        return BesluitenLijst.find_first(pattern, text)
 
     @staticmethod
     def get_voortouwcommissie(text):
         pattern = 'Voortouwcommissie:\s{0,}(.*)'
-        return re.findall(pattern, text)[0].strip()
+        return BesluitenLijst.find_first(pattern, text)
 
     @staticmethod
     def get_activiteitnummer(text):
         pattern = 'Activiteitnummer:\s{0,}(.*)'
-        return re.findall(pattern, text)[0].strip()
+        return BesluitenLijst.find_first(pattern, text)
 
     @staticmethod
     def get_date_published(text):
@@ -49,6 +109,12 @@ class BesluitenLijst(object):
         locale.setlocale(locale.LC_TIME, lc_saved)
         return date_published
 
+    @staticmethod
+    def find_first(pattern, text):
+        result = re.findall(pattern, text)
+        if result:
+            return result[0].strip()
+        return ''
 
 class BesluitItem(object):
     def __init__(self):

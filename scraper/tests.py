@@ -21,6 +21,18 @@ import scraper.besluitenlijst
 # scraper.documents.search_politieknl_dossier(33885)
 
 
+class TestVoortouwCommissieScraper(TestCase):
+
+    def test_get_commissies(self):
+        commissions = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
+        self.assertTrue(len(commissions) >= 37)
+
+    def test_get_besluitenlijst_urls(self):
+        overview_url = 'https://www.tweedekamer.nl/kamerstukken/besluitenlijsten?qry=%2A&fld_tk_categorie=Kamerstukken&srt=date%3Adesc%3Adate&clusterName=Besluitenlijsten&Type=Kamerstukken&fld_prl_kamerstuk=Besluitenlijsten&nocache=&fld_prl_voortouwcommissie=Vaste+commissie+voor+binnenlandse+zaken'
+        urls = scraper.besluitenlijst.get_besluitenlijsten_urls(overview_url, max_results=10)
+        self.assertEqual(len(urls), 10)
+
+
 class TestBesluitenlijstScraper(TestCase):
     filename1 = 'data/besluitenlijsten/besluitenlijst_example1.pdf'
     filename2 = 'data/besluitenlijsten/besluitenlijst_example2.pdf'

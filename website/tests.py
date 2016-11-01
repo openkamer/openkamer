@@ -72,12 +72,20 @@ class TestCreateGovernment(TestCase):
 
 
 class TestCreateBesluitenLijst(TestCase):
+    urls = [
+        'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=a1473f2c-79b1-47dd-b82c-7d7cd628e395&title=Besluitenlijst%20procedurevergadering%20Rijksuitgaven%20-%205%20juni%202014.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=57fad866-5252-492f-9974-0ef396ba9080&title=Procedurevergadering%20RU%20-%2011%20oktober%202012%20VINDT%20GEEN%20DOORGANG.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=a1342689-a7e4-4b17-a058-439005b22991&title=Herziene%20besluitenlijst%20e-mailprocedure%20BIZA%20-%2030%20mei%202016%20.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=39d1fda2-24ce-4b11-b979-ce9b3b0ae7cf&title=Besluitenlijst%20procedurevergadering%20Buza%2017%20mrt.pdf',
+    ]
 
     def test_create_besluitenlijst_from_url(self):
-        url = 'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf'
-        besluitenlijst = create_besluitenlijst(url)
-        dossier_ids = besluitenlijst.related_dossier_ids()
-        # print(dossier_ids)
+        for url in self.urls:
+            besluitenlijst = create_besluitenlijst(url)
+            items = besluitenlijst.items()
+            self.assertTrue(items)
+            dossier_ids = besluitenlijst.related_dossier_ids()
 
 
 class TestFindParliamentMembers(TestCase):

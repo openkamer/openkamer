@@ -53,7 +53,7 @@ def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
                 print(element.text.split('-')[0])
                 dossier_ids.append(element.text.split('-')[0])  # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
                 start += 1
-                if len(dossier_ids) >= max_results:
+                if max_results and len(dossier_ids) >= max_results:
                     return dossier_ids
     return dossier_ids
 
