@@ -1,6 +1,7 @@
 import logging
 import re
 import os
+import uuid
 import traceback
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
@@ -443,7 +444,7 @@ def get_decision(decision_string):
 def create_besluitenlijst(url):
     logger.info('BEGIN')
     logger.info('url: ' + url)
-    filename = url.split('/')[-1]
+    filename = uuid.uuid4().hex + '.pdf'
     filepath = 'data/tmp/' + filename
     with open(filepath, 'wb') as pdffile:
         response = requests.get(url)
