@@ -1,11 +1,12 @@
 import logging
-import re
 import os
-import uuid
-import traceback
+import re
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
+import traceback
+import uuid
 
+from pdfminer.pdfparser import PDFSyntaxError
 
 from django.db import transaction
 
@@ -438,6 +439,22 @@ def get_decision(decision_string):
     elif 'mistake' in decision_string:
         return Vote.MISTAKE
     return None
+
+
+def create_besluitenlijsten(max_results_per_commission=None):
+    BesluitenLijst.objects.all().delete()
+    commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
+    for commissie in commissies:
+        urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
+        for url in urls:
+            try:
+                create_besluitenlijst(url)
+            except PDFSyntaxError as e:
+                logger.error('failed to download and parse besluitenlijst with url: ' + url)
+            except TypeError as e:
+                # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
+                logger.error(traceback.format_exc())
+                logger.error('error while converting besluitenlijst pdf to text')
 
 
 @transaction.atomic
