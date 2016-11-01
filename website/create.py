@@ -440,7 +440,6 @@ def get_decision(decision_string):
 
 
 def create_besluitenlijsten(max_results_per_commission=None):
-    BesluitenLijst.objects.all().delete()
     commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
     for commissie in commissies:
         urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
@@ -468,6 +467,8 @@ def create_besluitenlijst(url):
     text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filepath)
     os.remove(filepath)
     bl = scraper.besluitenlijst.create_besluitenlijst(text)
+    BesluitenLijst.objects.filter(activity_id=bl.activiteitnummer).delete()
+    BesluitenLijst.objects.filter(url=url).delete()
     besluiten_lijst = BesluitenLijst.objects.create(
         title=bl.title,
         commission=bl.voortouwcommissie,
