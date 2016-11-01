@@ -63,46 +63,12 @@
 
   </div> <!-- cd-timeline-block -->
 
-  {% for kamerstuk in dossier.kamerstukken.reverse %}
+  {% for item in timeline_items %}
 
 	<div class="cd-timeline-block">
-      <a class="anchor" id="{{ kamerstuk.id_full }}"></a>
-      {% get_kamerstuk_timeline_bg_color kamerstuk.id as bgclass %}
-      <div class="cd-timeline-img text-center {{ bgclass }}">
-        {% get_kamerstuk_icon_name kamerstuk.id as icon_name %}
-        <span style="font-size:24px;" class="fa {{ icon_name }}"></span>
-      </div> <!-- cd-timeline-img -->
-
-      <div class="cd-timeline-content">
-        <div class="kamertuk-id-timeline-container">
-          {{ kamerstuk.id_full }}
-        </div>
-        <h2><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_short }}</a>
-        {% if kamerstuk.voting %}
-          {% with voting=kamerstuk.voting %}
-          {% include "document/items/voting_result_small.html" %}
-          {% endwith %}
-        {% endif %}
-        </h2>
-        <p>{{ kamerstuk.type_long }}</p>
-
-        {% with submitters=kamerstuk.document.submitters %}
-        {% if submitters %}
-        <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
-        {% endif %}
-        {% endwith %}
-
-        <p>{% include "document/items/kamerstuk_modifications.html" %}</p>
-
-        {% if kamerstuk.voting %}
-          {% with voting=kamerstuk.voting %}
-          {% include "document/items/voting_result_bar_small.html" %}
-          {% endwith %}
-        {% endif %}
-
-        <span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
-
-      </div> <!-- cd-timeline-content -->
+      {% with kamerstuk=item.object %}
+        {% include item.template_name %}
+      {% endwith %}
 
 	</div> <!-- cd-timeline-block -->
 

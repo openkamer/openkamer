@@ -28,6 +28,9 @@ class Dossier(models.Model):
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
 
+    def besluitenlijst_cases(self):
+        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id)
+
     def start_date(self):
         documents = Document.objects.filter(dossier=self).order_by('date_published')
         if documents.exists():

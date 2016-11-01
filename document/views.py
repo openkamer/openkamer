@@ -65,12 +65,27 @@ class DossierView(TemplateView):
         return context
 
 
+class TimelineItem(object):
+    def __init__(self, object):
+        self.object = object
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_kamerstuk.html'
+
+
 class DossierTimelineView(TemplateView):
     template_name = 'document/dossier_timeline.html'
 
     def get_context_data(self, dossier_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
+        dossier = Dossier.objects.get(dossier_id=dossier_id)
+        context['dossier'] = dossier
+        timeline_items = []
+        for kamerstuk in dossier.kamerstukken():
+            timeline_items.append(TimelineItem(kamerstuk))
+        print(len(timeline_items))
+        context['timeline_items'] = timeline_items
         return context
 
 
