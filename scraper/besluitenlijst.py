@@ -87,7 +87,11 @@ class BesluitenLijst(object):
     @staticmethod
     def get_title(text):
         pattern = 'Document:\s{0,}(.*)'
-        return BesluitenLijst.find_first(pattern, text)
+        title = BesluitenLijst.find_first(pattern, text)
+        if not title:
+            pattern = 'Onderwerp:\s{0,}(.*)'
+            title = BesluitenLijst.find_first(pattern, text)
+        return title
 
     @staticmethod
     def get_voortouwcommissie(text):
@@ -115,6 +119,7 @@ class BesluitenLijst(object):
         if result:
             return result[0].strip()
         return ''
+
 
 class BesluitItem(object):
     def __init__(self):
@@ -193,8 +198,8 @@ def create_besluit_items(text):
 def besluitenlijst_pdf_to_text(filepath):
     text = pdf_to_text(filepath)
     text = format_text(text)
-    # with open('data/lijst.txt', 'w') as fileout:
-    #     fileout.write(text)
+    with open('data/lijst.txt', 'w') as fileout:
+        fileout.write(text)
     return text
 
 
@@ -204,7 +209,7 @@ def create_besluitenlijst(text):
 
 
 def find_agendapunten(text):
-    pattern = "\d{1,3}\.\s{0,}Agendapunt:(.*)"
+    pattern = "Agendapunt:(.*)"
     return find_items(pattern, text)
 
 
@@ -270,13 +275,16 @@ def pdf_to_text(filepath):
 
 def format_text(text):
     text = format_whitespaces(text)
+    text = format_dates(text)
     text = format_agendapunten(text)
-    text = add_line_before('Zaak:', text)
-    text = add_line_before('Besluit:', text)
-    text = add_line_before('Noot:', text)
-    text = add_line_before('Volgcommissie\(s\):', text)
-    text = add_line_before('Griffier:', text)
-    text = add_line_before('Activiteitnummer:', text)
+    text = add_line_front('Voortouwcommissie:', text)
+    text = add_line_front('Document:', text)
+    text = add_line_front('Zaak:', text)
+    text = add_line_front('Besluit:', text)
+    text = add_line_front('Noot:', text)
+    text = add_line_front('Volgcommissie\(s\):', text)
+    text = add_line_front('Griffier:', text)
+    text = add_line_front('Activiteitnummer:', text)
     text = remove_page_numbers(text)
     return text
 
@@ -294,13 +302,22 @@ def format_agendapunten(text):
     pattern = "\d{1,3}\.\s{0,}Agendapunt:"
     return re.sub(
         pattern=pattern,
-        repl=add_double_new_line,
+        repl=add_double_new_line_front,
+        string=text
+    )
+
+
+def format_dates(text):
+    pattern = '\d{1,2}\s\w+\s\d{4}'
+    return re.sub(
+        pattern=pattern,
+        repl=add_double_new_line_back,
         string=text
     )
 
 
 def remove_page_numbers(text):
-    pattern = r'\s+\d+\s+\n'
+    pattern = r'\s+\d{1,2}\s+\n'
     return re.sub(
         pattern=pattern,
         repl='\n\n',
@@ -308,17 +325,21 @@ def remove_page_numbers(text):
     )
 
 
-def add_line_before(pattern, text):
+def add_line_front(pattern, text):
     return re.sub(
         pattern=pattern,
-        repl=add_new_line,
+        repl=add_new_line_front,
         string=text
     )
 
 
-def add_new_line(matchobj):
-    return '\n' + matchobj.group(0)
+def add_new_line_front(matchobj):
+    return '\n' + str(matchobj.group(0))
 
 
-def add_double_new_line(matchobj):
-    return '\n\n' + matchobj.group(0)
+def add_double_new_line_front(matchobj):
+    return '\n\n' + str(matchobj.group(0))
+
+
+def add_double_new_line_back(matchobj):
+    return str(matchobj.group(0)) + "\n"
