@@ -86,12 +86,16 @@ class BesluitenLijst(object):
 
     @staticmethod
     def get_title(text):
-        pattern = 'Document:\s{0,}(.*)'
+        end_line_pattern = '\d{1,2}\s\w+\s\d{4}'
+        pattern = 'Document:\s{0,}([\w\s]+' + end_line_pattern + ')'
         title = BesluitenLijst.find_first(pattern, text)
+        if not title:
+            pattern = 'Document:\s{0,}(.*)'
+            title = BesluitenLijst.find_first(pattern, text)
         if not title:
             pattern = 'Onderwerp:\s{0,}(.*)'
             title = BesluitenLijst.find_first(pattern, text)
-        return title
+        return title.strip()
 
     @staticmethod
     def get_voortouwcommissie(text):
@@ -275,8 +279,8 @@ def pdf_to_text(filepath):
 
 def format_text(text):
     text = format_whitespaces(text)
-    text = format_dates(text)
     text = format_agendapunten(text)
+    text = format_dates(text)
     text = add_line_front('Voortouwcommissie:', text)
     text = add_line_front('Document:', text)
     text = add_line_front('Zaak:', text)
@@ -299,7 +303,7 @@ def format_whitespaces(text):
 
 
 def format_agendapunten(text):
-    pattern = "\d{1,3}\.\s{0,}Agendapunt:"
+    pattern = "(\d{1,3}\.\s{0,})?Agendapunt:"
     return re.sub(
         pattern=pattern,
         repl=add_double_new_line_front,
@@ -308,12 +312,16 @@ def format_agendapunten(text):
 
 
 def format_dates(text):
-    pattern = '\d{1,2}\s\w+\s\d{4}'
+    pattern = '(\d{1,2}\s\w+\s\d{4})(\w+)'
     return re.sub(
         pattern=pattern,
-        repl=add_double_new_line_back,
+        repl=add_new_line_after_first_group,
         string=text
     )
+
+
+def add_new_line_after_first_group(matchobj):
+    return str(matchobj.group(1)) + ". " + str(matchobj.group(2))
 
 
 def remove_page_numbers(text):
@@ -339,7 +347,3 @@ def add_new_line_front(matchobj):
 
 def add_double_new_line_front(matchobj):
     return '\n\n' + str(matchobj.group(0))
-
-
-def add_double_new_line_back(matchobj):
-    return str(matchobj.group(0)) + "\n"
