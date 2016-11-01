@@ -149,7 +149,15 @@ class BesluitenLijstenView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['besluitenlijsten'] = BesluitenLijst.objects.all()
+        paginator = Paginator(BesluitenLijst.objects.all(), settings.BESLUITENLIJSTEN_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            besluitenlijsten = paginator.page(page)
+        except PageNotAnInteger:
+            besluitenlijsten = paginator.page(1)
+        except EmptyPage:
+            besluitenlijsten = paginator.page(paginator.num_pages)
+        context['besluitenlijsten'] = besluitenlijsten
         return context
 
 
