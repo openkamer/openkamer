@@ -66,10 +66,7 @@
   {% for item in timeline_items %}
 
 	<div class="cd-timeline-block">
-      {% with kamerstuk=item.object %}
-        {% include item.template_name %}
-      {% endwith %}
-
+      {% include item.template_name %}
 	</div> <!-- cd-timeline-block -->
 
   {% endfor %}

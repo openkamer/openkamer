@@ -1,5 +1,7 @@
 {% load openkamer %}
 
+{% with kamerstuk=item.obj %}
+
 <a class="anchor" id="{{ kamerstuk.id_full }}"></a>
 {% get_kamerstuk_timeline_bg_color kamerstuk.id as bgclass %}
 <div class="cd-timeline-img text-center {{ bgclass }}">
@@ -37,3 +39,5 @@
   <span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
 
 </div> <!-- cd-timeline-content -->
+
+{% endwith %}
