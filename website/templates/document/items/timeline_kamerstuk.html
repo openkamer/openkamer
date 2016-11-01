@@ -24,7 +24,10 @@
 
   {% with submitters=kamerstuk.document.submitters %}
   {% if submitters %}
-  <p>Indieners: {% include "document/items/submitters_list.html" %}</p>
+    <p>
+      <strong>{% if submitters|length > 1 %}Indieners:{% else %}Indiener:{% endif %}</strong>
+      {% include "document/items/submitters_list.html" %}
+    </p>
   {% endif %}
   {% endwith %}
 

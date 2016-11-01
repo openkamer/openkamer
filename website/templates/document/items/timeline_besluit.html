@@ -12,7 +12,7 @@
   </div>
     <h2><a href="">{{ case.title }}</a></h2>
   <p>
-    <strong>Commissie:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
+    <strong>Indiener:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
     <br/>
     {% for decision in case.decision_list %}
       <strong>Besluit:</strong> {{ decision }}
