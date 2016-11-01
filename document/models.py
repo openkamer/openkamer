@@ -326,6 +326,9 @@ class BesluitenLijst(models.Model):
     date_published = models.DateField()
     url = models.URLField()
 
+    class Meta:
+        ordering = ['-date_published']
+
     def items(self):
         return BesluitItem.objects.filter(besluiten_lijst=self)
 
