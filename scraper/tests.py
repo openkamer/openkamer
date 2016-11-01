@@ -34,13 +34,19 @@ class TestVoortouwCommissieScraper(TestCase):
 
 
 class TestBesluitenlijstScraper(TestCase):
-    filename1 = 'data/besluitenlijsten/besluitenlijst_example1.pdf'
-    filename2 = 'data/besluitenlijsten/besluitenlijst_example2.pdf'
+    filenames = [
+        # 'data/besluitenlijsten/besluitenlijst_example1.pdf',
+        # 'data/besluitenlijsten/besluitenlijst_example2.pdf',
+        # 'data/besluitenlijsten/besluitenlijst_example3.pdf',
+        'data/besluitenlijsten/besluitenlijst_example4.pdf',
+    ]
 
     @classmethod
     def setUpTestData(cls):
-        cls.text1 = scraper.besluitenlijst.besluitenlijst_pdf_to_text(cls.filename1)
-        cls.text2 = scraper.besluitenlijst.besluitenlijst_pdf_to_text(cls.filename2)
+        cls.texts = []
+        for filename in cls.filenames:
+            text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filename)
+            cls.texts.append(text)
 
     def test_regex(self):
         pattern = "\d{1,3}\.\s{0,}Agendapunt:"
@@ -52,24 +58,27 @@ class TestBesluitenlijstScraper(TestCase):
         self.assertEqual(result[0], '6.  Agendapunt:')
 
     def test_find_agendapunten(self):
-        scraper.besluitenlijst.find_agendapunten(self.text1)
-        scraper.besluitenlijst.find_agendapunten(self.text2)
+        for text in self.texts:
+            items = scraper.besluitenlijst.find_agendapunten(text)
+            self.assertTrue(len(items) > 0)
 
     def test_create_besluitenlijst(self):
-        lijst1 = scraper.besluitenlijst.create_besluitenlijst(self.text1)
-        lijst2 = scraper.besluitenlijst.create_besluitenlijst(self.text2)
+        for text in self.texts:
+            lijst = scraper.besluitenlijst.create_besluitenlijst(text)
 
     def test_find_cases(self):
-        cases1 = scraper.besluitenlijst.find_cases(self.text1)
-        cases2 = scraper.besluitenlijst.find_cases(self.text2)
+        for text in self.texts:
+            cases = scraper.besluitenlijst.find_cases(text)
 
     def test_find_case_decisions(self):
-        punten = scraper.besluitenlijst.find_agendapunten(self.text1)
-        cases = scraper.besluitenlijst.find_cases(self.text1)
-        decisions = scraper.besluitenlijst.find_decisions(self.text1)
+        for text in self.texts:
+            punten = scraper.besluitenlijst.find_agendapunten(text)
+            cases = scraper.besluitenlijst.find_cases(text)
+            decisions = scraper.besluitenlijst.find_decisions(text)
 
     def test_create_besluit_items(self):
-        items = scraper.besluitenlijst.create_besluit_items(self.text1)
+        for text in self.texts:
+            items = scraper.besluitenlijst.create_besluit_items(text)
 
 
 class TestPersonInfoScraper(TestCase):
