@@ -8,9 +8,9 @@
 
 <div class="cd-timeline-content">
   <div class="kamertuk-id-timeline-container">
-    {{ case.besluit_item.besluiten_lijst.activity_id }}
+    Besluitenlijst {{ case.besluit_item.besluiten_lijst.activity_id }}
   </div>
-    <h2><a href="">{{ case.title }}</a></h2>
+    <h6><a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}">{{ case.title }}</a></h6>
   <p>
     <strong>Indiener:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
     <br/>
