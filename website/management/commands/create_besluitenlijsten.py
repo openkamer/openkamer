@@ -1,6 +1,8 @@
 import traceback
 import logging
 
+from pdfminer.pdfparser import PDFSyntaxError
+
 from django.core.management.base import BaseCommand
 
 import scraper.besluitenlijst
@@ -17,4 +19,7 @@ class Command(BaseCommand):
         for commissie in commissies:
             urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'])
             for url in urls:
-                create_besluitenlijst(url)
+                try:
+                    create_besluitenlijst(url)
+                except PDFSyntaxError as e:
+                    logger.error('failed to donwload and parse besluitenlijst with url: ' + url)
