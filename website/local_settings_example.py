@@ -30,6 +30,7 @@ MEDIA_URL = '/static/media/'
 # DOCUMENT
 DOSSIERS_PER_PAGE = 20
 VOTINGS_PER_PAGE = 25
+BESLUITENLIJSTEN_PER_PAGE = 200
 
 # PIWIK
 PIWIK_URL = ''  # optional, without trailing slash

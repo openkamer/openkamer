@@ -1,0 +1,90 @@
+{% extends "website/base.html" %}
+
+{% load bootstrap_pagination %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>{{ besluitenlijst.title }}</h3></div>
+    <h5>Gepubliceerd: {{ besluitenlijst.date_published }}</h5>
+    <h5>Voortouwcommissie: {{ besluitenlijst.commission }}</h5>
+    <h5>Activiteitnummer: {{ besluitenlijst.activity_id }}</h5>
+    <h5>Bron: <a href="{{ besluitenlijst.url }}">{{ besluitenlijst.url }}</a> [PDF]</h5>
+    <h5>
+      Behandelde dossiers:
+      {% for dossier_id in besluitenlijst.related_dossier_ids %}
+        {{ dossier_id }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </h5>
+    <hr/>
+  </div>
+</div>
+
+<div class="row">
+  {% for item in besluitenlijst.items %}
+  {% if item.cases %}
+  <div class="col-sm-12">
+    <div class="well" align="left">
+
+      <h4 align="center">{{ item.title }}</h4>
+
+      {% for case in item.cases %}
+      <div class="row">
+        <div class="col-sm-12">
+
+          <strong>Zaak:</strong> {{ case.title }}
+          <br/>
+          <br/>
+
+          {% for decision in case.decision_list %}
+          <div class="row">
+            <div class="col-sm-11 col-sm-offset-1">
+              <strong>Besluit:</strong> {{ decision }}
+            </div>
+          </div>
+          {% endfor %}
+
+          {% for note in case.note_list %}
+          <div class="row">
+            <div class="col-sm-11 col-sm-offset-1">
+              {% if note %}<strong>Noot:</strong> {{ note }} {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+
+          {% if case.related_document_ids %}
+          <div class="row">
+            <div class="col-sm-11 col-sm-offset-1">
+              <strong>Gerelateerde documenten:</strong>
+              {% for document_id in case.related_document_id_list %}
+                {{ document_id }}
+              {% if not forloop.last %},{% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+      {% if not forloop.last %}
+      <hr/>
+      {% endif %}
+      {% endfor %}
+
+    </div>
+  </div>
+
+  {% if forloop.counter|divisibleby:2 %}
+  <div class="clearfix"></div>
+  {% endif %}
+
+  {% endif %}
+  {% endfor %}
+</div>
+
+
+<hr/>
+
+{% endblock %}

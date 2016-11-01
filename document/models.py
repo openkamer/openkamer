@@ -28,6 +28,9 @@ class Dossier(models.Model):
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
 
+    def besluitenlijst_cases(self):
+        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id)
+
     def start_date(self):
         documents = Document.objects.filter(dossier=self).order_by('date_published')
         if documents.exists():
@@ -317,3 +320,59 @@ class VoteIndividual(Vote):
 
     def get_name(self):
         return str(self.parliament_member)
+
+
+class BesluitenLijst(models.Model):
+    title = models.CharField(max_length=300)
+    commission = models.CharField(max_length=50)
+    activity_id = models.CharField(max_length=100)
+    date_published = models.DateField()
+    url = models.URLField()
+
+    class Meta:
+        ordering = ['-date_published']
+
+    def items(self):
+        return BesluitItem.objects.filter(besluiten_lijst=self)
+
+    def cases_all(self):
+        return BesluitItemCase.objects.filter(besluit_item__in=self.items())
+
+    def related_dossier_ids(self):
+        dossier_ids = []
+        for case in self.cases_all():
+            document_ids = case.related_document_id_list()
+            for doc_id in document_ids:
+                if doc_id:
+                    dossier_ids.append(doc_id.split('-')[0])
+        return dossier_ids
+
+
+class BesluitItem(models.Model):
+    title = models.CharField(max_length=300)
+    besluiten_lijst = models.ForeignKey(BesluitenLijst)
+
+    def cases(self):
+        return BesluitItemCase.objects.filter(besluit_item=self)
+
+
+class BesluitItemCase(models.Model):
+    title = models.CharField(max_length=300)
+    besluit_item = models.ForeignKey(BesluitItem)
+    decisions = models.CharField(max_length=500)
+    notes = models.CharField(max_length=500)
+    related_commissions = models.CharField(max_length=500)
+    related_document_ids = models.CharField(max_length=300)
+    SEP_CHAR = '|'
+
+    def decision_list(self):
+        return self.decisions.split(self.SEP_CHAR)
+
+    def note_list(self):
+        return self.notes.split(self.SEP_CHAR)
+
+    def related_commission_list(self):
+        return self.related_commissions.split(self.SEP_CHAR)
+
+    def related_document_id_list(self):
+        return self.related_document_ids.split(self.SEP_CHAR)

@@ -1,5 +1,7 @@
 import json
 import datetime
+import re
+
 from django.test import TestCase
 
 from wikidata import wikidata
@@ -8,6 +10,7 @@ import scraper.documents
 import scraper.votings
 import scraper.government
 import scraper.persons
+import scraper.besluitenlijst
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -16,6 +19,66 @@ import scraper.persons
 # scraper.documents.get_document_id(page_url)
 
 # scraper.documents.search_politieknl_dossier(33885)
+
+
+class TestVoortouwCommissieScraper(TestCase):
+
+    def test_get_commissies(self):
+        commissions = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
+        self.assertTrue(len(commissions) >= 37)
+
+    def test_get_besluitenlijst_urls(self):
+        overview_url = 'https://www.tweedekamer.nl/kamerstukken/besluitenlijsten?qry=%2A&fld_tk_categorie=Kamerstukken&srt=date%3Adesc%3Adate&clusterName=Besluitenlijsten&Type=Kamerstukken&fld_prl_kamerstuk=Besluitenlijsten&nocache=&fld_prl_voortouwcommissie=Vaste+commissie+voor+binnenlandse+zaken'
+        urls = scraper.besluitenlijst.get_besluitenlijsten_urls(overview_url, max_results=10)
+        self.assertEqual(len(urls), 10)
+
+
+class TestBesluitenlijstScraper(TestCase):
+    filenames = [
+        # 'data/besluitenlijsten/besluitenlijst_example1.pdf',
+        # 'data/besluitenlijsten/besluitenlijst_example2.pdf',
+        # 'data/besluitenlijsten/besluitenlijst_example3.pdf',
+        'data/besluitenlijsten/besluitenlijst_example4.pdf',
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.texts = []
+        for filename in cls.filenames:
+            text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filename)
+            cls.texts.append(text)
+
+    def test_regex(self):
+        pattern = "\d{1,3}\.\s{0,}Agendapunt:"
+        text = 'BuZa6.Agendapunt:Stukken'
+        result = re.findall(pattern, text)
+        self.assertEqual(result[0], '6.Agendapunt:')
+        text = 'BuZa6.  Agendapunt:Stukken'
+        result = re.findall(pattern, text)
+        self.assertEqual(result[0], '6.  Agendapunt:')
+
+    def test_find_agendapunten(self):
+        for text in self.texts:
+            items = scraper.besluitenlijst.find_agendapunten(text)
+            self.assertTrue(len(items) > 0)
+
+    def test_create_besluitenlijst(self):
+        for text in self.texts:
+            lijst = scraper.besluitenlijst.create_besluitenlijst(text)
+
+    def test_find_cases(self):
+        for text in self.texts:
+            cases = scraper.besluitenlijst.find_cases(text)
+
+    def test_find_case_decisions(self):
+        for text in self.texts:
+            punten = scraper.besluitenlijst.find_agendapunten(text)
+            cases = scraper.besluitenlijst.find_cases(text)
+            decisions = scraper.besluitenlijst.find_decisions(text)
+
+    def test_create_besluit_items(self):
+        for text in self.texts:
+            items = scraper.besluitenlijst.create_besluit_items(text)
 
 
 class TestPersonInfoScraper(TestCase):

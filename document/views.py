@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect
 
+from document.models import BesluitenLijst
 from document.models import Document, Dossier, Kamerstuk
 from document.models import Agenda, AgendaItem
 from document.models import Document, Dossier
@@ -64,12 +65,59 @@ class DossierView(TemplateView):
         return context
 
 
+class TimelineItem(object):
+    def __init__(self, obj):
+        self.obj = obj
+
+    @staticmethod
+    def template_name():
+        raise NotImplementedError
+
+    @property
+    def date(self):
+        raise NotImplementedError
+
+
+class TimelineKamerstukItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_kamerstuk.html'
+
+    @property
+    def date(self):
+        return self.obj.document.date_published
+
+
+class TimelineBesluitItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_besluit.html'
+
+    @property
+    def date(self):
+        return self.obj.besluit_item.besluiten_lijst.date_published
+
+
 class DossierTimelineView(TemplateView):
     template_name = 'document/dossier_timeline.html'
 
     def get_context_data(self, dossier_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
+        dossier = Dossier.objects.get(dossier_id=dossier_id)
+        context['dossier'] = dossier
+        timeline_items = []
+        for kamerstuk in dossier.kamerstukken():
+            timeline_items.append(TimelineKamerstukItem(kamerstuk))
+        for case in dossier.besluitenlijst_cases():
+            timeline_items.append(TimelineBesluitItem(case))
+        timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
+        context['timeline_items'] = timeline_items
         return context
 
 
@@ -140,4 +188,30 @@ class VotingsView(TemplateView):
         except EmptyPage:
             votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
+        return context
+
+
+class BesluitenLijstenView(TemplateView):
+    template_name = 'document/besluitenlijsten.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(BesluitenLijst.objects.all(), settings.BESLUITENLIJSTEN_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            besluitenlijsten = paginator.page(page)
+        except PageNotAnInteger:
+            besluitenlijsten = paginator.page(1)
+        except EmptyPage:
+            besluitenlijsten = paginator.page(paginator.num_pages)
+        context['besluitenlijsten'] = besluitenlijsten
+        return context
+
+
+class BesluitenLijstView(TemplateView):
+    template_name = 'document/besluitenlijst.html'
+
+    def get_context_data(self, activity_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['besluitenlijst'] = BesluitenLijst.objects.get(activity_id=activity_id)
         return context

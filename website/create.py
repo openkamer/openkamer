@@ -1,7 +1,12 @@
 import logging
+import os
 import re
-import traceback
+import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
+import traceback
+import uuid
+
+from pdfminer.pdfparser import PDFSyntaxError
 
 from django.db import transaction
 
@@ -22,6 +27,9 @@ from parliament.util import parse_name_surname_initials
 
 from document.models import Agenda
 from document.models import AgendaItem
+from document.models import BesluitenLijst
+from document.models import BesluitItem
+from document.models import BesluitItemCase
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -31,10 +39,11 @@ from document.models import Vote
 from document.models import VoteParty
 from document.models import VoteIndividual
 
-import scraper.government
+import scraper.besluitenlijst
 import scraper.documents
-import scraper.votings
+import scraper.government
 import scraper.persons
+import scraper.votings
 
 logger = logging.getLogger(__name__)
 
@@ -430,3 +439,58 @@ def get_decision(decision_string):
     elif 'mistake' in decision_string:
         return Vote.MISTAKE
     return None
+
+
+def create_besluitenlijsten(max_results_per_commission=None):
+    BesluitenLijst.objects.all().delete()
+    commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
+    for commissie in commissies:
+        urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
+        for url in urls:
+            try:
+                create_besluitenlijst(url)
+            except PDFSyntaxError as e:
+                logger.error('failed to download and parse besluitenlijst with url: ' + url)
+            except TypeError as e:
+                # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
+                logger.error(traceback.format_exc())
+                logger.error('error while converting besluitenlijst pdf to text')
+
+
+@transaction.atomic
+def create_besluitenlijst(url):
+    logger.info('BEGIN')
+    logger.info('url: ' + url)
+    filename = uuid.uuid4().hex + '.pdf'
+    filepath = 'data/tmp/' + filename
+    with open(filepath, 'wb') as pdffile:
+        response = requests.get(url)
+        response.raise_for_status()
+        pdffile.write(response.content)
+    text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filepath)
+    os.remove(filepath)
+    bl = scraper.besluitenlijst.create_besluitenlijst(text)
+    besluiten_lijst = BesluitenLijst.objects.create(
+        title=bl.title,
+        commission=bl.voortouwcommissie,
+        activity_id=bl.activiteitnummer,
+        date_published=bl.date_published,
+        url=url
+    )
+
+    for item in bl.items:
+        besluit_item = BesluitItem.objects.create(
+            title=item.title,
+            besluiten_lijst=besluiten_lijst
+        )
+        for case in item.cases:
+            BesluitItemCase.objects.create(
+                title=case.title,
+                besluit_item = besluit_item,
+                decisions=case.create_str_list(case.decisions, BesluitItemCase.SEP_CHAR),
+                notes=case.create_str_list(case.notes, BesluitItemCase.SEP_CHAR),
+                related_commissions=case.create_str_list(case.volgcommissies, BesluitItemCase.SEP_CHAR),
+                related_document_ids=case.create_str_list(case.related_document_ids, BesluitItemCase.SEP_CHAR),
+            )
+    logger.info('END')
+    return besluiten_lijst

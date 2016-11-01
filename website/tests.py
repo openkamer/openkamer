@@ -22,6 +22,7 @@ from document.models import Voting
 from website.create import create_or_update_dossier
 from website.create import find_original_kamerstuk_id
 from website.create import create_government
+from website.create import create_besluitenlijst
 
 
 class TestCreateParliament(TestCase):
@@ -68,6 +69,33 @@ class TestCreateGovernment(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/api/governmentposition/')
         self.assertEqual(response.status_code, 200)
+
+
+class TestCreateBesluitenLijst(TestCase):
+    urls = [
+        'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=a1473f2c-79b1-47dd-b82c-7d7cd628e395&title=Besluitenlijst%20procedurevergadering%20Rijksuitgaven%20-%205%20juni%202014.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=57fad866-5252-492f-9974-0ef396ba9080&title=Procedurevergadering%20RU%20-%2011%20oktober%202012%20VINDT%20GEEN%20DOORGANG.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=a1342689-a7e4-4b17-a058-439005b22991&title=Herziene%20besluitenlijst%20e-mailprocedure%20BIZA%20-%2030%20mei%202016%20.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=39d1fda2-24ce-4b11-b979-ce9b3b0ae7cf&title=Besluitenlijst%20procedurevergadering%20Buza%2017%20mrt.pdf',
+        'https://www.tweedekamer.nl/downloads/document?id=8f30f5b6-eadc-4d9f-8ef4-59feed7d62f5&title=Besluitenlijst%20extra%20procedurevergadering%208%2F3%2F2011%20Buza%2FDef%20.pdf',
+        # 'https://www.tweedekamer.nl/downloads/document?id=61a2686e-ec4a-4881-892b-04e215462ecd&title=Besluitenlijst%20extra%20procedurevergadering%20IM%20d.d.%207%20juni%202011.pdf',  # gives a TypeError, may be corrupt pdf or pdfminer bug
+    ]
+
+    def test_create_besluitenlijst_from_url(self):
+        for url in self.urls:
+            besluitenlijst = create_besluitenlijst(url)
+            self.assertFalse(besluitenlijst.title == '')
+            items = besluitenlijst.items()
+            for item in items:
+                self.assertFalse('Zaak:' in item.title)
+                self.assertFalse('Besluit:' in item.title)
+                self.assertFalse('Document:' in item.title)
+                self.assertFalse('Noot:' in item.title)
+                for case in item.cases():
+                    self.assertFalse('Besluit:' in case.title)
+                    self.assertFalse('Noot:' in case.title)
+            dossier_ids = besluitenlijst.related_dossier_ids()
 
 
 class TestFindParliamentMembers(TestCase):

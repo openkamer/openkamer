@@ -5,8 +5,9 @@ import scraper.parliament_members
 import scraper.government
 
 from person.models import Person
-from website.create import create_or_update_dossier
+from website.create import create_besluitenlijsten
 from website.create import create_governments
+from website.create import create_or_update_dossier
 
 
 class Command(BaseCommand):
@@ -21,3 +22,6 @@ class Command(BaseCommand):
         create_or_update_dossier('33885')
         create_or_update_dossier('34344')
         create_or_update_dossier('33506')
+
+        create_besluitenlijsten(max_results_per_commission=20)
+
