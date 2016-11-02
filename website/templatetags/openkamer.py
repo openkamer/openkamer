@@ -29,8 +29,9 @@ def get_kamerstuk_icon_name(kamerstuk_id):
     elif kamerstuk.type() == Kamerstuk.VERSLAG:
         return 'fa-comments'
     elif kamerstuk.type() == Kamerstuk.NOTA:
-        # return 'fa-sticky-note'
-        return 'fa-bullhorn'
+        return 'fa-file'
+    elif kamerstuk.type() == Kamerstuk.BRIEF:
+        return 'fa-envelope'
     return 'fa-file-text'
 
 

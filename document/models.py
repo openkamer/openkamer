@@ -119,6 +119,7 @@ class Kamerstuk(models.Model):
     WETSVOORSTEL = 'Wetsvoorstel'
     VERSLAG = 'Verslag'
     NOTA = 'Nota'
+    BRIEF = 'Brief'
 
     def __str__(self):
         return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
@@ -134,6 +135,8 @@ class Kamerstuk(models.Model):
             return Kamerstuk.WETSVOORSTEL
         elif 'verslag' in self.type_short.lower():
             return Kamerstuk.VERSLAG
+        elif 'brief' in self.type_short.lower():
+            return Kamerstuk.BRIEF
         return None
 
     def id_full(self):
