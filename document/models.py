@@ -178,7 +178,7 @@ class Kamerstuk(models.Model):
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'
-        ordering = ['document__date_published', 'id_sub',]
+        ordering = ['-document__date_published', '-id_sub',]
 
 
 class Agenda(models.Model):
