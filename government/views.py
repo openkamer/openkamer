@@ -22,6 +22,7 @@ class GovernmentView(TemplateView):
     def get_context_data(self, slug, **kwargs):
         context = super().get_context_data(**kwargs)
         context['government'] = Government.objects.get(slug=slug)
+        context['governments'] = Government.objects.all()
         return context
 
 
@@ -38,4 +39,5 @@ class GovernmentCurrentView(TemplateView):
         else:
             government = None
         context['government'] = government
+        context['governments'] = Government.objects.all()
         return context

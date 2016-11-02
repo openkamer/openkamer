@@ -7,7 +7,15 @@
 <div class="subnav subnav-default subnav-fixed-top">
   <div class="container">
     <ul class="nav navbar-nav">
-      <li><a href="{% url 'governments' %}">historische kabinetten</a></li>
+      {% for gov in governments %}
+      {% if gov == government %}
+      <li class="active">
+      {% else %}
+      <li>
+      {% endif %}
+        <a href="{% url 'government' gov.slug %}">{{ gov.name }}</a>
+      </li>
+      {% endfor %}
     </ul>
   </div>
 </div>
