@@ -440,18 +440,23 @@ def get_decision(decision_string):
 
 
 def create_besluitenlijsten(max_results_per_commission=None):
+    logger.info('BEGIN')
+    besluiten_lijsten = []
     commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
     for commissie in commissies:
         urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
         for url in urls:
             try:
-                create_besluitenlijst(url)
+                besluiten_lijst = create_besluitenlijst(url)
+                besluiten_lijsten.append(besluiten_lijst)
             except PDFSyntaxError as e:
                 logger.error('failed to download and parse besluitenlijst with url: ' + url)
             except TypeError as e:
                 # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
                 logger.error(traceback.format_exc())
                 logger.error('error while converting besluitenlijst pdf to text')
+    logger.info('END')
+    return besluiten_lijsten
 
 
 @transaction.atomic
