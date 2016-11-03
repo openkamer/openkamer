@@ -1,7 +1,9 @@
-sudo: false
+sudo: true
 language: python
 python:
 - '3.5'
+before install:
+- sudo apt-get update && sudo apt-get --reinstall install -qq language-pack-en language-pack-nl
 install:
 - pip install -r requirements.txt
 - pip install coveralls
