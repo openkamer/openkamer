@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 from person.views import PersonsView, PersonView
 from document.views import BesluitenLijstView, BesluitenLijstenView
@@ -60,4 +61,6 @@ urlpatterns = [
 
     url(r'^stats/exampleplots/', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
+
+    url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
 ]
