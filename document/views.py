@@ -160,7 +160,7 @@ class AddDossierView(TemplateView):
             dossier = dossiers[0]
         else:
             dossier = create_or_update_dossier(self.kwargs['dossier_id'])
-        return redirect(reverse('dossier', args=(dossier.dossier_id)))
+        return redirect(reverse('dossier-timeline', args=(dossier.dossier_id,)))
         # return HttpResponseRedirect()
 
 

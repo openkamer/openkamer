@@ -195,7 +195,7 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
     Dossier.objects.filter(dossier_id=dossier_id).delete()
-    dossier = Dossier.objects.create(dossier_id=dossier_id)
+    dossier_new = Dossier.objects.create(dossier_id=dossier_id)
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
         # skip eerste kamer documents, first focus on the tweede kamer
@@ -224,6 +224,18 @@ def create_or_update_dossier(dossier_id):
         if 'submitter' not in metadata:
             metadata['submitter'] = 'undefined'
 
+        if 'dossier_id' in metadata:
+            main_dossier_id = metadata['dossier_id'].split(';')[0].strip()
+            if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
+                dossier, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
+            else:
+                dossier = dossier_new
+
+        documents = Document.objects.filter(document_id=document_id)
+        if documents.exists():
+            logger.warning('document with id: ' + document_id + ' already exists, skip creating document.')
+            continue
+
         document = Document.objects.create(
             dossier=dossier,
             document_id=document_id,
@@ -241,14 +253,14 @@ def create_or_update_dossier(dossier_id):
             create_submitter(document, submitter)
 
         if metadata['is_kamerstuk']:
-            create_kamerstuk(document, dossier_id, metadata, result)
+            create_kamerstuk(document, dossier.dossier_id, metadata, result)
 
         if metadata['is_agenda']:
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
     logger.info('END - dossier id: ' + str(dossier_id))
-    return dossier
+    return dossier_new
 
 
 @transaction.atomic
