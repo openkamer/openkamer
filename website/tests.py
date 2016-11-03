@@ -272,7 +272,7 @@ class TestWebsite(TestCase):
     def test_besluitenlijst_view(self):
         lijsten = BesluitenLijst.objects.all()
         for lijst in lijsten:
-            response = self.client.get(reverse('besluitenlijst', params=(lijst.activity_id)))
+            response = self.client.get(reverse('besluitenlijst', args=(lijst.activity_id,)))
             self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):
