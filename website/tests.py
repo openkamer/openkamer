@@ -19,10 +19,11 @@ from document.models import Document
 from document.models import Kamerstuk
 from document.models import Voting
 
-from website.create import create_or_update_dossier
-from website.create import find_original_kamerstuk_id
-from website.create import create_government
 from website.create import create_besluitenlijst
+from website.create import create_besluitenlijsten
+from website.create import create_government
+from website.create import create_dossier_retry_on_error
+from website.create import find_original_kamerstuk_id
 
 
 class TestCreateParliament(TestCase):
@@ -180,8 +181,9 @@ class TestWebsite(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        create_or_update_dossier(33885)
-        create_or_update_dossier(33506)
+        create_dossier_retry_on_error(33885)
+        create_dossier_retry_on_error(33506)
+        create_besluitenlijsten(max_results_per_commission=5)
         cls.client = Client()
 
     def test_homepage(self):
