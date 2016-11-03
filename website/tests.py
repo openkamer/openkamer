@@ -14,6 +14,7 @@ from parliament.models import PartyMember
 from parliament.models import PoliticalParty
 
 from document.models import Agenda
+from document.models import BesluitenLijst
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
@@ -234,6 +235,10 @@ class TestWebsite(TestCase):
             response = self.client.get(reverse('kamerstuk', args=(kamerstuk.id_main, kamerstuk.id_sub,)))
             self.assertEqual(response.status_code, 200)
 
+    def test_agendas_view(self):
+        response = self.client.get('/agendas/')
+        self.assertEqual(response.status_code, 200)
+
     def test_agenda_view(self):
         agendas = Agenda.objects.all()
         for agenda in agendas:
@@ -258,6 +263,16 @@ class TestWebsite(TestCase):
         parties = PoliticalParty.objects.all()
         for party in parties:
             response = self.client.get(reverse('party', args=(party.slug,)))
+            self.assertEqual(response.status_code, 200)
+
+    def test_besluitenlijsten_view(self):
+        response = self.client.get(reverse('besluitenlijsten'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_besluitenlijst_view(self):
+        lijsten = BesluitenLijst.objects.all()
+        for lijst in lijsten:
+            response = self.client.get(reverse('besluitenlijst', params=(lijst.activity_id)))
             self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):
