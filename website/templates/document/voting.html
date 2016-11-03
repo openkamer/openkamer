@@ -1,5 +1,8 @@
 {% extends "website/base.html" %}
 
+{% block title %}Stemming - {% if voting.kamerstuk %}{{ voting.kamerstuk.type_long }}{% else %}{{ voting.dossier.title }}{% endif %} - Dossier {{ voting.dossier.dossier_id }} {{ block.super }}{% endblock %}
+
+
 {% block content %}
 
 <div class="row">

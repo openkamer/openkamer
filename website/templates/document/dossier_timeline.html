@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}Tijdlijn wetsvoorstel {{ dossier.dossier_id }} - {{ dossier.title }} {{ block.super }}{% endblock %}
+
 {% load staticfiles %}
 {% load openkamer %}
 

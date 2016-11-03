@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}Besluitenlijst - {{ besluitenlijst.commission }} - {{ besluitenlijst.title }} - Tweede Kamer {{ block.super }}{% endblock %}
+
 {% load bootstrap_pagination %}
 
 {% block content %}

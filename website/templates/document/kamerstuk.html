@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}Kamerstuk {{ kamerstuk.id_full }} - {{ kamerstuk.type_long }} - {{ kamerstuk.document.date_published }} {{ block.super }}{% endblock %}
+
 {% block content %}
 
 <div class="row">

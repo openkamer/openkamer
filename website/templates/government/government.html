@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}{{ government.name }} ({{ government.date_formed|date:"Y" }}-{% if government.date_dissolved %}{{ government.date_dissolved|date:"Y" }}{% else %}heden{% endif %}) - Ministers, Staatssecretarissen en Ministeries {{ block.super }}{% endblock %}
+
 {% load openkamer %}
 
 {% block content %}

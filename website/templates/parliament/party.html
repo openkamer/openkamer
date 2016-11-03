@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}{{ party.name_short }} - {{ party.name }} {{ block.super }}{% endblock %}
+
 {% block content %}
 
 <div class="row" align="center">

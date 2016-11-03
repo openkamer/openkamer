@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% block title %}Dossier {{ dossier.dossier_id }} - {{ dossier.title }} - Tweede Kamer {{ block.super }}{% endblock %}
+
 {% block content %}
 
 <div class="row">
