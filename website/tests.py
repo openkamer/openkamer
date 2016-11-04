@@ -184,7 +184,7 @@ class TestWebsite(TestCase):
     def setUpTestData(cls):
         create_dossier_retry_on_error(33885)
         create_dossier_retry_on_error(33506)
-        create_besluitenlijsten(max_results_per_commission=5)
+        create_besluitenlijsten(max_commissions=3, max_results_per_commission=5)
         cls.client = Client()
 
     def test_homepage(self):
