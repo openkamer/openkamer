@@ -1,7 +1,19 @@
 from rest_framework import serializers, viewsets
 
-from document.models import Document, Kamerstuk, Dossier, Submitter
+from document.models import Category, Document, Kamerstuk, Dossier, Submitter
 from document.models import Voting, VoteParty, VoteIndividual
+
+
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name',)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class DossierSerializer(serializers.HyperlinkedModelSerializer):

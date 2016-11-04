@@ -5,7 +5,7 @@ from person.api import PersonViewSet
 from government.api import GovernmentViewSet, MinistryViewSet, GovernmentPositionViewSet, GovernmentMemberViewSet
 from parliament.api import ParliamentViewSet, ParliamentMemberViewSet
 from parliament.api import PoliticalPartyViewSet, PartyMemberViewSet
-from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet, SubmitterViewSet
+from document.api import CategoryViewSet, DocumentViewSet, KamerstukViewSet, DossierViewSet, SubmitterViewSet
 from document.api import VotingViewSet, VotePartyViewSet, VoteIndividualViewSet
 
 router = routers.DefaultRouter()
@@ -22,6 +22,7 @@ router.register(r'ministry', MinistryViewSet)
 router.register(r'governmentposition', GovernmentPositionViewSet)
 router.register(r'governmentmember', GovernmentMemberViewSet)
 
+router.register(r'category', CategoryViewSet)
 router.register(r'document', DocumentViewSet)
 router.register(r'kamerstuk', KamerstukViewSet)
 router.register(r'submitter', SubmitterViewSet)
