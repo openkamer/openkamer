@@ -2,6 +2,7 @@ import logging
 
 from itertools import chain
 from django.db import models
+from django.utils.text import slugify
 
 from person.models import Person
 
@@ -15,6 +16,14 @@ logger = logging.getLogger(__name__)
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, default='')
+
+    class Meta:
+        ordering = ['name']
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class Dossier(models.Model):
