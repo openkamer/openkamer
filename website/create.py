@@ -451,7 +451,7 @@ def get_decision(decision_string):
     return None
 
 
-def create_besluitenlijsten(max_results_per_commission=None):
+def create_besluitenlijsten(max_commissions=None, max_results_per_commission=None):
     logger.info('BEGIN')
     besluiten_lijsten = []
     commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
@@ -467,6 +467,8 @@ def create_besluitenlijsten(max_results_per_commission=None):
                 # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
                 logger.error(traceback.format_exc())
                 logger.error('error while converting besluitenlijst pdf to text')
+        if max_commissions and max_commissions >= len(besluiten_lijsten):
+            break
     logger.info('END')
     return besluiten_lijsten
 
