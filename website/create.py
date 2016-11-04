@@ -227,6 +227,7 @@ def create_or_update_dossier(dossier_id):
 
         if 'dossier_id' in metadata:
             main_dossier_id = metadata['dossier_id'].split(';')[0].strip()
+            main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
             if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
                 dossier, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
             else:
