@@ -12,6 +12,14 @@ from document.models import VoteIndividual
 from document.models import Voting
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'slug'
+    )
+
+
 class DocumentAdmin(admin.ModelAdmin):
     list_display = (
         'id',
@@ -72,7 +80,7 @@ class VoteIndividualAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
 
 
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)

@@ -28,6 +28,7 @@ class Category(models.Model):
 
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
+    categories = models.ManyToManyField(Category, blank=True)
 
     class Meta:
         ordering = ['-dossier_id']

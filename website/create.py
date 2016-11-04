@@ -248,7 +248,9 @@ def create_or_update_dossier(dossier_id):
             date_published=date_published,
             content_html=content_html,
         )
-        document.categories.add(*get_categories(text=metadata['category'], sep_char='|'))
+        category_list = get_categories(text=metadata['category'], sep_char='|')
+        document.categories.add(*category_list)
+        dossier.categories.add(*category_list)
 
         submitters = metadata['submitter'].split('|')
         for submitter in submitters:
@@ -265,12 +267,15 @@ def create_or_update_dossier(dossier_id):
     return dossier_new
 
 
+@transaction.atomic
 def get_categories(text, sep_char='|'):
     category_list = text.split(sep_char)
     categories = []
     for category_name in category_list:
-        category, created = Category.objects.get_or_create(name=category_name.lower().strip())
-        categories.append(category)
+        name = category_name.lower().strip()
+        if name:
+            category, created = Category.objects.get_or_create(name=category_name.lower().strip())
+            categories.append(category)
     return categories
 
 

@@ -27,7 +27,7 @@ class DossierSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Dossier
-        fields = ('id', 'dossier_id', 'title', 'kamerstukken', 'documents')
+        fields = ('id', 'dossier_id', 'categories', 'title', 'kamerstukken', 'documents')
 
 
 class DossierViewSet(viewsets.ModelViewSet):
