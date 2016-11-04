@@ -82,3 +82,12 @@ def get_voting_result_icon(voting_id):
     elif voting.result == Voting.AANGEHOUDEN:
         return 'fa-pause'
     return 'fa-spinner'
+
+
+@register.assignment_tag
+def get_extra_category_button_class(category_slug, active_category_slug):
+    if category_slug == active_category_slug:
+        return 'active'
+    elif category_slug.lower() == 'all' and active_category_slug == '':
+        return 'active'
+    return ''

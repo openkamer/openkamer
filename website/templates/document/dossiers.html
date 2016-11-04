@@ -1,10 +1,13 @@
 {% extends "website/base.html" %}
 
+{% load openkamer %}
+
 {% block title %}Wetsvoorstellen - Tweede Kamer {{ block.super }}{% endblock %}
 
 {% load bootstrap_pagination %}
 
 {% block content %}
+
 
 <div class="row">
   <div class="col-lg-12">
@@ -12,6 +15,41 @@
     <hr/>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-lg-12">
+  <h5>Filters (verfijn resultaten)</h5>
+  <h6>Onderwerp</h6>
+  </div>
+  <div class="col-lg-12 hidden-xs">
+    <a href="{% url 'dossiers' %}" class="btn btn-xs btn-default {% get_extra_category_button_class 'all' category_name %}" role="button">alle</a>
+    {% for category in categories %}
+      <a href="?category={{ category.slug }}" class="btn btn-xs btn-default {% get_extra_category_button_class category.slug category_name %}" role="button">{{ category.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="col-lg-12 visible-xs">
+    <div class="btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {% if category_name %}
+          {{ category_name }}
+        {% else %}
+          alle
+        {% endif %}
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        {% for category in categories %}
+        <li><a href="?category={{ category.slug }}">{{ category.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+
+<hr/>
 
 <div class="row">
   {% for dossier in dossiers %}

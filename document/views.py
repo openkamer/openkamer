@@ -8,10 +8,11 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.shortcuts import redirect
 
-from document.models import BesluitenLijst
-from document.models import Document, Dossier, Kamerstuk
 from document.models import Agenda, AgendaItem
-from document.models import Document, Dossier
+from document.models import BesluitenLijst
+from document.models import CategoryDossier
+from document.models import Document, Kamerstuk
+from document.models import Dossier
 from document.models import Voting
 from document import settings
 
@@ -44,7 +45,13 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Dossier.objects.all(), settings.DOSSIERS_PER_PAGE)
+        category_name = ''
+        if 'category' in self.request.GET:
+            category_name = self.request.GET['category']
+            dossiers = Dossier.objects.filter(categories__slug=category_name)
+        else:
+            dossiers = Dossier.objects.all()
+        paginator = Paginator(dossiers, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             dossiers = paginator.page(page)
@@ -53,6 +60,8 @@ class DossiersView(TemplateView):
         except EmptyPage:
             dossiers = paginator.page(paginator.num_pages)
         context['dossiers'] = dossiers
+        context['categories'] = CategoryDossier.objects.all()
+        context['category_name'] = category_name
         return context
 
 
