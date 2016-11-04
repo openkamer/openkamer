@@ -99,14 +99,11 @@ class TestGovernmentScraper(TestCase):
 
     def test(self):
         government = scraper.government.get_government(self.rutte_2_wikidata_id)
-        print(government)
         self.assertEqual(government['name'], 'Kabinet-Rutte II')
         self.assertEqual(government['start_date'], datetime.date(2012, 11, 5))
 
     def test_get_members(self):
         members = scraper.government.get_government_members(self.rutte_2_wikidata_id)
-        for member in members:
-            print(member)
 
     def test_get_parlement_and_politiek_id(self):
         person_wikidata_id = 'Q32681'
@@ -120,7 +117,7 @@ class TestWetsvoorstellenDossierScraper(TestCase):
 
     def test_get_initiatief_wetsvoorstellen_dossier_ids(self):
         dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
-        print('initiatief wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
+        # print('initiatief wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
         # with open('data/dossier_ids_wetsvoorstellen_initiatief.txt', 'w') as fileout:
         #     for dossier_id in dossier_ids:
         #         fileout.write(dossier_id + '\n')
@@ -128,7 +125,7 @@ class TestWetsvoorstellenDossierScraper(TestCase):
 
     def test_get_regering_wetsvoorstellen_dossier_ids(self):
         dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
-        print('regering wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
+        # print('regering wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
         # with open('data/dossier_ids_wetsvoorstellen_regering.txt', 'w') as fileout:
         #     for dossier_id in dossier_ids:
         #         fileout.write(dossier_id + '\n')

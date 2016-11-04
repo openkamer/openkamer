@@ -25,6 +25,7 @@ def get_dossier_ids_wetsvoorstellen_regering(max_results=None):
 
 
 def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
+    logger.info('BEGIN')
     url = 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen'
     # these parameters cannot be percent encoded, and can thus not be part of the params variable
     url += '?clusterName=' + subsubcategorie + '&fld_tk_subsubcategorie=' + subsubcategorie
@@ -40,21 +41,19 @@ def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
     new_dossiers_found = True
     start = 1
     while new_dossiers_found:
-        print('start at: ' + str(start))
         params['sta'] = str(start)
         page = requests.get(url, params)
-        print(page.request.url)
-        # print(page.content)
         tree = lxml.html.fromstring(page.content)
         elements = tree.xpath('//div[@class="search-result-properties"]/p')
         new_dossiers_found = len(elements) != 0
         for element in elements:
             if 'class' not in element.attrib:
-                print(element.text.split('-')[0])
                 dossier_ids.append(element.text.split('-')[0])  # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
                 start += 1
                 if max_results and len(dossier_ids) >= max_results:
+                    logger.info('END: max results reached')
                     return dossier_ids
+    logger.info('END')
     return dossier_ids
 
 

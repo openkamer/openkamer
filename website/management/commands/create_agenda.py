@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from document.models import create_or_update_agenda
+from website.create import create_or_update_agenda
 
 
 class Command(BaseCommand):
@@ -19,6 +19,3 @@ class Command(BaseCommand):
             raise NameError("please format date as yyyy-mm-dd")
             
         create_or_update_agenda("ag-tk-"+agenda_date)
-        
-
-
