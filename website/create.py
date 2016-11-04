@@ -30,6 +30,7 @@ from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import BesluitItem
 from document.models import BesluitItemCase
+from document.models import Category
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -242,11 +243,11 @@ def create_or_update_dossier(dossier_id):
             title_full=metadata['title_full'],
             title_short=metadata['title_short'],
             publication_type=metadata['publication_type'],
-            category=metadata['category'],
             publisher=metadata['publisher'],
             date_published=date_published,
             content_html=content_html,
         )
+        document.categories.add(*get_categories(text=metadata['category'], sep_char='|'))
 
         submitters = metadata['submitter'].split('|')
         for submitter in submitters:
@@ -261,6 +262,15 @@ def create_or_update_dossier(dossier_id):
     create_votings(dossier_id)
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
+
+
+def get_categories(text, sep_char='|'):
+    category_list = text.split(sep_char)
+    categories = []
+    for category_name in category_list:
+        category, created = Category.objects.get_or_create(name=category_name.lower().strip())
+        categories.append(category)
+    return categories
 
 
 @transaction.atomic

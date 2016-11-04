@@ -6,5 +6,5 @@
     {% include "document/items/submitters_list.html" %}
   {% endwith %}
 </h5>
-<h5>Categorie: {{ document.category }}</h5>
+<h5>Categorieën: {% with categories=document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
 <h5>Bron: <a href="{{ document.document_url }}">{{ document.document_url }}</a></h5>

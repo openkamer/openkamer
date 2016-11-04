@@ -13,6 +13,10 @@ from government.models import GovernmentMember
 logger = logging.getLogger(__name__)
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=200)
+
+
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
 
@@ -69,7 +73,7 @@ class Document(models.Model):
     title_full = models.CharField(max_length=500)
     title_short = models.CharField(max_length=200)
     publication_type = models.CharField(max_length=200, blank=True)
-    category = models.CharField(max_length=200, blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True)
     content_html = models.CharField(max_length=200000, blank=True)

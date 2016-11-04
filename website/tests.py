@@ -20,11 +20,7 @@ from document.models import Document
 from document.models import Kamerstuk
 from document.models import Voting
 
-from website.create import create_besluitenlijst
-from website.create import create_besluitenlijsten
-from website.create import create_government
-from website.create import create_dossier_retry_on_error
-from website.create import find_original_kamerstuk_id
+import website.create
 
 
 class TestCreateParliament(TestCase):
@@ -40,7 +36,7 @@ class TestCreateGovernment(TestCase):
     @classmethod
     def setUpTestData(cls):
         rutte_2_wikidata_id = 'Q1638648'
-        government = create_government(rutte_2_wikidata_id, max_members=4)
+        government = website.create.create_government(rutte_2_wikidata_id, max_members=4)
 
     def test_government_data(self):
         government = Government.objects.all()[0]
@@ -86,7 +82,7 @@ class TestCreateBesluitenLijst(TestCase):
 
     def test_create_besluitenlijst_from_url(self):
         for url in self.urls:
-            besluitenlijst = create_besluitenlijst(url)
+            besluitenlijst = website.create.create_besluitenlijst(url)
             self.assertFalse(besluitenlijst.title == '')
             items = besluitenlijst.items()
             for item in items:
@@ -137,25 +133,25 @@ class TestFindOriginalKamerstukId(TestCase):
     def test_find_original_motie(self):
         expected_result = '33885-18'
         title = 'Gewijzigde motie van het lid Segers c.s. (t.v.v. 33885, nr.18) over de bevoegdheden van de Koninklijke Marechaussee'
-        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        original_id = website.create.find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
     def test_find_original_amendement(self):
         title = 'Gewijzigd amendement van het lid Oskam ter vervanging van nr. 9 waarmee een verbod op illegaal pooierschap in het wetboek van strafrecht wordt geintroduceerd'
         expected_result = '33885-9'
-        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        original_id = website.create.find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
     def test_find_original_voorstel_van_wet(self):
         title = 'Wijziging van de Wet regulering prostitutie en bestrijding misstanden seksbranche; Gewijzigd voorstel van wet '
         expected_result = '33885-voorstel_van_wet'
-        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        original_id = website.create.find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
     def test_find_original_none(self):
         title = 'Motie van de leden Volp en Kooiman over monitoring van het nulbeleid'
         expected_result = ''
-        original_id = find_original_kamerstuk_id(self.dossier_id, title)
+        original_id = website.create.find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
 
@@ -182,9 +178,9 @@ class TestWebsite(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        create_dossier_retry_on_error(33885)
-        create_dossier_retry_on_error(33506)
-        create_besluitenlijsten(max_commissions=3, max_results_per_commission=5)
+        website.create.create_dossier_retry_on_error(33885)
+        website.create.create_dossier_retry_on_error(33506)
+        website.create.create_besluitenlijsten(max_commissions=3, max_results_per_commission=5)
         cls.client = Client()
 
     def test_homepage(self):
@@ -334,3 +330,26 @@ class TestWebsite(TestCase):
     def test_api_voteindividual(self):
         response = self.client.get('/api/voteindividual/')
         self.assertEqual(response.status_code, 200)
+
+
+class TestCategory(TestCase):
+
+    def test_create_from_string(self):
+        text = 'Zorg en gezondheid | Ziekten en behandelingen'
+        expected_names = [
+            'zorg en gezondheid',
+            'ziekten en behandelingen',
+        ]
+        categories = website.create.get_categories(text)
+        self.assertEqual(len(categories), 2)
+        for index, category in enumerate(categories):
+            self.assertEqual(expected_names[index], category.name)
+        text = '  Zorg en Gezondheid|  Ziekten en Behandelingen'
+        expected_names = [
+            'zorg en gezondheid',
+            'ziekten en behandelingen',
+        ]
+        categories = website.create.get_categories(text)
+        self.assertEqual(len(categories), 2)
+        for index, category in enumerate(categories):
+            self.assertEqual(expected_names[index], category.name)

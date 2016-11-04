@@ -4,6 +4,6 @@
     {% include "document/items/submitters_list.html" %}
   {% endwith %}
 </h5>
-<h5>Categorie: {{ kamerstuk.document.category }}</h5>
+<h5>Categorieën: {% with categories=kamerstuk.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
 <h5>Bron: <a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.document.document_url }}</a></h5>
 <h5>ID: {{ kamerstuk.id_full }}</h5>
