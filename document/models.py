@@ -20,15 +20,34 @@ class Category(models.Model):
 
     class Meta:
         ordering = ['name']
+        abstract = True
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
 
+class CategoryDossier(Category):
+    def __str__(self):
+        return 'Dossier category: ' + str(self.name)
+
+    class Meta:
+        verbose_name = 'Category (dossier)'
+        verbose_name_plural = 'Categories (dossier)'
+
+
+class CategoryDocument(Category):
+    def __str__(self):
+        return 'Document category: ' + str(self.name)
+
+    class Meta:
+        verbose_name = 'Category (document)'
+        verbose_name_plural = 'Categories (document)'
+
+
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
-    categories = models.ManyToManyField(Category, blank=True)
+    categories = models.ManyToManyField(CategoryDossier, blank=True)
 
     class Meta:
         ordering = ['-dossier_id']
@@ -83,7 +102,7 @@ class Document(models.Model):
     title_full = models.CharField(max_length=500)
     title_short = models.CharField(max_length=200)
     publication_type = models.CharField(max_length=200, blank=True)
-    categories = models.ManyToManyField(Category, blank=True)
+    categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True)
     content_html = models.CharField(max_length=200000, blank=True)

@@ -3,7 +3,8 @@ from django.contrib import admin
 from document.models import BesluitenLijst
 from document.models import Dossier
 from document.models import Document
-from document.models import Category
+from document.models import CategoryDossier
+from document.models import CategoryDocument
 from document.models import Kamerstuk
 from document.models import Submitter
 from document.models import Vote
@@ -80,7 +81,8 @@ class VoteIndividualAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
 
 
-admin.site.register(Category, CategoryAdmin)
+admin.site.register(CategoryDossier, CategoryAdmin)
+admin.site.register(CategoryDocument, CategoryAdmin)
 admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)

@@ -15,6 +15,8 @@ from parliament.models import PoliticalParty
 
 from document.models import Agenda
 from document.models import BesluitenLijst
+from document.models import CategoryDossier
+from document.models import CategoryDocument
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
@@ -334,13 +336,19 @@ class TestWebsite(TestCase):
 
 class TestCategory(TestCase):
 
-    def test_create_from_string(self):
+    def test_create_dossier_category_from_string(self):
+        self.create_category_from_string(CategoryDossier)
+
+    def test_create_document_category_from_string(self):
+        self.create_category_from_string(CategoryDocument)
+
+    def create_category_from_string(self, category_class):
         text = 'Zorg en gezondheid | Ziekten en behandelingen'
         expected_names = [
             'zorg en gezondheid',
             'ziekten en behandelingen',
         ]
-        categories = website.create.get_categories(text)
+        categories = website.create.get_categories(text, category_class)
         self.assertEqual(len(categories), 2)
         for index, category in enumerate(categories):
             self.assertEqual(expected_names[index], category.name)
@@ -349,7 +357,7 @@ class TestCategory(TestCase):
             'zorg en gezondheid',
             'ziekten en behandelingen',
         ]
-        categories = website.create.get_categories(text)
+        categories = website.create.get_categories(text, category_class)
         self.assertEqual(len(categories), 2)
         for index, category in enumerate(categories):
             self.assertEqual(expected_names[index], category.name)

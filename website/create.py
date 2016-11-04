@@ -30,7 +30,8 @@ from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import BesluitItem
 from document.models import BesluitItemCase
-from document.models import Category
+from document.models import CategoryDocument
+from document.models import CategoryDossier
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -248,9 +249,8 @@ def create_or_update_dossier(dossier_id):
             date_published=date_published,
             content_html=content_html,
         )
-        category_list = get_categories(text=metadata['category'], sep_char='|')
+        category_list = get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
         document.categories.add(*category_list)
-        dossier.categories.add(*category_list)
 
         submitters = metadata['submitter'].split('|')
         for submitter in submitters:
@@ -258,6 +258,8 @@ def create_or_update_dossier(dossier_id):
 
         if metadata['is_kamerstuk']:
             create_kamerstuk(document, dossier.dossier_id, metadata, result)
+            category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
+            dossier.categories.add(*category_list)
 
         if metadata['is_agenda']:
             create_agenda(document, metadata)
@@ -268,13 +270,13 @@ def create_or_update_dossier(dossier_id):
 
 
 @transaction.atomic
-def get_categories(text, sep_char='|'):
+def get_categories(text, category_class=CategoryDocument, sep_char='|'):
     category_list = text.split(sep_char)
     categories = []
     for category_name in category_list:
         name = category_name.lower().strip()
         if name:
-            category, created = Category.objects.get_or_create(name=category_name.lower().strip())
+            category, created = category_class.objects.get_or_create(name=name)
             categories.append(category)
     return categories
 
