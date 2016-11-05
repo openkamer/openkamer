@@ -44,12 +44,13 @@ class KamerstukView(TemplateView):
 
 
 class DossierFilter(django_filters.FilterSet):
-    title = django_filters.CharFilter(method='title_filter')
     VOTING_RESULT_CHOICES = (
         ('ALL', 'Alle'),
         (Voting.AANGENOMEN, 'Aangenomen'),
         (Voting.VERWORPEN, 'Verworpen'),
     )
+    title = django_filters.CharFilter(method='title_filter', label='')
+    submitter = django_filters.CharFilter(method='submitter_filter', label='')
     voting_result = django_filters.ChoiceFilter(
         choices=VOTING_RESULT_CHOICES,
         method='voting_result_filter',
@@ -58,7 +59,7 @@ class DossierFilter(django_filters.FilterSet):
     categories = django_filters.ModelMultipleChoiceFilter(
         name='categories',
         queryset=CategoryDossier.objects.all(),
-        widget=forms.CheckboxSelectMultiple()
+        widget=forms.CheckboxSelectMultiple(),
     )
 
     class Meta:
@@ -66,6 +67,10 @@ class DossierFilter(django_filters.FilterSet):
 
     def title_filter(self, queryset, name, value):
         dossiers = queryset.filter(document__title_full__icontains=value).distinct()
+        return dossiers
+
+    def submitter_filter(self, queryset, name, value):
+        dossiers = queryset.filter(document__submitter__person__surname__icontains=value).distinct()
         return dossiers
 
     def voting_result_filter(self, queryset, name, value):
