@@ -19,7 +19,6 @@ class Category(models.Model):
     slug = models.SlugField(max_length=250, default='')
 
     class Meta:
-        ordering = ['name']
         abstract = True
 
     def save(self, *args, **kwargs):
@@ -32,6 +31,7 @@ class CategoryDossier(Category):
         return str(self.name)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Category (dossier)'
         verbose_name_plural = 'Categories (dossier)'
 
@@ -41,6 +41,7 @@ class CategoryDocument(Category):
         return 'Document category: ' + str(self.name)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Category (document)'
         verbose_name_plural = 'Categories (document)'
 
