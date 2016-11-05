@@ -29,7 +29,7 @@ class Category(models.Model):
 
 class CategoryDossier(Category):
     def __str__(self):
-        return 'Dossier category: ' + str(self.name)
+        return str(self.name)
 
     class Meta:
         verbose_name = 'Category (dossier)'

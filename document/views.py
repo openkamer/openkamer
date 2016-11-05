@@ -2,11 +2,15 @@ import logging
 import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.generic import TemplateView
+from django.db import models
+from django import forms
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import TemplateView
+
+import django_filters
 
 from document.models import Agenda, AgendaItem
 from document.models import BesluitenLijst
@@ -40,17 +44,20 @@ class KamerstukView(TemplateView):
         return context
 
 
+class DossierFilter(django_filters.FilterSet):
+    categories = django_filters.ModelMultipleChoiceFilter(
+        name='categories',
+        queryset=CategoryDossier.objects.all(),
+        widget=forms.CheckboxSelectMultiple()
+    )
+
+
 class DossiersView(TemplateView):
     template_name = 'document/dossiers.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category_name = ''
-        if 'category' in self.request.GET:
-            category_name = self.request.GET['category']
-            dossiers = Dossier.objects.filter(categories__slug=category_name)
-        else:
-            dossiers = Dossier.objects.all()
+        dossiers = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         paginator = Paginator(dossiers, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
@@ -60,8 +67,7 @@ class DossiersView(TemplateView):
         except EmptyPage:
             dossiers = paginator.page(paginator.num_pages)
         context['dossiers'] = dossiers
-        context['categories'] = CategoryDossier.objects.all()
-        context['category_name'] = category_name
+        context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         return context
 
 

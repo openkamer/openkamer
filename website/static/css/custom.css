@@ -72,3 +72,7 @@ hr.hr-small {
 .col-kamerstukken {
   padding: 0 0.2em;
 }
+
+.category-filter-checkboxes .checkbox {
+  display: inline;
+}
