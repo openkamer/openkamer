@@ -69,6 +69,10 @@ hr.hr-small {
   padding: 0.5em 0.5em 0 0.5em;
 }
 
+.well.well-filters {
+  padding: 0.8em 0.8em;
+}
+
 .col-kamerstukken {
   padding: 0 0.2em;
 }
