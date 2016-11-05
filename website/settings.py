@@ -35,6 +35,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = [
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,6 +95,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+INTERNAL_IPS = ['127.0.0.1']  # needed for django-debug-toolbar
 
 DATABASES = {
     'default': {

@@ -21,6 +21,7 @@ from parliament.views import ParliamentMembersView
 from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
+from website import settings
 from website.views import get_dossier_timeline_json
 from website.views import PlotExampleView
 
@@ -63,4 +64,11 @@ urlpatterns = [
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
+
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
