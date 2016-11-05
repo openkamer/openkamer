@@ -65,9 +65,9 @@ class TestCreateGovernment(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get('/api/ministry/')
         self.assertEqual(response.status_code, 200)
-        response = self.client.get('/api/governmentmember/')
+        response = self.client.get('/api/government_member/')
         self.assertEqual(response.status_code, 200)
-        response = self.client.get('/api/governmentposition/')
+        response = self.client.get('/api/government_position/')
         self.assertEqual(response.status_code, 200)
 
 
@@ -294,7 +294,7 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_api_parliament_member(self):
-        response = self.client.get('/api/parliamentmember/')
+        response = self.client.get('/api/parliament_member/')
         self.assertEqual(response.status_code, 200)
 
     def test_api_party(self):
@@ -302,7 +302,7 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_api_party_member(self):
-        response = self.client.get('/api/partymember/')
+        response = self.client.get('/api/party_member/')
         self.assertEqual(response.status_code, 200)
 
     def test_api_document(self):
@@ -326,11 +326,19 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_api_voteparty(self):
-        response = self.client.get('/api/voteparty/')
+        response = self.client.get('/api/vote_party/')
         self.assertEqual(response.status_code, 200)
 
     def test_api_voteindividual(self):
-        response = self.client.get('/api/voteindividual/')
+        response = self.client.get('/api/vote_individual/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_api_category_dossier(self):
+        response = self.client.get('/api/category_dossier/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_api_category_document(self):
+        response = self.client.get('/api/category_document/')
         self.assertEqual(response.status_code, 200)
 
 
