@@ -79,6 +79,7 @@ class Dossier(models.Model):
         return None
 
     def title(self):
+        # TODO: improve performance
         kamerstukken = self.kamerstukken()
         titles = {}
         for stuk in kamerstukken:

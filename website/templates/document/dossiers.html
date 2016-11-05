@@ -22,6 +22,8 @@
   <h5>Filters (verfijn resultaten)</h5>
 
     <form action="" method="get">
+      <h6>Titel</h6>
+      {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
       <h6>Onderwerp</h6>
       {% bootstrap_field filter.form.categories size='medium' field_class='category-filter-checkboxes' bound_css_class='' show_label=False show_help=False %}
       {% bootstrap_button content='Zoek' button_type='submit' %}

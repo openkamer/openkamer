@@ -2,7 +2,6 @@ import logging
 import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db import models
 from django import forms
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
@@ -45,11 +44,19 @@ class KamerstukView(TemplateView):
 
 
 class DossierFilter(django_filters.FilterSet):
+    title = django_filters.CharFilter(method='title_filter')
     categories = django_filters.ModelMultipleChoiceFilter(
         name='categories',
         queryset=CategoryDossier.objects.all(),
         widget=forms.CheckboxSelectMultiple()
     )
+
+    class Meta:
+        model = Dossier
+
+    def title_filter(self, queryset, name, value):
+        dossiers = queryset.filter(document__title_full__icontains=value).distinct()
+        return dossiers
 
 
 class DossiersView(TemplateView):
