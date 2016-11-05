@@ -22,11 +22,21 @@
   <h5>Filters (verfijn resultaten)</h5>
 
     <form action="" method="get">
-      <h6>Titel</h6>
-      {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
+      <div class="col-sm-6">
+        <h6>Titel</h6>
+        {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
+      </div>
+      <div class="col-sm-6">
+        <h6>Stemmingsuitslag</h6>
+        {% bootstrap_field filter.form.voting_result bound_css_class='' show_label=False show_help=False %}
+      </div>
+      <div class="col-lg-12">
+
       <h6>Onderwerp</h6>
       {% bootstrap_field filter.form.categories size='medium' field_class='category-filter-checkboxes' bound_css_class='' show_label=False show_help=False %}
+      </div>
       {% bootstrap_button content='Zoek' button_type='submit' %}
+
     </form>
 
   </div>
