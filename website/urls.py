@@ -18,6 +18,7 @@ from government.views import GovernmentView
 from government.views import GovernmentCurrentView
 from parliament.views import PartiesView, PartyView
 from parliament.views import ParliamentMembersView
+from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
@@ -35,6 +36,7 @@ urlpatterns = [
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
     url(r'^tweedekamerleden/$', ParliamentMembersView.as_view(), name='parliament-members'),
+    url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
 
     url(r'^kabinetten/$', GovernmentsView.as_view(), name='governments'),
     url(r'^kabinet/huidig/$', GovernmentCurrentView.as_view(), name='government-current'),

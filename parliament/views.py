@@ -31,3 +31,13 @@ class ParliamentMembersView(TemplateView):
         members = ParliamentMember.objects.all()
         context['members'] = members
         return context
+
+
+class ParliamentMembersCheckView(TemplateView):
+    template_name = 'parliament/members_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        members = ParliamentMember.objects.all()
+        context['members'] = members
+        return context

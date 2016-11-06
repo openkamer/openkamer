@@ -39,14 +39,6 @@ def create_members():
                 )
             party_name = columns[2][0].text
             party = PoliticalParty.get_party(party_name)
-            # residence = columns[3][0].text
-            # age = columns[4][0][0].text
-            # sex = columns[5][0].text
-            # assert age is not None
-            # if sex == 'Man':
-            #     sex = Member.MALE
-            # elif sex == 'Vrouw':
-            #     sex = Member.FEMALE
             party_member = PartyMember.objects.create(person=person, party=party)
             parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
             logger.info("new person: " + str(person))

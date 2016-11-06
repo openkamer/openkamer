@@ -121,7 +121,7 @@ class Person(models.Model):
             self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
         self.parlement_and_politiek_id = wikidata.get_parlement_and_politiek_id(self.wikidata_id)
 
-    def get_wikidata_url(self):
+    def wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
 
     def parlement_and_politiek_url(self):
