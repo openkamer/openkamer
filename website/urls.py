@@ -41,7 +41,7 @@ urlpatterns = [
     url(r'^kabinet/huidig/$', GovernmentCurrentView.as_view(), name='government-current'),
     url(r'^kabinet/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
-    url(r'^dossiers/$', DossiersView.as_view(), name='dossiers'),
+    url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
     url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>\d+)/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),

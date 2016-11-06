@@ -200,7 +200,7 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_dossiers_overview(self):
-        response = self.client.get(reverse('dossiers'))
+        response = self.client.get(reverse('wetsvoorstellen'))
         self.assertEqual(response.status_code, 200)
 
     def test_dossier_views(self):
