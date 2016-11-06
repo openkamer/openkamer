@@ -25,6 +25,8 @@ INSTALLED_APPS = (
     # 'debug_toolbar',
     'bootstrap3',
     'bootstrap_pagination',
+    'dal',
+    'dal_select2',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',

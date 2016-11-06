@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 
 from person.views import PersonsView, PersonView
+from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersView
 from document.views import DossierView, AddDossierView
@@ -64,7 +65,7 @@ urlpatterns = [
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
-
+    url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 ]
 
 if settings.DEBUG:

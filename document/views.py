@@ -7,9 +7,12 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 
 import django_filters
+from dal import autocomplete
+
+from person.models import Person
 
 from document.models import Agenda, AgendaItem
 from document.models import BesluitenLijst
@@ -43,6 +46,18 @@ class KamerstukView(TemplateView):
         return context
 
 
+class PersonAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        persons = Person.objects.exclude(surname='').order_by('surname')
+        person_ids = []
+        if self.q:
+            for person in persons:
+                if self.q in person.fullname():
+                    person_ids.append(person.id)
+            return Person.objects.filter(pk__in=person_ids)
+        return persons
+
+
 class DossierFilter(django_filters.FilterSet):
     VOTING_RESULT_CHOICES = (
         ('ALL', 'Alle'),
@@ -50,7 +65,12 @@ class DossierFilter(django_filters.FilterSet):
         (Voting.VERWORPEN, 'Verworpen'),
     )
     title = django_filters.CharFilter(method='title_filter', label='')
-    submitter = django_filters.CharFilter(method='submitter_filter', label='')
+    submitter = django_filters.ModelChoiceFilter(
+        queryset=Person.objects.all(),
+        method='submitter_filter',
+        label='',
+        widget=autocomplete.ModelSelect2(url='person-autocomplete')
+    )
     voting_result = django_filters.ChoiceFilter(
         choices=VOTING_RESULT_CHOICES,
         method='voting_result_filter',
@@ -70,7 +90,7 @@ class DossierFilter(django_filters.FilterSet):
         return dossiers
 
     def submitter_filter(self, queryset, name, value):
-        dossiers = queryset.filter(document__submitter__person__surname__icontains=value).distinct()
+        dossiers = queryset.filter(document__submitter__person=value).distinct()
         return dossiers
 
     def voting_result_filter(self, queryset, name, value):
