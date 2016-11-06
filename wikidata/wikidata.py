@@ -200,3 +200,41 @@ def get_political_party_memberships(id):
             member_info['end_date'] = get_date(party['qualifiers']['P582'][0]['datavalue']['value']['time'])
         memberships.append(member_info)
     return memberships
+
+
+def search_parliament_members():
+    url = 'https://query.wikidata.org/sparql?'
+    params = {
+        'query': 'SELECT ?item WHERE { ?item wdt:P31 wd:Q5 . ?item wdt:P39 wd:Q18887908 . }',  ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
+        'format': 'json',
+    }
+    response = requests.get(url, params)
+    response_json = response.json()
+    print(response_json)
+
+
+def get_positions_held(id, filter_position_id=None):
+    claims = get_claims(id)
+    if 'P39' not in claims:
+        return []
+    positions = []
+    for pos in claims['P39']:
+        # print(json.dumps(pos, sort_keys=True, indent=4))
+        position_id = pos['mainsnak']['datavalue']['value']['id']
+        if filter_position_id and position_id != filter_position_id:
+            continue
+        start_time = None
+        end_time = None
+        if 'qualifiers' in pos and 'P580' in pos['qualifiers']:
+            start_time = get_date(pos['qualifiers']['P580'][0]['datavalue']['value']['time'])
+        if 'qualifiers' in pos and 'P582' in pos['qualifiers']:
+            end_time = get_date(pos['qualifiers']['P582'][0]['datavalue']['value']['time'])
+        position = {
+            'id': position_id,
+            'label': get_label(position_id),
+            'start_time': start_time,
+            'end_time': end_time,
+        }
+        positions.append(position)
+    return positions
+
