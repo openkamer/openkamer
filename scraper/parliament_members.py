@@ -3,6 +3,8 @@ import logging
 
 import lxml.html
 
+from wikidata import wikidata
+
 from person.models import Person
 from parliament.models import Parliament
 from parliament.models import PoliticalParty
@@ -17,7 +19,7 @@ def create_members():
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
 
-    parliament = get_or_create_tweede_kamer()
+    parliament = Parliament.get_or_create_tweede_kamer()
 
     rows = tree.xpath("//tbody/tr")
 
@@ -44,11 +46,3 @@ def create_members():
             logger.info("new person: " + str(person))
             logger.info("new party member: " + str(party_member))
             logger.info("new parliament member: " + str(parliament_member))
-
-
-def get_or_create_tweede_kamer():
-    parliaments = Parliament.objects.filter(name='Tweede Kamer')
-    if parliaments.exists():
-        return parliaments[0]
-    else:
-        return Parliament.objects.create(name='Tweede Kamer', wikidata_id='Q233262')

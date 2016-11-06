@@ -31,6 +31,9 @@ class TestCreateParliament(TestCase):
         political_parties.create_parties()
         parliament_members.create_members()
 
+    def test_create_parliament_from_wikidata(self):
+        website.create.create_parliament_members()
+
 
 class TestCreateGovernment(TestCase):
     fixtures = ['person.json', 'parliament.json']

@@ -107,12 +107,16 @@ class Person(models.Model):
 
     def find_wikidata_id(self, language='en'):
         wikidata_id = wikidata.search_wikidata_id(self.get_full_name(), language)
-        logger.info('wikidata id: ' + wikidata_id)
+        logger.info('wikidata id: ' + str(wikidata_id))
         return wikidata_id
 
     def update_info(self, language='en'):
         logger.info('get info from wikidata for ' + self.get_full_name())
-        self.wikidata_id = self.find_wikidata_id(language)
+        if not self.wikidata_id:
+            self.wikidata_id = self.find_wikidata_id(language)
+        if not self.wikidata_id:
+            logger.warning('no wikidata id found')
+            return
         birthdate = wikidata.get_birth_date(self.wikidata_id)
         if birthdate:
             self.birthdate = birthdate

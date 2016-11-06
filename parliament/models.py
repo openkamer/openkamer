@@ -17,6 +17,14 @@ class Parliament(models.Model):
     def __str__(self):
         return str(self.name)
 
+    @staticmethod
+    def get_or_create_tweede_kamer():
+        parliaments = Parliament.objects.filter(name='Tweede Kamer')
+        if parliaments.exists():
+            return parliaments[0]
+        else:
+            return Parliament.objects.create(name='Tweede Kamer', wikidata_id='Q233262')
+
 
 class ParliamentMember(models.Model):
     person = models.ForeignKey(Person)
@@ -42,7 +50,10 @@ class ParliamentMember(models.Model):
         return None
 
     def __str__(self):
-        return str(self.person.fullname()) + ' (' + str(self.party().name_short) + ')'
+        display_name = self.person.fullname()
+        if self.party():
+            display_name +=  ' (' + str(self.party().name_short) + ')'
+        return display_name
 
 
 class PoliticalParty(models.Model):

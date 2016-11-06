@@ -21,7 +21,7 @@ def search_wikidata_id(search_str, language='en'):
     ids = search_wikidata_ids(search_str, language)
     if ids:
         return ids[0]
-    return None
+    return ''
 
 
 def search_wikidata_ids(search_str, language='en'):
@@ -34,6 +34,7 @@ def search_wikidata_ids(search_str, language='en'):
 
 
 def get_item(id, sites=None, props=None):
+    assert id
     url = 'https://www.wikidata.org/w/api.php'
     params = {
         'action': 'wbgetentities',
@@ -45,9 +46,10 @@ def get_item(id, sites=None, props=None):
     if props:
         params['props'] = props
     response = requests.get(url, params)
+    print(response.url)
     reponse_json = response.json()
-    item_json = reponse_json['entities'][id]
-    return item_json
+    item = reponse_json['entities'][id]
+    return item
 
 
 def get_claims(id):

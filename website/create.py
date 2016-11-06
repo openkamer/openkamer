@@ -19,9 +19,10 @@ from government.models import Ministry
 from government.models import GovernmentPosition
 from government.models import GovernmentMember
 
-from parliament.models import PoliticalParty
-from parliament.models import PartyMember
+from parliament.models import Parliament
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
 from parliament.util import parse_name_initials_surname
 from parliament.util import parse_name_surname_initials
 
@@ -111,11 +112,13 @@ def create_goverment_member(government, member, person, position):
 
 
 @transaction.atomic
-def create_person(wikidata_id, fullname):
+def create_person(wikidata_id, fullname=''):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
     if persons.exists():
         person = persons[0]
     else:
+        if not fullname:
+            fullname = wikidata.get_label(wikidata_id, language='nl')
         forename = wikidata.get_given_name(wikidata_id)
         if not forename:
             forename = fullname.split(' ')[0]
@@ -530,3 +533,22 @@ def create_besluitenlijst(url):
             )
     logger.info('END')
     return besluiten_lijst
+
+
+def create_parliament_members():
+    logger.info('BEGIN')
+    member_wikidata_ids = wikidata.search_parliament_member_ids()
+    parliament = Parliament.get_or_create_tweede_kamer()
+    for wikidata_id in member_wikidata_ids:
+        person = create_person(wikidata_id)
+        print(person)
+        positions = wikidata.get_parliament_positions_held(wikidata_id)
+        for position in positions:
+            parliament_member = ParliamentMember.objects.create(
+                person=person,
+                parliament=parliament,
+                joined=position['start_time'],
+                left=position['end_time']
+            )
+            print(parliament_member)
+    logger.info('END')
