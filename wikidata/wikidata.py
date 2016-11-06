@@ -202,7 +202,7 @@ def get_political_party_memberships(id):
     return memberships
 
 
-def search_parliament_members():
+def search_parliament_member_ids():
     url = 'https://query.wikidata.org/sparql?'
     params = {
         'query': 'SELECT ?item WHERE { ?item wdt:P31 wd:Q5 . ?item wdt:P39 wd:Q18887908 . }',  ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
@@ -210,7 +210,11 @@ def search_parliament_members():
     }
     response = requests.get(url, params)
     response_json = response.json()
-    print(response_json)
+    member_ids = []
+    for item in response_json['results']['bindings']:
+        member_id = item['item']['value'].split('/')[-1]
+        member_ids.append(member_id)
+    return member_ids
 
 
 def get_positions_held(id, filter_position_id=None):
@@ -238,3 +242,6 @@ def get_positions_held(id, filter_position_id=None):
         positions.append(position)
     return positions
 
+
+def get_parliament_positions_held(id):
+    return get_positions_held(id, filter_position_id='Q18887908')
