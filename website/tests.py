@@ -178,6 +178,24 @@ class TestPersonView(TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+class TestCreatePerson(TestCase):
+    wikidata_id_ss = 'Q516335'  # Sjoerd Wiemer Sjoerdsma
+    name_ss = 'Sjoerd Wiemer Sjoerdsma'
+
+    def test_create_person_from_wikidata_id(self):
+        person = website.create.create_person(self.wikidata_id_ss)
+        self.check_sjoerd(person)
+
+    def test_create_person_from_wikidata_id_and_fullname(self):
+        person = website.create.create_person(self.wikidata_id_ss, self.name_ss)
+        self.check_sjoerd(person)
+
+    def check_sjoerd(self, person):
+        self.assertTrue('Sjoerdsma' in person.surname)  # TODO: make this check more strict, surname is only Sjoerdsma not Wiemer Sjoerdsma, but this cannot be determined from wikidata atm.
+        self.assertEqual(person.forename, 'Sjoerd')
+        self.assertEqual(person.initials, 'Sj.W.')
+
+
 class TestWebsite(TestCase):
     fixtures = ['person.json', 'parliament.json', 'government.json']
 

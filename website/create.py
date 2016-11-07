@@ -5,6 +5,7 @@ import requests
 from requests.exceptions import ConnectionError, ConnectTimeout
 import traceback
 import uuid
+from json.decoder import JSONDecodeError
 
 from pdfminer.pdfparser import PDFSyntaxError
 
@@ -122,7 +123,7 @@ def create_person(wikidata_id, fullname=''):
         forename = wikidata.get_given_name(wikidata_id)
         if not forename:
             forename = fullname.split(' ')[0]
-        surname = fullname.replace(forename, '').strip()
+        surname = fullname.replace(forename + ' ', '').strip()
         prefix = Person.find_prefix(surname)
         if prefix:
             surname = surname.replace(prefix + ' ', '')
@@ -555,9 +556,10 @@ def create_parliament_members():
                     left=position['end_time']
                 )
                 print(parliament_member)
-        except KeyError as error:
+        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout)as error:
             logger.error(traceback.format_exc())
             logger.error(error)
+            logger.error('')
         counter += 1
         print(counter)
     logger.info('END')
