@@ -50,7 +50,7 @@ class Person(models.Model):
     def find_prefix(name):
         name_prefix = ''
         for prefix in NAME_PREFIXES:
-            if prefix + ' ' in name:
+            if ' ' + prefix + ' ' in name:
                 name_prefix = prefix
                 break
         return name_prefix

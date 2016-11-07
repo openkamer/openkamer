@@ -41,6 +41,9 @@ class TestFindName(TestCase):
         name = 'Gerard \'t Hooft'
         prefix = Person.find_prefix(name)
         self.assertEqual(prefix, '\'t')
+        name = 'Jan Peter Balkenende'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, '')
 
 
 class TestCreatePerson(TestCase):
