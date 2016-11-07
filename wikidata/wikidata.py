@@ -1,8 +1,11 @@
 from datetime import datetime
 import json
 import urllib.parse
+import logging
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 def search(search_str, language='en'):
@@ -46,7 +49,7 @@ def get_item(id, sites=None, props=None):
     if props:
         params['props'] = props
     response = requests.get(url, params)
-    print(response.url)
+    logger.info(response.url)
     reponse_json = response.json()
     item = reponse_json['entities'][id]
     return item
@@ -174,7 +177,7 @@ def get_date(date_str):
         date = datetime.strptime(date_str[1:11], '%Y-%m-%d')
         return date.date()
     except ValueError as error:
-        print(error)
+        logger.error(error)
         return None
 
 
@@ -193,6 +196,9 @@ def get_political_party_memberships(id):
     political_parties = claims['P102']
     # print(json.dumps(political_parties, sort_keys=True, indent=4))
     for party in political_parties:
+        if not 'datavalue' in party['mainsnak']:
+            logger.warning('datavalue not in party[\'mainsnak\'] for person with wikidata id: ' + str(id))
+            continue
         member_info = {'wikidata_id': party['mainsnak']['datavalue']['value']['id']}
         member_info['start_date'] = None
         member_info['end_date'] = None
@@ -226,6 +232,9 @@ def get_positions_held(id, filter_position_id=None):
     positions = []
     for pos in claims['P39']:
         # print(json.dumps(pos, sort_keys=True, indent=4))
+        if not 'datavalue' in pos['mainsnak']:
+            logger.warning('datavalue not in pos[\'mainsnak\'] for person with wikidata id: ' + str(id))
+            continue
         position_id = pos['mainsnak']['datavalue']['value']['id']
         if filter_position_id and position_id != filter_position_id:
             continue
@@ -233,8 +242,12 @@ def get_positions_held(id, filter_position_id=None):
         end_time = None
         if 'qualifiers' in pos and 'P580' in pos['qualifiers']:
             start_time = get_date(pos['qualifiers']['P580'][0]['datavalue']['value']['time'])
+            if len(pos['qualifiers']['P580']) > 1:
+                logger.warning('multiple start-times for a single position for wikidata_id: ' + str(id))
         if 'qualifiers' in pos and 'P582' in pos['qualifiers']:
             end_time = get_date(pos['qualifiers']['P582'][0]['datavalue']['value']['time'])
+            if len(pos['qualifiers']['P582']) > 1:
+                logger.warning('multiple end-times for a single position for wikidata_id: ' + str(id))
         position = {
             'id': position_id,
             'label': get_label(position_id),
