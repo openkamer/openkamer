@@ -146,7 +146,7 @@ def create_person(wikidata_id, fullname=''):
             if parties.exists():
                 party = parties[0]
             else:
-                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
+                logger.error('political party for person with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
                 continue
             PartyMember.objects.create(
                 person=person,
@@ -539,16 +539,25 @@ def create_parliament_members():
     logger.info('BEGIN')
     member_wikidata_ids = wikidata.search_parliament_member_ids()
     parliament = Parliament.get_or_create_tweede_kamer()
+    counter = 0
     for wikidata_id in member_wikidata_ids:
-        person = create_person(wikidata_id)
-        print(person)
-        positions = wikidata.get_parliament_positions_held(wikidata_id)
-        for position in positions:
-            parliament_member = ParliamentMember.objects.create(
-                person=person,
-                parliament=parliament,
-                joined=position['start_time'],
-                left=position['end_time']
-            )
-            print(parliament_member)
+        print('=========================')
+        print(wikidata_id)
+        try:
+            person = create_person(wikidata_id)
+            print(person)
+            positions = wikidata.get_parliament_positions_held(wikidata_id)
+            for position in positions:
+                parliament_member = ParliamentMember.objects.create(
+                    person=person,
+                    parliament=parliament,
+                    joined=position['start_time'],
+                    left=position['end_time']
+                )
+                print(parliament_member)
+        except KeyError as error:
+            logger.error(traceback.format_exc())
+            logger.error(error)
+        counter += 1
+        print(counter)
     logger.info('END')
