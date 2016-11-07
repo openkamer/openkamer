@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 TITLES = (
     'dr.',
     'mr.',
-    'ir.'
+    'ir.',
     'drs.',
     'bacc.',
     'kand.',
