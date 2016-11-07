@@ -1,9 +1,14 @@
+from datetime import date
+
 from django.test import TestCase
 
 from wikidata import wikidata
 
+from parliament.models import Parliament
+
 from parliament.util import parse_name_initials_surname
 from parliament.util import parse_name_surname_initials
+
 
 
 class TestParseName(TestCase):
@@ -53,3 +58,12 @@ class TestPoliticalParty(TestCase):
     def test_get_political_party_memberships_wikidata(self):
         mark_rutte_wikidata_id = 'Q57792'
         wikidata.get_political_party_memberships(mark_rutte_wikidata_id)
+
+
+class TestParliamentMembers(TestCase):
+    fixtures = ['person.json', 'parliament.json']
+
+    def test_get_members_at_date(self):
+        tweede_kamer = Parliament.get_or_create_tweede_kamer()
+        active_members = tweede_kamer.get_members_at_date(date(year=2016, month=6, day=1))
+        print(len(active_members))

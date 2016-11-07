@@ -1,6 +1,10 @@
+import datetime
+
 from django.views.generic import TemplateView
 
-from parliament.models import PoliticalParty, ParliamentMember
+from parliament.models import Parliament
+from parliament.models import ParliamentMember
+from parliament.models import PoliticalParty
 
 
 class PartiesView(TemplateView):
@@ -38,6 +42,25 @@ class ParliamentMembersCheckView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        start_date = datetime.date(year=2000, month=1, day=1)
+        # members_per_month = self.get_members_per_month(start_date)
         members = ParliamentMember.objects.all()
         context['members'] = members
         return context
+
+    @staticmethod
+    def get_members_per_month(start_date):
+        start_date = datetime.date(year=2000, month=1, day=1)
+        current_date = start_date
+        parliament = Parliament.get_or_create_tweede_kamer()
+        members_per_month = []
+        while current_date < datetime.date.today():
+            members = parliament.get_members_at_date(current_date)
+            members_per_month.append({
+                'date': current_date,
+                'members': members,
+            })
+            print(current_date)
+            print(len(members))
+            current_date += datetime.timedelta(days=31)
+        return members_per_month

@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 from django.db import models
 from django.utils.text import slugify
@@ -16,6 +17,22 @@ class Parliament(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def get_members_at_date(self, date):
+        members = self.members()
+        members_active = []
+        for member in members:
+            if not member.joined:
+                continue
+            date_left = member.left
+            if not date_left:
+                date_left = date.today()
+            if member.joined <= date < date_left:
+                members_active.append(member)
+        return members_active
+
+    def members(self):
+        return ParliamentMember.objects.filter(parliament=self)
 
     @staticmethod
     def get_or_create_tweede_kamer():

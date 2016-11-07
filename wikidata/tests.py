@@ -26,14 +26,20 @@ class TestGetParliamentMemberInfo(TestCase):
 
 
 class TestPositionHeld(TestCase):
-    wikidata_id = 'Q32681'  # Frans Timmermans
+    wikidata_id_ft = 'Q32681'  # Frans Timmermans
+    wikidata_id_wa = 'Q474763'  # Willem Aantjes
+    wikidata_id_mr = 'Q57792'  # Mark Rutte
 
     def test_search_all(self):
-        positions = wikidata.get_positions_held(self.wikidata_id)
+        positions = wikidata.get_positions_held(self.wikidata_id_ft)
         self.assertEqual(len(positions), 8)
+        positions = wikidata.get_positions_held(self.wikidata_id_wa)
+        self.assertEqual(len(positions), 1)
 
     def test_search_parliament_member(self):
-        positions = wikidata.get_parliament_positions_held(self.wikidata_id)
+        positions = wikidata.get_parliament_positions_held(self.wikidata_id_ft)
         self.assertEqual(len(positions), 6)
         for position in positions:
             self.assertEqual(position['label'], 'member of the House of Representatives of the Netherlands')
+        positions = wikidata.get_parliament_positions_held(self.wikidata_id_mr)
+        self.assertEqual(len(positions), 3)
