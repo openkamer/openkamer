@@ -60,10 +60,10 @@
           {% endif %}
           </td>
           <td>
-          {% if not member.joined %}
+          {% if not member.left %}
             <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data missing @ wikidata</a>
           {% else %}
-            {{ member.joined }}
+            {{ member.left }}
           {% endif %}
           </td>
            <td>{{ member.party.name_short }}</td>
@@ -71,6 +71,7 @@
       {% endfor %}
       </tbody>
     </table>
+    
   </div>
 </div>
 
