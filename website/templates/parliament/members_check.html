@@ -37,54 +37,27 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <h4></h4>
+    <h4>Personen met meerdere zetels op hetzelfde moment</h4>
+    {% with members=members_overlap %}
+    {% include "parliament/items/members_check_table.html" %}
+    {% endwith %}
+  </div>
+</div>
 
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>nr</th>
-          <th>naam</th>
-          <th>begin datum</th>
-          <th>eind datum</th>
-          <th>partij</th>
-          <th>geboortedatum</th>
-          <th>wikidata</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for member in members %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ member.person.fullname }}</td>
-          <td>
-          {% if not member.joined %}
-            <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>
-          {% else %}
-            {{ member.joined }}
-          {% endif %}
-          </td>
-          <td>
-          {% if not member.joined and not member.left %}
-            <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>
-          {% elif not member.left %}
-            heden (?)
-          {% else %}
-            {{ member.left }}
-          {% endif %}
-          </td>
-           <td>{{ member.party.name_short }}</td>
-           <td>
-             {% if member.person.birthdate %}
-               {{ member.person.birthdate }}
-             {% else %}
-               <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>
-             {% endif %}
-           </td>
-           <td><a href="{{ member.person.wikidata_url }}" target="_blank">edit @ wikidata</a></td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+<div class="row">
+  <div class="col-lg-12">
+    <h4>Huidige Kamerleden volgens Wikidata</h4>
+    {% with members=members_current %}
+    {% include "parliament/items/members_check_table.html" %}
+    {% endwith %}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <h4>Alle Kamerleden</h4>
+
+    {% include "parliament/items/members_check_table.html" %}
 
   </div>
 </div>
