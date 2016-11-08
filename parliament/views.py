@@ -42,15 +42,23 @@ class ParliamentMembersCheckView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        start_date = datetime.date(year=2000, month=1, day=1)
-        # members_per_month = self.get_members_per_month(start_date)
+        start_date = datetime.date(year=2010, month=1, day=1)
+        members_per_month = self.get_members_per_month(start_date)
         members = ParliamentMember.objects.all()
+        members_overlap = []
+        for member in members:
+            members_overlap += member.check_overlap()
+        overlap_ids = []
+        for member in members_overlap:
+            overlap_ids.append(member.id)
         context['members'] = members
+        parliament = Parliament.get_or_create_tweede_kamer()
+        context['members_current'] = parliament.get_members_at_date(datetime.date.today())
+        context['members_overlap'] = ParliamentMember.objects.filter(pk__in=overlap_ids).distinct()
         return context
 
     @staticmethod
     def get_members_per_month(start_date):
-        start_date = datetime.date(year=2000, month=1, day=1)
         current_date = start_date
         parliament = Parliament.get_or_create_tweede_kamer()
         members_per_month = []
@@ -63,4 +71,8 @@ class ParliamentMembersCheckView(TemplateView):
             print(current_date)
             print(len(members))
             current_date += datetime.timedelta(days=31)
+        current_date = datetime.date.today()
+        members = parliament.get_members_at_date(current_date)
+        print(current_date)
+        print(len(members))
         return members_per_month

@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import date, timedelta
 
 from django.db import models
 from django.utils.text import slugify
@@ -26,7 +26,7 @@ class Parliament(models.Model):
                 continue
             date_left = member.left
             if not date_left:
-                date_left = date.today()
+                date_left = date.today() + timedelta(days=1)
             if member.joined <= date < date_left:
                 members_active.append(member)
         return members_active
@@ -65,6 +65,32 @@ class ParliamentMember(models.Model):
             if member.left is None:
                 return member.party
         return None
+
+    def check_overlap(self):
+        members = ParliamentMember.objects.filter(person=self.person)
+        if members.count() <= 1:
+            return []
+        overlapping_members = []
+        for member_a in members:
+            for member_b in members:
+                if member_a.id == member_b.id or not member_a.joined or not member_b.joined:
+                    continue
+                left_a = date.today() + timedelta(days=1)
+                left_b = date.today() + timedelta(days=1)
+                if member_a.left:
+                    left_a = member_a.left
+                if member_b.left:
+                    left_b = member_b.left
+                if member_a.joined < member_b.joined < left_a:
+                    overlapping_members.append(member_a)
+                elif member_b.joined < member_a.joined < left_b:
+                    overlapping_members.append(member_a)
+                elif member_b.joined < member_a.joined and left_a < left_b:
+                    overlapping_members.append(member_a)
+                elif member_a.joined < member_b.joined and left_b < left_a:
+                    overlapping_members.append(member_a)
+        return overlapping_members
+
 
     def __str__(self):
         display_name = self.person.fullname()
