@@ -22,7 +22,7 @@ class TestGetParliamentMemberInfo(TestCase):
         birth_date = wikidata.get_birth_date(wikidata_id)
         self.assertEqual(birth_date, date(day=6, month=5, year=1961))
         parlement_positions = wikidata.get_parliament_positions_held(wikidata_id)
-        self.assertEqual(len(parlement_positions), 6)
+        self.assertEqual(len(parlement_positions), 2)
 
 
 class TestPositionHeld(TestCase):
@@ -32,13 +32,13 @@ class TestPositionHeld(TestCase):
 
     def test_search_all(self):
         positions = wikidata.get_positions_held(self.wikidata_id_ft)
-        self.assertEqual(len(positions), 8)
+        self.assertEqual(len(positions), 4)
         positions = wikidata.get_positions_held(self.wikidata_id_wa)
         self.assertEqual(len(positions), 1)
 
     def test_search_parliament_member(self):
         positions = wikidata.get_parliament_positions_held(self.wikidata_id_ft)
-        self.assertEqual(len(positions), 6)
+        self.assertEqual(len(positions), 2)
         for position in positions:
             self.assertEqual(position['label'], 'member of the House of Representatives of the Netherlands')
         positions = wikidata.get_parliament_positions_held(self.wikidata_id_mr)
