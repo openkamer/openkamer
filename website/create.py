@@ -152,6 +152,44 @@ def create_parliamemt_members():
         logger.info("new parliament member: " + str(parliament_member))
 
 
+def create_parliament_members_from_wikidata(max_results=None):
+    logger.info('BEGIN')
+    member_wikidata_ids = wikidata.search_parliament_member_ids()
+    parliament = Parliament.get_or_create_tweede_kamer()
+    counter = 0
+    members = []
+    for wikidata_id in member_wikidata_ids:
+        print('=========================')
+        print(wikidata_id)
+        try:
+            person = create_person(wikidata_id)
+            print(person)
+            positions = wikidata.get_parliament_positions_held(wikidata_id)
+            for position in positions:
+                parliament_member = ParliamentMember.objects.create(
+                    person=person,
+                    parliament=parliament,
+                    joined=position['start_time'],
+                    left=position['end_time']
+                )
+                print(parliament_member)
+                members.append(parliament_member)
+        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
+            logger.error(traceback.format_exc())
+            logger.error(error)
+            logger.error('')
+        except:
+            logger.error(traceback.format_exc())
+            raise
+        counter += 1
+        if max_results and counter >= max_results:
+            logger.info('END: max results reached')
+            return members
+        print(counter)
+    logger.info('END')
+    return members
+
+
 @transaction.atomic
 def create_person(wikidata_id, fullname=''):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
@@ -574,41 +612,3 @@ def create_besluitenlijst(url):
             )
     logger.info('END')
     return besluiten_lijst
-
-
-def create_parliament_members_from_wikidata(max_results=None):
-    logger.info('BEGIN')
-    member_wikidata_ids = wikidata.search_parliament_member_ids()
-    parliament = Parliament.get_or_create_tweede_kamer()
-    counter = 0
-    members = []
-    for wikidata_id in member_wikidata_ids:
-        print('=========================')
-        print(wikidata_id)
-        try:
-            person = create_person(wikidata_id)
-            print(person)
-            positions = wikidata.get_parliament_positions_held(wikidata_id)
-            for position in positions:
-                parliament_member = ParliamentMember.objects.create(
-                    person=person,
-                    parliament=parliament,
-                    joined=position['start_time'],
-                    left=position['end_time']
-                )
-                print(parliament_member)
-                members.append(parliament_member)
-        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
-            logger.error(traceback.format_exc())
-            logger.error(error)
-            logger.error('')
-        except:
-            logger.error(traceback.format_exc())
-            raise
-        counter += 1
-        if max_results and counter >= max_results:
-            logger.info('END: max results reached')
-            return members
-        print(counter)
-    logger.info('END')
-    return members
