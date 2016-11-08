@@ -1,7 +1,10 @@
+import logging
 from unittest import TestCase
 from datetime import date
 
 from wikidata import wikidata
+
+logger = logging.getLogger(__name__)
 
 
 class TestSearchParliamentMembers(TestCase):
@@ -14,15 +17,18 @@ class TestSearchParliamentMembers(TestCase):
 class TestGetParliamentMemberInfo(TestCase):
 
     def test_get_frans_timmermans(self):
+        logger.info('BEGIN')
         wikidata_id = 'Q32681'  # Frans Timmermans
-        fullname = wikidata.get_label(wikidata_id)
+        item = wikidata.WikidataItem(wikidata_id)
+        fullname = item.get_label()
         self.assertEqual(fullname, 'Frans Timmermans')
-        given_name = wikidata.get_given_name(wikidata_id)
+        given_name = item.get_given_name()
         self.assertEqual(given_name, 'Frans')
-        birth_date = wikidata.get_birth_date(wikidata_id)
+        birth_date = item.get_birth_date()
         self.assertEqual(birth_date, date(day=6, month=5, year=1961))
-        parlement_positions = wikidata.get_parliament_positions_held(wikidata_id)
+        parlement_positions = item.get_parliament_positions_held()
         self.assertEqual(len(parlement_positions), 2)
+        logger.info('END')
 
 
 class TestPositionHeld(TestCase):
@@ -31,15 +37,19 @@ class TestPositionHeld(TestCase):
     wikidata_id_mr = 'Q57792'  # Mark Rutte
 
     def test_search_all(self):
-        positions = wikidata.get_positions_held(self.wikidata_id_ft)
+        item = wikidata.WikidataItem(self.wikidata_id_ft)
+        positions = item.get_positions_held()
         self.assertEqual(len(positions), 4)
-        positions = wikidata.get_positions_held(self.wikidata_id_wa)
+        item = wikidata.WikidataItem(self.wikidata_id_wa)
+        positions = item.get_positions_held()
         self.assertEqual(len(positions), 1)
 
     def test_search_parliament_member(self):
-        positions = wikidata.get_parliament_positions_held(self.wikidata_id_ft)
+        item = wikidata.WikidataItem(self.wikidata_id_ft)
+        positions = item.get_parliament_positions_held()
         self.assertEqual(len(positions), 2)
         for position in positions:
-            self.assertEqual(position['label'], 'member of the House of Representatives of the Netherlands')
-        positions = wikidata.get_parliament_positions_held(self.wikidata_id_mr)
+            self.assertEqual(position['id'], 'Q18887908')
+        item = wikidata.WikidataItem(self.wikidata_id_mr)
+        positions = item.get_parliament_positions_held()
         self.assertEqual(len(positions), 3)

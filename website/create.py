@@ -154,8 +154,8 @@ def create_parliamemt_members():
 
 def create_parliament_members_from_wikidata(max_results=None):
     logger.info('BEGIN')
-    member_wikidata_ids = wikidata.search_parliament_member_ids()
     parliament = Parliament.get_or_create_tweede_kamer()
+    member_wikidata_ids = wikidata.search_parliament_member_ids()
     counter = 0
     members = []
     for wikidata_id in member_wikidata_ids:
