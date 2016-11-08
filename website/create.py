@@ -2,7 +2,7 @@ import logging
 import os
 import re
 import requests
-from requests.exceptions import ConnectionError, ConnectTimeout
+from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 import traceback
 import uuid
 from json.decoder import JSONDecodeError
@@ -556,10 +556,13 @@ def create_parliament_members():
                     left=position['end_time']
                 )
                 print(parliament_member)
-        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout)as error:
+        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
             logger.error(traceback.format_exc())
             logger.error(error)
             logger.error('')
+        except:
+            logger.error(traceback.format_exc())
+            raise
         counter += 1
         print(counter)
     logger.info('END')
