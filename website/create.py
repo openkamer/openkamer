@@ -576,11 +576,12 @@ def create_besluitenlijst(url):
     return besluiten_lijst
 
 
-def create_parliament_members():
+def create_parliament_members_from_wikidata(max_results=None):
     logger.info('BEGIN')
     member_wikidata_ids = wikidata.search_parliament_member_ids()
     parliament = Parliament.get_or_create_tweede_kamer()
     counter = 0
+    members = []
     for wikidata_id in member_wikidata_ids:
         print('=========================')
         print(wikidata_id)
@@ -596,6 +597,7 @@ def create_parliament_members():
                     left=position['end_time']
                 )
                 print(parliament_member)
+                members.append(parliament_member)
         except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
             logger.error(traceback.format_exc())
             logger.error(error)
@@ -604,5 +606,9 @@ def create_parliament_members():
             logger.error(traceback.format_exc())
             raise
         counter += 1
+        if max_results and counter >= max_results:
+            logger.info('END: max results reached')
+            return members
         print(counter)
     logger.info('END')
+    return members

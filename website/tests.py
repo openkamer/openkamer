@@ -47,7 +47,7 @@ class TestCreateParliament(TestCase):
         website.create.create_parliamemt_members()
 
     def test_create_parliament_from_wikidata(self):
-        website.create.create_parliament_members()
+        website.create.create_parliament_members_from_wikidata(max_results=20)
 
 
 class TestCreateGovernment(TestCase):
