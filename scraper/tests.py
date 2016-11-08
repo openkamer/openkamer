@@ -35,9 +35,9 @@ class TestVoortouwCommissieScraper(TestCase):
 
 class TestBesluitenlijstScraper(TestCase):
     filenames = [
-        # 'data/besluitenlijsten/besluitenlijst_example1.pdf',
-        # 'data/besluitenlijsten/besluitenlijst_example2.pdf',
-        # 'data/besluitenlijsten/besluitenlijst_example3.pdf',
+        'data/besluitenlijsten/besluitenlijst_example1.pdf',
+        'data/besluitenlijsten/besluitenlijst_example2.pdf',
+        'data/besluitenlijsten/besluitenlijst_example3.pdf',
         'data/besluitenlijsten/besluitenlijst_example4.pdf',
     ]
 
