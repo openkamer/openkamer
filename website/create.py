@@ -47,6 +47,7 @@ import scraper.besluitenlijst
 import scraper.documents
 import scraper.government
 import scraper.persons
+import scraper.parliament_members
 import scraper.political_parties
 import scraper.votings
 
@@ -125,6 +126,30 @@ def create_parties():
             logger.info('created: ' + str(party))
         party.update_info('nl', 'nl')
         party.save()
+
+
+@transaction.atomic
+def create_parliamemt_members():
+    parliament = Parliament.get_or_create_tweede_kamer()
+    members = scraper.parliament_members.search_members()
+    for member in members:
+        forename = member['forename']
+        surname = member['surname']
+        if Person.person_exists(forename, surname):
+            person = Person.objects.get(forename=forename, surname=surname)
+        else:
+            person = Person.objects.create(
+                forename=forename,
+                surname=surname,
+                surname_prefix=member['prefix'],
+                initials=member['initials']
+            )
+        party = PoliticalParty.get_party(member['party'])
+        party_member = PartyMember.objects.create(person=person, party=party)
+        parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
+        logger.info("new person: " + str(person))
+        logger.info("new party member: " + str(party_member))
+        logger.info("new parliament member: " + str(parliament_member))
 
 
 @transaction.atomic

@@ -9,6 +9,7 @@ from django_cron import CronJobBase, Schedule
 from git import Repo, Actor
 
 import scraper.political_parties
+import scraper.parliament_members
 
 from website import settings
 
@@ -34,7 +35,7 @@ class CreateCommitPartyCSV(CronJobBase):
             changed_files = repo.git.diff(name_only=True)
 
             if not changed_files:
-                logger.info('no changes found')
+                logger.info('no changes')
                 logger.info('END')
                 return
 
@@ -69,17 +70,17 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             # origin = repo.create_remote('origin', repo.remotes.origin.url)
             # origin.pull()
 
-            parties = scraper.political_parties.search_parties()
-            filepath = os.path.join(settings.PARTIES_REPO_DIR, 'tweedekamerleden.csv')
-            scraper.political_parties.create_parties_csv(parties, filepath)
+            parties = scraper.parliament_members.search_members()
+            filepath = os.path.join(settings.MEMBERS_REPO_DIR, 'tweedekamerleden.csv')
+            scraper.parliament_members.create_members_csv(parties, filepath)
             changed_files = repo.git.diff(name_only=True)
 
             if not changed_files:
-                logger.info('no changes found')
+                logger.info('no changes')
                 logger.info('END')
                 return
 
-            filepath_date = os.path.join(settings.PARTIES_REPO_DIR, 'date.txt')
+            filepath_date = os.path.join(settings.MEMBERS_REPO_DIR, 'date.txt')
             with open(filepath_date, 'w') as fileout:
                 fileout.write(datetime.date.today().strftime('%Y-%m-%d'))
 

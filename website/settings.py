@@ -132,7 +132,8 @@ BOOTSTRAP3 = {
 # DJANGO-CRON #
 ###############
 CRON_CLASSES = [
-    "website.cron.CreateCommitPartyCSV",
+    'website.cron.CreateCommitPartyCSV',
+    'website.cron.CreateCommitParliamentMembersCSV'
 ]
 
 ###########

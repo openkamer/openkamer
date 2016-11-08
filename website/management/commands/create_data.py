@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         website.create.create_parties()
         website.create.create_governments()
-        scraper.parliament_members.create_members()
+        website.create.create_parliamemt_members()
         Person.update_persons_all('nl')
 
         # add a few demo dossiers

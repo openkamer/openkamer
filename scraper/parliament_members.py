@@ -3,26 +3,15 @@ import logging
 
 import lxml.html
 
-from wikidata import wikidata
-
-from person.models import Person
-from parliament.models import Parliament
-from parliament.models import PoliticalParty
-from parliament.models import PartyMember
-from parliament.models import ParliamentMember
-
 logger = logging.getLogger(__name__)
 
 
-def create_members():
+def search_members():
     url = 'http://www.tweedekamer.nl/kamerleden/alle_kamerleden'
     page = requests.get(url)
     tree = lxml.html.fromstring(page.content)
-
-    parliament = Parliament.get_or_create_tweede_kamer()
-
     rows = tree.xpath("//tbody/tr")
-
+    members = []
     for row in rows:
         columns = row.xpath("td")
         if len(columns) == 8:
@@ -30,19 +19,20 @@ def create_members():
             surname = columns[0][0].text.split(',')[0]
             prefix = columns[0][0].text.split('.')[-1].strip()
             initials = columns[0][0].text.split(',')[1].replace(prefix, '').replace(' ', '')
-            if Person.person_exists(forename, surname):
-                person = Person.objects.get(forename=forename, surname=surname)
-            else:
-                person = Person.objects.create(
-                    forename=forename,
-                    surname=surname,
-                    surname_prefix=prefix,
-                    initials=initials
-                )
-            party_name = columns[2][0].text
-            party = PoliticalParty.get_party(party_name)
-            party_member = PartyMember.objects.create(person=person, party=party)
-            parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
-            logger.info("new person: " + str(person))
-            logger.info("new party member: " + str(party_member))
-            logger.info("new parliament member: " + str(parliament_member))
+            party = columns[2][0].text
+            member = {
+                'forename': forename,
+                'surname': surname,
+                'prefix': prefix,
+                'initials': initials,
+                'party': party
+            }
+            members.append(member)
+    return members
+
+
+def create_members_csv(members, filepath):
+    with open(filepath, 'w') as fileout:
+        fileout.write('forename,surname,name prefix,initials,party\n')
+        for member in members:
+            fileout.write(member['forename'] + ',' + member['surname'] + ',' + member['prefix'] + ',' + member['initials'] + ',' + member['party'] + '\n')
