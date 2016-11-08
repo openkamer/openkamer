@@ -50,7 +50,8 @@ class Person(models.Model):
     def find_prefix(name):
         name_prefix = ''
         for prefix in NAME_PREFIXES:
-            if ' ' + prefix + ' ' in name:
+            prefix_pos = name.find(prefix + ' ')
+            if prefix_pos >= 0 and (prefix_pos == 0 or name[prefix_pos-1] == ' '):  # prefix must be at the start or there should be a whitespace in front
                 name_prefix = prefix
                 break
         return name_prefix

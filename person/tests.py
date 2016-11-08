@@ -25,6 +25,9 @@ class TestFindName(TestCase):
         p_found = Person.find_by_fullname('Jan Jaap van Balkenende')
         self.assertEqual(None, p_found)
 
+
+class TestNamePrefix(TestCase):
+
     def test_find_name_prefix(self):
         name = 'Ard van der Steur'
         prefix = Person.find_prefix(name)
@@ -44,6 +47,15 @@ class TestFindName(TestCase):
         name = 'Jan Peter Balkenende'
         prefix = Person.find_prefix(name)
         self.assertEqual(prefix, '')
+        name = 'Boris van der Ham'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van der')
+        name = 'van der Ham'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van der')
+        name = 'van derHam'
+        prefix = Person.find_prefix(name)
+        self.assertEqual(prefix, 'van')
 
 
 class TestCreatePerson(TestCase):
