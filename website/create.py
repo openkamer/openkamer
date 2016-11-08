@@ -47,6 +47,7 @@ import scraper.besluitenlijst
 import scraper.documents
 import scraper.government
 import scraper.persons
+import scraper.political_parties
 import scraper.votings
 
 logger = logging.getLogger(__name__)
@@ -110,6 +111,20 @@ def create_goverment_member(government, member, person, position):
         end_date=end_date
     )
     return member
+
+
+@transaction.atomic
+def create_parties():
+    parties = scraper.political_parties.search_parties()
+    for party_info in parties:
+        party = PoliticalParty.find_party(party_info['name'])
+        if party:
+            logger.warning('party ' + party_info['name'] + ' already exists!')
+        else:
+            party = PoliticalParty.objects.create(name=party_info['name'], name_short=party_info['name_short'])
+            logger.info('created: ' + str(party))
+        party.update_info('nl', 'nl')
+        party.save()
 
 
 @transaction.atomic

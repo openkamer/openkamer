@@ -1,6 +1,7 @@
 import json
 import datetime
 import re
+import os
 
 from django.test import TestCase
 
@@ -11,6 +12,7 @@ import scraper.votings
 import scraper.government
 import scraper.persons
 import scraper.besluitenlijst
+import scraper.political_parties
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -19,6 +21,24 @@ import scraper.besluitenlijst
 # scraper.documents.get_document_id(page_url)
 
 # scraper.documents.search_politieknl_dossier(33885)
+
+
+class TestPoliticalPartyScraper(TestCase):
+
+    def test_scrape_parties(self):
+        parties = scraper.political_parties.search_parties()
+        self.assertTrue(len(parties) > 10)
+        for party in parties:
+            self.assertTrue(party['name'])
+            self.assertTrue(party['name_short'])
+
+    def test_create_party_csv(self):
+        filepath = './data/tmp/parties.csv'
+        try:
+            parties = scraper.political_parties.search_parties()
+            scraper.political_parties.create_parties_csv(parties, filepath)
+        finally:
+            os.remove(filepath)
 
 
 class TestVoortouwCommissieScraper(TestCase):

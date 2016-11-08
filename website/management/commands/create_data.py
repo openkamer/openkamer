@@ -5,23 +5,21 @@ import scraper.parliament_members
 import scraper.government
 
 from person.models import Person
-from website.create import create_besluitenlijsten
-from website.create import create_governments
-from website.create import create_or_update_dossier
+import website.create
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        scraper.political_parties.create_parties()
-        create_governments()
+        website.create.create_parties()
+        website.create.create_governments()
         scraper.parliament_members.create_members()
         Person.update_persons_all('nl')
 
         # add a few demo dossiers
-        create_or_update_dossier('33885')
-        create_or_update_dossier('34344')
-        create_or_update_dossier('33506')
+        website.create.create_or_update_dossier('33885')
+        website.create.create_or_update_dossier('34344')
+        website.create.create_or_update_dossier('33506')
 
-        create_besluitenlijsten(max_results_per_commission=20)
+        website.create.create_besluitenlijsten(max_results_per_commission=20)
 

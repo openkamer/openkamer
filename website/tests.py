@@ -1,9 +1,14 @@
+import logging
+import os
+
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
 
-from scraper import political_parties
-from scraper import parliament_members
+from git import Repo, Actor
+
+import scraper.political_parties
+import scraper.parliament_members
 
 from person.models import Person
 
@@ -23,13 +28,23 @@ from document.models import Kamerstuk
 from document.models import Voting
 
 import website.create
+from website import settings
+
+logger = logging.getLogger(__name__)
+
+
+class TestExample(TestCase):
+
+    def test_example(self):
+        logger.info('BEGIN')
+        logger.info('END')
 
 
 class TestCreateParliament(TestCase):
 
     def test_create_parliament(self):
-        political_parties.create_parties()
-        parliament_members.create_members()
+        website.create.create_parties()
+        scraper.parliament_members.create_members()
 
     def test_create_parliament_from_wikidata(self):
         website.create.create_parliament_members()
