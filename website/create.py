@@ -192,7 +192,7 @@ def create_parliament_members_from_wikidata(max_results=None):
 
 
 @transaction.atomic
-def create_person(wikidata_id, fullname='', wikidata_item=None):
+def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=False):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
     if not wikidata_item:
         wikidata_item = wikidata.WikidataItem(wikidata_id)
@@ -216,9 +216,9 @@ def create_person(wikidata_id, fullname='', wikidata_item=None):
         )
         person.update_info(language='nl', wikidata_item=wikidata_item)
         person.save()
-        # if person.parlement_and_politiek_id:
-        #     person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
-        #     person.save()
+        if add_initials and person.parlement_and_politiek_id:
+            person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+            person.save()
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():

@@ -198,11 +198,11 @@ class TestCreatePerson(TestCase):
     name_ss = 'Sjoerd Wiemer Sjoerdsma'
 
     def test_create_person_from_wikidata_id(self):
-        person = website.create.create_person(self.wikidata_id_ss)
+        person = website.create.create_person(self.wikidata_id_ss, add_initials=True)
         self.check_sjoerd(person)
 
     def test_create_person_from_wikidata_id_and_fullname(self):
-        person = website.create.create_person(self.wikidata_id_ss, self.name_ss)
+        person = website.create.create_person(self.wikidata_id_ss, self.name_ss, add_initials=True)
         self.check_sjoerd(person)
 
     def check_sjoerd(self, person):
