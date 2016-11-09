@@ -3,8 +3,8 @@ import json
 import urllib.parse
 import logging
 
-import requests
 import dateparser
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -199,11 +199,12 @@ class WikidataItem(object):
     @staticmethod
     def get_date(date_str):
         try:
-            date = dateparser.parse(date_str)
-            if not date:
-                return None
-            return dateparser.parse(date_str).date()
+            date = datetime.strptime(date_str[1:11], '%Y-%m-%d')
+            return date.date()
         except ValueError as error:
+            date = dateparser.parse(date_str)
+            if date:
+                return date.date()
             logger.error(error)
             return None
 
