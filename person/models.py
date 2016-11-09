@@ -111,21 +111,23 @@ class Person(models.Model):
         logger.info('wikidata id: ' + str(wikidata_id))
         return wikidata_id
 
-    def update_info(self, language='en'):
-        logger.info('get info from wikidata for ' + self.get_full_name())
+    def update_info(self, language='en', wikidata_item=None):
+        logger.info('get info from wikidata for ' + str(self.get_full_name()))
         if not self.wikidata_id:
             self.wikidata_id = self.find_wikidata_id(language)
         if not self.wikidata_id:
             logger.warning('no wikidata id found')
             return
-        birthdate = wikidata.get_birth_date(self.wikidata_id)
+        if not wikidata_item:
+            wikidata_item = wikidata.WikidataItem(self.wikidata_id)
+        birthdate = wikidata_item.get_birth_date()
         if birthdate:
             self.birthdate = birthdate
-        image_filename = wikidata.get_image_filename(self.wikidata_id)
+        image_filename = wikidata_item.get_image_filename()
         if image_filename:
             self.wikimedia_image_name = image_filename
-            self.wikimedia_image_url = wikidata.get_wikimedia_image_url(self.wikimedia_image_name)
-        self.parlement_and_politiek_id = wikidata.get_parlement_and_politiek_id(self.wikidata_id)
+            self.wikimedia_image_url = wikidata.WikidataItem.get_wikimedia_image_url(self.wikimedia_image_name)
+        self.parlement_and_politiek_id = wikidata_item.get_parlement_and_politiek_id()
 
     def wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)

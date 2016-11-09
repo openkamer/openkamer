@@ -58,7 +58,7 @@ class WikidataItem(object):
 
     def __init__(self, wikidata_id):
         self.id = wikidata_id
-        self.item = self.get_item(self.id)
+        self.item = self.get_item(wikidata_id)
 
     @staticmethod
     def get_item(id, sites=None, props=None):

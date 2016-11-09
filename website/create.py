@@ -129,7 +129,7 @@ def create_parties():
 
 
 @transaction.atomic
-def create_parliamemt_members():
+def create_parliament_members():
     parliament = Parliament.get_or_create_tweede_kamer()
     members = scraper.parliament_members.search_members()
     for member in members:
@@ -162,9 +162,10 @@ def create_parliament_members_from_wikidata(max_results=None):
         print('=========================')
         print(wikidata_id)
         try:
-            person = create_person(wikidata_id)
+            wikidata_item = wikidata.WikidataItem(wikidata_id)
+            person = create_person(wikidata_id, wikidata_item=wikidata_item)
             print(person)
-            positions = wikidata.get_parliament_positions_held(wikidata_id)
+            positions = wikidata_item.get_parliament_positions_held()
             for position in positions:
                 parliament_member = ParliamentMember.objects.create(
                     person=person,
@@ -191,14 +192,16 @@ def create_parliament_members_from_wikidata(max_results=None):
 
 
 @transaction.atomic
-def create_person(wikidata_id, fullname=''):
+def create_person(wikidata_id, fullname='', wikidata_item=None):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
+    if not wikidata_item:
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
     if persons.exists():
         person = persons[0]
     else:
         if not fullname:
-            fullname = wikidata.get_label(wikidata_id, language='nl')
-        forename = wikidata.get_given_name(wikidata_id)
+            fullname = wikidata_item.get_label(language='nl')
+        forename = wikidata_item.get_given_name()
         if not forename:
             forename = fullname.split(' ')[0]
         surname = fullname.replace(forename + ' ', '').strip()
@@ -211,15 +214,15 @@ def create_person(wikidata_id, fullname=''):
             surname_prefix=prefix,
             wikidata_id=wikidata_id
         )
-        person.update_info()
+        person.update_info(language='nl', wikidata_item=wikidata_item)
         person.save()
-        if person.parlement_and_politiek_id:
-            person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
-            person.save()
+        # if person.parlement_and_politiek_id:
+        #     person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+        #     person.save()
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
-        memberships = wikidata.get_political_party_memberships(wikidata_id)
+        memberships = wikidata_item.get_political_party_memberships()
         for membership in memberships:
             parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
             if parties.exists():

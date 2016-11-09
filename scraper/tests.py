@@ -128,7 +128,8 @@ class TestGovernmentScraper(TestCase):
     def test_get_parlement_and_politiek_id(self):
         person_wikidata_id = 'Q32681'
         expected_id = 'vg09llk9rzrp'
-        parlement_id = wikidata.get_parlement_and_politiek_id(person_wikidata_id)
+        item = wikidata.WikidataItem(person_wikidata_id)
+        parlement_id = item.get_parlement_and_politiek_id()
         self.assertEqual(parlement_id, expected_id)
 
 

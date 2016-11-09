@@ -91,7 +91,6 @@ class ParliamentMember(models.Model):
                     overlapping_members.append(member_a)
         return overlapping_members
 
-
     def __str__(self):
         display_name = self.person.fullname()
         if self.party():
@@ -128,28 +127,27 @@ class PoliticalParty(models.Model):
         """
         if top_level_domain[0] == '.':
             logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
-        wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
-        if not wikidata_ids:
-            return
-        wikidata_id = wikidata_ids[0]
-        # find the first result with a website with the given domain
-        for id in wikidata_ids:
-            official_website = wikidata.get_official_website(id)
-            if official_website:
-                tld = official_website.split('.')[-1]
-                if tld == top_level_domain or tld == top_level_domain + '/':
-                    self.official_website_url = official_website
-                    wikidata_id = id
-                    break
-        self.wikidata_id = wikidata_id
-        self.wikipedia_url = wikidata.get_wikipedia_url(wikidata_id, language)
+        if not self.wikidata_id:
+            wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
+            if not wikidata_ids:
+                return
+            self.wikidata_id = wikidata_ids[0]
+            # find the first result with a website with the given domain
+            for wid in wikidata_ids:
+                official_website = wikidata.WikidataItem(wid).get_official_website()
+                if official_website:
+                    tld = official_website.split('.')[-1]
+                    if tld == top_level_domain or tld == top_level_domain + '/':
+                        self.official_website_url = official_website
+                        self.wikidata_id = wid
+                        break
+        self.wikipedia_url = wikidata.WikidataItem.get_wikipedia_url(self.wikidata_id, language)
         logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
-        logo_filename = wikidata.get_logo_filename(self.wikidata_id)
-        inception_date = wikidata.get_inception(self.wikidata_id)
-        if inception_date:
-            self.founded = inception_date
+        wikidata_item = wikidata.WikidataItem(self.wikidata_id)
+        logo_filename = wikidata_item.get_logo_filename()
+        self.founded = wikidata_item.get_inception()
         if logo_filename:
-            self.wikimedia_logo_url = wikidata.get_wikimedia_image_url(logo_filename)
+            self.wikimedia_logo_url = wikidata.WikidataItem.get_wikimedia_image_url(logo_filename)
         self.save()
 
     @staticmethod
