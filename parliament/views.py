@@ -55,6 +55,7 @@ class ParliamentMembersCheckView(TemplateView):
         parliament = Parliament.get_or_create_tweede_kamer()
         context['members_current'] = parliament.get_members_at_date(datetime.date.today())
         context['members_overlap'] = ParliamentMember.objects.filter(pk__in=overlap_ids).distinct()
+        context['members_per_month'] = members_per_month
         return context
 
     @staticmethod
@@ -68,11 +69,11 @@ class ParliamentMembersCheckView(TemplateView):
                 'date': current_date,
                 'members': members,
             })
-            print(current_date)
-            print(len(members))
             current_date += datetime.timedelta(days=31)
         current_date = datetime.date.today()
         members = parliament.get_members_at_date(current_date)
-        print(current_date)
-        print(len(members))
+        members_per_month.append({
+            'date': current_date,
+            'members': members,
+        })
         return members_per_month

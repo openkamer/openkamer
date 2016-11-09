@@ -7,12 +7,13 @@ from django.test import TestCase
 
 from wikidata import wikidata
 
-import scraper.documents
-import scraper.votings
-import scraper.government
-import scraper.persons
 import scraper.besluitenlijst
+import scraper.documents
+import scraper.government
+import scraper.parliament_members
+import scraper.persons
 import scraper.political_parties
+import scraper.votings
 
 # metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
 # print(metadata)
@@ -37,6 +38,17 @@ class TestPoliticalPartyScraper(TestCase):
         try:
             parties = scraper.political_parties.search_parties()
             scraper.political_parties.create_parties_csv(parties, filepath)
+        finally:
+            os.remove(filepath)
+
+
+class TestParliamentMemberScraper(TestCase):
+
+    def test_scrape_parliament_members(self):
+        members = scraper.parliament_members.search_members()
+        filepath = './data/tmp/members.csv'
+        try:
+            scraper.parliament_members.create_members_csv(members, filepath)
         finally:
             os.remove(filepath)
 
