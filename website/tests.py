@@ -313,6 +313,10 @@ class TestWebsite(TestCase):
         response = self.client.get(reverse('parliament-members'))
         self.assertEqual(response.status_code, 200)
 
+    def test_parliament_members_check(self):
+        response = self.client.get(reverse('parliament-members-check'))
+        self.assertEqual(response.status_code, 200)
+
     def test_plot_example_view(self):
         response = self.client.get('/stats/exampleplots/')
         self.assertEqual(response.status_code, 200)
