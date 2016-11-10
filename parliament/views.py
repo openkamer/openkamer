@@ -47,7 +47,7 @@ class ParliamentMembersCheckView(TemplateView):
         context = super().get_context_data(**kwargs)
         start_date = datetime.date(year=2005, month=6, day=1)
         members_per_month = self.get_members_per_month(start_date)
-        members = ParliamentMember.objects.filter()
+        members = ParliamentMember.objects.all()
         members_overlap = []
         for member in members:
             members_overlap += member.check_overlap()
