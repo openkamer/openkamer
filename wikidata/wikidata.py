@@ -1,9 +1,7 @@
-from datetime import datetime
-import json
+import datetime
 import urllib.parse
 import logging
 
-import dateparser
 import requests
 
 logger = logging.getLogger(__name__)
@@ -127,10 +125,13 @@ class WikidataItem(object):
             return claims['P17'][0]['mainsnak']['datavalue']['value']['numeric-id']
         return None
 
-    def get_given_name(self):
+    def get_given_names(self):
         claims = self.get_claims()
         if 'P735' in claims:
-            return WikidataItem.get_label_for_id(claims['P735'][0]['mainsnak']['datavalue']['value']['id'])
+            given_names = []
+            for value in claims['P735']:
+                given_names.append(WikidataItem.get_label_for_id(value['mainsnak']['datavalue']['value']['id']))
+            return given_names
         return ''
 
     def get_official_website(self):
@@ -199,12 +200,9 @@ class WikidataItem(object):
     @staticmethod
     def get_date(date_str):
         try:
-            date = datetime.strptime(date_str[1:11], '%Y-%m-%d')
+            date = datetime.datetime.strptime(date_str[1:11], '%Y-%m-%d')
             return date.date()
         except ValueError as error:
-            date = dateparser.parse(date_str)
-            if date:
-                return date.date()
             logger.error(error)
             return None
 

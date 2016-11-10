@@ -73,14 +73,16 @@ def search_members_check():
             start_date = datetime.datetime.strptime(dates[0], '%Y-%m-%d').date()
             end_date = ''
             if len(dates) == 2:
-                end_date = datetime.datetime.strptime(dates[0], '%Y-%m-%d').date() + datetime.timedelta(days=1)
+                end_date = datetime.datetime.strptime(dates[1], '%Y-%m-%d').date() + datetime.timedelta(days=1)
             date_ranges.append({
                 'start_date': start_date,
                 'end_date': end_date,
                 'fractie': fractie,
             })
         initials = name_line.split(' ')[0]
-        name = name_line.replace(initials, '').strip()
+        name = name_line.replace(initials, '')
+        name = name.replace('MPM', '')  # Fred Teeven has this surfix that should not be there
+        name = name.strip()
         member = {
             'name': name,
             'initials': initials,

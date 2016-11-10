@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 
 import requests
 
@@ -72,5 +72,5 @@ class TestCreatePerson(TestCase):
         self.assertEqual(person.wikimedia_image_name.split('.')[1], 'jpg')
         response = requests.get(person.wikimedia_image_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(person.birthdate, date(1967, 2, 14))
+        self.assertEqual(person.birthdate, datetime.date(1967, 2, 14))
         self.assertEqual(person.slug, 'mark-rutte')

@@ -1,5 +1,5 @@
 import logging
-from datetime import date, timedelta
+import datetime
 
 from django.db import models
 from django.utils.text import slugify
@@ -18,7 +18,7 @@ class Parliament(models.Model):
     def __str__(self):
         return str(self.name)
 
-    def get_members_at_date(self, date):
+    def get_members_at_date(self, check_date):
         members = self.members()
         members_active = []
         for member in members:
@@ -26,8 +26,8 @@ class Parliament(models.Model):
                 continue
             date_left = member.left
             if not date_left:
-                date_left = date.today() + timedelta(days=1)
-            if member.joined <= date < date_left:
+                date_left = datetime.date.today() + datetime.timedelta(days=1)
+            if member.joined <= check_date < date_left:
                 members_active.append(member)
         return members_active
 
@@ -75,8 +75,8 @@ class ParliamentMember(models.Model):
             for member_b in members:
                 if member_a.id == member_b.id or not member_a.joined or not member_b.joined:
                     continue
-                left_a = date.today() + timedelta(days=1)
-                left_b = date.today() + timedelta(days=1)
+                left_a = datetime.date.today() + datetime.timedelta(days=1)
+                left_b = datetime.date.today() + datetime.timedelta(days=1)
                 if member_a.left:
                     left_a = member_a.left
                 if member_b.left:

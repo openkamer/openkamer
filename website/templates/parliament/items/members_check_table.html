@@ -3,6 +3,8 @@
     <tr>
       <th>nr</th>
       <th>naam</th>
+      <th>first</th>
+      <th>last</th>
       <th>begin datum</th>
       <th>eind datum</th>
       <th>partij</th>
@@ -15,6 +17,8 @@
     <tr>
       <td>{{ forloop.counter }}</td>
       <td>{{ member.person.fullname }}</td>
+      <td>{{ member.person.forename }}</td>
+      <td>{{ member.person.surname }}</td>
       <td>
       {% if not member.joined %}
         <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>

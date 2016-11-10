@@ -195,7 +195,7 @@ class TestPersonView(TestCase):
 
 class TestCreatePerson(TestCase):
     wikidata_id_ss = 'Q516335'  # Sjoerd Wiemer Sjoerdsma
-    name_ss = 'Sjoerd Wiemer Sjoerdsma'
+    name_ss = 'Sjoerd Sjoerdsma'
 
     def test_create_person_from_wikidata_id(self):
         person = website.create.create_person(self.wikidata_id_ss, add_initials=True)
@@ -208,7 +208,28 @@ class TestCreatePerson(TestCase):
     def check_sjoerd(self, person):
         self.assertTrue('Sjoerdsma' in person.surname)  # TODO: make this check more strict, surname is only Sjoerdsma not Wiemer Sjoerdsma, but this cannot be determined from wikidata atm.
         self.assertEqual(person.forename, 'Sjoerd')
+        self.assertEqual(person.surname, 'Sjoerdsma')
         self.assertEqual(person.initials, 'Sj.W.')
+
+    def test_jeroen_wikidata(self):
+        wikidata_id = 'Q17428405'
+        person = website.create.create_person(wikidata_id)
+
+    def test_jan_kees_wikidata(self):
+        wikidata_id = 'Q1666631'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Jan')  # Kees is seen as second given name, there is no way to know 'Jan Kees' is a single first name
+        self.assertEqual(person.surname_prefix, 'de')
+        self.assertEqual(person.surname, 'Jager')
+        self.assertEqual(person.fullname(), 'Jan de Jager')
+
+    def test_eelke_wikidata(self):
+        wikidata_id = 'Q2710877'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Eeke')
+        self.assertEqual(person.surname_prefix, 'van der')
+        self.assertEqual(person.surname, 'Veen')
+        self.assertEqual(person.fullname(), 'Eeke van der Veen')
 
 
 class TestWebsite(TestCase):

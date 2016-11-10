@@ -1,6 +1,6 @@
 import logging
 from unittest import TestCase
-from datetime import date
+import datetime
 
 from wikidata import wikidata
 
@@ -22,10 +22,10 @@ class TestGetParliamentMemberInfo(TestCase):
         item = wikidata.WikidataItem(wikidata_id)
         fullname = item.get_label()
         self.assertEqual(fullname, 'Frans Timmermans')
-        given_name = item.get_given_name()
+        given_name = item.get_given_names()[0]
         self.assertEqual(given_name, 'Frans')
         birth_date = item.get_birth_date()
-        self.assertEqual(birth_date, date(day=6, month=5, year=1961))
+        self.assertEqual(birth_date, datetime.date(day=6, month=5, year=1961))
         parlement_positions = item.get_parliament_positions_held()
         self.assertEqual(len(parlement_positions), 2)
         logger.info('END')

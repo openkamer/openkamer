@@ -6,7 +6,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-def check_parliament_members_at_date(date):
+def check_parliament_members_at_date(check_date):
     filepath = './data/secret/parliament_members_check.json'
     if not os.path.exists(filepath):
         logger.error('file ' + filepath + ' does note exist!')
@@ -21,6 +21,7 @@ def check_parliament_members_at_date(date):
                 end_date = datetime.datetime.strptime(date_range['end_date'], "%Y-%m-%d").date()
             else:
                 end_date = datetime.date.today() + datetime.timedelta(days=1)
-            if start_date < date < end_date:
+            # print(str(start_date) + ' - ' + str(end_date) + ' [' + str(check_date) + ']')
+            if start_date < check_date < end_date:
                 members_active.append(member)
     return members_active
