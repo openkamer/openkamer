@@ -57,7 +57,7 @@ class ParliamentMembersCheckView(TemplateView):
         context['members'] = members
         parliament = Parliament.get_or_create_tweede_kamer()
         # check_date = datetime.date.today()
-        check_date = datetime.date(year=2007, month=1, day=1)
+        check_date = datetime.date(year=2007, month=6, day=1)
         members_current = parliament.get_members_at_date(check_date)
         members_current_check = check_parliament_members_at_date(check_date)
         members_missing = []
