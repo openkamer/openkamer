@@ -19,6 +19,7 @@ NAME_PREFIXES = [
     'het',
     '\'t',
     'der',
+    'den',
     'ter',
     'te',
 ]
