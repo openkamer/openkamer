@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
+from parliament.check import check_parliament_members_at_date
 
 
 class PartiesView(TemplateView):
@@ -53,7 +54,31 @@ class ParliamentMembersCheckView(TemplateView):
             overlap_ids.append(member.id)
         context['members'] = members
         parliament = Parliament.get_or_create_tweede_kamer()
-        context['members_current'] = parliament.get_members_at_date(datetime.date.today())
+        members_current = parliament.get_members_at_date(datetime.date.today())
+        members_current_check = check_parliament_members_at_date(datetime.date.today())
+        members_missing = []
+        for member_check in members_current_check:
+            found = False
+            for member in members_current:
+                if member_check['name'] == member.person.surname_including_prefix():
+                    found = True
+                    break
+            if not found:
+                members_missing.append(member_check['initials'] + ' ' + member_check['name'])
+                print(member_check['name'])
+        members_wrong = []
+        for member in members_current:
+            found = False
+            for member_check in members_current_check:
+                if member_check['name'] == member.person.surname_including_prefix():
+                    found = True
+                    break
+            if not found:
+                members_wrong.append(member)
+                print(member.person.fullname())
+        context['members_current'] = members_current
+        context['members_current_wrong'] = members_wrong
+        context['members_current_missing'] = members_missing
         context['members_overlap'] = ParliamentMember.objects.filter(pk__in=overlap_ids).distinct()
         context['members_per_month'] = members_per_month
         return context

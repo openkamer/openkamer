@@ -1,6 +1,7 @@
 import datetime
-import re
+import json
 import os
+import re
 
 from django.test import TestCase
 
@@ -47,11 +48,13 @@ class TestParliamentMemberScraper(TestCase):
 class TestParliamentMembersParlementComScraper(TestCase):
 
     def test_scrape(self):
-        members = scraper.parliament_members.search_members_check()
+        members_json = scraper.parliament_members.search_members_check_json()
+        # with open('./data/secret/parliament_members_check.json', 'w') as fileout:
+        #     fileout.write(str(members_json))
+        members = json.loads(members_json)
         for member in members:
             self.assertNotEqual(member['name'], '')
             self.assertNotEqual(member['initials'], '')
-            self.assertNotEqual(member['fractie'], '')
             self.assertNotEqual(member['date_ranges'], [])
 
 

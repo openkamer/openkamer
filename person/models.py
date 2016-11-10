@@ -90,10 +90,13 @@ class Person(models.Model):
 
     def get_full_name(self):
         fullname = self.forename
-        if self.surname_prefix:
-            fullname += ' ' + str(self.surname_prefix)
-        fullname += ' ' + str(self.surname)
+        fullname += ' ' + self.surname_including_prefix()
         return fullname
+
+    def surname_including_prefix(self):
+        if self.surname_prefix:
+            return self.surname_prefix + ' ' + self.surname
+        return self.surname
 
     @staticmethod
     def person_exists(forename, surname):

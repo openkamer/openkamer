@@ -61,23 +61,19 @@ def search_members_check():
         for more_date in more_dates:
             date_range_strings.append(more_date.tail)
         extra_info = re.findall("\(.*?\)", name_line)
-        name_line = re.sub("\(.*?\)", '', name_line).strip()
+        name_line = re.sub("\(.*\)", '', name_line).strip()
         name_line = re.sub("\s+", ' ', name_line)
-        fractie = ''
         forename = ''
         if len(extra_info) >= 2:
             forename = remove_brackets(extra_info[0])
-            fractie = remove_brackets(extra_info[1])
-        elif len(extra_info) == 2:
-            fractie = remove_brackets(extra_info[0])
         date_ranges = []
         for date_range_str in date_range_strings:
             fractie = remove_brackets(re.findall("\(.*?\)", date_range_str)[0])
             dates = re.findall("\d{4}-\d{2}-\d{2}", date_range_str)
             start_date = datetime.datetime.strptime(dates[0], '%Y-%m-%d').date()
-            end_date = None
+            end_date = ''
             if len(dates) == 2:
-                end_date = datetime.datetime.strptime(dates[0], '%Y-%m-%d').date()
+                end_date = datetime.datetime.strptime(dates[0], '%Y-%m-%d').date() + datetime.timedelta(days=1)
             date_ranges.append({
                 'start_date': start_date,
                 'end_date': end_date,
@@ -89,7 +85,6 @@ def search_members_check():
             'name': name,
             'initials': initials,
             'forename': forename,
-            'fractie': fractie,
             'date_ranges': date_ranges
         }
         # print('======================')
@@ -98,5 +93,18 @@ def search_members_check():
     return members
 
 
+def search_members_check_json():
+    members = search_members_check()
+    return json.dumps(members, sort_keys=True, indent=4, ensure_ascii=False, default=json_serial)
+
+
 def remove_brackets(text):
     return text.replace('(', '').replace(')', '')
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+    if isinstance(obj, datetime.date):
+        serial = obj.isoformat()
+        return serial
+    raise TypeError ("Type not serializable")
