@@ -45,19 +45,18 @@ class ParliamentMembersCheckView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        start_date = datetime.date(year=2005, month=1, day=1)
+        start_date = datetime.date(year=2005, month=6, day=1)
         members_per_month = self.get_members_per_month(start_date)
-        members = ParliamentMember.objects.all()
+        members = ParliamentMember.objects.filter()
         members_overlap = []
         for member in members:
             members_overlap += member.check_overlap()
         overlap_ids = []
         for member in members_overlap:
             overlap_ids.append(member.id)
-        context['members'] = members
         parliament = Parliament.get_or_create_tweede_kamer()
-        # check_date = datetime.date.today()
-        check_date = datetime.date(year=2007, month=6, day=1)
+        check_date = datetime.date.today()
+        # check_date = datetime.date(year=2008, month=7, day=1)
         members_current = parliament.get_members_at_date(check_date)
         members_current_check = check_parliament_members_at_date(check_date)
         members_missing = []
@@ -87,9 +86,10 @@ class ParliamentMembersCheckView(TemplateView):
             if not found:
                 members_wrong.append(member)
                 # print(member.person.fullname())
+        context['members'] = members
         context['members_current'] = sorted(members_current, key=lambda member: member.person.surname)
-        context['members_current_wrong'] = members_wrong
         context['members_current_missing'] = members_missing
+        context['members_current_wrong'] = sorted(members_wrong, key=lambda member: member.person.surname)
         context['members_overlap'] = ParliamentMember.objects.filter(pk__in=overlap_ids).distinct()
         context['members_per_month'] = members_per_month
         return context

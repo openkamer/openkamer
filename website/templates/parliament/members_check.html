@@ -1,6 +1,6 @@
 {% extends "website/base.html" %}
 
-{% block title %}Tweede Kamerleden {{ block.super }}{% endblock %}
+{% block title %}Tweede Kamerleden Checks {{ block.super }}{% endblock %}
 
 
 {% block content %}
@@ -76,7 +76,9 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <h4>Huidige Kamerleden volgens Wikidata</h4>
+
+    <h4>Huidige Kamerleden volgens Wikidata ({{ members_current|length }})</h4>
+
     {% with members=members_current %}
     {% include "parliament/items/members_check_table.html" %}
     {% endwith %}

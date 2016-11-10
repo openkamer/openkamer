@@ -3,20 +3,19 @@
     <tr>
       <th>nr</th>
       <th>naam</th>
-      <th>first</th>
-      <th>last</th>
+      <th>voor</th>
+      <th>achter</th>
       <th>begin datum</th>
       <th>eind datum</th>
       <th>partij</th>
       <th>geboortedatum</th>
-      <th>wikidata</th>
     </tr>
   </thead>
   <tbody>
   {% for member in members %}
     <tr>
       <td>{{ forloop.counter }}</td>
-      <td>{{ member.person.fullname }}</td>
+      <td><a href="{{ member.person.wikidata_url }}" target="_blank">{{ member.person.fullname }}</a></td>
       <td>{{ member.person.forename }}</td>
       <td>{{ member.person.surname }}</td>
       <td>
@@ -35,15 +34,14 @@
         {{ member.left|date:"Y-m-d" }}
       {% endif %}
       </td>
-       <td>{{ member.party.name_short }}</td>
-       <td>
-         {% if member.person.birthdate %}
-           {{ member.person.birthdate|date:"Y-m-d" }}
-         {% else %}
-           <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>
-         {% endif %}
-       </td>
-       <td><a href="{{ member.person.wikidata_url }}" target="_blank">edit @ wikidata</a></td>
+      <td>{{ member.party.name_short }}</td>
+      <td>
+        {% if member.person.birthdate %}
+          {{ member.person.birthdate|date:"Y-m-d" }}
+        {% else %}
+          <a class="text-danger" href="{{ member.person.wikidata_url }}" target="_blank">data ontbreekt</a>
+        {% endif %}
+      </td>
     </tr>
   {% endfor %}
   </tbody>
