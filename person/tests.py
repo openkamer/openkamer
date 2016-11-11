@@ -4,6 +4,7 @@ import requests
 
 from django.test import TestCase
 
+from wikidata import wikidata
 from person.models import Person
 
 
@@ -74,3 +75,59 @@ class TestCreatePerson(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(person.birthdate, datetime.date(1967, 2, 14))
         self.assertEqual(person.slug, 'mark-rutte')
+
+
+class TestWikidataNameParts(TestCase):
+
+    def test_fatma_koser_kaya(self):
+        wikidata_id = 'Q467610'  # Fatma Koşer Kaya
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Fatma')
+        self.assertEqual(surname, 'Koşer Kaya')
+        self.assertEqual(surname_prefix, '')
+
+    def test_jan_peter_balkenende(self):
+        wikidata_id = 'Q133386'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Jan Peter')
+        self.assertEqual(surname, 'Balkenende')
+        self.assertEqual(surname_prefix, '')
+
+    def test_jan_kees_de_jager(self):
+        wikidata_id = 'Q1666631'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Jan Kees')
+        self.assertEqual(surname, 'Jager')
+        self.assertEqual(surname_prefix, 'de')
+
+    def test_sjoerd_sjoerdsma(self):
+        wikidata_id = 'Q516335'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Sjoerd')
+        self.assertEqual(surname, 'Sjoerdsma')
+        self.assertEqual(surname_prefix, '')
+
+    def test_sybrand_van_haersma_buma(self):
+        wikidata_id = 'Q377266'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Sybrand')
+        self.assertEqual(surname, 'Haersma Buma')
+        self.assertEqual(surname_prefix, 'van')
+
+    def test_chantal_nijkerken_de_haan(self):
+        wikidata_id = 'Q19830701'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Chantal')
+        self.assertEqual(surname, 'Nijkerken-de Haan')

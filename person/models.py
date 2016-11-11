@@ -13,6 +13,7 @@ NAME_PREFIXES = [
     'van der',
     'van den',
     'van de',
+    'van \'t',
     'in het',
     'van',
     'de',
@@ -138,3 +139,37 @@ class Person(models.Model):
 
     def parlement_and_politiek_url(self):
         return 'https://www.parlement.com/id/' + self.parlement_and_politiek_id + '/'
+
+    @staticmethod
+    def get_name_parts(fullname, wikidata_item):
+        name_parts = fullname.split(' ')
+        surname_prefix = ''
+        if len(name_parts) == 2:
+            forename = name_parts[0]
+            surname = name_parts[1]
+            return forename.strip(), surname.strip(), surname_prefix.strip()
+        surname_prefix = Person.find_prefix(fullname)
+        if surname_prefix:
+            prefix_pos = fullname.find(surname_prefix)
+            forename = fullname[0:prefix_pos]
+            surname_pos = prefix_pos + len(surname_prefix)
+            surname = fullname[surname_pos:]
+            return forename.strip(), surname.strip(), surname_prefix.strip()
+        given_names = wikidata_item.get_given_names()
+        if given_names:
+            surname = fullname
+            for name in given_names:
+                name_pos = fullname.find(name + ' ')
+                if name_pos >= 0 and (name_pos == 0 or fullname[name_pos - 1] == ' '):  # not part of a longer name
+                    surname = surname.replace(name, '').strip()
+            if surname != fullname:
+                forename = fullname.replace(surname, '').strip()
+            else:
+                surname = name_parts[-1]
+                forename = fullname.replace(surname, '')
+            return forename.strip(), surname.strip(), surname_prefix.strip()
+        else:
+            surname = name_parts[-1]
+            forename = fullname.replace(surname, '')
+            return forename.strip(), surname.strip(), surname_prefix.strip()
+

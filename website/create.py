@@ -201,18 +201,11 @@ def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=Fal
     else:
         if not fullname:
             fullname = wikidata_item.get_label(language='nl')
-        forename = fullname.split(' ')[0]
-        surname = fullname.replace(forename + ' ', '').strip()
-        given_names = wikidata_item.get_given_names()
-        for given_name in given_names:
-            surname = surname.replace(given_name + ' ', '').strip()
-        prefix = Person.find_prefix(surname)
-        if prefix:
-            surname = surname.replace(prefix + ' ', '')
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
         person = Person.objects.create(
             forename=forename,
             surname=surname,
-            surname_prefix=prefix,
+            surname_prefix=surname_prefix,
             wikidata_id=wikidata_id
         )
         person.update_info(language='nl', wikidata_item=wikidata_item)
