@@ -152,10 +152,13 @@ def create_parliament_members():
         logger.info("new parliament member: " + str(parliament_member))
 
 
-def create_parliament_members_from_wikidata(max_results=None):
+def create_parliament_members_from_wikidata(max_results=None, all_members=False):
     logger.info('BEGIN')
     parliament = Parliament.get_or_create_tweede_kamer()
-    member_wikidata_ids = wikidata.search_parliament_member_ids()
+    if all_members:
+        member_wikidata_ids = wikidata.search_parliament_member_ids()
+    else:
+        member_wikidata_ids = wikidata.search_parliament_member_ids_with_start_date()
     counter = 0
     members = []
     for wikidata_id in member_wikidata_ids:

@@ -35,6 +35,29 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
+def search_parliament_member_ids_with_start_date():
+    logger.info('BEGIN')
+    url = 'https://query.wikidata.org/sparql?'
+    params = {
+        'query': 'SELECT ?item WHERE { '
+                 '?item wdt:P31 wd:Q5 . '
+                 '?item p:P39 ?position_held_statement .'
+                 '?position_held_statement ps:P39 wd:Q18887908 .'
+                 '?position_held_statement pq:P580 ?start . '
+                 '} ORDER BY DESC(?start)',
+    ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
+        'format': 'json',
+    }
+    response = requests.get(url, params)
+    response_json = response.json()
+    member_ids = []
+    for item in response_json['results']['bindings']:
+        member_id = item['item']['value'].split('/')[-1]
+        member_ids.append(member_id)
+    logger.info('END')
+    return set(member_ids)
+
+
 def search_parliament_member_ids():
     logger.info('BEGIN')
     url = 'https://query.wikidata.org/sparql?'
@@ -129,9 +152,7 @@ class WikidataItem(object):
         claims = self.get_claims()
         if 'P735' in claims:
             given_names = []
-            for value in claims['P735']:
-                given_names.append(WikidataItem.get_label_for_id(value['mainsnak']['datavalue']['value']['id']))
-            return given_names
+            return WikidataItem.get_label_for_id(claims['P735'][0]['mainsnak']['datavalue']['value']['id'])
         return ''
 
     def get_official_website(self):

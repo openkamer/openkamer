@@ -43,8 +43,11 @@ def create_members_csv(members, filepath):
             fileout.write(member['forename'] + ',' + member['surname'] + ',' + member['prefix'] + ',' + member['initials'] + ',' + member['party'] + '\n')
 
 
-def search_members_wikidata():
-    return wikidata.search_parliament_member_ids()
+def search_members_wikidata(all_members=False):
+    if all_members:
+        return wikidata.search_parliament_member_ids()
+    else:
+        return wikidata.search_parliament_member_ids_with_start_date()
 
 
 def search_members_check():

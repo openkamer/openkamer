@@ -9,9 +9,15 @@ logger = logging.getLogger(__name__)
 
 class TestSearchParliamentMembers(TestCase):
 
-    def test_search_all_ids(self):
+    def test_search_ids_all(self):
         member_ids = wikidata.search_parliament_member_ids()
+        self.assertEqual(len(member_ids), len(set(member_ids)))
         self.assertTrue(len(member_ids) > 2200)
+
+    def test_search_ids_with_start_date(self):
+        member_ids = wikidata.search_parliament_member_ids_with_start_date()
+        self.assertEqual(len(member_ids), len(set(member_ids)))
+        self.assertTrue(len(member_ids) > 530)
 
 
 class TestGetParliamentMemberInfo(TestCase):
