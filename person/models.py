@@ -50,13 +50,12 @@ class Person(models.Model):
 
     @staticmethod
     def find_prefix(name):
-        name_prefix = ''
         for prefix in NAME_PREFIXES:
             prefix_pos = name.find(prefix + ' ')
             if prefix_pos >= 0 and (prefix_pos == 0 or name[prefix_pos-1] == ' '):  # prefix must be at the start or there should be a whitespace in front
                 name_prefix = prefix
-                break
-        return name_prefix
+                return name_prefix, prefix_pos
+        return '', -1
 
     @staticmethod
     def find(surname, initials=''):
@@ -148,9 +147,8 @@ class Person(models.Model):
             forename = name_parts[0]
             surname = name_parts[1]
             return forename.strip(), surname.strip(), surname_prefix.strip()
-        surname_prefix = Person.find_prefix(fullname)
+        surname_prefix, prefix_pos = Person.find_prefix(fullname)
         if surname_prefix:
-            prefix_pos = fullname.find(surname_prefix)
             forename = fullname[0:prefix_pos]
             surname_pos = prefix_pos + len(surname_prefix)
             surname = fullname[surname_pos:]

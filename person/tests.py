@@ -31,31 +31,31 @@ class TestNamePrefix(TestCase):
 
     def test_find_name_prefix(self):
         name = 'Ard van der Steur'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van der')
         name = 'Ard van derSteur'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van')
         name = 'Ard van de Steur'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van de')
         name = 'Ard van Steur'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van')
         name = 'Gerard \'t Hooft'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, '\'t')
         name = 'Jan Peter Balkenende'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, '')
         name = 'Boris van der Ham'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van der')
         name = 'van der Ham'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van der')
         name = 'van derHam'
-        prefix = Person.find_prefix(name)
+        prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van')
 
 
@@ -131,3 +131,12 @@ class TestWikidataNameParts(TestCase):
         forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
         self.assertEqual(forename, 'Chantal')
         self.assertEqual(surname, 'Nijkerken-de Haan')
+
+    def test_leendert_de_lange(self):
+        wikidata_id = 'Q19839084'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Leendert')
+        self.assertEqual(surname_prefix, 'de')
+        self.assertEqual(surname, 'Lange')
