@@ -7,7 +7,7 @@
 
 <div class="row">
   <div class="col-lg-12">
-    <div align="center"><h3>Kamerleden</h3></div>
+    <div align="center"><h3>Kamerleden ({{members|length}})</h3></div>
   </div>
 </div>
 
@@ -18,9 +18,11 @@
 
       <p>
         <h5><a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a></h5>
-        <small><a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a> <br/>
-        {% if member.party.wikimedia_logo_url %}
-          <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
+        {% if member.party %}
+          <small><a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a> <br/>
+          {% if member.party.wikimedia_logo_url %}
+            <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
+          {% endif %}
         {% endif %}
           <a href="/api/parliamentmember/{{ member.id }}/">API</a>
         {% if member.person.wikidata_id %}
