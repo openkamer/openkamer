@@ -1,14 +1,10 @@
 import logging
 import os
 
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
-
-from git import Repo, Actor
-
-import scraper.political_parties
-import scraper.parliament_members
 
 from person.models import Person
 
@@ -347,8 +343,12 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_check(self):
+        password = 'adminpassword'
+        my_admin = User.objects.create_superuser('adminuser', 'admin@admin.com', password)
+        self.client.login(username=my_admin.username, password=password)
         response = self.client.get(reverse('parliament-members-check'))
         self.assertEqual(response.status_code, 200)
+        self.client.logout()
 
     def test_plot_example_view(self):
         response = self.client.get('/stats/exampleplots/')
