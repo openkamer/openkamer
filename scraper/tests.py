@@ -1,24 +1,61 @@
-import json
 import datetime
+import json
+import os
 import re
 
 from django.test import TestCase
 
 from wikidata import wikidata
 
-import scraper.documents
-import scraper.votings
-import scraper.government
-import scraper.persons
 import scraper.besluitenlijst
+import scraper.documents
+import scraper.government
+import scraper.parliament_members
+import scraper.persons
+import scraper.political_parties
+import scraper.votings
 
-# metadata = scraper.documents.get_metadata(document_id='kst-33885-7')
-# print(metadata)
 
-# page_url = 'https://zoek.officielebekendmakingen.nl/kst-33885-7.html?zoekcriteria=%3fzkt%3dEenvoudig%26pst%3d%26vrt%3d33885%26zkd%3dInDeGeheleText%26dpr%3dAfgelopenDag%26spd%3d20160522%26epd%3d20160523%26sdt%3dDatumBrief%26ap%3d%26pnr%3d1%26rpp%3d10%26_page%3d4%26sorttype%3d1%26sortorder%3d4&resultIndex=34&sorttype=1&sortorder=4'
-# scraper.documents.get_document_id(page_url)
+class TestPoliticalPartyScraper(TestCase):
 
-# scraper.documents.search_politieknl_dossier(33885)
+    def test_scrape_parties(self):
+        parties = scraper.political_parties.search_parties()
+        self.assertTrue(len(parties) > 10)
+        for party in parties:
+            self.assertTrue(party['name'])
+            self.assertTrue(party['name_short'])
+
+    def test_create_party_csv(self):
+        filepath = './data/tmp/parties.csv'
+        try:
+            parties = scraper.political_parties.search_parties()
+            scraper.political_parties.create_parties_csv(parties, filepath)
+        finally:
+            os.remove(filepath)
+
+
+class TestParliamentMemberScraper(TestCase):
+
+    def test_scrape_parliament_members(self):
+        members = scraper.parliament_members.search_members()
+        filepath = './data/tmp/members.csv'
+        try:
+            scraper.parliament_members.create_members_csv(members, filepath)
+        finally:
+            os.remove(filepath)
+
+
+class TestParliamentMembersParlementComScraper(TestCase):
+
+    def test_scrape(self):
+        members_json = scraper.parliament_members.search_members_check_json()
+        # with open('./data/secret/parliament_members_check.json', 'w') as fileout:
+        #     fileout.write(str(members_json))
+        members = json.loads(members_json)
+        for member in members:
+            self.assertNotEqual(member['name'], '')
+            self.assertNotEqual(member['initials'], '')
+            self.assertNotEqual(member['date_ranges'], [])
 
 
 class TestVoortouwCommissieScraper(TestCase):
@@ -35,9 +72,9 @@ class TestVoortouwCommissieScraper(TestCase):
 
 class TestBesluitenlijstScraper(TestCase):
     filenames = [
-        # 'data/besluitenlijsten/besluitenlijst_example1.pdf',
-        # 'data/besluitenlijsten/besluitenlijst_example2.pdf',
-        # 'data/besluitenlijsten/besluitenlijst_example3.pdf',
+        'data/besluitenlijsten/besluitenlijst_example1.pdf',
+        'data/besluitenlijsten/besluitenlijst_example2.pdf',
+        'data/besluitenlijsten/besluitenlijst_example3.pdf',
         'data/besluitenlijsten/besluitenlijst_example4.pdf',
     ]
 
@@ -108,7 +145,8 @@ class TestGovernmentScraper(TestCase):
     def test_get_parlement_and_politiek_id(self):
         person_wikidata_id = 'Q32681'
         expected_id = 'vg09llk9rzrp'
-        parlement_id = wikidata.get_parlement_and_politiek_id(person_wikidata_id)
+        item = wikidata.WikidataItem(person_wikidata_id)
+        parlement_id = item.get_parlement_and_politiek_id()
         self.assertEqual(parlement_id, expected_id)
 
 

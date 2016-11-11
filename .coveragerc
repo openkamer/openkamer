@@ -7,4 +7,6 @@ omit =
     website/local_settings_example.py
     website/local_settings.py
     website/wsgi.py
+    website/cron.py
+    website/management/commands/*.py
     */apps.py

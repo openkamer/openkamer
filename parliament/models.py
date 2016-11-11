@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 from django.db import models
 from django.utils.text import slugify
@@ -16,6 +17,22 @@ class Parliament(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def get_members_at_date(self, check_date):
+        members = self.members()
+        members_active = members.filter(joined__lt=check_date, left__gte=check_date) | members.filter(joined__lt=check_date, left=None)
+        return members_active
+
+    def members(self):
+        return ParliamentMember.objects.filter(parliament=self)
+
+    @staticmethod
+    def get_or_create_tweede_kamer():
+        parliaments = Parliament.objects.filter(name='Tweede Kamer')
+        if parliaments.exists():
+            return parliaments[0]
+        else:
+            return Parliament.objects.create(name='Tweede Kamer', wikidata_id='Q233262')
 
 
 class ParliamentMember(models.Model):
@@ -41,8 +58,36 @@ class ParliamentMember(models.Model):
                 return member.party
         return None
 
+    def check_overlap(self):
+        members = ParliamentMember.objects.filter(person=self.person)
+        if members.count() <= 1:
+            return []
+        overlapping_members = []
+        for member_a in members:
+            for member_b in members:
+                if member_a.id == member_b.id or not member_a.joined or not member_b.joined:
+                    continue
+                left_a = datetime.date.today() + datetime.timedelta(days=1)
+                left_b = datetime.date.today() + datetime.timedelta(days=1)
+                if member_a.left:
+                    left_a = member_a.left
+                if member_b.left:
+                    left_b = member_b.left
+                if member_a.joined < member_b.joined < left_a:
+                    overlapping_members.append(member_a)
+                elif member_b.joined < member_a.joined < left_b:
+                    overlapping_members.append(member_a)
+                elif member_b.joined < member_a.joined and left_a < left_b:
+                    overlapping_members.append(member_a)
+                elif member_a.joined < member_b.joined and left_b < left_a:
+                    overlapping_members.append(member_a)
+        return overlapping_members
+
     def __str__(self):
-        return str(self.person.fullname()) + ' (' + str(self.party().name_short) + ')'
+        display_name = self.person.fullname()
+        if self.party():
+            display_name +=  ' (' + str(self.party().name_short) + ')'
+        return display_name
 
 
 class PoliticalParty(models.Model):
@@ -74,28 +119,27 @@ class PoliticalParty(models.Model):
         """
         if top_level_domain[0] == '.':
             logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
-        wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
-        if not wikidata_ids:
-            return
-        wikidata_id = wikidata_ids[0]
-        # find the first result with a website with the given domain
-        for id in wikidata_ids:
-            official_website = wikidata.get_official_website(id)
-            if official_website:
-                tld = official_website.split('.')[-1]
-                if tld == top_level_domain or tld == top_level_domain + '/':
-                    self.official_website_url = official_website
-                    wikidata_id = id
-                    break
-        self.wikidata_id = wikidata_id
-        self.wikipedia_url = wikidata.get_wikipedia_url(wikidata_id, language)
+        if not self.wikidata_id:
+            wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
+            if not wikidata_ids:
+                return
+            self.wikidata_id = wikidata_ids[0]
+            # find the first result with a website with the given domain
+            for wid in wikidata_ids:
+                official_website = wikidata.WikidataItem(wid).get_official_website()
+                if official_website:
+                    tld = official_website.split('.')[-1]
+                    if tld == top_level_domain or tld == top_level_domain + '/':
+                        self.official_website_url = official_website
+                        self.wikidata_id = wid
+                        break
+        self.wikipedia_url = wikidata.WikidataItem.get_wikipedia_url(self.wikidata_id, language)
         logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
-        logo_filename = wikidata.get_logo_filename(self.wikidata_id)
-        inception_date = wikidata.get_inception(self.wikidata_id)
-        if inception_date:
-            self.founded = inception_date
+        wikidata_item = wikidata.WikidataItem(self.wikidata_id)
+        logo_filename = wikidata_item.get_logo_filename()
+        self.founded = wikidata_item.get_inception()
         if logo_filename:
-            self.wikimedia_logo_url = wikidata.get_wikimedia_image_url(logo_filename)
+            self.wikimedia_logo_url = wikidata.WikidataItem.get_wikimedia_image_url(logo_filename)
         self.save()
 
     @staticmethod

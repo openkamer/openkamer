@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+import datetime
 import re
 
 import requests
@@ -172,7 +172,7 @@ def search_politieknl_dossier(dossier_id):
             # print(title)
             result_info = element.find('em').text
             published_date = result_info.split('|')[0].strip()
-            published_date = datetime.strptime(published_date, '%d-%m-%Y').date()
+            published_date = datetime.datetime.strptime(published_date, '%d-%m-%Y').date()
             # print(published_date)
             page_url = 'https://zoek.officielebekendmakingen.nl' + element.get('href')
             # print(page_url)
