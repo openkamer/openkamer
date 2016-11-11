@@ -20,15 +20,7 @@ class Parliament(models.Model):
 
     def get_members_at_date(self, check_date):
         members = self.members()
-        members_active = []
-        for member in members:
-            if not member.joined:
-                continue
-            date_left = member.left
-            if not date_left:
-                date_left = datetime.date.today() + datetime.timedelta(days=1)
-            if member.joined <= check_date < date_left:
-                members_active.append(member)
+        members_active = members.filter(joined__lt=check_date, left__gte=check_date) | members.filter(joined__lt=check_date, left=None)
         return members_active
 
     def members(self):

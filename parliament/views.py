@@ -33,17 +33,33 @@ class PartyView(TemplateView):
 class ParliamentMembersView(TemplateView):
     template_name = 'parliament/members.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, at_date, **kwargs):
         context = super().get_context_data(**kwargs)
-        members = ParliamentMember.objects.all()
+        tweedekamer = Parliament.get_or_create_tweede_kamer()
+        members = tweedekamer.get_members_at_date(at_date)
         context['members'] = members
+        context['date'] = at_date
         return context
+
+
+class ParliamentMembersCurrentView(ParliamentMembersView):
+    def get_context_data(self, **kwargs):
+        at_date = datetime.date.today()
+        return super().get_context_data(at_date, **kwargs)
+
+
+class ParliamentMembersAtDateView(ParliamentMembersView):
+    def get_context_data(self, year, month, day, **kwargs):
+        at_date = datetime.date(year=int(year), month=int(month), day=int(day))
+        return super().get_context_data(at_date, **kwargs)
 
 
 class ParliamentMembersCheckView(TemplateView):
     template_name = 'parliament/members_check.html'
 
     def get_context_data(self, **kwargs):
+        if not self.request.user.is_superuser:
+            raise PermissionError("You need to be an admin to view this page.")
         context = super().get_context_data(**kwargs)
         start_date = datetime.date(year=2005, month=6, day=1)
         members_per_month = self.get_members_per_month(start_date)
