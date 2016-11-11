@@ -62,3 +62,12 @@ $ python manage.py test website.test.TestCreateParliament
 ```
 $ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament document website > website/fixtures/<fixture_name>.json
 ```
+
+## CronJobs
+
+Openkamer has some optional cronjobs that do some cool stuff. You can review them in `website/cron.py`.  
+Create the following cronjob (Linux) to kickstart the `django-cron` jobs,
+```
+$ crontab -e
+*/5 * * * * source /home/bart/.bashrc && source /home/<path-to-openkamer>/openkamer/env/bin/activate && python /home/<path-to-openkamer>/responsivevideo/manage.py runcrons > /home/<path-to-openkamer>/log/cronjob.log
+```

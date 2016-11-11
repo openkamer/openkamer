@@ -1,9 +1,10 @@
+import logging
+import os
+
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
-
-from scraper import political_parties
-from scraper import parliament_members
 
 from person.models import Person
 
@@ -23,13 +24,26 @@ from document.models import Kamerstuk
 from document.models import Voting
 
 import website.create
+from website import settings
+
+logger = logging.getLogger(__name__)
+
+
+class TestExample(TestCase):
+
+    def test_example(self):
+        logger.info('BEGIN')
+        logger.info('END')
 
 
 class TestCreateParliament(TestCase):
 
     def test_create_parliament(self):
-        political_parties.create_parties()
-        parliament_members.create_members()
+        website.create.create_parties()
+        website.create.create_parliament_members()
+
+    def test_create_parliament_from_wikidata(self):
+        website.create.create_parliament_members_from_wikidata(max_results=20)
 
 
 class TestCreateGovernment(TestCase):
@@ -175,6 +189,57 @@ class TestPersonView(TestCase):
             self.assertEqual(response.status_code, 200)
 
 
+class TestCreatePerson(TestCase):
+    wikidata_id_ss = 'Q516335'
+    name_ss = 'Sjoerd Sjoerdsma'
+
+    def test_create_person_from_wikidata_id(self):
+        person = website.create.create_person(self.wikidata_id_ss, add_initials=True)
+        self.check_sjoerd(person)
+
+    def test_create_person_from_wikidata_id_and_fullname(self):
+        person = website.create.create_person(self.wikidata_id_ss, self.name_ss, add_initials=True)
+        self.check_sjoerd(person)
+
+    def check_sjoerd(self, person):
+        self.assertTrue('Sjoerdsma' in person.surname)
+        self.assertEqual(person.forename, 'Sjoerd')
+        self.assertEqual(person.surname, 'Sjoerdsma')
+        self.assertEqual(person.initials, 'Sj.W.')
+
+    def test_jeroen_wikidata(self):
+        wikidata_id = 'Q17428405'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Jeroen')
+        self.assertEqual(person.surname_prefix, 'van')
+        self.assertEqual(person.surname, 'Wijngaarden')
+        self.assertEqual(person.fullname(), 'Jeroen van Wijngaarden')
+
+    def test_jan_kees_wikidata(self):
+        wikidata_id = 'Q1666631'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Jan Kees')
+        self.assertEqual(person.surname_prefix, 'de')
+        self.assertEqual(person.surname, 'Jager')
+        self.assertEqual(person.fullname(), 'Jan Kees de Jager')
+
+    def test_eelke_wikidata(self):
+        wikidata_id = 'Q2710877'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Eeke')
+        self.assertEqual(person.surname_prefix, 'van der')
+        self.assertEqual(person.surname, 'Veen')
+        self.assertEqual(person.fullname(), 'Eeke van der Veen')
+
+    def test_koser_kaya_wikidata(self):
+        wikidata_id = 'Q467610'
+        person = website.create.create_person(wikidata_id)
+        self.assertEqual(person.forename, 'Fatma')
+        self.assertEqual(person.surname_prefix, '')
+        self.assertEqual(person.surname, 'Koşer Kaya')
+        self.assertEqual(person.fullname(), 'Fatma Koşer Kaya')
+
+
 class TestWebsite(TestCase):
     fixtures = ['person.json', 'parliament.json', 'government.json']
 
@@ -276,6 +341,14 @@ class TestWebsite(TestCase):
     def test_parliament_members_overview(self):
         response = self.client.get(reverse('parliament-members'))
         self.assertEqual(response.status_code, 200)
+
+    def test_parliament_members_check(self):
+        password = 'adminpassword'
+        my_admin = User.objects.create_superuser('adminuser', 'admin@admin.com', password)
+        self.client.login(username=my_admin.username, password=password)
+        response = self.client.get(reverse('parliament-members-check'))
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
 
     def test_plot_example_view(self):
         response = self.client.get('/stats/exampleplots/')

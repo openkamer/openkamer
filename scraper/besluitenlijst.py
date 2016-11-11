@@ -1,11 +1,11 @@
 import datetime
-import locale
 import logging
 import re
-import requests
 from io import StringIO
 
 import lxml
+import dateparser
+import requests
 
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
@@ -111,10 +111,7 @@ class BesluitenLijst(object):
     def get_date_published(text):
         pattern = '\d{1,2}\s\w+\s\d{4}'
         result = re.findall(pattern, text)[0]  # first date is publication date
-        lc_saved = locale.getlocale(locale.LC_TIME)
-        locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
-        date_published = datetime.datetime.strptime(result, '%d %B %Y').date()
-        locale.setlocale(locale.LC_TIME, lc_saved)
+        date_published = dateparser.parse(result).date()
         return date_published
 
     @staticmethod

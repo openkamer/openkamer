@@ -45,7 +45,7 @@
   {% if vote.parliament_member %}
   <a href="{% url 'person' vote.parliament_member.person.slug %}">{{ vote.parliament_member.person.surname }}</a>{% if not forloop.last %},{% endif %}
   {% else %}
-    <small>onbekend kamerlid{% if not forloop.last %},{% endif %}
+    onbekend kamerlid{% if not forloop.last %},{% endif %}
   {% endif %}
   </small>
 {% endfor %}

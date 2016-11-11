@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     'dal',
     'dal_select2',
     'rest_framework',
+    'django_cron',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,6 +132,13 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-4',
 }
 
+###############
+# DJANGO-CRON #
+###############
+CRON_CLASSES = [
+    'website.cron.CreateCommitPartyCSV',
+    'website.cron.CreateCommitParliamentMembersCSV'
+]
 
 ###########
 # LOGGING #

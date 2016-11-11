@@ -35,3 +35,8 @@ BESLUITENLIJSTEN_PER_PAGE = 200
 # PIWIK
 PIWIK_URL = ''  # optional, without trailing slash
 PIWIK_SITE_ID = 0
+
+# TWEEDEKAMER DATA REPO
+GIT_AUTHOR_NAME = ''
+GIT_AUTHOR_EMAIL = ''
+PARTIES_REPO_DIR = '<path-to-repo>/ok-tknl-fracties/'

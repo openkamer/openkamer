@@ -2,9 +2,10 @@ import logging
 import os
 import re
 import requests
-from requests.exceptions import ConnectionError, ConnectTimeout
+from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 import traceback
 import uuid
+from json.decoder import JSONDecodeError
 
 from pdfminer.pdfparser import PDFSyntaxError
 
@@ -19,9 +20,10 @@ from government.models import Ministry
 from government.models import GovernmentPosition
 from government.models import GovernmentMember
 
-from parliament.models import PoliticalParty
-from parliament.models import PartyMember
+from parliament.models import Parliament
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
 from parliament.util import parse_name_initials_surname
 from parliament.util import parse_name_surname_initials
 
@@ -45,6 +47,8 @@ import scraper.besluitenlijst
 import scraper.documents
 import scraper.government
 import scraper.persons
+import scraper.parliament_members
+import scraper.political_parties
 import scraper.votings
 
 logger = logging.getLogger(__name__)
@@ -111,39 +115,117 @@ def create_goverment_member(government, member, person, position):
 
 
 @transaction.atomic
-def create_person(wikidata_id, fullname):
+def create_parties():
+    parties = scraper.political_parties.search_parties()
+    for party_info in parties:
+        party = PoliticalParty.find_party(party_info['name'])
+        if party:
+            logger.warning('party ' + party_info['name'] + ' already exists!')
+        else:
+            party = PoliticalParty.objects.create(name=party_info['name'], name_short=party_info['name_short'])
+            logger.info('created: ' + str(party))
+        party.update_info('nl', 'nl')
+        party.save()
+
+
+@transaction.atomic
+def create_parliament_members():
+    parliament = Parliament.get_or_create_tweede_kamer()
+    members = scraper.parliament_members.search_members()
+    for member in members:
+        forename = member['forename']
+        surname = member['surname']
+        if Person.person_exists(forename, surname):
+            person = Person.objects.get(forename=forename, surname=surname)
+        else:
+            person = Person.objects.create(
+                forename=forename,
+                surname=surname,
+                surname_prefix=member['prefix'],
+                initials=member['initials']
+            )
+        party = PoliticalParty.get_party(member['party'])
+        party_member = PartyMember.objects.create(person=person, party=party)
+        parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
+        logger.info("new person: " + str(person))
+        logger.info("new party member: " + str(party_member))
+        logger.info("new parliament member: " + str(parliament_member))
+
+
+def create_parliament_members_from_wikidata(max_results=None, all_members=False):
+    logger.info('BEGIN')
+    parliament = Parliament.get_or_create_tweede_kamer()
+    if all_members:
+        member_wikidata_ids = wikidata.search_parliament_member_ids()
+    else:
+        member_wikidata_ids = wikidata.search_parliament_member_ids_with_start_date()
+    counter = 0
+    members = []
+    for wikidata_id in member_wikidata_ids:
+        print('=========================')
+        print(wikidata_id)
+        try:
+            wikidata_item = wikidata.WikidataItem(wikidata_id)
+            person = create_person(wikidata_id, wikidata_item=wikidata_item)
+            print(person)
+            positions = wikidata_item.get_parliament_positions_held()
+            for position in positions:
+                parliament_member = ParliamentMember.objects.create(
+                    person=person,
+                    parliament=parliament,
+                    joined=position['start_time'],
+                    left=position['end_time']
+                )
+                print(parliament_member)
+                members.append(parliament_member)
+        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
+            logger.error(traceback.format_exc())
+            logger.error(error)
+            logger.error('')
+        except:
+            logger.error(traceback.format_exc())
+            raise
+        counter += 1
+        if max_results and counter >= max_results:
+            logger.info('END: max results reached')
+            return members
+        print(counter)
+    logger.info('END')
+    return members
+
+
+@transaction.atomic
+def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=False):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
+    if not wikidata_item:
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
     if persons.exists():
         person = persons[0]
     else:
-        forename = wikidata.get_given_name(wikidata_id)
-        if not forename:
-            forename = fullname.split(' ')[0]
-        surname = fullname.replace(forename, '').strip()
-        prefix = Person.find_prefix(surname)
-        if prefix:
-            surname = surname.replace(prefix + ' ', '')
+        if not fullname:
+            fullname = wikidata_item.get_label(language='nl')
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
         person = Person.objects.create(
             forename=forename,
             surname=surname,
-            surname_prefix=prefix,
+            surname_prefix=surname_prefix,
             wikidata_id=wikidata_id
         )
-        person.update_info()
+        person.update_info(language='nl', wikidata_item=wikidata_item)
         person.save()
-        if person.parlement_and_politiek_id:
+        if add_initials and person.parlement_and_politiek_id:
             person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
             person.save()
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
-        memberships = wikidata.get_political_party_memberships(wikidata_id)
+        memberships = wikidata_item.get_political_party_memberships()
         for membership in memberships:
             parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
             if parties.exists():
                 party = parties[0]
             else:
-                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
+                logger.error('political party for person with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
                 continue
             PartyMember.objects.create(
                 person=person,

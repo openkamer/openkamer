@@ -18,7 +18,17 @@ class PoliticalPartyAdmin(admin.ModelAdmin):
     )
 
 
+class ParliamentMemberAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'person',
+        'joined',
+        'left',
+        'parliament',
+    )
+
+
 admin.site.register(Parliament)
-admin.site.register(ParliamentMember)
+admin.site.register(ParliamentMember, ParliamentMemberAdmin)
 admin.site.register(PartyMember)
 admin.site.register(PoliticalParty, PoliticalPartyAdmin)
