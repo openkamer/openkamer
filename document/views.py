@@ -2,11 +2,17 @@ import logging
 import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.generic import TemplateView
+from django import forms
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import TemplateView, FormView
+
+import django_filters
+from dal import autocomplete
+
+from person.models import Person
 
 from document.models import Agenda, AgendaItem
 from document.models import BesluitenLijst
@@ -40,17 +46,69 @@ class KamerstukView(TemplateView):
         return context
 
 
+class PersonAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        persons = Person.objects.exclude(surname='').order_by('surname')
+        person_ids = []
+        if self.q:
+            for person in persons:
+                if self.q in person.fullname():
+                    person_ids.append(person.id)
+            return Person.objects.filter(pk__in=person_ids)
+        return persons
+
+
+class DossierFilter(django_filters.FilterSet):
+    VOTING_RESULT_CHOICES = (
+        ('ALL', 'Alle'),
+        (Voting.AANGENOMEN, 'Aangenomen'),
+        (Voting.VERWORPEN, 'Verworpen'),
+    )
+    title = django_filters.CharFilter(method='title_filter', label='')
+    submitter = django_filters.ModelChoiceFilter(
+        queryset=Person.objects.all(),
+        method='submitter_filter',
+        label='',
+        widget=autocomplete.ModelSelect2(url='person-autocomplete')
+    )
+    voting_result = django_filters.ChoiceFilter(
+        choices=VOTING_RESULT_CHOICES,
+        method='voting_result_filter',
+        # widget=forms.ChoiceField()
+    )
+    categories = django_filters.ModelMultipleChoiceFilter(
+        name='categories',
+        queryset=CategoryDossier.objects.all(),
+        widget=forms.CheckboxSelectMultiple(),
+    )
+
+    class Meta:
+        model = Dossier
+
+    def title_filter(self, queryset, name, value):
+        dossiers = queryset.filter(document__title_full__icontains=value).distinct()
+        return dossiers
+
+    def submitter_filter(self, queryset, name, value):
+        dossiers = queryset.filter(document__submitter__person=value).distinct()
+        return dossiers
+
+    def voting_result_filter(self, queryset, name, value):
+        if value == 'ALL':
+            return queryset
+        dossier_ids = []
+        for dossier in queryset:
+            if dossier.voting() and dossier.voting().result == value:
+                dossier_ids.append(dossier.id)
+        return Dossier.objects.filter(pk__in=dossier_ids)
+
+
 class DossiersView(TemplateView):
     template_name = 'document/dossiers.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        category_name = ''
-        if 'category' in self.request.GET:
-            category_name = self.request.GET['category']
-            dossiers = Dossier.objects.filter(categories__slug=category_name)
-        else:
-            dossiers = Dossier.objects.all()
+        dossiers = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         paginator = Paginator(dossiers, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
@@ -60,8 +118,7 @@ class DossiersView(TemplateView):
         except EmptyPage:
             dossiers = paginator.page(paginator.num_pages)
         context['dossiers'] = dossiers
-        context['categories'] = CategoryDossier.objects.all()
-        context['category_name'] = category_name
+        context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         return context
 
 

@@ -2,7 +2,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from person.views import PersonsView, PersonView
+from person.views import PersonView
+from person.views import PersonsView
+from person.views import PersonsCheckView
+from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersView
 from document.views import DossierView, AddDossierView
@@ -23,6 +26,7 @@ from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 
 from website.views import HomeView
+from website import settings
 from website.views import get_dossier_timeline_json
 from website.views import PlotExampleView
 
@@ -32,6 +36,7 @@ import website.api
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
+    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
@@ -45,7 +50,7 @@ urlpatterns = [
     url(r'^kabinet/huidig/$', GovernmentCurrentView.as_view(), name='government-current'),
     url(r'^kabinet/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
-    url(r'^dossiers/$', DossiersView.as_view(), name='dossiers'),
+    url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
     url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>\d+)/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),
@@ -68,4 +73,11 @@ urlpatterns = [
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
+    url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]

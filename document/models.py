@@ -19,7 +19,6 @@ class Category(models.Model):
     slug = models.SlugField(max_length=250, default='')
 
     class Meta:
-        ordering = ['name']
         abstract = True
 
     def save(self, *args, **kwargs):
@@ -29,9 +28,10 @@ class Category(models.Model):
 
 class CategoryDossier(Category):
     def __str__(self):
-        return 'Dossier category: ' + str(self.name)
+        return str(self.name)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Category (dossier)'
         verbose_name_plural = 'Categories (dossier)'
 
@@ -41,6 +41,7 @@ class CategoryDocument(Category):
         return 'Document category: ' + str(self.name)
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Category (document)'
         verbose_name_plural = 'Categories (document)'
 
@@ -79,6 +80,7 @@ class Dossier(models.Model):
         return None
 
     def title(self):
+        # TODO: improve performance
         kamerstukken = self.kamerstukken()
         titles = {}
         for stuk in kamerstukken:

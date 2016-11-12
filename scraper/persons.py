@@ -35,6 +35,6 @@ def get_initials(parlement_and_politiek_id):
     name_parts = title.split(' ')  # this includes the title, if applicable, for example: Ir. J.R.V.A. (Jeroen) Dijsselbloem
     initials = name_parts[0]
     for title in TITLES:
-        if name_parts[0].lower() in title.lower():
+        if title.lower() in name_parts[0].lower():
             initials = name_parts[1]
     return initials

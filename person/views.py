@@ -20,3 +20,19 @@ class PersonView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['person'] = Person.objects.get(slug=slug)
         return context
+
+
+class PersonsCheckView(TemplateView):
+    template_name = 'person/persons_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        persons = Person.objects.all()
+        same_name_ids = []
+        for person in persons:
+            persons_same_name = Person.objects.filter(surname=person.surname)
+            if persons_same_name.count() > 1:
+                for p in persons_same_name:
+                    same_name_ids.append(p.id)
+        context['persons_same_surname'] = Person.objects.filter(pk__in=same_name_ids).order_by('surname')
+        return context
