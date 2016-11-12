@@ -152,7 +152,9 @@ class WikidataItem(object):
         claims = self.get_claims()
         if 'P735' in claims:
             given_names = []
-            return WikidataItem.get_label_for_id(claims['P735'][0]['mainsnak']['datavalue']['value']['id'])
+            for value in claims['P735']:
+                given_names.append(WikidataItem.get_label_for_id(value['mainsnak']['datavalue']['value']['id']))
+            return given_names
         return ''
 
     def get_official_website(self):
