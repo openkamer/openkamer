@@ -52,7 +52,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
         person_ids = []
         if self.q:
             for person in persons:
-                if self.q in person.fullname():
+                if self.q.lower() in person.fullname().lower():
                     person_ids.append(person.id)
             return Person.objects.filter(pk__in=person_ids)
         return persons
