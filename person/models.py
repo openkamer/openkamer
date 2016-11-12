@@ -75,7 +75,9 @@ class Person(models.Model):
                 score += 1
             if initials.lower() == unidecode(person.initials.lower()):
                 score += 1
-            if initials.split('.')[0] == unidecode(person.forename)[0]:
+            intials_letters = initials.split('.')
+            forename = unidecode(person.forename)
+            if intials_letters and forename and intials_letters[0] == forename[0]:
                 score += 0.5
             if score >= 1.5 and score > best_score:
                 best_match = person
