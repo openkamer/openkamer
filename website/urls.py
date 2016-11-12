@@ -2,7 +2,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from person.views import PersonsView, PersonView
+from person.views import PersonView
+from person.views import PersonsView
+from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersView
@@ -34,6 +36,7 @@ import website.api
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
+    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
