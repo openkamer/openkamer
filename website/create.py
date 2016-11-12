@@ -420,7 +420,7 @@ def create_submitter(document, submitter):
     surname = submitter
     if has_initials:
         initials, surname = parse_name_initials_surname(submitter)
-    person = Person.find(surname=surname, initials=initials)
+    person = Person.find_surname_initials(surname=surname, initials=initials)
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, initials=initials)
