@@ -58,25 +58,31 @@ class Person(models.Model):
         return '', -1
 
     @staticmethod
-    def find(surname, initials=''):
+    def find_surname_initials(surname, initials=''):
         logger.info('surname: ' + surname + ', initials: ' + initials)
         surname = unidecode(surname)
         initials = unidecode(initials)
         persons = Person.objects.all()
+        best_match = None
+        best_score = 0
         for person in persons:
             score = 0
             if surname.lower() == unidecode(person.surname.lower()):
                 score += 1
-            if surname.lower() == unidecode(person.surname.lower() + ' ' + person.surname_prefix.lower()):
+            elif surname.lower() == unidecode(person.surname.lower() + ' ' + person.surname_prefix.lower()):
                 score += 1
-            if surname.lower() == unidecode(person.surname_prefix.lower() + ' ' + person.surname.lower()):
+            elif surname.lower() == unidecode(person.surname_prefix.lower() + ' ' + person.surname.lower()):
                 score += 1
             if initials.lower() == unidecode(person.initials.lower()):
                 score += 1
-            if score >= 2:
-                logger.info('person found: ' + surname + ', ' + initials + ' : ' + str(person))
-                return person
-        return None
+            if initials.split('.')[0] == unidecode(person.forename)[0]:
+                score += 0.5
+            if score >= 1.5 and score > best_score:
+                best_match = person
+                best_score = score
+        if best_match:
+            logger.info('person found: ' + surname + ', ' + initials + ' : ' + str(best_match))
+        return best_match
 
     @staticmethod
     def find_by_fullname(fullname):

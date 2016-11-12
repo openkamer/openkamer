@@ -44,7 +44,7 @@ class ParliamentMember(models.Model):
     @staticmethod
     def find(surname, initials=''):
         logger.info('surname: ' + surname + ', initials: ' + initials)
-        person = Person.find(surname, initials)
+        person = Person.find_surname_initials(surname, initials)
         members = ParliamentMember.objects.filter(person=person)
         if members.exists():
             return members[0]

@@ -166,7 +166,7 @@ def create_parliament_members_from_wikidata(max_results=None, all_members=False)
         print(wikidata_id)
         try:
             wikidata_item = wikidata.WikidataItem(wikidata_id)
-            person = create_person(wikidata_id, wikidata_item=wikidata_item)
+            person = create_person(wikidata_id, wikidata_item=wikidata_item, add_initials=True)
             print(person)
             positions = wikidata_item.get_parliament_positions_held()
             for position in positions:

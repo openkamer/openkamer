@@ -10,21 +10,33 @@ from person.models import Person
 
 class TestFindName(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.p1 = Person.objects.create(forename='Jan Peter', surname='Balkenende', initials='J.P.')
+        cls.p2 = Person.objects.create(forename='Jan', surname='Balkenende', initials='J.')
+        cls.p3 = Person.objects.create(forename='Jan', surname='Balkenende', surname_prefix='van', initials='J.')
+        cls.p4 = Person.objects.create(forename='Jan Peter', surname='Balkenende', surname_prefix='van', initials='J.P.')
+        cls.p5 = Person.objects.create(forename='Fatma', surname='Koşer Kaya', surname_prefix='', initials='F.')
+
     def test_find_by_fullname(self):
-        p1 = Person.objects.create(forename='Jan Peter', surname='Balkenende', initials='J.P.')
-        p2 = Person.objects.create(forename='Jan', surname='Balkenende', initials='J.')
-        p3 = Person.objects.create(forename='Jan', surname='Balkenende', surname_prefix='van', initials='J.')
-        p4 = Person.objects.create(forename='Jan Peter', surname='Balkenende', surname_prefix='van', initials='J.P.')
         p_found = Person.find_by_fullname('Jan Peter Balkenende')
-        self.assertEqual(p1.id, p_found.id)
+        self.assertEqual(self.p1, p_found)
         p_found = Person.find_by_fullname('Jan Balkenende')
-        self.assertEqual(p2.id, p_found.id)
+        self.assertEqual(self.p2, p_found)
         p_found = Person.find_by_fullname('Jan van Balkenende')
-        self.assertEqual(p3.id, p_found.id)
+        self.assertEqual(self.p3, p_found)
         p_found = Person.find_by_fullname('Jan Peter van Balkenende')
-        self.assertEqual(p4.id, p_found.id)
+        self.assertEqual(self.p4, p_found)
         p_found = Person.find_by_fullname('Jan Jaap van Balkenende')
         self.assertEqual(None, p_found)
+
+    def test_find_by_surname_initials(self):
+        p_found = Person.find_surname_initials('Balkenende', 'J.P.')
+        self.assertEqual(p_found, self.p1)
+        p_found = Person.find_surname_initials('Balkenende', 'J.')
+        self.assertEqual(p_found, self.p2)
+        p_found = Person.find_surname_initials('Koşer Kaya', 'F.')
+        self.assertEqual(p_found, self.p5)
 
 
 class TestNamePrefix(TestCase):
