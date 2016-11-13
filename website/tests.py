@@ -72,6 +72,11 @@ class TestCreateGovernment(TestCase):
             response = self.client.get(reverse('government', args=(government.slug,)))
             self.assertEqual(response.status_code, 200)
 
+    def test_governement_current_view(self):
+        governments = Government.objects.all()
+        response = self.client.get(reverse('government-current'))
+        self.assertEqual(response.status_code, 200)
+
     def test_api_governement(self):
         response = self.client.get('/api/government/')
         self.assertEqual(response.status_code, 200)
