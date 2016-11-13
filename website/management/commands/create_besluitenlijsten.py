@@ -12,4 +12,9 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        create_besluitenlijsten()
+        try:
+            create_besluitenlijsten()
+        except:
+            logger.error('while trying to create besluitenlijsten')
+            logger.error(traceback.format_exc())
+            raise

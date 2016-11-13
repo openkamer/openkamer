@@ -565,8 +565,12 @@ def create_besluitenlijsten(max_commissions=None, max_results_per_commission=Non
                 logger.error('failed to download and parse besluitenlijst with url: ' + url)
             except TypeError as e:
                 # pdfminer error that may cause this has been reported here: https://github.com/euske/pdfminer/pull/89
-                logger.error(traceback.format_exc())
                 logger.error('error while converting besluitenlijst pdf to text')
+                logger.error(traceback.format_exc())
+            except:
+                logger.error('failed to download and parse besluitenlijst with url: ' + url)
+                logger.error(traceback.format_exc())
+                raise
         if max_commissions and (index+1) >= max_commissions:
             break
     logger.info('END')
