@@ -200,7 +200,7 @@ class Kamerstuk(models.Model):
         if ids[1] == 'voorstel_van_wet':
             kamerstukken = Kamerstuk.objects.filter(id_main=ids[0])
             for stuk in kamerstukken:
-                if 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
+                if stuk != self and 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
                     return stuk
         kamerstukken = Kamerstuk.objects.filter(id_main=ids[0], id_sub=ids[1])
         if kamerstukken.exists():
