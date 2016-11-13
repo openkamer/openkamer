@@ -60,12 +60,16 @@ urlpatterns = [
 
     url(r'^agendas/$', AgendasView.as_view()),
     url(r'^agenda/(?P<pk>\d+)/$', AgendaView.as_view()),
+
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
-    url(r'^document/voting/(?P<voting_id>\d+)/$', VotingView.as_view()),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
+
     url(r'^besluitenlijsten/$', BesluitenLijstenView.as_view(), name='besluitenlijsten'),
     url(r'^besluitenlijst/(?P<activity_id>.*)/$', BesluitenLijstView.as_view(), name='besluitenlijst'),
+
     url(r'^stemmingen/$', VotingsView.as_view(), name='votings'),
+    url(r'^stemming/dossier/(?P<dossier_id>\d+)/$', VotingView.as_view(), name='voting-dossier'),
+    url(r'^stemming/kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', VotingView.as_view(), name='voting-kamerstuk'),
 
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),

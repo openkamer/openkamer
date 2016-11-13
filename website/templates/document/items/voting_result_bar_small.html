@@ -1,7 +1,11 @@
 {% load l10n %}
 
 {% if voting.has_result_details %}
-<a href="/document/voting/{{ voting.id }}/">
+  {% if voting.is_dossier_voting %}
+    <a href="{% url 'voting-dossier' voting.dossier.dossier_id %}">
+  {% else %}
+    <a href="{% url 'voting-kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}">
+  {% endif %}
   <div class="progress progress-small">
     <div class="progress-bar progress-bar-success" style="width: {{ voting.result_percent.for|unlocalize }}%" title="{{ voting.result_percent.for|floatformat:1 }} %"></div>
     <div class="progress-bar progress-bar-danger" style="width: {{ voting.result_percent.against|unlocalize }}%" title="{{ voting.result_percent.against|floatformat:1 }} %"></div>

@@ -334,7 +334,10 @@ class TestWebsite(TestCase):
     def test_voting_view(self):
         votings = Voting.objects.all()
         for voting in votings:
-            response = self.client.get('/document/voting/' + str(voting.id) + '/')
+            if voting.is_dossier_voting:
+                response = self.client.get(reverse('voting-dossier'), args=(voting.dossier.dossier_id,))
+            else:
+                response = self.client.get(reverse('voting-kamerstuk'), args=(voting.kamerstuk.id_main, voting.kamerstuk.id_sub,))
             self.assertEqual(response.status_code, 200)
 
     def test_parties_overview(self):

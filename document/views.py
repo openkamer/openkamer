@@ -233,9 +233,14 @@ class AddDossierView(TemplateView):
 class VotingView(TemplateView):
     template_name = 'document/voting.html'
 
-    def get_context_data(self, voting_id, **kwargs):
+    def get_context_data(self, dossier_id, sub_id=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        voting = Voting.objects.get(id=voting_id)
+        if sub_id:
+            kamerstuk = Kamerstuk.objects.get(id_main=dossier_id, id_sub=sub_id)
+            voting = kamerstuk.voting()
+        else:
+            dossier = Dossier.objects.get(dossier_id=dossier_id)
+            voting = dossier.voting()
         context['voting'] = voting
         return context
 
