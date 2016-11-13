@@ -272,8 +272,17 @@ class TestWebsite(TestCase):
             response = self.client.get(reverse('person', args=(person.slug,)))
             self.assertEqual(response.status_code, 200)
 
+    def test_person_autocomplete_view(self):
+        response = self.client.get(reverse('person-autocomplete') + '?q=samsom')
+        self.assertEqual(response.status_code, 200)
+
     def test_dossiers_overview(self):
         response = self.client.get(reverse('wetsvoorstellen'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_dossiers_filter_view(self):
+        ivo = Person.objects.filter(forename='Ivo', surname='Opstelten')[0]
+        response = self.client.get(reverse('wetsvoorstellen') + '?title=wet&submitter=' + str(ivo.id) + '&voting_result=AAN')
         self.assertEqual(response.status_code, 200)
 
     def test_dossier_views(self):

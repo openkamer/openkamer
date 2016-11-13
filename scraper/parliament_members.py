@@ -52,7 +52,7 @@ def search_members_wikidata(all_members=False):
 
 def search_members_check():
     # WARNING: this uses parliament member data from parlement.com, which has copyright
-    url = 'http://www.parlement.com/id/vg7zoaah7lqb/selectiemenu_tweede_kamerleden?&u=%u2713&dlgid=k91ltodn5ambf&s01=k91ltod9pb6upd&v07=&v11=&v12=&v02=&v05=&v06=&Zoek=Ok&Reset=Reset'
+    url = ''  # This url becomes invalid after time, goto http://www.parlement.com/id/vg7zoaah7lqb/selectiemenu_tweede_kamerleden and create a new one
     response = requests.get(url)
     tree = lxml.html.fromstring(response.content)
     rows = tree.xpath('//div[@class="seriekeuze seriekeuze_align"]')
