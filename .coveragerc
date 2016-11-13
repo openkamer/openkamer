@@ -1,5 +1,5 @@
 [run]
-source = website, wikidata, document, parliament, person, scraper
+source = website, wikidata, document, parliament, government, person, scraper, stats
 
 [report]
 omit =
@@ -9,4 +9,6 @@ omit =
     website/wsgi.py
     website/cron.py
     website/management/commands/*.py
+    person/management/commands/*.py
     */apps.py
+    parliament/check.py

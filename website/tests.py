@@ -186,6 +186,11 @@ class TestPersonView(TestCase):
             response = self.client.get(reverse('person', args=(person.slug,)))
             self.assertEqual(response.status_code, 200)
 
+    def test_person_check_view(self):
+        response = self.client.get(reverse('persons-check'))
+        self.assertEqual(response.status_code, 200)
+
+
 
 class TestCreatePerson(TestCase):
     wikidata_id_ss = 'Q516335'
