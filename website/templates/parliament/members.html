@@ -67,7 +67,6 @@ datepickerElement.datepicker()
             <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
           {% endif %}
         {% endif %}
-          <a href="/api/parliamentmember/{{ member.id }}/">API</a>
         {% if member.person.wikidata_id %}
           | <a href="https://www.wikidata.org/wiki/{{ member.person.wikidata_id }}">wikidata</a>
         {% endif %}
@@ -84,14 +83,6 @@ datepickerElement.datepicker()
   <div class="clearfix"></div>
   {% endif %}
 {% endfor %}
-</div>
-
-<hr/>
-
-<div class="row">
-  <div class="col-lg-12">
-    <div align="center"><h5><a href="/api/parliamentmember/">Kamerleden API</a></h5></div>
-  </div>
 </div>
 
 <hr/>
