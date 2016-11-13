@@ -1,6 +1,6 @@
 {% if voting.is_dossier_voting %}
 <a href="{% url 'voting-dossier' voting.dossier.dossier_id %}">
-{% else %}
+{% elif voting.kamerstuk %}
 <a href="{% url 'voting-kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}">
 {% endif %}
 
