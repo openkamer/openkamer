@@ -46,7 +46,7 @@ def get_dossier_timeline_json(request):
             'text': text
         }
         eras.append(era)
-    dossier = Dossier.objects.get(id=request.POST['dossier_pk'])
+    dossier = Dossier.objects.get(id=request.GET['dossier_pk'])
     events = []
     for kamerstuk in dossier.kamerstukken():
         text = {

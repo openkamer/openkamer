@@ -56,7 +56,7 @@ $(window).ready(function() {
     marker_width_min: 10
   }
 
-  $.post(
+  $.get(
     "/dossier/timeline/horizontal/json/",
     {
       dossier_pk : {{ dossier.id }}

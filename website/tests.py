@@ -1,9 +1,8 @@
 import logging
-import os
 
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.test import Client
+from django.test import TestCase
 from django.urls import reverse
 
 from person.models import Person
@@ -24,7 +23,6 @@ from document.models import Kamerstuk
 from document.models import Voting
 
 import website.create
-from website import settings
 
 logger = logging.getLogger(__name__)
 
@@ -284,6 +282,8 @@ class TestWebsite(TestCase):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
             response = self.client.get(reverse('dossier-timeline-horizontal', args=(dossier.dossier_id,)))
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get('/dossier/timeline/horizontal/json/?dossier_pk=' + str(dossier.id))
             self.assertEqual(response.status_code, 200)
 
     def test_document_view(self):
