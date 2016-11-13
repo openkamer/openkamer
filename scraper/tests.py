@@ -45,17 +45,17 @@ class TestParliamentMemberScraper(TestCase):
             os.remove(filepath)
 
 
-class TestParliamentMembersParlementComScraper(TestCase):
-
-    def test_scrape(self):
-        members_json = scraper.parliament_members.search_members_check_json()
-        # with open('./data/secret/parliament_members_check.json', 'w') as fileout:
-        #     fileout.write(str(members_json))
-        members = json.loads(members_json)
-        for member in members:
-            self.assertNotEqual(member['name'], '')
-            self.assertNotEqual(member['initials'], '')
-            self.assertNotEqual(member['date_ranges'], [])
+# class TestParliamentMembersParlementComScraper(TestCase):
+#
+#     def test_scrape(self):
+#         members_json = scraper.parliament_members.search_members_check_json()
+#         # with open('./data/secret/parliament_members_check.json', 'w') as fileout:
+#         #     fileout.write(str(members_json))
+#         members = json.loads(members_json)
+#         for member in members:
+#             self.assertNotEqual(member['name'], '')
+#             self.assertNotEqual(member['initials'], '')
+#             self.assertNotEqual(member['date_ranges'], [])
 
 
 class TestVoortouwCommissieScraper(TestCase):

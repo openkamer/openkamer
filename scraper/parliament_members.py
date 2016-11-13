@@ -53,6 +53,8 @@ def search_members_wikidata(all_members=False):
 def search_members_check():
     # WARNING: this uses parliament member data from parlement.com, which has copyright
     url = ''  # This url becomes invalid after time, goto http://www.parlement.com/id/vg7zoaah7lqb/selectiemenu_tweede_kamerleden and create a new one
+    if not url:
+        logger.error('please set a valid url')
     response = requests.get(url)
     tree = lxml.html.fromstring(response.content)
     rows = tree.xpath('//div[@class="seriekeuze seriekeuze_align"]')

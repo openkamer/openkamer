@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
+    url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
@@ -73,7 +74,6 @@ urlpatterns = [
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
-    url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 ]
 
 if settings.DEBUG:
