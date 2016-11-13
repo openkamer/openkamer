@@ -3,7 +3,7 @@ django-bootstrap3==7.1.0
 django-bootstrap-pagination==1.6.2
 django-filter==0.15.3
 django-autocomplete-light==3.2.1
-djangorestframework==3.5.2
+djangorestframework==3.5.3
 pillow==3.4.2
 requests==2.11.1
 lxml==3.6.4
