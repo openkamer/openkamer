@@ -83,7 +83,7 @@ def create_government_members(government, max_members=None):
     for member in members:
         ministry = create_ministry(government, member)
         position = create_government_position(government, member, ministry)
-        person = create_person(member['wikidata_id'], member['name'])
+        person = create_person(member['wikidata_id'], member['name'], add_initials=True)
         gov_member = create_goverment_member(government, member, person, position)
         members_created.append(gov_member)
     return members_created
