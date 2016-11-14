@@ -102,7 +102,7 @@ def create_goverment_member(government, member, person, position):
     start_date = government.date_formed
     if 'start_date' in member:
         start_date = member['start_date']
-    end_date = None
+    end_date = government.date_dissolved
     if 'end_date' in member:
         end_date = member['end_date']
     member = GovernmentMember.objects.get_or_create(

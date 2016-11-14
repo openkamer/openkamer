@@ -2,8 +2,8 @@
 
 {% for submitter in submitters %}
   <a href="{% url 'person' submitter.person.slug %}">{{ submitter }}</a>
-  {% if submitter.government_member.position %}
-    ({{ submitter.government_member.position.get_position_display|lower }} {{ submitter.government_member.position.ministry }})
+  {% if submitter.government_members %}
+    ({% for member in submitter.government_members %}{{ member.position.get_position_display|lower }} {{ member.position.ministry }}{% if not forloop.last %}, {% endif %}{% endfor %})
   {% endif %}
   {% get_current_party submitter.person.id as party %}
   {% if party %}(<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>){% endif %}{% if not forloop.last %},{% endif %}
