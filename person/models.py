@@ -22,6 +22,7 @@ NAME_PREFIXES = [
     'der',
     'den',
     'ter',
+    'ten',
     'te',
 ]
 
