@@ -246,13 +246,19 @@ class WikidataItem(object):
             if not 'datavalue' in party['mainsnak']:
                 logger.warning('datavalue not in party[\'mainsnak\'] for person with wikidata id: ' + str(id))
                 continue
-            member_info = {'wikidata_id': party['mainsnak']['datavalue']['value']['id']}
-            member_info['start_date'] = None
-            member_info['end_date'] = None
+            member_info = {
+                'wikidata_id': party['mainsnak']['datavalue']['value']['id'],
+                'start_date': None,
+                'end_date': None,
+            }
             if 'qualifiers' in party and 'P580' in party['qualifiers']:
-                member_info['start_date'] = WikidataItem.get_date(party['qualifiers']['P580'][0]['datavalue']['value']['time'])
+                start_time = party['qualifiers']['P580'][0]
+                if 'datavalue' in start_time:
+                    member_info['start_date'] = WikidataItem.get_date(start_time['datavalue']['value']['time'])
             if 'qualifiers' in party and 'P582' in party['qualifiers']:
-                member_info['end_date'] = WikidataItem.get_date(party['qualifiers']['P582'][0]['datavalue']['value']['time'])
+                end_time = party['qualifiers']['P582'][0]
+                if 'datavalue' in end_time:
+                    member_info['end_date'] = WikidataItem.get_date(end_time['datavalue']['value']['time'])
             memberships.append(member_info)
         return memberships
 
