@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 from person.views import PersonView
 from person.views import PersonsView
@@ -52,6 +53,7 @@ urlpatterns = [
     url(r'^kabinet/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
     url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
+    url(r'^dossiers/$', RedirectView.as_view(url='/wetsvoorstellen/', permanent=False)),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
     url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>\d+)/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),
