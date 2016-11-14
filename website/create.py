@@ -163,11 +163,11 @@ def create_parliament_members_from_wikidata(max_results=None, all_members=False)
     members = []
     for wikidata_id in member_wikidata_ids:
         print('=========================')
-        print(wikidata_id)
         try:
             wikidata_item = wikidata.WikidataItem(wikidata_id)
             person = create_person(wikidata_id, wikidata_item=wikidata_item, add_initials=True)
             print(person)
+            print(person.wikipedia_url)
             positions = wikidata_item.get_parliament_positions_held()
             for position in positions:
                 parliament_member = ParliamentMember.objects.create(
@@ -178,7 +178,7 @@ def create_parliament_members_from_wikidata(max_results=None, all_members=False)
                 )
                 print(parliament_member)
                 members.append(parliament_member)
-        except (KeyError, JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
+        except (JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
             logger.error(traceback.format_exc())
             logger.error(error)
             logger.error('')

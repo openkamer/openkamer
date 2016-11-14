@@ -17,6 +17,7 @@ def get_government(government_wikidata_id):
 
 def get_government_members(government_wikidata_id, max_members=None):
     logger.info('BEGIN')
+    language = 'nl'
     parts = wikidata.WikidataItem(government_wikidata_id).get_parts()
     members = []
     for part in parts:
@@ -24,9 +25,9 @@ def get_government_members(government_wikidata_id, max_members=None):
         member['position_name'] = ''  # used for ministers without portfolio
         member['properties'] = []
         member['wikidata_id'] = part['mainsnak']['datavalue']['value']['id']
-        member['wikipedia_url'] = wikidata.WikidataItem.get_wikipedia_url(member['wikidata_id'], language='nl')
         member_item = wikidata.WikidataItem(member['wikidata_id'])
-        member['name'] = member_item.get_label(language='nl')
+        member['wikipedia_url'] = member_item.get_wikipedia_url(language=language)
+        member['name'] = member_item.get_label(language=language)
         member['parlement_and_politiek_id'] = member_item.get_parlement_and_politiek_id()
         for prop_id in part['qualifiers']:
             prop = part['qualifiers'][prop_id][0]
@@ -34,7 +35,7 @@ def get_government_members(government_wikidata_id, max_members=None):
             if prop['datatype'] == 'wikibase-item':
                 item_id = prop['datavalue']['value']['id']
                 # print(item_id)
-                item_label = wikidata.WikidataItem(item_id).get_label(language='nl')
+                item_label = wikidata.WikidataItem(item_id).get_label(language=language)
                 item_label = item_label.lower()
                 member['properties'].append(item_label)
                 if 'ministerie' in item_label:

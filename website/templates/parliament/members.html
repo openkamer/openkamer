@@ -67,11 +67,11 @@ datepickerElement.datepicker()
             <img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"> <br/>
           {% endif %}
         {% endif %}
-        {% if member.person.wikidata_id %}
-          | <a href="https://www.wikidata.org/wiki/{{ member.person.wikidata_id }}">wikidata</a>
+        {% if member.person.wikipedia_url %}
+          <a href="{{ member.person.wikipedia_url }}">wikipedia</a><br/>
         {% endif %}
-        {% if member.person.wikimedia_image_url %}
-          | <a href="{{ member.person.wikimedia_image_url }}">image</a>
+        {% if member.person.parlement_and_politiek_id %}
+          <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}">parlement.com</a>
         {% endif %}
         </small>
       </p>

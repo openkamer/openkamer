@@ -34,6 +34,7 @@ class Person(models.Model):
     initials = models.CharField(max_length=200, blank=True, default='')
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
+    wikipedia_url = models.URLField(blank=True)
     wikimedia_image_name = models.CharField(max_length=200, blank=True)
     wikimedia_image_url = models.URLField(blank=True)
     parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
@@ -136,6 +137,7 @@ class Person(models.Model):
         birthdate = wikidata_item.get_birth_date()
         if birthdate:
             self.birthdate = birthdate
+        self.wikipedia_url = wikidata_item.get_wikipedia_url(language)
         image_filename = wikidata_item.get_image_filename()
         if image_filename:
             self.wikimedia_image_name = image_filename

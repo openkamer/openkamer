@@ -86,7 +86,7 @@ class ParliamentMember(models.Model):
     def __str__(self):
         display_name = self.person.fullname()
         if self.party():
-            display_name +=  ' (' + str(self.party().name_short) + ')'
+            display_name += ' (' + str(self.party().name_short) + ')'
         return display_name
 
 
@@ -133,9 +133,9 @@ class PoliticalParty(models.Model):
                         self.official_website_url = official_website
                         self.wikidata_id = wid
                         break
-        self.wikipedia_url = wikidata.WikidataItem.get_wikipedia_url(self.wikidata_id, language)
-        logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
+        self.wikipedia_url = wikidata_item.get_wikipedia_url(language)
+        logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         logo_filename = wikidata_item.get_logo_filename()
         self.founded = wikidata_item.get_inception()
         if logo_filename:

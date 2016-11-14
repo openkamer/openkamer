@@ -196,7 +196,6 @@ class TestPersonView(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-
 class TestCreatePerson(TestCase):
     wikidata_id_ss = 'Q516335'
     name_ss = 'Sjoerd Sjoerdsma'

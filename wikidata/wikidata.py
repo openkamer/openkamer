@@ -78,9 +78,10 @@ def search_parliament_member_ids():
 
 class WikidataItem(object):
 
-    def __init__(self, wikidata_id):
+    def __init__(self, wikidata_id, language='nl'):
         self.id = wikidata_id
-        self.item = self.get_item(wikidata_id)
+        site = 'wiki' + language
+        self.item = self.get_item(wikidata_id, sites=site)
 
     @staticmethod
     def get_item(id, sites=None, props=None):
@@ -190,16 +191,13 @@ class WikidataItem(object):
         title = item['labels'][language]['value']
         return title
 
-    @staticmethod
-    def get_wikipedia_url(id, language='en'):
+    def get_wikipedia_url(self, language='en'):
         site = language + 'wiki'
-        item = WikidataItem.get_item(id, sites=site, props='sitelinks')
-        if not 'sitelinks' in item:
+        if 'sitelinks' not in self.item or site not in self.item['sitelinks']:
+            logger.info('wikipedia url not found for wikidata item: ' + str(self.id))
             return ''
-        if not site in item['sitelinks']:
-            return ''
-        title = item['sitelinks'][site]['title']
-        url = 'https://' + language + '.wikipedia.org/wiki/' + urllib.parse.quote(title) + ''
+        title = self.item['sitelinks'][site]['title']
+        url = 'https://' + language + '.wikipedia.org/wiki/' + urllib.parse.quote(title)
         return url
 
     @staticmethod
