@@ -68,10 +68,10 @@ datepickerElement.datepicker()
           {% endif %}
         {% endif %}
         {% if member.person.wikipedia_url %}
-          <a href="{{ member.person.wikipedia_url }}">wikipedia</a><br/>
+          <a href="{{ member.person.wikipedia_url }}" target="_blank">wikipedia</a><br/>
         {% endif %}
         {% if member.person.parlement_and_politiek_id %}
-          <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}">parlement.com</a>
+          <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}" target="_blank">parlement.com</a>
         {% endif %}
         </small>
       </p>
