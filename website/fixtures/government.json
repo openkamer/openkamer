@@ -926,7 +926,7 @@
     "person": 1,
     "position": 22,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -946,7 +946,7 @@
     "person": 28,
     "position": 23,
     "start_date": "2011-12-16",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -956,7 +956,7 @@
     "person": 29,
     "position": 24,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -966,7 +966,7 @@
     "person": 30,
     "position": 25,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -976,7 +976,7 @@
     "person": 31,
     "position": 26,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -986,7 +986,7 @@
     "person": 32,
     "position": 27,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -996,7 +996,7 @@
     "person": 33,
     "position": 28,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1006,7 +1006,7 @@
     "person": 9,
     "position": 29,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1016,7 +1016,7 @@
     "person": 34,
     "position": 30,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1026,7 +1026,7 @@
     "person": 7,
     "position": 31,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1036,7 +1036,7 @@
     "person": 12,
     "position": 32,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1046,7 +1046,7 @@
     "person": 13,
     "position": 33,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1056,7 +1056,7 @@
     "person": 35,
     "position": 34,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1066,7 +1066,7 @@
     "person": 36,
     "position": 35,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1076,7 +1076,7 @@
     "person": 19,
     "position": 36,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1086,7 +1086,7 @@
     "person": 37,
     "position": 37,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1096,7 +1096,7 @@
     "person": 38,
     "position": 38,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1106,7 +1106,7 @@
     "person": 39,
     "position": 39,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1116,7 +1116,7 @@
     "person": 16,
     "position": 40,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1126,7 +1126,7 @@
     "person": 40,
     "position": 41,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1136,7 +1136,7 @@
     "person": 31,
     "position": 42,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 },
 {
@@ -1146,7 +1146,7 @@
     "person": 1,
     "position": 43,
     "start_date": "2010-10-14",
-    "end_date": null
+    "end_date": "2012-11-05"
   }
 }
 ]
