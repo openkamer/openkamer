@@ -198,9 +198,9 @@ class Kamerstuk(models.Model):
             return None
         ids = self.original_id.split('-')
         if ids[1] == 'voorstel_van_wet':
-            kamerstukken = Kamerstuk.objects.filter(id_main=ids[0])
+            kamerstukken = Kamerstuk.objects.filter(id_main=ids[0]).exclude(id=self.id)
             for stuk in kamerstukken:
-                if stuk != self and 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
+                if 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
                     return stuk
         kamerstukken = Kamerstuk.objects.filter(id_main=ids[0], id_sub=ids[1])
         if kamerstukken.exists():
@@ -212,7 +212,7 @@ class Kamerstuk(models.Model):
             stukken = Kamerstuk.objects.filter(original_id=self.id_main+'-voorstel_van_wet').exclude(id=self.id)
         else:
             stukken = Kamerstuk.objects.filter(original_id=self.id_full())
-        return stukken
+        return stukken.order_by('document__date_published', 'id_sub')
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'

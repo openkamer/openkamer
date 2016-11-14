@@ -5,6 +5,6 @@
 {% if kamerstuk.modifications %}
   <strong>wijzigingen:</strong>
   {% for modification in kamerstuk.modifications %}
-    <a href="#{{ modification.id_full }}">{{ modification.id_full }}</a><br>
+    <a href="#{{ modification.id_full }}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
   {% endfor %}
 {% endif %}

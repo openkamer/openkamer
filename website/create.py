@@ -394,7 +394,7 @@ def create_kamerstuk(document, dossier_id, metadata, result):
 
 
 def find_original_kamerstuk_id(dossier_id, type_long):
-    if 'gewijzigd' not in type_long.lower():
+    if 'gewijzigd' not in type_long.lower() and 'nota van wijziging' not in type_long.lower():
         return ''
     result_dossier = re.search(r"t.v.v.\s*(?P<main_id>[0-9]*)", type_long)
     result_document = re.search(r"nr.\s*(?P<sub_id>[0-9]*)", type_long)
@@ -408,7 +408,7 @@ def find_original_kamerstuk_id(dossier_id, type_long):
         return main_id + '-' + sub_id
     elif sub_id:
         return str(dossier_id) + '-' + sub_id
-    elif 'voorstel van wet' in type_long.lower():
+    elif 'voorstel van wet' in type_long.lower() or 'nota van wijziging' in type_long.lower():
         return str(dossier_id) + '-voorstel_van_wet'
     return ''
 

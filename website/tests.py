@@ -317,6 +317,18 @@ class TestWebsite(TestCase):
             response = self.client.get(reverse('kamerstuk', args=(kamerstuk.id_main, kamerstuk.id_sub,)))
             self.assertEqual(response.status_code, 200)
 
+    def test_kamerstuk_modifications(self):
+        kamerstuk_08 = Kamerstuk.objects.filter(id_main='33885', id_sub='08')
+        kamerstuk_11 = Kamerstuk.objects.filter(id_main='33885', id_sub='11')
+        kamerstuk_29 = Kamerstuk.objects.filter(id_main='33885', id_sub='29')
+        kamerstuk_original = Kamerstuk.objects.filter(id_main='33885', id_sub='02')
+        self.assertEqual(kamerstuk_08.original(), kamerstuk_original)
+        self.assertEqual(kamerstuk_11.original(), kamerstuk_original)
+        self.assertEqual(kamerstuk_29.original(), kamerstuk_original)
+        modifications = [kamerstuk_08, kamerstuk_11, kamerstuk_29]
+        for modification in kamerstuk_original.modifications():
+            self.assertTrue(modification in modifications)
+
     def test_agendas_view(self):
         response = self.client.get('/agendas/')
         self.assertEqual(response.status_code, 200)
