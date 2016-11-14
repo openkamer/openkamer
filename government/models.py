@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.db import models
@@ -25,7 +26,7 @@ class Government(models.Model):
             government=self
         )
         if pms.exists():
-            return pms[0].member_current()
+            return pms[0].member_latest()
         return None
 
     def deputy_prime_minister(self):
@@ -34,31 +35,29 @@ class Government(models.Model):
             government=self
         )
         if deputies.exists():
-            return deputies[0].member_current()
+            return deputies[0].member_latest()
         return None
 
-    def members_current(self):
-        members = []
+    def members_latest(self):
+        member_ids = []
         positions = GovernmentPosition.objects.filter(government=self)
         for position in positions:
-            members.append(position.member_current())
-        return members
+            member_ids.append(position.member_latest().id)
+        return GovernmentMember.objects.filter(pk__in=member_ids)
 
     def members(self):
-        members = []
+        member_ids = []
         positions = GovernmentPosition.objects.filter(government=self)
         for position in positions:
-            for mem in position.members():
-                members.append(mem)
-        return members
+            member_ids += [member.id for member in position.members()]
+        return GovernmentMember.objects.filter(pk__in=member_ids)
 
-    def ministers_without_portfolio(self):
-        members = []
-        positions = GovernmentPosition.objects.filter(position=GovernmentPosition.MINISTER_WO_PORTFOLIO, government=self)
+    def ministers_without_portfolio_current(self):
+        member_ids = []
+        positions = GovernmentPosition.objects.filter(government=self, position=GovernmentPosition.MINISTER_WO_PORTFOLIO)
         for position in positions:
-            for mem in position.members():
-                members.append(mem)
-        return members
+            member_ids.append(position.member_latest().id)
+        return GovernmentMember.objects.filter(pk__in=member_ids)
 
     def ministries(self):
         return Ministry.objects.filter(government=self)
@@ -73,6 +72,13 @@ class Ministry(models.Model):
 
     def positions(self):
         return GovernmentPosition.objects.filter(ministry=self)
+
+    def has_members_replaced(self):
+        positions = GovernmentPosition.objects.filter(ministry=self)
+        for position in positions:
+            if position.members_replaced().exists():
+                return True
+        return False
 
     def __str__(self):
         return str(self.name)
@@ -99,20 +105,18 @@ class GovernmentPosition(models.Model):
     def __str__(self):
         return self.get_position_display()
 
-    def member_current(self):
-        members = self.members()
-        for member in members:
-            if member.is_active():
-                return member
-        return None
+    def member_latest(self):
+        current = GovernmentMember.objects.filter(position=self, end_date__isnull=True)
+        if current:
+            return current[0]
+        else:
+            return GovernmentMember.objects.filter(position=self).order_by('-end_date')[0]
 
-    def members_inactive(self):
-        members = self.members()
-        members_inactive = []
-        for member in members:
-            if not member.is_active():
-                members_inactive.append(member)
-        return members_inactive
+    def members_replaced(self):
+        latest_date = self.government.date_dissolved
+        if not latest_date:
+            latest_date = datetime.date.today()
+        return GovernmentMember.objects.filter(position=self, end_date__lt=latest_date)
 
     def members(self):
         return GovernmentMember.objects.filter(position=self)
