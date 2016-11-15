@@ -378,6 +378,8 @@ def create_kamerstuk(document, dossier_id, metadata, result):
         type_long = 'Bijlage'
     if type_short == '':
         type_short = document.title_short
+    elif type_short == 'officiële publicatie':
+        type_short = title_parts[-1].strip()
     if type_long == '':
         type_long = document.title_full
     original_id = find_original_kamerstuk_id(dossier_id, type_long)
