@@ -12,27 +12,33 @@
 
 <div class="row">
 {% for party in parties %}
-  <div class="col-sm-3 fixed-height-column" align="center">
-    <p>
+  <div class="col-sm-3" align="center">
+    <div class="well">
       <h4><a href="{% url 'party' party.slug %}">{{ party.name_short }}</a></h4>
-      <small>{{ party.name }}</small>
-    </p>
-    <p>
-    {% include "parliament/items/party_logo.html" %}
-    </p>
-    <p><small>
-    {% if party.founded %}
-      {{ party.founded }}<br/>
-    {% endif %}
-    {% if party.wikipedia_url %}
-      <a href="{{ party.wikipedia_url }}">wikipedia</a> |
-    {% endif %}
-    {% if party.official_website_url %}
-      <a href="{{ party.official_website_url }}" target="_blank">website</a> |
-    {% endif %}
-    <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a> <br/>
-    </small></p>
+      <p>
+        <small>{{ party.name }}</small>
+      </p>
+      <p>
+      {% include "parliament/items/party_logo.html" %}
+      </p>
+      <p><small>
+      {% if party.founded %}
+        {{ party.founded }}<br/>
+      {% endif %}
+      {% if party.wikipedia_url %}
+        <a href="{{ party.wikipedia_url }}">wikipedia</a> |
+      {% endif %}
+      {% if party.official_website_url %}
+        <a href="{{ party.official_website_url }}" target="_blank">website</a> |
+      {% endif %}
+      <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a> <br/>
+      </small></p>
+    </div>
   </div>
+
+  {% if forloop.counter|divisibleby:4 %}
+  <div class="clearfix"></div>
+  {% endif %}
 {% endfor %}
 </div>
 
