@@ -10,14 +10,14 @@
   <h4 class="text-danger">WAARSCHUWING: openkamer.org is nog in ontwikkeling</h4>
 </div>
 
-<div class="vertical-spacer-20"></div>
+<hr/>
 
 <div class="row">
 
-  <div class="col-sm-6 col-lg-3" align="center">
+  <div class="col-sm-6 col-lg-3 col-lg-offset-3" align="center">
     <div class="well">
       <a href="{% url 'wetsvoorstellen' %}">
-        <h3><span class="glyphicon glyphicon-folder-open"></span></h3>
+        <h1><span class="fa fa-balance-scale"></span></h1>
         <h3>Wetsvoorstellen</h3>
       </a>
     </div>
@@ -26,44 +26,23 @@
   <div class="col-sm-6 col-lg-3" align="center">
     <div class="well">
       <a href="{% url 'votings' %}">
-        <h3><span class="glyphicon glyphicon-pencil"></span></h3>
+        <h1><span class="fa fa-pencil-square-o"></span></h1>
         <h3>Stemmingen</h3>
       </a>
     </div>
   </div>
 
-  <div class="col-sm-6 col-lg-3" align="center">
-    <div class="well">
-      <a href="{% url 'parties' %}">
-        <h3><span class="glyphicon glyphicon-leaf"></span></h3>
-        <h3>Partijen</h3>
-      </a>
-    </div>
-  </div>
+</div>
+
+<hr/>
+
+<div class="row">
 
   <div class="col-sm-6 col-lg-3" align="center">
     <div class="well">
       <a href="{% url 'parliament-members' %}">
         <h3><span class="glyphicon glyphicon-user"></span></h3>
-        <h3>Kamerleden</h3>
-      </a>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-3" align="center">
-    <div class="well">
-      <a href="/agendas/">
-        <h3><span class="glyphicon glyphicon-calendar"></span></h3>
-        <h3>Agendas</h3>
-      </a>
-    </div>
-  </div>
-
-  <div class="col-sm-6 col-lg-3" align="center">
-    <div class="well">
-      <a href="{% url 'besluitenlijsten' %}">
-        <h3><span class="glyphicon glyphicon-list"></span></h3>
-        <h3>Besluitenlijsten</h3>
+        <h4>Kamerleden</h4>
       </a>
     </div>
   </div>
@@ -72,7 +51,34 @@
     <div class="well">
       <a href="{% url 'government-current' %}">
         <h3><span class="glyphicon glyphicon-briefcase"></span></h3>
-        <h3>Kabinet</h3>
+        <h4>Kabinet</h4>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="{% url 'parties' %}">
+        <h3><span class="glyphicon glyphicon-leaf"></span></h3>
+        <h4>Partijen</h4>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="/agendas/">
+        <h3><span class="glyphicon glyphicon-calendar"></span></h3>
+        <h4>Agenda's</h4>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3" align="center">
+    <div class="well">
+      <a href="{% url 'besluitenlijsten' %}">
+        <h3><span class="glyphicon glyphicon-list"></span></h3>
+        <h4>Besluitenlijsten</h4>
       </a>
     </div>
   </div>
