@@ -201,7 +201,15 @@ class AgendasView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['agendas'] = Agenda.objects.all()
+        paginator = Paginator(Agenda.objects.all(), settings.AGENDAS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            agendas = paginator.page(page)
+        except PageNotAnInteger:
+            agendas = paginator.page(1)
+        except EmptyPage:
+            agendas = paginator.page(paginator.num_pages)
+        context['agendas'] = agendas
         return context
 
 

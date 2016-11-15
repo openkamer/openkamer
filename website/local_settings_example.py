@@ -28,6 +28,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 MEDIA_URL = '/static/media/'
 
 # DOCUMENT
+AGENDAS_PER_PAGE = 50
 DOSSIERS_PER_PAGE = 20
 VOTINGS_PER_PAGE = 25
 BESLUITENLIJSTEN_PER_PAGE = 200
@@ -40,3 +41,4 @@ PIWIK_SITE_ID = 0
 GIT_AUTHOR_NAME = ''
 GIT_AUTHOR_EMAIL = ''
 PARTIES_REPO_DIR = '<path-to-repo>/ok-tknl-fracties/'
+MEMBERS_REPO_DIR = '<path-to-repo>/ok-tknl-kamerleden/'

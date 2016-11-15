@@ -2,6 +2,8 @@
 
 {% block title %}Agenda's - Tweede Kamer {{ block.super }}{% endblock %}
 
+{% load bootstrap_pagination %}
+
 {% block content %}
 
 <div class="row">
@@ -22,6 +24,8 @@
 </div>
 
 {% endfor %}
+
+<div class="row" align="center">{% bootstrap_paginate agendas %}</div>
 
 <hr/>
 
