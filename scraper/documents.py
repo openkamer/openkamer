@@ -73,9 +73,17 @@ def get_document_id_and_content(url):
     elements = tree.xpath('//div[@class="stuk"]')
     if elements:
         content_html = lxml.etree.tostring(elements[0])
+    elif tree.xpath('//h2[@class="stuktitel"]'):
+        content_html = lxml.etree.tostring(tree.xpath('//h2[@class="stuktitel"]')[0].getparent())
     else:
         content_html = ''
-    return document_id, content_html
+    titles = tree.xpath('//h2[@class="stuktitel"]')
+    titles += tree.xpath('//h1[@class="stuktitel"]')
+    title = ''
+    if titles:
+        text = titles[0].text_content()
+        title = re.sub("\w{2}\.\s\d+", '', text).strip().lower()  # remove 'nr. 6'
+    return document_id, content_html, title
 
 
 def get_metadata(document_id):

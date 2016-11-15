@@ -293,7 +293,7 @@ def create_or_update_dossier(dossier_id):
             logger.info('Staatscourant, skip for now')
             continue
 
-        document_id, content_html = scraper.documents.get_document_id_and_content(result['page_url'])
+        document_id, content_html, title = scraper.documents.get_document_id_and_content(result['page_url'])
         if not document_id:
             logger.warning('No document id found, will not create document')
             continue
@@ -339,7 +339,8 @@ def create_or_update_dossier(dossier_id):
             create_submitter(document, submitter)
 
         if metadata['is_kamerstuk']:
-            create_kamerstuk(document, dossier.dossier_id, metadata, result)
+            is_attachement = "Bijlage" in result['type']
+            create_kamerstuk(document, dossier.dossier_id, title, metadata, is_attachement)
             category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
             dossier.categories.add(*category_list)
 
@@ -364,7 +365,7 @@ def get_categories(text, category_class=CategoryDocument, sep_char='|'):
 
 
 @transaction.atomic
-def create_kamerstuk(document, dossier_id, metadata, result):
+def create_kamerstuk(document, dossier_id, title, metadata, is_attachement):
     logger.info('BEGIN')
     logger.info('document: ' + str(document))
     title_parts = metadata['title_full'].split(';')
@@ -373,13 +374,13 @@ def create_kamerstuk(document, dossier_id, metadata, result):
     if len(title_parts) > 2:
         type_short = title_parts[1].strip()
         type_long = title_parts[2].strip()
-    if "Bijlage" in result['type']:
+    if is_attachement:
         type_short = 'Bijlage'
         type_long = 'Bijlage'
     if type_short == '':
         type_short = document.title_short
-    elif type_short == 'officiële publicatie':
-        type_short = title_parts[-1].strip()
+    if type_short == 'officiële publicatie':
+        type_short = title
     if type_long == '':
         type_long = document.title_full
     original_id = find_original_kamerstuk_id(dossier_id, type_long)

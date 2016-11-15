@@ -257,3 +257,19 @@ class TestDocumentScraper(TestCase):
         self.assertEqual(metadata['publisher'], 'Tweede Kamer der Staten-Generaal')
         self.assertEqual(metadata['submitter'], 'Ham van der B.|Wit de J.M.A.M.|Teeven F.')
         self.assertEqual(metadata['publication_type'], 'Kamerstuk')
+
+    def test_get_document_content_2016(self):
+        url = 'https://zoek.officielebekendmakingen.nl/kst-34575-2.html'
+        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
+        self.assertEqual(document_id, 'kst-34575-2')
+        self.assertEqual(title, 'voorstel van wet')
+
+    def test_get_document_content_2009(self):
+        url = 'https://zoek.officielebekendmakingen.nl/kst-32203-2.html'
+        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
+        self.assertEqual(document_id, 'kst-32203-2')
+        self.assertEqual(title, 'voorstel van wet')
+        url = 'https://zoek.officielebekendmakingen.nl/kst-31830-6.html'
+        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
+        self.assertEqual(document_id, 'kst-31830-6')
+        self.assertEqual(title, 'brief van de minister van financiën')
