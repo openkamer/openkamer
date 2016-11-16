@@ -317,10 +317,10 @@ class TestWebsite(TestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_kamerstuk_modifications(self):
-        kamerstuk_08 = Kamerstuk.objects.get(id_main='33885', id_sub='08')
+        kamerstuk_08 = Kamerstuk.objects.get(id_main='33885', id_sub='8')
         kamerstuk_11 = Kamerstuk.objects.get(id_main='33885', id_sub='11')
         kamerstuk_29 = Kamerstuk.objects.get(id_main='33885', id_sub='29')
-        kamerstuk_original = Kamerstuk.objects.get(id_main='33885', id_sub='02')
+        kamerstuk_original = Kamerstuk.objects.get(id_main='33885', id_sub='2')
         self.assertEqual(kamerstuk_08.original(), kamerstuk_original)
         self.assertEqual(kamerstuk_11.original(), kamerstuk_original)
         self.assertEqual(kamerstuk_29.original(), kamerstuk_original)
