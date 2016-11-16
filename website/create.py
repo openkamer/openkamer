@@ -225,7 +225,7 @@ def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=Fal
             if parties.exists():
                 party = parties[0]
             else:
-                logger.error('political party for person with wikidata id: ' + str(membership['wikidata_id']) + ' does not exist')
+                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ', for person with wikidata id: ' + str(wikidata_id) + ' does not exist')
                 continue
             PartyMember.objects.create(
                 person=person,

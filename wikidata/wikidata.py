@@ -179,19 +179,19 @@ class WikidataItem(object):
         claims = self.get_claims()
         if 'P856' in claims:
             return claims['P856'][0]['mainsnak']['datavalue']['value']
-        return None
+        return ''
 
     def get_image_filename(self):
         claims = self.get_claims()
         if 'P18' in claims:
             return claims['P18'][0]['mainsnak']['datavalue']['value']
-        return None
+        return ''
 
     def get_logo_filename(self):
         claims = self.get_claims()
         if 'P154' in claims:
             return claims['P154'][0]['mainsnak']['datavalue']['value']
-        return None
+        return ''
 
     @staticmethod
     def get_label_for_id(id, language='en'):

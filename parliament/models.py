@@ -114,7 +114,7 @@ class PoliticalParty(models.Model):
     def find_wikidata_id(self, language='en', top_level_domain='com'):
         wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
         if not wikidata_ids:
-            return None
+            return ''
         # find the first result with a website with the given domain
         for wid in wikidata_ids:
             official_website = wikidata.WikidataItem(wid).get_official_website()
@@ -139,7 +139,7 @@ class PoliticalParty(models.Model):
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
         self.official_website_url = wikidata_item.get_official_website()
         self.wikipedia_url = wikidata_item.get_wikipedia_url(language)
-        logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
+        logger.info(self.name + ' - id: ' + str(self.wikidata_id) + ', website: ' + str(self.official_website_url))
         logo_filename = wikidata_item.get_logo_filename()
         self.founded = wikidata_item.get_inception()
         if logo_filename:
