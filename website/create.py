@@ -144,7 +144,7 @@ def create_parliament_members():
                 surname_prefix=member['prefix'],
                 initials=member['initials']
             )
-        party = PoliticalParty.get_party(member['party'])
+        party = PoliticalParty.find_party(member['party'])
         party_member = PartyMember.objects.create(person=person, party=party)
         parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
         logger.info("new person: " + str(person))
