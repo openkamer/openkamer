@@ -31,13 +31,17 @@ class Command(BaseCommand):
     def create_dossiers_from_file(filename, skip_existing=False):
         with open(filename, 'r') as filein:
             lines = filein.read().splitlines()
-            for line in lines:
-                dossier_id = line.strip()
-                dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-                if skip_existing and dossiers.exists():
-                    logger.info('dossier already exists, skip')
-                    continue
-                try:
-                    create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=Command.MAX_TRIES)
-                except Exception as e:
-                    logger.error(traceback.format_exc())
+        failed_dossiers = []
+        for line in lines:
+            dossier_id = line.strip()
+            dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+            if skip_existing and dossiers.exists():
+                logger.info('dossier already exists, skip')
+                continue
+            try:
+                create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=Command.MAX_TRIES)
+            except Exception as e:
+                failed_dossiers.append(dossier_id)
+                logger.error('error for dossier id: ' + str(dossier_id))
+                logger.error(traceback.format_exc())
+        logger.error('failed dossiers: ' + str(failed_dossiers))

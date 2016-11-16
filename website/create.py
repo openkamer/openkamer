@@ -473,6 +473,7 @@ def create_or_update_agenda(agenda_id):
 
 @transaction.atomic
 def create_votings(dossier_id):
+    logger.info('BEGIN')
     logger.info('dossier id: ' + str(dossier_id))
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
     logger.info('votings found: ' + str(len(voting_results)))
@@ -502,15 +503,26 @@ def create_votings(dossier_id):
             create_votes_individual(voting_obj, voting_result.votes)
         else:
             create_votes_party(voting_obj, voting_result.votes)
+    logger.info('END')
 
 
 @transaction.atomic
 def create_votes_party(voting, votes):
+    logger.info('BEGIN')
     for vote in votes:
         party = PoliticalParty.find_party(vote.party_name)
-        assert party
+        if not party:
+            wikidata_id = wikidata.search_political_party_id(vote.party_name, language='nl')
+            item = wikidata.WikidataItem(wikidata_id)
+            party = PoliticalParty.objects.create(
+                name=item.get_label('nl'),
+                name_short=vote.party_name,
+                wikidata_id=wikidata_id
+            )
+            party.update_info()
         VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
                                  decision=get_decision(vote.decision), details=vote.details)
+    logger.info('END')
 
 
 @transaction.atomic

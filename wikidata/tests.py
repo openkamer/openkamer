@@ -59,3 +59,24 @@ class TestPositionHeld(TestCase):
         item = wikidata.WikidataItem(self.wikidata_id_mr)
         positions = item.get_parliament_positions_held()
         self.assertEqual(len(positions), 3)
+
+
+class TestFindPoliticalParty(TestCase):
+
+    def test_search_pvdd(self):
+        wikidata_id = wikidata.search_political_party_id('PvdD', language='nl')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Partij voor de Dieren')
+
+    def test_search_vvd(self):
+        wikidata_id = wikidata.search_political_party_id('VVD', language='nl')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Volkspartij voor Vrijheid en Democratie')
+
+    def test_is_policital_party(self):
+        wikidata_id = 'Q275441'  # PvdA
+        item = wikidata.WikidataItem(wikidata_id)
+        is_pp = item.is_political_party()
+        self.assertTrue(is_pp)

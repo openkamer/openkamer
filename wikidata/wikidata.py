@@ -35,6 +35,15 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
+def search_political_party_id(search_str, language='en'):
+    wikidata_ids = search_wikidata_ids(search_str, language)
+    for wikidata_id in wikidata_ids:
+        item = WikidataItem(wikidata_id)
+        if item.is_political_party():
+            return wikidata_id
+    return None
+
+
 def search_parliament_member_ids_with_start_date():
     logger.info('BEGIN')
     url = 'https://query.wikidata.org/sparql?'
@@ -146,8 +155,16 @@ class WikidataItem(object):
     def get_country_id(self):
         claims = self.get_claims()
         if 'P17' in claims:
-            return claims['P17'][0]['mainsnak']['datavalue']['value']['numeric-id']
+            return claims['P17'][0]['mainsnak']['datavalue']['value']['id']
         return None
+
+    def is_political_party(self):
+        claims = self.get_claims()
+        if 'P31' in claims:
+            for instance_of in claims['P31']:
+                if instance_of['mainsnak']['datavalue']['value']['id'] == 'Q7278':
+                    return True
+        return False
 
     def get_given_names(self):
         claims = self.get_claims()
@@ -186,7 +203,7 @@ class WikidataItem(object):
 
     @staticmethod
     def get_label_from_item(item, language='en'):
-        if not 'labels' in item:
+        if 'labels' not in item or language not in item['labels']:
             return ''
         title = item['labels'][language]['value']
         return title

@@ -111,6 +111,19 @@ class PoliticalParty(models.Model):
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 
+    def find_wikidata_id(self, language='en', top_level_domain='com'):
+        wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
+        if not wikidata_ids:
+            return None
+        # find the first result with a website with the given domain
+        for wid in wikidata_ids:
+            official_website = wikidata.WikidataItem(wid).get_official_website()
+            if official_website:
+                tld = official_website.split('.')[-1]
+                if tld == top_level_domain or tld == top_level_domain + '/':
+                    return wid
+        return wikidata_ids[0]
+
     def update_info(self, language='en', top_level_domain='com'):
         """
         update the model derived info
@@ -120,20 +133,11 @@ class PoliticalParty(models.Model):
         if top_level_domain[0] == '.':
             logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
         if not self.wikidata_id:
-            wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
-            if not wikidata_ids:
+            self.wikidata_id = self.find_wikidata_id(language, top_level_domain)
+            if not self.wikidata_id:
                 return
-            self.wikidata_id = wikidata_ids[0]
-            # find the first result with a website with the given domain
-            for wid in wikidata_ids:
-                official_website = wikidata.WikidataItem(wid).get_official_website()
-                if official_website:
-                    tld = official_website.split('.')[-1]
-                    if tld == top_level_domain or tld == top_level_domain + '/':
-                        self.official_website_url = official_website
-                        self.wikidata_id = wid
-                        break
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
+        self.official_website_url = wikidata_item.get_official_website()
         self.wikipedia_url = wikidata_item.get_wikipedia_url(language)
         logger.info(self.name + ' - id: ' + self.wikidata_id + ', website: ' + self.official_website_url)
         logo_filename = wikidata_item.get_logo_filename()
