@@ -387,7 +387,7 @@ def create_kamerstuk(document, dossier_id, title, metadata, is_attachement):
     stuk = Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
-        id_sub=metadata['id_sub'].zfill(2),
+        id_sub=metadata['id_sub'],
         type_short=type_short,
         type_long=type_long,
         original_id=original_id
@@ -479,9 +479,6 @@ def create_votings(dossier_id):
     logger.info('votings found: ' + str(len(voting_results)))
     for voting_result in voting_results:
         result = get_result_choice(voting_result.get_result())
-        if result is None:
-            logger.error('Could not interpret vote result: ' + voting_result.get_result())
-            assert False
         document_id = voting_result.get_document_id()
         if not document_id:
             logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
@@ -527,6 +524,7 @@ def create_votes_party(voting, votes):
 
 @transaction.atomic
 def create_votes_individual(voting, votes):
+    logger.info('BEGIN')
     for vote in votes:
         initials, surname = parse_name_surname_initials(vote.parliament_member)
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
@@ -539,17 +537,20 @@ def create_votes_individual(voting, votes):
                 logger.error('voting.kamerstuk does not exist')
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
                                       decision=get_decision(vote.decision), details=vote.details)
+    logger.info('END')
 
 
 def get_result_choice(result_string):
-    if 'aangenomen' in result_string.lower():
+    result_string = result_string.lower()
+    if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
         return Voting.AANGENOMEN
-    elif 'verworpen' in result_string.lower():
+    elif 'verworpen' in result_string:
         return Voting.VERWORPEN
-    elif 'ingetrokken' in result_string.lower():
+    elif 'ingetrokken' in result_string:
         return Voting.INGETROKKEN
-    elif 'aangehouden' in result_string.lower():
+    elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
         return Voting.AANGEHOUDEN
+    logger.error('could not interpret the voting result: ' + result_string)
     return None
 
 

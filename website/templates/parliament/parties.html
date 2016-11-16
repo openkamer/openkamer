@@ -31,7 +31,9 @@
       {% if party.official_website_url %}
         <a href="{{ party.official_website_url }}" target="_blank">website</a> |
       {% endif %}
-      <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a> <br/>
+      {% if party.wikidata_id %}
+      <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a>
+      {% endif %}
       </small></p>
     </div>
   </div>
