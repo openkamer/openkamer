@@ -53,19 +53,19 @@ def get_kamerstuk_timeline_bg_color(kamerstuk_id):
 
 
 @register.assignment_tag
-def get_voting_result_bg_color(voting_id):
+def get_voting_result_color(voting_id):
     voting = Voting.objects.get(id=voting_id)
     if not voting:
-        return 'bg-info'
+        return 'info'
     if voting.result == Voting.VERWORPEN:
-        return 'bg-danger'
+        return 'danger'
     elif voting.result == Voting.AANGENOMEN:
-        return 'bg-success'
+        return 'success'
     elif voting.result == Voting.INGETROKKEN:
-        return 'bg-warning'
+        return 'warning'
     elif voting.result == Voting.AANGEHOUDEN:
-        return 'bg-warning'
-    return 'bg-info'
+        return 'warning'
+    return 'info'
 
 
 @register.assignment_tag

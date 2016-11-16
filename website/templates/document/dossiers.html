@@ -88,7 +88,32 @@
   <div class="col-md-6">
     <div class="well well-small" align="left">
 
-      <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
+      <div class="row">
+        <div class="col-xs-5" align="left">
+          <small>{{ dossier.start_date }}</small>
+        </div>
+        <div class="col-xs-2" align="center">
+          <small>{{ dossier.dossier_id }}</small>
+        </div>
+        <div class="col-xs-5" align="right">
+          {% if dossier.voting %}
+          {% get_voting_result_color dossier.voting.id as voting_result_class %}
+          {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+            <span class="fa {{ voting_result_icon }} text-{{ voting_result_class }}"></span>
+          {% elif dossier.is_active %}
+            <span class="fa fa-spinner text-info" title="In behandeling"></span>
+          {% else %}
+            <span class="fa fa-flag-checkered text-warning" title="Niet meer in behandling. Resultaat onduidelijk."></span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-md-12">
           {% with voting=dossier.voting %}
@@ -97,14 +122,6 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-xs-6">
-          {{ dossier.start_date }}
-        </div>
-        <div class="col-xs-6" align="right">
-          {{ dossier.dossier_id }}
-        </div>
-      </div>
     </div>
   </div>
 

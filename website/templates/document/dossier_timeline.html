@@ -37,19 +37,19 @@
   <div class="cd-timeline-block">
 
     {% if dossier.voting %}
-    {% get_voting_result_bg_color dossier.voting.id as voting_result_class %}
-    {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
-    <div class="cd-timeline-img text-center {{ voting_result_class }}">
-      <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
-    </div>
-    {% elif dossier.is_active %}
-    <div class="cd-timeline-img text-center bg-info">
-      <span style="font-size:24px;" class="fa fa-spinner"></span>
-    </div>
-    {% else %}
-    <div class="cd-timeline-img text-center bg-warning">
-      <span style="font-size:24px;" class="fa fa-flag-checkered"></span>
-    </div>
+      {% get_voting_result_color dossier.voting.id as voting_result_class %}
+      {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+      <div class="cd-timeline-img text-center bg-{{ voting_result_class }}">
+        <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
+      </div>
+      {% elif dossier.is_active %}
+      <div class="cd-timeline-img text-center bg-info">
+        <span style="font-size:24px;" class="fa fa-spinner"></span>
+      </div>
+      {% else %}
+      <div class="cd-timeline-img text-center bg-warning">
+        <span style="font-size:24px;" class="fa fa-flag-checkered"></span>
+      </div>
     {% endif %}
 
     <div class="cd-timeline-content">
