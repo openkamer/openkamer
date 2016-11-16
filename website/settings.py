@@ -137,7 +137,8 @@ BOOTSTRAP3 = {
 ###############
 CRON_CLASSES = [
     'website.cron.CreateCommitPartyCSV',
-    'website.cron.CreateCommitParliamentMembersCSV'
+    'website.cron.CreateCommitParliamentMembersCSV',
+    'website.cron.CreateCommitWetsvoorstellenIDs',
 ]
 
 ###########

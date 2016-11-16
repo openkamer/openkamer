@@ -10,22 +10,23 @@ import lxml.etree
 logger = logging.getLogger(__name__)
 
 
-def get_dossier_ids_wetsvoorstellen_initiatief(max_results=None):
+def get_dossier_ids_wetsvoorstellen_initiatief(max_results=None, filter_active=False, filter_inactive=False):
     logger.info('BEGIN')
-    dossier_ids = get_wetsvoorstellen_dossier_ids('Initiatiefwetsvoorstellen', max_results)
+    dossier_ids = get_wetsvoorstellen_dossier_ids('Initiatiefwetsvoorstellen', max_results, filter_active, filter_inactive)
     logger.info('END')
     return dossier_ids
 
 
-def get_dossier_ids_wetsvoorstellen_regering(max_results=None):
+def get_dossier_ids_wetsvoorstellen_regering(max_results=None, filter_active=False, filter_inactive=False):
     logger.info('BEGIN')
-    dossier_ids = get_wetsvoorstellen_dossier_ids('Wetsvoorstellen+regering', max_results)
+    dossier_ids = get_wetsvoorstellen_dossier_ids('Wetsvoorstellen+regering', max_results, filter_active, filter_inactive)
     logger.info('END')
     return dossier_ids
 
 
-def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
+def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None, filter_active=False, filter_inactive=False):
     logger.info('BEGIN')
+    assert not (filter_active and filter_inactive)
     url = 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen'
     # these parameters cannot be percent encoded, and can thus not be part of the params variable
     url += '?clusterName=' + subsubcategorie + '&fld_tk_subsubcategorie=' + subsubcategorie
@@ -37,15 +38,24 @@ def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None):
         'Type': 'Wetsvoorstellen',
         'sta': '1'
     }
+    if filter_active:
+        params['fld_prl_status'] = 'Aanhangig'
+    if filter_inactive:
+        params['fld_prl_status'] = 'Afgedaan'
     dossier_ids = []
     new_dossiers_found = True
     start = 1
     while new_dossiers_found:
+        logger.info('start item nr: ' + str(start))
         params['sta'] = str(start)
-        page = requests.get(url, params)
-        tree = lxml.html.fromstring(page.content)
+        response = requests.get(url, params)
+        response.raise_for_status()
+        tree = lxml.html.fromstring(response.content)
         elements = tree.xpath('//div[@class="search-result-properties"]/p')
+        logger.info('results on page: ' + str(len(elements)/2))
         new_dossiers_found = len(elements) != 0
+        if not new_dossiers_found:
+            logger.info('no new dossiers found on page: ' + str(response.url))
         for element in elements:
             if 'class' not in element.attrib:
                 dossier_ids.append(element.text.split('-')[0])  # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)

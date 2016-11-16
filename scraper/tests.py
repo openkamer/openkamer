@@ -155,18 +155,14 @@ class TestWetsvoorstellenDossierScraper(TestCase):
 
     def test_get_initiatief_wetsvoorstellen_dossier_ids(self):
         dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
-        # print('initiatief wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
-        # with open('data/dossier_ids_wetsvoorstellen_initiatief.txt', 'w') as fileout:
-        #     for dossier_id in dossier_ids:
-        #         fileout.write(dossier_id + '\n')
+        self.assertEqual(len(dossier_ids), self.max_results)
+        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results, filter_active=True)
         self.assertEqual(len(dossier_ids), self.max_results)
 
     def test_get_regering_wetsvoorstellen_dossier_ids(self):
         dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
-        # print('regering wetsvoorstel dossiers found: ' + str(len(dossier_ids)))
-        # with open('data/dossier_ids_wetsvoorstellen_regering.txt', 'w') as fileout:
-        #     for dossier_id in dossier_ids:
-        #         fileout.write(dossier_id + '\n')
+        self.assertEqual(len(dossier_ids), self.max_results)
+        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results, filter_inactive=True)
         self.assertEqual(len(dossier_ids), self.max_results)
 
 
