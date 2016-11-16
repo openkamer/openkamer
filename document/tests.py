@@ -3,6 +3,7 @@ import datetime
 from django.test import TestCase
 
 from document.models import Document
+from document.models import Dossier
 from document.models import Submitter
 from document.models import CategoryDossier
 from document.models import CategoryDocument
@@ -88,3 +89,18 @@ class TestSubmitter(TestCase):
         self.assertEqual(len(members), len(expected_members))
         for mem in members:
             self.assertTrue(mem in expected_members)
+
+
+class TestDossier(TestCase):
+
+    def test_get_active_ids(self):
+        active_ids = Dossier.get_active_dossier_ids()
+        self.assertTrue(len(active_ids) > 226)
+        active_ids = Dossier.get_active_dossier_ids()
+        self.assertTrue(len(active_ids) > 226)
+
+    def test_get_inactive_ids(self):
+        inactive_ids = Dossier.get_inactive_dossier_ids()
+        self.assertTrue(len(inactive_ids) > 1335)
+        inactive_ids = Dossier.get_inactive_dossier_ids()
+        self.assertTrue(len(inactive_ids) > 1335)

@@ -42,9 +42,13 @@
     <div class="cd-timeline-img text-center {{ voting_result_class }}">
       <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
     </div>
-    {% else %}
+    {% elif dossier.is_active %}
     <div class="cd-timeline-img text-center bg-info">
       <span style="font-size:24px;" class="fa fa-spinner"></span>
+    </div>
+    {% else %}
+    <div class="cd-timeline-img text-center bg-warning">
+      <span style="font-size:24px;" class="fa fa-flag-checkered"></span>
     </div>
     {% endif %}
 
@@ -55,8 +59,13 @@
           {% include "document/items/voting_result_bar.html" %}
         {% endwith %}
         {% include "document/items/voting_result_list.html" %}
-      {% else %}
+      {% elif dossier.is_active %}
       <h2>Dit wetsvoorstel is nog in behandeling.</h2>
+      {% else %}
+      <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
+      <h2>Er is niet over gestemd.</h2>
+      <p>Het is voor openkamer niet duidelijk of dit voorstel is aangenomen of verworpen, en op welke manier dit is gebeurd.</p>
+      <p>Mogelijk is er iets besloten door een commissie, of heeft de indiener het voorstel ingetrokken. Deze beslissingen zouden zichtbaar moeten zijn als items in deze tijdlijn.</p>
       {% endif %}
 
       <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>

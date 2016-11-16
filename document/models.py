@@ -1,3 +1,4 @@
+import requests
 import logging
 
 from itertools import chain
@@ -49,6 +50,7 @@ class CategoryDocument(Category):
 class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['-dossier_id']
@@ -96,6 +98,42 @@ class Dossier(models.Model):
                 title = key
                 max_titles = value
         return title
+
+    @staticmethod
+    def is_active_id(dossier_id):
+        active_dossier_ids = Dossier.get_active_dossier_ids()
+        return dossier_id in active_dossier_ids
+
+    @staticmethod
+    def get_lines_from_url(url):
+        response = requests.get(url)
+        return response.content.decode('utf-8').splitlines()
+
+    @classmethod
+    def get_active_dossier_ids(cls):
+        if hasattr(cls, 'active_dossier_ids'):
+            return cls.active_dossier_ids
+        lines = Dossier.get_lines_from_url(
+            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
+        lines += Dossier.get_lines_from_url(
+            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
+        cls.active_dossier_ids = []
+        for line in lines:
+            cls.active_dossier_ids.append(line.strip())
+        return cls.active_dossier_ids
+
+    @classmethod
+    def get_inactive_dossier_ids(cls):
+        if hasattr(cls, 'inactive_dossier_ids'):
+            return cls.inactive_dossier_ids
+        lines = Dossier.get_lines_from_url(
+            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
+        lines += Dossier.get_lines_from_url(
+            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
+        cls.inactive_dossier_ids = []
+        for line in lines:
+            cls.inactive_dossier_ids.append(line.strip())
+        return cls.inactive_dossier_ids
 
 
 class Document(models.Model):
