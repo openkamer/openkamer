@@ -18,11 +18,16 @@ import scraper.votings
 
 
 class TestDossierScraper(TestCase):
+    dossier_id = '33711'
 
     def test_scrape_dossier_url(self):
-        dossier_id = '33711'
-        dossier_url = scraper.dossiers.search_dossier_url(dossier_id)
+        dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
         self.assertEqual(dossier_url, 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/detail?id=2013Z16228&dossier=33711')
+
+    def test_get_dossier_decision(self):
+        dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
+        decision = scraper.dossiers.get_dossier_decision(dossier_url)
+        self.assertEqual(decision, 'Wetsvoorstel zonder stemming aangenomen.')
 
 
 class TestPoliticalPartyScraper(TestCase):

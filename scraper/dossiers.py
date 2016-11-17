@@ -20,6 +20,15 @@ def search_dossier_url(dossier_id):
     return ''
 
 
+def get_dossier_decision(dossier_url):
+    response = requests.get(dossier_url)
+    tree = lxml.html.fromstring(response.content)
+    elements = tree.xpath('//div[@class="bill-header"]/p[@class="status"]/span')
+    if elements:
+        return elements[0].text
+    return ''
+
+
 def get_dossier_ids_wetsvoorstellen_initiatief(max_results=None, filter_active=False, filter_inactive=False):
     logger.info('BEGIN')
     dossier_ids = get_wetsvoorstellen_dossier_ids('Initiatiefwetsvoorstellen', max_results, filter_active, filter_inactive)
