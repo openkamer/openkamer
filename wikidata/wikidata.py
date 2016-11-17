@@ -41,7 +41,7 @@ def search_political_party_id(search_str, language='en'):
         item = WikidataItem(wikidata_id)
         if item.is_political_party():
             return wikidata_id
-    return None
+    return ''
 
 
 def search_parliament_member_ids_with_start_date():
