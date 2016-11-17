@@ -24,6 +24,7 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
 
     @staticmethod
     def dossier_ids_to_file(dossier_ids, filepath):
+        dossier_ids = sorted(dossier_ids)
         with open(filepath, 'w') as fileout:
             for dossier_id in dossier_ids:
                 fileout.write(dossier_id + '\n')
