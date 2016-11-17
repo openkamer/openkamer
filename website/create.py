@@ -3,6 +3,7 @@ import os
 import re
 import requests
 from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
+import time
 import traceback
 import uuid
 from json.decoder import JSONDecodeError
@@ -269,6 +270,7 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
             create_or_update_dossier(dossier_id)
         except (ConnectionError, ConnectTimeout) as e:
             logger.error(traceback.format_exc())
+            time.sleep(5)  # wait 5 seconds for external servers to relax
             if tries < max_tries:
                 logger.error('trying again!')
                 continue
