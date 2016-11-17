@@ -45,6 +45,7 @@ from document.models import VoteIndividual
 
 import scraper.besluitenlijst
 import scraper.documents
+import scraper.dossiers
 import scraper.government
 import scraper.persons
 import scraper.parliament_members
@@ -279,7 +280,14 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
     Dossier.objects.filter(dossier_id=dossier_id).delete()
-    dossier_new = Dossier.objects.create(dossier_id=dossier_id, is_active=Dossier.is_active_id(dossier_id))
+    dossier_url = scraper.dossiers.search_dossier_url(dossier_id)
+    decision = scraper.dossiers.get_dossier_decision(dossier_url)
+    dossier_new = Dossier.objects.create(
+        dossier_id=dossier_id,
+        is_active=Dossier.is_active_id(dossier_id),
+        url=dossier_url,
+        decision=decision
+    )
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for result in search_results:
         # skip eerste kamer documents, first focus on the tweede kamer

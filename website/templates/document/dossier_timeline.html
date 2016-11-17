@@ -26,6 +26,7 @@
     <div align="center">
       <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
       <h4>{{ dossier.title }}</h4>
+      <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
     </div>
   </div>
 </div>
@@ -60,12 +61,12 @@
         {% endwith %}
         {% include "document/items/voting_result_list.html" %}
       {% elif dossier.is_active %}
-      <h2>Dit wetsvoorstel is nog in behandeling.</h2>
+      <h2>Dit wetsvoorstel is in behandeling.</h2>
+      <p><strong>Status:</strong> {{ dossier.decision }}</p>
       {% else %}
       <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
       <h2>Er is niet over gestemd.</h2>
-      <p>Het is voor openkamer niet duidelijk of dit voorstel is aangenomen of verworpen, en op welke manier dit is gebeurd.</p>
-      <p>Mogelijk is er iets besloten door een commissie, of heeft de indiener het voorstel ingetrokken. Deze beslissingen zouden zichtbaar moeten zijn als items in deze tijdlijn.</p>
+      <p><strong>Status:</strong> {{ dossier.decision }}</p>
       {% endif %}
 
       <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>

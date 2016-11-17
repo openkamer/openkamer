@@ -51,6 +51,8 @@ class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     is_active = models.BooleanField(default=True)
+    url = models.URLField(blank=True)
+    decision = models.CharField(max_length=200, blank=True)
 
     class Meta:
         ordering = ['-dossier_id']
