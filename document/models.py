@@ -76,7 +76,7 @@ class Dossier(models.Model):
         return None
 
     def voting(self):
-        votings = Voting.objects.filter(dossier=self, is_dossier_voting=True)
+        votings = Voting.objects.filter(dossier=self, is_dossier_voting=True).exclude(result=Voting.AANGEHOUDEN)
         if votings.exists():
             if votings.count() > 1:
                 logger.error('more than one dossier voting found for dossier ' + str(self.dossier_id))
