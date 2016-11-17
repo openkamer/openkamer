@@ -116,13 +116,16 @@
         </div>
       </div>
 
+      {% if dossier.voting %}
       <div class="row">
         <div class="col-md-12">
           {% with voting=dossier.voting %}
             {% include "document/items/voting_result_bar_small.html" %}
           {% endwith %}
         </div>
+        <div class="vertical-spacer-15"></div>
       </div>
+      {% endif %}
 
     </div>
   </div>

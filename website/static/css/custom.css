@@ -13,6 +13,12 @@ a.anchor {
     visibility: hidden;
 }
 
+.vertical-spacer-15 {
+    padding: 0;
+    margin: 0;
+    height: 15px;
+}
+
 .vertical-spacer-20 {
     padding: 0;
     margin: 0;
