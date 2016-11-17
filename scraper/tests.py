@@ -9,11 +9,20 @@ from wikidata import wikidata
 
 import scraper.besluitenlijst
 import scraper.documents
+import scraper.dossiers
 import scraper.government
 import scraper.parliament_members
 import scraper.persons
 import scraper.political_parties
 import scraper.votings
+
+
+class TestDossierScraper(TestCase):
+
+    def test_scrape_dossier_url(self):
+        dossier_id = '33711'
+        dossier_url = scraper.dossiers.search_dossier_url(dossier_id)
+        self.assertEqual(dossier_url, 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/detail?id=2013Z16228&dossier=33711')
 
 
 class TestPoliticalPartyScraper(TestCase):
@@ -154,15 +163,15 @@ class TestWetsvoorstellenDossierScraper(TestCase):
     max_results = 40
 
     def test_get_initiatief_wetsvoorstellen_dossier_ids(self):
-        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
+        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
         self.assertEqual(len(dossier_ids), self.max_results)
-        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results, filter_active=True)
+        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results, filter_active=True)
         self.assertEqual(len(dossier_ids), self.max_results)
 
     def test_get_regering_wetsvoorstellen_dossier_ids(self):
-        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
+        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
         self.assertEqual(len(dossier_ids), self.max_results)
-        dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results, filter_inactive=True)
+        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results, filter_inactive=True)
         self.assertEqual(len(dossier_ids), self.max_results)
 
 

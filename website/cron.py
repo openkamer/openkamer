@@ -8,6 +8,7 @@ from django_cron import CronJobBase, Schedule
 
 from git import Repo, Actor
 
+import scraper.dossiers
 import scraper.documents
 import scraper.political_parties
 import scraper.parliament_members
@@ -39,25 +40,25 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
 
             filename_iaan = 'wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaan)
-            dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
+            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
             assert len(dossier_ids) > 105
             self.dossier_ids_to_file(dossier_ids, filepath)
 
             filename_iaf = 'wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaf)
-            dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_initiatief(filter_inactive=True)
+            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_inactive=True)
             assert len(dossier_ids) > 68
             self.dossier_ids_to_file(dossier_ids, filepath)
 
             filename_raan = 'wetsvoorstellen_dossier_ids_regering_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raan)
-            dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
+            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
             assert len(dossier_ids) > 120
             self.dossier_ids_to_file(dossier_ids, filepath)
 
             filename_raf = 'wetsvoorstellen_dossier_ids_regering_afgedaan.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raf)
-            dossier_ids = scraper.documents.get_dossier_ids_wetsvoorstellen_regering(filter_inactive=True)
+            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_inactive=True)
             assert len(dossier_ids) > 1266
             self.dossier_ids_to_file(dossier_ids, filepath)
 
