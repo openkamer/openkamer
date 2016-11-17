@@ -102,8 +102,10 @@
             <span class="fa {{ voting_result_icon }} text-{{ voting_result_class }}"></span>
           {% elif dossier.is_active %}
             <span class="fa fa-spinner text-info" title="In behandeling"></span>
+          {% elif dossier.is_withdrawn %}
+            <span class="fa fa-undo text-danger" title="Ingetrokken"></span>
           {% else %}
-            <span class="fa fa-flag-checkered text-warning" title="Niet meer in behandling. Resultaat onduidelijk."></span>
+            <span class="fa fa-stop-circle-o text-warning" title="Niet meer in behandling. Resultaat onduidelijk."></span>
           {% endif %}
         </div>
       </div>

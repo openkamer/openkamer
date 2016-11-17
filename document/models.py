@@ -101,6 +101,10 @@ class Dossier(models.Model):
                 max_titles = value
         return title
 
+    def is_withdrawn(self):
+        latest_kamerstuk = self.kamerstukken().order_by('-document__date_published')[0]
+        return 'intrekking' in latest_kamerstuk.type_long
+
     @staticmethod
     def is_active_id(dossier_id):
         active_dossier_ids = Dossier.get_active_dossier_ids()

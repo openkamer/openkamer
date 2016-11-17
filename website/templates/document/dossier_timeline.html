@@ -45,11 +45,15 @@
       </div>
       {% elif dossier.is_active %}
       <div class="cd-timeline-img text-center bg-info">
-        <span style="font-size:24px;" class="fa fa-spinner"></span>
+        <span style="font-size:24px;" class="fa fa-spinner" title="In behandeling"></span>
+      </div>
+      {% elif dossier.is_withdrawn %}
+      <div class="cd-timeline-img text-center bg-danger">
+        <span style="font-size:24px;" class="fa fa-undo" title="Ingetrokken"></span>
       </div>
       {% else %}
       <div class="cd-timeline-img text-center bg-warning">
-        <span style="font-size:24px;" class="fa fa-flag-checkered"></span>
+        <span style="font-size:24px;" class="fa fa-stop-circle-o" title="Behandeld"></span>
       </div>
     {% endif %}
 
@@ -65,7 +69,11 @@
       <p><strong>Status:</strong> {{ dossier.decision }}</p>
       {% else %}
       <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
-      <h2>Er is niet over gestemd.</h2>
+        {% if dossier.is_withdrawn %}
+        <h2>Voorstel is ingetrokken.</h2>
+        {% else %}
+        <h2>Er is niet over gestemd.</h2>
+        {% endif %}
       <p><strong>Status:</strong> {{ dossier.decision }}</p>
       {% endif %}
 
