@@ -510,9 +510,12 @@ def create_votes_party(voting, votes):
         party = PoliticalParty.find_party(vote.party_name)
         if not party:
             wikidata_id = wikidata.search_political_party_id(vote.party_name, language='nl')
-            item = wikidata.WikidataItem(wikidata_id)
+            name = vote.party_name
+            if wikidata_id:
+                item = wikidata.WikidataItem(wikidata_id)
+                name = item.get_label('nl')
             party = PoliticalParty.objects.create(
-                name=item.get_label('nl'),
+                name=name,
                 name_short=vote.party_name,
                 wikidata_id=wikidata_id
             )
