@@ -522,6 +522,9 @@ def create_votes_party(voting, votes):
             if wikidata_id:
                 item = wikidata.WikidataItem(wikidata_id)
                 name = item.get_label('nl')
+            if not name:
+                logger.error('vote party has no name')
+                assert False
             party = PoliticalParty.objects.create(
                 name=name,
                 name_short=vote.party_name,

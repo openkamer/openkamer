@@ -32,7 +32,7 @@ class VoteParty(Vote):
         for column in self.vote_table_row.iter():
             if column.tag == 'td':
                 ncol += 1
-            if ncol == 1 and column.tag == 'a':
+            if ncol == 1:
                 self.party_name = column.text
             elif ncol == 2:
                 self.number_of_seats = int(column.text)

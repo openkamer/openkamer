@@ -239,6 +239,13 @@ class TestVotingScraper(TestCase):
         for url in voting_page_urls:
             results += scraper.votings.get_votings_for_page(url)
 
+    def test_get_votings_no_party_link(self):
+        url = 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2014P16390'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        self.assertEqual(len(voting_results), 1)
+        voting_result = voting_results[0]
+        self.assertEqual(len(voting_result.votes), 14)
+
 
 class TestDocumentScraper(TestCase):
 
