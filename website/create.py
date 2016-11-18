@@ -492,10 +492,13 @@ def create_votings(dossier_id):
         document_id = voting_result.get_document_id()
         if not document_id:
             logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
-            id_main = dossier_id
+            continue
         else:
             id_main = document_id.split('-')[0]
         dossiers = Dossier.objects.filter(dossier_id=id_main)
+        if dossiers.count() != 1:
+            logger.error('number of dossiers found: ' + str(dossiers.count()) + ', which is not 1, so we have to skip this voting')
+            continue
         assert dossiers.count() == 1
         voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result, is_dossier_voting=voting_result.is_dossier_voting())
         if document_id and len(document_id.split('-')) == 2:
@@ -533,6 +536,8 @@ def create_votes_party(voting, votes):
                 wikidata_id=wikidata_id
             )
             party.update_info()
+        if not vote.decision:
+            logger.warning('vote has no decision, vote.details: ' + str(vote.details))
         VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
                                  decision=get_decision(vote.decision), details=vote.details)
     logger.info('END')
@@ -567,7 +572,7 @@ def get_result_choice(result_string):
     elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
         return Voting.AANGEHOUDEN
     logger.error('could not interpret the voting result: ' + result_string)
-    return None
+    return Voting.ONBEKEND
 
 
 def get_decision(decision_string):
@@ -580,7 +585,8 @@ def get_decision(decision_string):
         return Vote.NONE
     elif 'mistake' in decision_string:
         return Vote.MISTAKE
-    return None
+    logger.error('no decision detected, returning Vote.NONE')
+    return Vote.NONE
 
 
 def create_besluitenlijsten(max_commissions=None, max_results_per_commission=None):
