@@ -86,3 +86,7 @@ hr.hr-small {
 .category-filter-checkboxes .checkbox {
   display: inline;
 }
+
+.category-filter-checkboxes .checkbox input {
+  position: relative;
+}
