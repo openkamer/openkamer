@@ -259,7 +259,7 @@ class VotingsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Voting.objects.all(), settings.VOTINGS_PER_PAGE)
+        paginator = Paginator(Voting.objects.all().order_by('-date'), settings.VOTINGS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             votings = paginator.page(page)
