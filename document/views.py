@@ -84,6 +84,7 @@ class DossierFilter(django_filters.FilterSet):
 
     class Meta:
         model = Dossier
+        exclude = '__all__'
 
     def title_filter(self, queryset, name, value):
         dossiers = queryset.filter(document__title_full__icontains=value).distinct()
@@ -108,7 +109,7 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
+        dossiers = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
         paginator = Paginator(dossiers, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
