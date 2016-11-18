@@ -41,7 +41,6 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
             filename_iaan = 'wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaan)
             dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
-            assert len(dossier_ids) > 105
             self.dossier_ids_to_file(dossier_ids, filepath)
 
             filename_iaf = 'wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt'
@@ -53,7 +52,6 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
             filename_raan = 'wetsvoorstellen_dossier_ids_regering_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raan)
             dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
-            assert len(dossier_ids) > 120
             self.dossier_ids_to_file(dossier_ids, filepath)
 
             filename_raf = 'wetsvoorstellen_dossier_ids_regering_afgedaan.txt'
