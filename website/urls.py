@@ -36,6 +36,8 @@ import website.api
 
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
+    url(r'^colofon/$', TemplateView.as_view(template_name="website/about.html"), name='about'),
+
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
