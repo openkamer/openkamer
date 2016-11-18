@@ -102,8 +102,10 @@ class Dossier(models.Model):
         return title
 
     def is_withdrawn(self):
-        latest_kamerstuk = self.kamerstukken().order_by('-document__date_published')[0]
-        return 'intrekking' in latest_kamerstuk.type_long
+        kamerstukken = self.kamerstukken().order_by('-document__date_published')
+        if kamerstukken:
+            return 'intrekking' in kamerstukken[0].type_long  # latest kamerstuk
+        return False
 
     @staticmethod
     def is_active_id(dossier_id):
