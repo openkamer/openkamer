@@ -49,18 +49,22 @@ class CategoryDocument(Category):
 
 
 class Dossier(models.Model):
-    dossier_id = models.CharField(max_length=100, blank=True, unique=True)
-    categories = models.ManyToManyField(CategoryDossier, blank=True)
-    is_active = models.BooleanField(default=True)
-    url = models.URLField(blank=True)
-    decision = models.CharField(max_length=200, blank=True)
-
     AANGENOMEN = 'AAN'
     VERWORPEN = 'VER'
     INGETROKKEN = 'ING'
     AANGEHOUDEN = 'AGH'
     IN_BEHANDELING = 'INB'
     ONBEKEND = 'ONB'
+    CHOICES = (
+        (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
+        (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (ONBEKEND, 'ONB')
+    )
+    dossier_id = models.CharField(max_length=100, blank=True, unique=True)
+    categories = models.ManyToManyField(CategoryDossier, blank=True)
+    is_active = models.BooleanField(default=True)
+    url = models.URLField(blank=True)
+    decision = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND)
 
     class Meta:
         ordering = ['-dossier_id']
@@ -76,19 +80,18 @@ class Dossier(models.Model):
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
 
-    @cached_property
-    def status(self):
+    def set_status(self):
         if self.passed:
-            return Dossier.AANGENOMEN
-        if self.is_active:
-            return Dossier.IN_BEHANDELING
-        voting = self.voting
-        if voting and voting.result == Voting.VERWORPEN:
-            return Dossier.VERWORPEN
+            self.status = Dossier.AANGENOMEN
+        elif self.is_active:
+            self.status = Dossier.IN_BEHANDELING
+        elif self.voting and self.voting.result == Voting.VERWORPEN:
+            self.status = Dossier.VERWORPEN
         elif self.is_withdrawn:
-            return Dossier.INGETROKKEN
-        # logger.error('status onbekend')
-        return Dossier.ONBEKEND
+            self.status = Dossier.INGETROKKEN
+        else:
+            self.status = Dossier.ONBEKEND
+        self.save()
 
     @cached_property
     def besluitenlijst_cases(self):

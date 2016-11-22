@@ -103,13 +103,7 @@ class DossierFilter(django_filters.FilterSet):
         return dossiers
 
     def status_filter(self, queryset, name, value):
-        if value == 'ALL':
-            return queryset
-        dossier_ids = []
-        for dossier in queryset:
-            if dossier.status == value:
-                dossier_ids.append(dossier.id)
-        return Dossier.objects.filter(pk__in=dossier_ids)
+        return queryset.filter(status=value)
 
 
 class DossiersView(TemplateView):
@@ -117,8 +111,7 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers_all = Dossier.objects.all().prefetch_related('voting_set')
-        dossiers_filtered = DossierFilter(self.request.GET, queryset=dossiers_all).qs
+        dossiers_filtered = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
         paginator = Paginator(dossiers_filtered, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
@@ -191,7 +184,7 @@ class DossierTimelineView(TemplateView):
         timeline_items = []
         for kamerstuk in dossier.kamerstukken:
             timeline_items.append(TimelineKamerstukItem(kamerstuk))
-        for case in dossier.besluitenlijst_cases():
+        for case in dossier.besluitenlijst_cases:
             timeline_items.append(TimelineBesluitItem(case))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items
