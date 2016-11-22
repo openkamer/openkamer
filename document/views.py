@@ -125,7 +125,7 @@ class DossiersView(TemplateView):
         except EmptyPage:
             dossiers = paginator.page(paginator.num_pages)
         context['dossiers'] = dossiers
-        context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False).order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
+        context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False).distinct().order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
         context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         return context
 
