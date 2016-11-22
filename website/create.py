@@ -508,8 +508,8 @@ def create_votings(dossier_id):
                 voting_obj.kamerstuk = kamerstukken[0]
             else:
                 logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
-        elif document_id:
-            logger.error('Unexpected document id found: ' + document_id)
+        elif document_id == '':
+            logger.error('No document ID found')
         voting_obj.save()
         if voting_result.is_individual():
             create_votes_individual(voting_obj, voting_result.votes)
