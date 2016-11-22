@@ -15,6 +15,7 @@ from document.views import DossierTimelineHorizontalView
 from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import KamerstukView
+from document.views import KamerstukRedirectView
 from document.views import VotingView
 from document.views import VotingsView
 from government.views import GovernmentsView
@@ -65,6 +66,7 @@ urlpatterns = [
     url(r'^agendas/$', AgendasView.as_view()),
     url(r'^agenda/(?P<pk>\d+)/$', AgendaView.as_view()),
 
+    url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 

@@ -1,13 +1,13 @@
 import logging
-import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django import forms
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
+from django.views.generic.base import RedirectView
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import TemplateView, FormView
+from django.views.generic import TemplateView
 
 import django_filters
 from dal import autocomplete
@@ -42,9 +42,14 @@ class KamerstukView(TemplateView):
 
     def get_context_data(self, dossier_id, sub_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        sub_id = sub_id.lstrip('0')  # remove leading zeros
         context['kamerstuk'] = Kamerstuk.objects.get(id_main=dossier_id, id_sub=sub_id)
         return context
+
+
+class KamerstukRedirectView(RedirectView):
+    def get_redirect_url(self, dossier_id, sub_id):
+        sub_id = sub_id.lstrip('0')  # remove leading zeros
+        return reverse('kamerstuk', args=(dossier_id, sub_id), current_app='document')
 
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
