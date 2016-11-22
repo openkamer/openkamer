@@ -1,9 +1,10 @@
 import requests
 import logging
-
 from itertools import chain
+
 from django.db import models
 from django.utils.text import slugify
+from django.utils.functional import cached_property
 
 from person.models import Person
 
@@ -67,45 +68,52 @@ class Dossier(models.Model):
     def __str__(self):
         return str(self.dossier_id)
 
+    @cached_property
     def documents(self):
         return Document.objects.filter(dossier=self)
 
+    @cached_property
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
 
+    @cached_property
     def status(self):
-        if self.passed():
+        if self.passed:
             return Dossier.AANGENOMEN
         if self.is_active:
             return Dossier.IN_BEHANDELING
-        voting = self.voting()
+        voting = self.voting
         if voting and voting.result == Voting.VERWORPEN:
             return Dossier.VERWORPEN
-        elif self.is_withdrawn():
+        elif self.is_withdrawn:
             return Dossier.INGETROKKEN
-        logger.error('status onbekend')
+        # logger.error('status onbekend')
         return Dossier.ONBEKEND
 
+    @cached_property
     def besluitenlijst_cases(self):
         return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id)
 
+    @cached_property
     def start_date(self):
         documents = Document.objects.filter(dossier=self).order_by('date_published')
         if documents.exists():
             return documents[0].date_published
         return None
 
+    @cached_property
     def voting(self):
-        votings = Voting.objects.filter(dossier=self, is_dossier_voting=True).exclude(result=Voting.AANGEHOUDEN)
+        votings = Voting.objects.filter(dossier=self.id, is_dossier_voting=True).exclude(result=Voting.AANGEHOUDEN)
         if votings.exists():
-            if votings.count() > 1:
-                logger.error('more than one dossier voting found for dossier ' + str(self.dossier_id))
+            # if votings.count() > 1:
+            #     logger.error('more than one dossier voting found for dossier ' + str(self.dossier_id))
             return votings[0]
         return None
 
+    @cached_property
     def title(self):
         # TODO: improve performance
-        kamerstukken = self.kamerstukken()
+        kamerstukken = self.kamerstukken.select_related('document')
         titles = {}
         for stuk in kamerstukken:
             title = stuk.document.title()
@@ -121,16 +129,18 @@ class Dossier(models.Model):
                 max_titles = value
         return title
 
+    @cached_property
     def is_withdrawn(self):
-        kamerstukken = self.kamerstukken().order_by('-document__date_published')
+        kamerstukken = self.kamerstukken.order_by('-document__date_published')
         if kamerstukken:
             return 'intrekking' in kamerstukken[0].type_long  # latest kamerstuk
         return False
 
+    @cached_property
     def passed(self):
         if 'aangenomen' in self.decision.lower():
             return True
-        voting = self.voting()
+        voting = self.voting
         if voting and voting.result == Voting.AANGENOMEN:
             return True
         return False
@@ -250,6 +260,7 @@ class Kamerstuk(models.Model):
     def id_full(self):
         return str(self.id_main) + '-' + str(self.id_sub)
 
+    @cached_property
     def voting(self):
         votings = Voting.objects.filter(kamerstuk=self)
         if votings.exists():
@@ -325,63 +336,70 @@ class Voting(models.Model):
     result = models.CharField(max_length=3, choices=CHOICES)
     date = models.DateField(auto_now=False, blank=True)
 
+    @cached_property
     def votes(self):
-        return list(chain(self.votes_party(), self.votes_individual()))
+        return list(chain(self.votes_party, self.votes_individual))
 
+    @cached_property
     def votes_for(self):
         return list(chain(
             VoteParty.objects.filter(voting=self, decision=Vote.FOR),
             VoteIndividual.objects.filter(voting=self, decision=Vote.FOR)
         ))
 
+    @cached_property
     def votes_against(self):
         return list(chain(
             VoteParty.objects.filter(voting=self, decision=Vote.AGAINST),
             VoteIndividual.objects.filter(voting=self, decision=Vote.AGAINST)
         ))
 
+    @cached_property
     def votes_none(self):
         return list(chain(
             VoteParty.objects.filter(voting=self, decision=Vote.NONE),
             VoteIndividual.objects.filter(voting=self, decision=Vote.NONE)
         ))
 
+    @cached_property
     def votes_party(self):
         return VoteParty.objects.filter(voting=self)
 
+    @cached_property
     def votes_individual(self):
         return VoteIndividual.objects.filter(voting=self)
 
     def has_result_details(self):
-        return len(self.votes()) > 0
+        return len(self.votes) > 0
 
     def entities_for_string(self):
         entities_str = ''
-        for vote in self.votes():
+        for vote in self.votes:
             if vote.decision == Vote.FOR:
                 entities_str += vote.get_name() + ', '
         return entities_str
 
     def entities_against_string(self):
         entities_str = ''
-        for vote in self.votes():
+        for vote in self.votes:
             if vote.decision == Vote.AGAINST:
                 entities_str += vote.get_name() + ', '
         return entities_str
 
     def entities_none_string(self):
         entities_str = ''
-        for vote in self.votes():
+        for vote in self.votes:
             if vote.decision == Vote.NONE:
                 entities_str += vote.get_name() + ', '
         return entities_str
 
+    @cached_property
     def result_percent(self):
         n_votes = 0
         vote_for = 0
         vote_against = 0
         vote_none = 0
-        for vote in self.votes():
+        for vote in self.votes:
             n_votes += vote.number_of_seats
             if vote.decision == Vote.FOR:
                 vote_for += vote.number_of_seats

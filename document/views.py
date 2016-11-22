@@ -107,7 +107,7 @@ class DossierFilter(django_filters.FilterSet):
             return queryset
         dossier_ids = []
         for dossier in queryset:
-            if dossier.status() == value:
+            if dossier.status == value:
                 dossier_ids.append(dossier.id)
         return Dossier.objects.filter(pk__in=dossier_ids)
 
@@ -117,7 +117,8 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers_filtered = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
+        dossiers_all = Dossier.objects.all().prefetch_related('voting_set')
+        dossiers_filtered = DossierFilter(self.request.GET, queryset=dossiers_all).qs
         paginator = Paginator(dossiers_filtered, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
@@ -188,7 +189,7 @@ class DossierTimelineView(TemplateView):
         dossier = Dossier.objects.get(dossier_id=dossier_id)
         context['dossier'] = dossier
         timeline_items = []
-        for kamerstuk in dossier.kamerstukken():
+        for kamerstuk in dossier.kamerstukken:
             timeline_items.append(TimelineKamerstukItem(kamerstuk))
         for case in dossier.besluitenlijst_cases():
             timeline_items.append(TimelineBesluitItem(case))
@@ -255,10 +256,10 @@ class VotingView(TemplateView):
         context = super().get_context_data(**kwargs)
         if sub_id:
             kamerstuk = Kamerstuk.objects.get(id_main=dossier_id, id_sub=sub_id)
-            voting = kamerstuk.voting()
+            voting = kamerstuk.voting
         else:
             dossier = Dossier.objects.get(dossier_id=dossier_id)
-            voting = dossier.voting()
+            voting = dossier.voting
         context['voting'] = voting
         return context
 

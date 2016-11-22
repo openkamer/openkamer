@@ -38,7 +38,7 @@ def get_kamerstuk_icon_name(kamerstuk_id):
 @register.assignment_tag
 def get_kamerstuk_timeline_bg_color(kamerstuk_id):
     kamerstuk = Kamerstuk.objects.get(id=kamerstuk_id)
-    voting = kamerstuk.voting()
+    voting = kamerstuk.voting
     if not voting:
         return 'bg-info'
     if voting.result == Voting.VERWORPEN:

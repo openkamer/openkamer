@@ -48,7 +48,7 @@ def get_dossier_timeline_json(request):
         eras.append(era)
     dossier = Dossier.objects.get(id=request.GET['dossier_pk'])
     events = []
-    for kamerstuk in dossier.kamerstukken():
+    for kamerstuk in dossier.kamerstukken:
         text = {
             'headline': kamerstuk.type_short,
             'text': kamerstuk.type_long
