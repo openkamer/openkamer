@@ -115,8 +115,8 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
-        paginator = Paginator(dossiers, settings.DOSSIERS_PER_PAGE)
+        dossiers_filtered = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
+        paginator = Paginator(dossiers_filtered, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             dossiers = paginator.page(page)
@@ -125,6 +125,7 @@ class DossiersView(TemplateView):
         except EmptyPage:
             dossiers = paginator.page(paginator.num_pages)
         context['dossiers'] = dossiers
+        context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False).order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
         context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
         return context
 

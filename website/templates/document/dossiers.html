@@ -3,14 +3,12 @@
 {% load static %}
 
 {% load bootstrap3 %}
-{% load openkamer %}
 
 {% block title %}Wetsvoorstellen - Tweede Kamer {{ block.super }}{% endblock %}
 
 {% load bootstrap_pagination %}
 
 {% block content %}
-
 
 <div class="row">
   <div class="col-lg-12">
@@ -75,9 +73,27 @@
 
 <hr class="hr-small"/>
 
+{% if dossiers_voted %}
 <div class="row">
+  <h5>Recent behandeld</h5>
+  {% for dossier in dossiers_voted %}
   <div class="col-md-6">
-    <h6>{{ filter.qs|length }} {% if filter.qs|length == 0%}geen wetsvoorstellen{% elif filter.qs|length == 1%}wetsvoorstel{% else %}wetsvoorstellen{% endif %} gevonden</h6>
+    {% include "document/items/dossier_tile.html" %}
+  </div>
+
+  {% if forloop.counter|divisibleby:2 %}
+  <div class="clearfix"></div>
+  {% endif %}
+
+  {% endfor %}
+</div>
+<hr class="hr-small"/>
+{% endif %}
+
+<div class="row">
+  <h5>Alle</h5>
+  <div class="col-md-6">
+    <h6>{% if filter.qs|length == 0%}geen wetsvoorstellen{% elif filter.qs|length == 1%}1 wetsvoorstel{% else %}{{ filter.qs|length }} wetsvoorstellen{% endif %} gevonden</h6>
   </div>
   <div class="col-md-6" align="right">
   </div>
@@ -86,48 +102,7 @@
 <div class="row">
   {% for dossier in dossiers %}
   <div class="col-md-6">
-    <div class="well well-small" align="left">
-
-      <div class="row">
-        <div class="col-xs-5" align="left">
-          <small>{{ dossier.start_date }}</small>
-        </div>
-        <div class="col-xs-2" align="center">
-          <small>{{ dossier.dossier_id }}</small>
-        </div>
-        <div class="col-xs-5" align="right">
-          {% if dossier.voting %}
-          {% get_voting_result_color dossier.voting.id as voting_result_class %}
-          {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
-            <span class="fa {{ voting_result_icon }} text-{{ voting_result_class }}"></span>
-          {% elif dossier.is_active %}
-            <span class="fa fa-spinner text-info" title="In behandeling"></span>
-          {% elif dossier.is_withdrawn %}
-            <span class="fa fa-undo text-danger" title="Ingetrokken"></span>
-          {% else %}
-            <span class="fa fa-stop-circle-o text-warning" title="Niet meer in behandling. Resultaat onduidelijk."></span>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-sm-12">
-          <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
-        </div>
-      </div>
-
-      {% if dossier.voting %}
-      <div class="row">
-        <div class="col-md-12">
-          {% with voting=dossier.voting %}
-            {% include "document/items/voting_result_bar_small.html" %}
-          {% endwith %}
-        </div>
-        <div class="vertical-spacer-15"></div>
-      </div>
-      {% endif %}
-
-    </div>
+    {% include "document/items/dossier_tile.html" %}
   </div>
 
   {% if forloop.counter|divisibleby:2 %}
