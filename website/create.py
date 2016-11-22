@@ -489,7 +489,7 @@ def create_votings(dossier_id):
     logger.info('votings found: ' + str(len(voting_results)))
     for voting_result in voting_results:
         result = get_result_choice(voting_result.get_result())
-        document_id = voting_result.get_document_id()
+        document_id = voting_result.get_document_id_without_rijkswet()
         if not document_id:
             logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
             continue
@@ -507,7 +507,9 @@ def create_votings(dossier_id):
             if kamerstukken.exists():
                 voting_obj.kamerstuk = kamerstukken[0]
             else:
-                logger.warning('Kamerstuk ' + voting_result.get_document_id() + ' not found in database. Kamerstuk is probably not yet published.')
+                logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
+        elif document_id:
+            logger.error('Unexpected document id found: ' + document_id)
         voting_obj.save()
         if voting_result.is_individual():
             create_votes_individual(voting_obj, voting_result.votes)

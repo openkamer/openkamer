@@ -231,7 +231,7 @@ class TestVotingScraper(TestCase):
             # print(results[i])
             # results[i].print_votes()
             self.assertEqual(results[i].get_result(), expected_results[i]['result'])
-            self.assertEqual(results[i].get_document_id(), expected_results[i]['document_id'])
+            self.assertEqual(results[i].get_document_id_without_rijkswet(), expected_results[i]['document_id'])
 
     def test_get_individual_votes(self):
         voting_page_urls = scraper.votings.get_voting_pages_for_dossier(self.dossier_nr_individual_votes)
@@ -245,6 +245,15 @@ class TestVotingScraper(TestCase):
         self.assertEqual(len(voting_results), 1)
         voting_result = voting_results[0]
         self.assertEqual(len(voting_result.votes), 14)
+
+    def test_get_votings_rijkswet(self):
+        url ='https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P11874'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        self.assertEqual(len(voting_results), 1)
+        self.assertEqual(voting_results[0].get_result(), 'Aangenomen')
+        self.assertEqual(voting_results[0].get_document_id(), '34158-(R2048)')
+        self.assertEqual(voting_results[0].get_document_id_without_rijkswet(), '34158')
+        self.assertEqual(voting_results[0].is_dossier_voting(), True)
 
 
 class TestDocumentScraper(TestCase):

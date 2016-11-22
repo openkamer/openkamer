@@ -1,5 +1,6 @@
 import logging
 import requests
+import re
 
 import lxml.html
 import dateparser
@@ -117,12 +118,15 @@ class VotingResult(object):
     def get_document_id(self):
         return self.get_property_elements()[0].text
 
+    def get_document_id_without_rijkswet(self):
+        return re.sub("-\(R\d+\)", '', self.get_document_id())   # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
+
     def is_dossier_voting(self):
         """
         :returns whether the voting is for the whole dossier
         This is the case if the result has a document id and this document id is the dossier id, without sub-id.
         """
-        return self.get_document_id() is not None and len(self.get_document_id().split('-')) == 1
+        return self.get_document_id() is not None and len(self.get_document_id_without_rijkswet().split('-')) == 1
 
     def is_individual(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
