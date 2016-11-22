@@ -54,6 +54,13 @@ class Dossier(models.Model):
     url = models.URLField(blank=True)
     decision = models.CharField(max_length=200, blank=True)
 
+    AANGENOMEN = 'AAN'
+    VERWORPEN = 'VER'
+    INGETROKKEN = 'ING'
+    AANGEHOUDEN = 'AGH'
+    IN_BEHANDELING = 'INB'
+    ONBEKEND = 'ONB'
+
     class Meta:
         ordering = ['-dossier_id']
 
@@ -65,6 +72,19 @@ class Dossier(models.Model):
 
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self)
+
+    def status(self):
+        if self.passed():
+            return Dossier.AANGENOMEN
+        if self.is_active:
+            return Dossier.IN_BEHANDELING
+        voting = self.voting()
+        if voting and voting.result == Voting.VERWORPEN:
+            return Dossier.VERWORPEN
+        elif self.is_withdrawn():
+            return Dossier.INGETROKKEN
+        logger.error('status onbekend')
+        return Dossier.ONBEKEND
 
     def besluitenlijst_cases(self):
         return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id)
@@ -105,6 +125,14 @@ class Dossier(models.Model):
         kamerstukken = self.kamerstukken().order_by('-document__date_published')
         if kamerstukken:
             return 'intrekking' in kamerstukken[0].type_long  # latest kamerstuk
+        return False
+
+    def passed(self):
+        if 'aangenomen' in self.decision.lower():
+            return True
+        voting = self.voting()
+        if voting and voting.result == Voting.AANGENOMEN:
+            return True
         return False
 
     @staticmethod

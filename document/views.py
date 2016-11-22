@@ -65,10 +65,12 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 
 
 class DossierFilter(django_filters.FilterSet):
-    VOTING_RESULT_CHOICES = (
-        ('ALL', 'Alle'),
-        (Voting.AANGENOMEN, 'Aangenomen'),
-        (Voting.VERWORPEN, 'Verworpen'),
+    DOSSIER_STATUS_CHOICES = (
+        (Dossier.AANGENOMEN, 'Aangenomen'),
+        (Dossier.VERWORPEN, 'Verworpen'),
+        (Dossier.INGETROKKEN, 'Ingetrokken'),
+        (Dossier.IN_BEHANDELING, 'In behandeling'),
+        (Dossier.ONBEKEND, 'Onbekend'),
     )
     title = django_filters.CharFilter(method='title_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
@@ -77,9 +79,9 @@ class DossierFilter(django_filters.FilterSet):
         label='',
         widget=autocomplete.ModelSelect2(url='person-autocomplete')
     )
-    voting_result = django_filters.ChoiceFilter(
-        choices=VOTING_RESULT_CHOICES,
-        method='voting_result_filter',
+    status = django_filters.ChoiceFilter(
+        choices=DOSSIER_STATUS_CHOICES,
+        method='status_filter',
         # widget=forms.ChoiceField()
     )
     categories = django_filters.ModelMultipleChoiceFilter(
@@ -100,12 +102,12 @@ class DossierFilter(django_filters.FilterSet):
         dossiers = queryset.filter(document__submitter__person=value).distinct()
         return dossiers
 
-    def voting_result_filter(self, queryset, name, value):
+    def status_filter(self, queryset, name, value):
         if value == 'ALL':
             return queryset
         dossier_ids = []
         for dossier in queryset:
-            if dossier.voting() and dossier.voting().result == value:
+            if dossier.status() == value:
                 dossier_ids.append(dossier.id)
         return Dossier.objects.filter(pk__in=dossier_ids)
 

@@ -47,6 +47,10 @@
       <div class="cd-timeline-img text-center bg-info">
         <span style="font-size:24px;" class="fa fa-spinner" title="In behandeling"></span>
       </div>
+      {% elif dossier.passed %}
+      <div class="cd-timeline-img text-center bg-success">
+        <span style="font-size:24px;" class="fa fa-check" title="Aangenomen"></span>
+      </div>
       {% elif dossier.is_withdrawn %}
       <div class="cd-timeline-img text-center bg-danger">
         <span style="font-size:24px;" class="fa fa-undo" title="Ingetrokken"></span>
