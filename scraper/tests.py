@@ -179,6 +179,11 @@ class TestWetsvoorstellenDossierScraper(TestCase):
         dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results, filter_inactive=True)
         self.assertEqual(len(dossier_ids), self.max_results)
 
+    def test_get_number_of_dossiers(self):
+        number_initiatief, number_regering = scraper.dossiers.get_number_of_wetsvoorstellen()
+        self.assertTrue(number_initiatief > 175)
+        self.assertTrue(number_regering > 1389)
+
 
 class TestVotingScraper(TestCase):
     dossier_nr_party_votes = 33885

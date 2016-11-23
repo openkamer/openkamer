@@ -1,5 +1,7 @@
 import logging
 import requests
+import re
+import time
 
 import lxml
 
@@ -43,6 +45,16 @@ def get_dossier_ids_wetsvoorstellen_regering(max_results=None, filter_active=Fal
     return dossier_ids
 
 
+def get_number_of_wetsvoorstellen():
+    url = 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/?qry=%2A&fld_tk_categorie=Kamerstukken&fld_tk_subcategorie=Wetsvoorstellen&Type=Wetsvoorstellen&srt=date%3Adesc%3Adate'
+    response = requests.get(url)
+    result = re.search("Wetsvoorstellen regering \((\d+)\)", response.content.decode('utf-8'))
+    number_regering = int(result.group(1))
+    result = re.search("Initiatiefwetsvoorstellen \((\d+)\)", response.content.decode('utf-8'))
+    number_initiatief = int(result.group(1))
+    return number_initiatief, number_regering
+
+
 def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None, filter_active=False, filter_inactive=False):
     logger.info('BEGIN')
     assert not (filter_active and filter_inactive)
@@ -82,5 +94,6 @@ def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None, filter_ac
                 if max_results and len(dossier_ids) >= max_results:
                     logger.info('END: max results reached')
                     return dossier_ids
+        time.sleep(2)  # give the server some rest
     logger.info('END')
     return dossier_ids

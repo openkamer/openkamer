@@ -40,25 +40,32 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
 
             filename_iaan = 'wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaan)
-            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
-            self.dossier_ids_to_file(dossier_ids, filepath)
+            dossier_ids_in_ac = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
+            self.dossier_ids_to_file(dossier_ids_in_ac, filepath)
 
             filename_iaf = 'wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaf)
-            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_inactive=True)
-            assert len(dossier_ids) > 68
-            self.dossier_ids_to_file(dossier_ids, filepath)
+            dossier_ids_in_in = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_inactive=True)
+            assert len(dossier_ids_in_in) > 68
+            self.dossier_ids_to_file(dossier_ids_in_in, filepath)
 
             filename_raan = 'wetsvoorstellen_dossier_ids_regering_aanhangig.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raan)
-            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
-            self.dossier_ids_to_file(dossier_ids, filepath)
+            dossier_ids_re_ac = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
+            self.dossier_ids_to_file(dossier_ids_re_ac, filepath)
 
             filename_raf = 'wetsvoorstellen_dossier_ids_regering_afgedaan.txt'
             filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raf)
-            dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_inactive=True)
-            assert len(dossier_ids) > 1266
-            self.dossier_ids_to_file(dossier_ids, filepath)
+            dossier_ids_re_in = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_inactive=True)
+            assert len(dossier_ids_re_in) > 1266
+            self.dossier_ids_to_file(dossier_ids_re_in, filepath)
+
+            number_initiatief, number_regering = scraper.dossiers.get_number_of_wetsvoorstellen()
+            total_expected = number_regering + number_initiatief
+            total_found = len(dossier_ids_in_ac) + len(dossier_ids_in_in) + len(dossier_ids_re_ac) + len(dossier_ids_re_in)
+            logger.info('expected: ' + str(total_expected))
+            logger.info('found: ' + str(total_found))
+            assert total_expected == total_found
 
             changed_files = repo.git.diff(name_only=True)
             if not changed_files:
