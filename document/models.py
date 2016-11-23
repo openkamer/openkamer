@@ -59,12 +59,12 @@ class Dossier(models.Model):
         (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
         (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (ONBEKEND, 'ONB')
     )
-    dossier_id = models.CharField(max_length=100, blank=True, unique=True)
+    dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     url = models.URLField(blank=True)
     decision = models.CharField(max_length=200, blank=True)
-    status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND)
+    status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
 
     class Meta:
         ordering = ['-dossier_id']
@@ -100,6 +100,12 @@ class Dossier(models.Model):
     @cached_property
     def start_date(self):
         documents = Document.objects.filter(dossier=self).order_by('date_published')
+        if documents.exists():
+            return documents[0].date_published
+        return None
+
+    def last_date(self):
+        documents = Document.objects.filter(dossier=self).order_by('-date_published')
         if documents.exists():
             return documents[0].date_published
         return None
@@ -187,13 +193,13 @@ class Dossier(models.Model):
 
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)
-    document_id = models.CharField(max_length=200, blank=True)
+    document_id = models.CharField(max_length=200, blank=True, db_index=True)
     title_full = models.CharField(max_length=500)
     title_short = models.CharField(max_length=200)
     publication_type = models.CharField(max_length=200, blank=True)
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
-    date_published = models.DateField(blank=True, null=True)
+    date_published = models.DateField(blank=True, null=True, db_index=True)
     content_html = models.CharField(max_length=200000, blank=True)
 
     @cached_property
@@ -245,6 +251,12 @@ class Kamerstuk(models.Model):
     VERSLAG = 'Verslag'
     NOTA = 'Nota'
     BRIEF = 'Brief'
+
+    class Meta:
+        verbose_name_plural = 'Kamerstukken'
+        ordering = ['-document__date_published', '-id_sub',]
+        index_together = ['id_main', 'id_sub']
+        # unique_together = ['id_main', 'id_sub']
 
     def __str__(self):
         return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
@@ -311,10 +323,6 @@ class Kamerstuk(models.Model):
             stukken = Kamerstuk.objects.filter(original_id=self.id_full)
         return stukken.order_by('document__date_published', 'id_sub')
 
-    class Meta:
-        verbose_name_plural = 'Kamerstukken'
-        ordering = ['-document__date_published', '-id_sub',]
-
 
 class Agenda(models.Model):
     document = models.ForeignKey(Document)
@@ -346,7 +354,7 @@ class Voting(models.Model):
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
     is_dossier_voting = models.BooleanField(default=False)
-    result = models.CharField(max_length=3, choices=CHOICES)
+    result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
     date = models.DateField(auto_now=False, blank=True)
 
     @cached_property

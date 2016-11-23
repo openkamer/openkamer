@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 class Government(models.Model):
     name = models.CharField(max_length=200)
-    date_formed = models.DateField()
-    date_dissolved = models.DateField(blank=True, null=True)
+    date_formed = models.DateField(db_index=True)
+    date_dissolved = models.DateField(blank=True, null=True, db_index=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     slug = models.SlugField(max_length=250, default='')
 
@@ -104,7 +104,7 @@ class GovernmentPosition(models.Model):
         (PRIME_MINISTER, 'Minister-president'),
         (DEPUTY_PRIME_MINISTER, 'Viceminister-president'),
     )
-    position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS)
+    position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS, db_index=True)
     ministry = models.ForeignKey(Ministry, blank=True, null=True)
     government = models.ForeignKey(Government, blank=True, null=True)
     extra_info = models.CharField(max_length=200, blank=True)
@@ -151,8 +151,8 @@ class GovernmentPosition(models.Model):
 class GovernmentMember(models.Model):
     person = models.ForeignKey(Person)
     position = models.ForeignKey(GovernmentPosition)
-    start_date = models.DateField()
-    end_date = models.DateField(blank=True, null=True)
+    start_date = models.DateField(db_index=True)
+    end_date = models.DateField(blank=True, null=True, db_index=True)
 
     def __str__(self):
         return str(self.person) + ' as ' + str(self.position)

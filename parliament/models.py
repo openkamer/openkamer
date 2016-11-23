@@ -26,7 +26,7 @@ class Parliament(models.Model):
 
     @cached_property
     def members(self):
-        return ParliamentMember.objects.filter(parliament=self)
+        return ParliamentMember.objects.filter(parliament=self).select_related('person', 'parliament')
 
     @staticmethod
     def get_or_create_tweede_kamer():
@@ -53,12 +53,16 @@ class ParliamentMember(models.Model):
         logger.info('ParliamentMember not found.')
         return None
 
-    def party(self):
-        memberships = PartyMember.objects.filter(person=self.person)
+    def political_party(self):
+        memberships = PartyMember.objects.filter(person=self.person).select_related('party', 'person')
         for member in memberships:
             if member.left is None:
                 return member.party
         return None
+
+    @cached_property
+    def party(self):
+        return self.political_party()
 
     def check_overlap(self):
         members = ParliamentMember.objects.filter(person=self.person)
@@ -167,8 +171,8 @@ class PoliticalParty(models.Model):
 class PartyMember(models.Model):
     person = models.ForeignKey(Person, related_name='partymember')
     party = models.ForeignKey(PoliticalParty)
-    joined = models.DateField(blank=True, null=True)
-    left = models.DateField(blank=True, null=True)
+    joined = models.DateField(blank=True, null=True, db_index=True)
+    left = models.DateField(blank=True, null=True, db_index=True)
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'

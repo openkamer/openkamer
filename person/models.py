@@ -28,10 +28,10 @@ NAME_PREFIXES = [
 
 
 class Person(models.Model):
-    forename = models.CharField(max_length=200)
-    surname = models.CharField(max_length=200)
-    surname_prefix = models.CharField(max_length=200, blank=True, default='')
-    initials = models.CharField(max_length=200, blank=True, default='')
+    forename = models.CharField(max_length=200, db_index=True)
+    surname = models.CharField(max_length=200, db_index=True)
+    surname_prefix = models.CharField(max_length=200, blank=True, default='', db_index=True)
+    initials = models.CharField(max_length=200, blank=True, default='', db_index=True)
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikipedia_url = models.URLField(blank=True)
