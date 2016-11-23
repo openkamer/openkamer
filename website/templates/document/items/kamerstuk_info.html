@@ -7,3 +7,14 @@
 <h5>Categorieën: {% with categories=kamerstuk.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
 <h5>Bron: <a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.document.document_url }}</a></h5>
 <h5>ID: {{ kamerstuk.id_full }}</h5>
+{% if kamerstuk.original %}
+  <h5 class="text-warning">Origineel: <a href="{% url 'kamerstuk' kamerstuk.original.id_main kamerstuk.original.id_sub %}">{{ kamerstuk.original.id_full }}</a></h5>
+{% endif %}
+
+{% if kamerstuk.modifications %}
+  <h5 class="text-warning">Wijzigingen:
+  {% for modification in kamerstuk.modifications %}
+    <a href="{% url 'kamerstuk' modification.id_main modification.id_sub %}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
+  {% endfor %}
+  </h5>
+{% endif %}
