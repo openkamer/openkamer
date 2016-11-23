@@ -158,6 +158,13 @@ class Dossier(models.Model):
             return True
         return False
 
+    @cached_property
+    def first_voorstel(self):
+        for kamerstuk in self.kamerstukken.reverse():
+            if kamerstuk.voorstelwet:
+                return kamerstuk
+        return None
+
     @staticmethod
     def is_active_id(dossier_id):
         active_dossier_ids = Dossier.get_active_dossier_ids()
