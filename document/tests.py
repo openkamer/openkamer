@@ -85,7 +85,7 @@ class TestSubmitter(TestCase):
     def check_document_goverment_member(self, document_date, expected_members):
         document = Document.objects.create(date_published=document_date)
         submitter = Submitter.objects.create(person=self.person, document=document)
-        members = submitter.government_members()
+        members = submitter.government_members
         self.assertEqual(len(members), len(expected_members))
         for mem in members:
             self.assertTrue(mem in expected_members)

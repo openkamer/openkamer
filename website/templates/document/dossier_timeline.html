@@ -38,8 +38,8 @@
   <div class="cd-timeline-block">
 
     {% if dossier.voting %}
-      {% get_voting_result_color dossier.voting.id as voting_result_class %}
-      {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+      {% get_voting_result_color dossier.voting as voting_result_class %}
+      {% get_voting_result_icon dossier.voting as voting_result_icon %}
       <div class="cd-timeline-img text-center bg-{{ voting_result_class }}">
         <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
       </div>

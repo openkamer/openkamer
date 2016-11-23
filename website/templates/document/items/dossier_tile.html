@@ -11,8 +11,8 @@
     </div>
     <div class="col-xs-5" align="right">
       {% if dossier.voting %}
-      {% get_voting_result_color dossier.voting.id as voting_result_class %}
-      {% get_voting_result_icon dossier.voting.id as voting_result_icon %}
+      {% get_voting_result_color dossier.voting as voting_result_class %}
+      {% get_voting_result_icon dossier.voting as voting_result_icon %}
         <span class="fa {{ voting_result_icon }} text-{{ voting_result_class }}"></span>
       {% elif dossier.is_active %}
         <span class="fa fa-spinner text-info" title="In behandeling"></span>

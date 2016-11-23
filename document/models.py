@@ -78,7 +78,7 @@ class Dossier(models.Model):
 
     @cached_property
     def kamerstukken(self):
-        return Kamerstuk.objects.filter(document__dossier=self)
+        return Kamerstuk.objects.filter(document__dossier=self).select_related('document')
 
     def set_status(self):
         if self.passed:
@@ -116,10 +116,10 @@ class Dossier(models.Model):
     @cached_property
     def title(self):
         # TODO: improve performance
-        kamerstukken = self.kamerstukken.select_related('document')
+        kamerstukken = self.kamerstukken
         titles = {}
         for stuk in kamerstukken:
-            title = stuk.document.title()
+            title = stuk.document.title
             if title in titles:
                 titles[title] += 1
             else:
@@ -134,7 +134,7 @@ class Dossier(models.Model):
 
     @cached_property
     def is_withdrawn(self):
-        kamerstukken = self.kamerstukken.order_by('-document__date_published')
+        kamerstukken = self.kamerstukken
         if kamerstukken:
             return 'intrekking' in kamerstukken[0].type_long  # latest kamerstuk
         return False
@@ -196,12 +196,15 @@ class Document(models.Model):
     date_published = models.DateField(blank=True, null=True)
     content_html = models.CharField(max_length=200000, blank=True)
 
+    @cached_property
     def submitters(self):
-        return Submitter.objects.filter(document=self).exclude(person__surname='')
+        return Submitter.objects.filter(document=self).exclude(person__surname='').select_related('person', 'document')
 
+    @cached_property
     def title(self):
         return self.title_full.split(';')[0]
 
+    @cached_property
     def document_url(self):
         return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
 
@@ -219,6 +222,7 @@ class Submitter(models.Model):
     def __str__(self):
         return self.person.fullname()
 
+    @cached_property
     def government_members(self):
         """ :returns the government members of this person at the time the documented was published """
         date = self.document.date_published
@@ -245,6 +249,7 @@ class Kamerstuk(models.Model):
     def __str__(self):
         return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
 
+    @cached_property
     def type(self):
         if 'nota' in self.type_short.lower():
             return Kamerstuk.NOTA
@@ -252,7 +257,7 @@ class Kamerstuk(models.Model):
             return Kamerstuk.MOTIE
         elif 'amendement' in self.type_short.lower():
             return Kamerstuk.AMENDEMENT
-        elif self.voorstelwet():
+        elif self.voorstelwet:
             return Kamerstuk.WETSVOORSTEL
         elif 'verslag' in self.type_short.lower():
             return Kamerstuk.VERSLAG
@@ -260,26 +265,30 @@ class Kamerstuk(models.Model):
             return Kamerstuk.BRIEF
         return None
 
+    @cached_property
     def id_full(self):
         return str(self.id_main) + '-' + str(self.id_sub)
 
     @cached_property
     def voting(self):
-        votings = Voting.objects.filter(kamerstuk=self)
+        votings = Voting.objects.filter(kamerstuk=self).select_related('kamerstuk')
         if votings.exists():
             return votings[0]
         return None
 
+    @cached_property
     def visible(self):
         if self.type_short == 'Koninklijke boodschap':
             return False
         return True
 
+    @cached_property
     def voorstelwet(self):
         if 'voorstel van wet' in self.type_short.lower():
             return True
         return False
 
+    @cached_property
     def original(self):
         if not self.original_id:
             return None
@@ -294,11 +303,12 @@ class Kamerstuk(models.Model):
             return kamerstukken[0]
         return None
 
+    @cached_property
     def modifications(self):
-        if self.voorstelwet():
+        if self.voorstelwet:
             stukken = Kamerstuk.objects.filter(original_id=self.id_main+'-voorstel_van_wet').exclude(id=self.id)
         else:
-            stukken = Kamerstuk.objects.filter(original_id=self.id_full())
+            stukken = Kamerstuk.objects.filter(original_id=self.id_full)
         return stukken.order_by('document__date_published', 'id_sub')
 
     class Meta:
@@ -366,11 +376,11 @@ class Voting(models.Model):
 
     @cached_property
     def votes_party(self):
-        return VoteParty.objects.filter(voting=self)
+        return VoteParty.objects.filter(voting=self).select_related('party')
 
     @cached_property
     def votes_individual(self):
-        return VoteIndividual.objects.filter(voting=self)
+        return VoteIndividual.objects.filter(voting=self).select_related('parliament_member')
 
     def has_result_details(self):
         return len(self.votes) > 0

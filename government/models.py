@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 
 from person.models import Person
@@ -20,45 +21,51 @@ class Government(models.Model):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    @cached_property
     def prime_minister(self):
         pms = GovernmentPosition.objects.filter(
             position=GovernmentPosition.PRIME_MINISTER,
             government=self
         )
         if pms.exists():
-            return pms[0].member_latest()
+            return pms[0].member_latest
         return None
 
+    @cached_property
     def deputy_prime_minister(self):
         deputies = GovernmentPosition.objects.filter(
             position=GovernmentPosition.DEPUTY_PRIME_MINISTER,
             government=self
         )
         if deputies.exists():
-            return deputies[0].member_latest()
+            return deputies[0].member_latest
         return None
 
+    @cached_property
     def members_latest(self):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self)
         for position in positions:
-            member_ids.append(position.member_latest().id)
+            member_ids.append(position.member_latest.id)
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
+    @cached_property
     def members(self):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self)
         for position in positions:
-            member_ids += [member.id for member in position.members()]
+            member_ids += [member.id for member in position.members]
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
+    @cached_property
     def ministers_without_portfolio_current(self):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self, position=GovernmentPosition.MINISTER_WO_PORTFOLIO)
         for position in positions:
-            member_ids.append(position.member_latest().id)
+            member_ids.append(position.member_latest.id)
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
+    @cached_property
     def ministries(self):
         return Ministry.objects.filter(government=self)
 
@@ -76,7 +83,7 @@ class Ministry(models.Model):
     def has_members_replaced(self):
         positions = GovernmentPosition.objects.filter(ministry=self)
         for position in positions:
-            if position.members_replaced().exists():
+            if position.members_replaced.exists():
                 return True
         return False
 
@@ -105,6 +112,7 @@ class GovernmentPosition(models.Model):
     def __str__(self):
         return self.get_position_display()
 
+    @cached_property
     def member_latest(self):
         current = GovernmentMember.objects.filter(position=self, end_date__isnull=True)
         if current:
@@ -112,12 +120,14 @@ class GovernmentPosition(models.Model):
         else:
             return GovernmentMember.objects.filter(position=self).order_by('-end_date')[0]
 
+    @cached_property
     def members_replaced(self):
         latest_date = self.government.date_dissolved
         if not latest_date:
             latest_date = datetime.date.today()
         return GovernmentMember.objects.filter(position=self, end_date__lt=latest_date)
 
+    @cached_property
     def members(self):
         return GovernmentMember.objects.filter(position=self)
 
@@ -147,5 +157,6 @@ class GovernmentMember(models.Model):
     def __str__(self):
         return str(self.person) + ' as ' + str(self.position)
 
+    @cached_property
     def is_active(self):
         return self.end_date is None

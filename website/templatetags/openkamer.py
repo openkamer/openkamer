@@ -10,7 +10,7 @@ register = template.Library()
 
 @register.assignment_tag
 def get_current_party(person_id):
-    members = PartyMember.objects.filter(person=person_id)
+    members = PartyMember.objects.filter(person=person_id).select_related('party', 'person')
     for member in members:
         if member.left is None:
             return member.party
@@ -18,26 +18,24 @@ def get_current_party(person_id):
 
 
 @register.assignment_tag
-def get_kamerstuk_icon_name(kamerstuk_id):
-    kamerstuk = Kamerstuk.objects.get(id=kamerstuk_id)
-    if kamerstuk.type() == Kamerstuk.MOTIE:
+def get_kamerstuk_icon_name(kamerstuk):
+    if kamerstuk.type == Kamerstuk.MOTIE:
         return 'fa-ticket'
-    elif kamerstuk.type() == Kamerstuk.AMENDEMENT:
+    elif kamerstuk.type == Kamerstuk.AMENDEMENT:
         return 'fa-pencil'
-    elif kamerstuk.type() == Kamerstuk.WETSVOORSTEL:
+    elif kamerstuk.type == Kamerstuk.WETSVOORSTEL:
         return 'fa-balance-scale'
-    elif kamerstuk.type() == Kamerstuk.VERSLAG:
+    elif kamerstuk.type == Kamerstuk.VERSLAG:
         return 'fa-comments'
-    elif kamerstuk.type() == Kamerstuk.NOTA:
+    elif kamerstuk.type == Kamerstuk.NOTA:
         return 'fa-file'
-    elif kamerstuk.type() == Kamerstuk.BRIEF:
+    elif kamerstuk.type == Kamerstuk.BRIEF:
         return 'fa-envelope'
     return 'fa-file-text'
 
 
 @register.assignment_tag
-def get_kamerstuk_timeline_bg_color(kamerstuk_id):
-    kamerstuk = Kamerstuk.objects.get(id=kamerstuk_id)
+def get_kamerstuk_timeline_bg_color(kamerstuk):
     voting = kamerstuk.voting
     if not voting:
         return 'bg-info'
@@ -53,8 +51,7 @@ def get_kamerstuk_timeline_bg_color(kamerstuk_id):
 
 
 @register.assignment_tag
-def get_voting_result_color(voting_id):
-    voting = Voting.objects.get(id=voting_id)
+def get_voting_result_color(voting):
     if not voting:
         return 'info'
     if voting.result == Voting.VERWORPEN:
@@ -69,8 +66,7 @@ def get_voting_result_color(voting_id):
 
 
 @register.assignment_tag
-def get_voting_result_icon(voting_id):
-    voting = Voting.objects.get(id=voting_id)
+def get_voting_result_icon(voting):
     if not voting:
         return 'fa-spinner'
     if voting.result == Voting.VERWORPEN:

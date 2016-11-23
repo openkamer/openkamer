@@ -2,6 +2,7 @@ import logging
 import datetime
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 
 from wikidata import wikidata
@@ -19,10 +20,11 @@ class Parliament(models.Model):
         return str(self.name)
 
     def get_members_at_date(self, check_date):
-        members = self.members()
+        members = self.members
         members_active = members.filter(joined__lt=check_date, left__gte=check_date) | members.filter(joined__lt=check_date, left=None)
         return members_active
 
+    @cached_property
     def members(self):
         return ParliamentMember.objects.filter(parliament=self)
 
@@ -85,8 +87,9 @@ class ParliamentMember(models.Model):
 
     def __str__(self):
         display_name = self.person.fullname()
-        if self.party():
-            display_name += ' (' + str(self.party().name_short) + ')'
+        party = self.party()
+        if party:
+            display_name += ' (' + str(party.name_short) + ')'
         return display_name
 
 
@@ -108,6 +111,7 @@ class PoliticalParty(models.Model):
         self.slug = slugify(self.name_short)
         super().save(*args, **kwargs)
 
+    @cached_property
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 

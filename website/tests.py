@@ -55,7 +55,7 @@ class TestCreateGovernment(TestCase):
     def test_government_data(self):
         government = Government.objects.all()[0]
         self.assertEqual(government.name, 'Kabinet-Rutte II')
-        members = government.members()
+        members = government.members
         persons = []
         for member in members:
             persons.append(member.person)
@@ -321,11 +321,11 @@ class TestWebsite(TestCase):
         kamerstuk_11 = Kamerstuk.objects.get(id_main='33885', id_sub='11')
         kamerstuk_29 = Kamerstuk.objects.get(id_main='33885', id_sub='29')
         kamerstuk_original = Kamerstuk.objects.get(id_main='33885', id_sub='2')
-        self.assertEqual(kamerstuk_08.original(), kamerstuk_original)
-        self.assertEqual(kamerstuk_11.original(), kamerstuk_original)
-        self.assertEqual(kamerstuk_29.original(), kamerstuk_original)
+        self.assertEqual(kamerstuk_08.original, kamerstuk_original)
+        self.assertEqual(kamerstuk_11.original, kamerstuk_original)
+        self.assertEqual(kamerstuk_29.original, kamerstuk_original)
         modifications = [kamerstuk_08, kamerstuk_11, kamerstuk_29]
-        for modification in kamerstuk_original.modifications():
+        for modification in kamerstuk_original.modifications:
             self.assertTrue(modification in modifications)
 
     def test_agendas_view(self):
