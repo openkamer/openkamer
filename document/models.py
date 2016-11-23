@@ -104,10 +104,14 @@ class Dossier(models.Model):
             return documents[0].date_published
         return None
 
+    @cached_property
     def last_date(self):
-        documents = Document.objects.filter(dossier=self).order_by('-date_published')
-        if documents.exists():
-            return documents[0].date_published
+        kamerstukken = Kamerstuk.objects.filter(id_main=self).order_by('-document__date_published').select_related('document')
+        if kamerstukken.exists():
+            if self.voting and self.voting.date > kamerstukken[0].document.date_published:
+                return self.voting.date
+            else:
+                return kamerstukken[0].document.date_published
         return None
 
     @cached_property
@@ -355,7 +359,7 @@ class Voting(models.Model):
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
     is_dossier_voting = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
-    date = models.DateField(auto_now=False, blank=True)
+    date = models.DateField(auto_now=False, blank=True, db_index=True)
 
     @cached_property
     def votes(self):
