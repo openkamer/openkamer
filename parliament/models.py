@@ -91,7 +91,7 @@ class ParliamentMember(models.Model):
 
     def __str__(self):
         display_name = self.person.fullname()
-        party = self.party()
+        party = self.party
         if party:
             display_name += ' (' + str(party.name_short) + ')'
         return display_name
