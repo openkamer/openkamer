@@ -542,7 +542,7 @@ def create_votes_party(voting, votes):
         if not vote.decision:
             logger.warning('vote has no decision, vote.details: ' + str(vote.details))
         VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
-                                 decision=get_decision(vote.decision), details=vote.details)
+                                 decision=get_decision(vote.decision), details=vote.details, is_mistake=vote.is_mistake)
     logger.info('END')
 
 
@@ -560,7 +560,7 @@ def create_votes_individual(voting, votes):
             else:
                 logger.error('voting.kamerstuk does not exist')
         VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
-                                      decision=get_decision(vote.decision), details=vote.details)
+                                      decision=get_decision(vote.decision), details=vote.details, is_mistake=vote.is_mistake)
     logger.info('END')
 
 
@@ -585,8 +585,6 @@ def get_decision(decision_string):
         return Vote.AGAINST
     elif scraper.votings.Vote.NOVOTE == decision_string:
         return Vote.NONE
-    elif 'mistake' in decision_string:
-        return Vote.MISTAKE
     logger.error('no decision detected, returning Vote.NONE')
     return Vote.NONE
 

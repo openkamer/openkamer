@@ -112,7 +112,7 @@ class TestCreateBesluitenLijst(TestCase):
                 for case in item.cases():
                     self.assertFalse('Besluit:' in case.title)
                     self.assertFalse('Noot:' in case.title)
-            dossier_ids = besluitenlijst.related_dossier_ids()
+            dossier_ids = besluitenlijst.related_dossier_ids
 
 
 class TestFindParliamentMembers(TestCase):

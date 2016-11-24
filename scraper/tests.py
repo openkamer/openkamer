@@ -268,6 +268,34 @@ class TestVotingScraper(TestCase):
                 if vote.party_name == 'Van Vliet':
                     self.assertEqual(vote.decision, scraper.votings.Vote.NOVOTE)
 
+    def test_get_individual_vote_not_voted_and_mistake(self):
+        url = 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10653'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        self.assertEqual(len(voting_results), 2)
+        self.assertTrue(voting_results[0].is_individual())
+        self.assertFalse(voting_results[1].is_individual())
+        n_mistakes = 0
+        n_novote = 0
+        n_for = 0
+        n_against = 0
+        for vote in voting_results[0].votes:
+            if vote.is_mistake:
+                n_mistakes += 1
+            if vote.decision == scraper.votings.Vote.NOVOTE:
+                n_novote += 1
+            elif vote.decision == scraper.votings.Vote.FOR:
+                n_for += 1
+            elif vote.decision == scraper.votings.Vote.AGAINST:
+                n_against += 1
+            else:
+                self.assertTrue(False)
+        self.assertEqual(len(voting_results[0].votes), 150)
+        self.assertEqual(n_novote, 12)
+        self.assertEqual(n_mistakes, 1)
+        self.assertEqual(n_for, 68)
+        self.assertEqual(n_against, 70)
+        self.assertEqual(n_novote + n_for + n_against, 150)
+
 
 class TestDocumentScraper(TestCase):
 

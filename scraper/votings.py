@@ -21,6 +21,7 @@ class Vote(object):
         self.details = ''
         self.decision = ''
         self.number_of_seats = 0
+        self.is_mistake = False
         self.create()
 
     def create(self):
@@ -55,6 +56,8 @@ class VoteParty(Vote):
 
 
 class VoteIndividual(Vote):
+    MISTAKE = 'MISTAKE'
+
     def __init__(self, vote_table_row):
         self.parliament_member = ''
         super().__init__(vote_table_row)
@@ -62,14 +65,17 @@ class VoteIndividual(Vote):
 
     def create(self):
         ncol = 0
-        col_type = {3: 'FOR', 4: 'AGAINST', 5: 'NONE', 6: 'MISTAKE'}
+        col_type = {3: Vote.FOR, 4: Vote.AGAINST, 5: Vote.NOVOTE, 6: VoteIndividual.MISTAKE}
         for column in self.vote_table_row.iter():
             if column.tag == 'td':
                 ncol += 1
             if ncol == 2:
                 self.parliament_member = column.text
             if 'class' in column.attrib and column.attrib['class'] == 'sel':
-                self.decision = col_type[ncol]
+                if col_type[ncol] == VoteIndividual.MISTAKE:
+                    self.is_mistake = True
+                else:
+                    self.decision = col_type[ncol]
 
     def __str__(self):
         return 'Vote: ' + self.parliament_member + ' : ' + self.decision
@@ -136,7 +142,12 @@ class VotingResult(object):
 
     def is_individual(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')
-        return 'hoofdelijk' in result_content_elements[0].text.lower()
+        if 'hoofdelijk' in result_content_elements[0].text.lower():
+            return True
+        result_content_elements = self.result_tree.xpath('div[@class="vote-result"]/p[@class="vote-type"]/span')
+        if 'hoofdelijk' in result_content_elements[0].text.lower():
+            return True
+        return False
 
     def get_result(self):
         result_content_elements = self.result_tree.xpath('div[@class="search-result-content"]/p[@class="result"]/span')

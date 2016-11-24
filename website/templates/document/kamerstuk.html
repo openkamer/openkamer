@@ -38,28 +38,25 @@
 <hr/>
 
 {% if kamerstuk.voting %}
-<div class="row">
-  <div class="col-sm-8 col-sm-offset-2" align="center">
-    {% with kamerstuk.voting as voting %}
-    {% include "document/items/voting_result_bar.html" %}
-    {% endwith %}
-  </div>
-</div>
-<div class="row">
-  {% for vote in kamerstuk.voting.votes %}
-  <div class="col-xs-3" align="center">
-    {% if vote.decision == "FO" %}
-      <h4 class="text-success">{{ vote.party.name_short }}</h4>
-    {% elif vote.decision == "AG" %}
-      <h4 class="text-danger">{{ vote.party.name_short }}</h4>
-    {% else %}
-      <h4>{{ vote.party.name_short }}</h4>
-    {% endif %}
-  </div>
-  {% endfor %}
-</div>
+  {% with voting=kamerstuk.voting %}
 
-<hr/>
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2" align="center">
+        {% include "document/items/voting_result_bar.html" %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+      {% include "document/items/voting_result_list_large.html" %}
+    </div>
+  </div>
+
+
+
+  <hr/>
+
+  {% endwith %}
 {% endif %}
 
 

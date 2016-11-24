@@ -1,0 +1,41 @@
+
+{% if voting.votes_party %}
+
+<div class="row">
+  {% for vote in kamerstuk.voting.votes %}
+  <div class="col-xs-3" align="center">
+    {% if vote.decision == "FO" %}
+      <h4 class="text-success">{{ vote.party.name_short }}</h4>
+    {% elif vote.decision == "AG" %}
+      <h4 class="text-danger">{{ vote.party.name_short }}</h4>
+    {% else %}
+      <h4>{{ vote.party.name_short }}</h4>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+
+  {% for vote in voting.votes_for %}
+    {% if forloop.counter0 == 0 %}
+      <strong>Voor:</strong>
+    {% endif %}
+    {% include "document/items/voting_result_person_link.html" %}
+  {% endfor %}
+  <br/>
+  {% for vote in voting.votes_against %}
+    {% if forloop.counter0 == 0 %}
+      <strong>Tegen:</strong>
+    {% endif %}
+    {% include "document/items/voting_result_person_link.html" %}
+  {% endfor %}
+  <br/>
+  {% for vote in voting.votes_none %}
+    {% if forloop.counter0 == 0 %}
+      <strong>Niet gestemd:</strong>
+    {% endif %}
+    {% include "document/items/voting_result_person_link.html" %}
+  {% endfor %}
+
+{% endif %}

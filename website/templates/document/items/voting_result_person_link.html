@@ -1,0 +1,5 @@
+{% if vote.parliament_member %}
+  <a href="{% url 'person' vote.parliament_member.person.slug %}">{{ vote.parliament_member.person.fullname }}</a>{% if vote.is_mistake %} (<strong class="text-danger">vergissing</strong> <a href="https://www.parlement.com/id/vh8lnhrpmxva/stemmingen#p2" target="_blank"><span class="fa fa-info-circle" title="Een vergissing beïnvloedt de stemming niet"></span></a>){% endif %}{% if not forloop.last %},{% endif %}
+{% else %}
+  onbekend kamerlid{% if not forloop.last %},{% endif %}
+{% endif %}

@@ -454,15 +454,15 @@ class Vote(models.Model):
     FOR = 'FO'
     AGAINST = 'AG'
     NONE = 'NO'
-    MISTAKE = 'MI'
     CHOICES = (
-        (FOR, 'For'), (AGAINST, 'Against'), (NONE, 'None'), (MISTAKE, 'Mistake')
+        (FOR, 'For'), (AGAINST, 'Against'), (NONE, 'None')
     )
 
     voting = models.ForeignKey(Voting)
     number_of_seats = models.IntegerField()
     decision = models.CharField(max_length=2, choices=CHOICES)
     details = models.CharField(max_length=2000, blank=True, null=False, default='')
+    is_mistake = models.BooleanField(default=False)
 
     def get_name(self):
         raise NotImplementedError
