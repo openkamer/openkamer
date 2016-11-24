@@ -53,6 +53,8 @@ def get_kamerstuk_timeline_bg_color(kamerstuk):
         return 'bg-warning'
     elif voting.result == Voting.AANGEHOUDEN:
         return 'bg-warning'
+    elif voting.result == Voting.CONTROVERSIEEL:
+        return 'bg-danger'
     return 'bg-info'
 
 
@@ -67,6 +69,8 @@ def get_voting_result_color(voting):
     elif voting.result == Voting.INGETROKKEN:
         return 'warning'
     elif voting.result == Voting.AANGEHOUDEN:
+        return 'warning'
+    elif voting.result == Voting.CONTROVERSIEEL:
         return 'warning'
     return 'info'
 
@@ -83,6 +87,8 @@ def get_voting_result_icon(voting):
         return 'fa-undo'
     elif voting.result == Voting.AANGEHOUDEN:
         return 'fa-pause'
+    elif voting.result == Voting.CONTROVERSIEEL:
+        return 'fa-warning'
     return 'fa-spinner'
 
 

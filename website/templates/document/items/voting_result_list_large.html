@@ -4,12 +4,12 @@
 <div class="row">
   {% for vote in kamerstuk.voting.votes %}
   <div class="col-xs-3" align="center">
-    {% if vote.decision == "FO" %}
+    {% if vote.decision == vote.FOR %}
       <h4 class="text-success">{{ vote.party.name_short }}</h4>
-    {% elif vote.decision == "AG" %}
+    {% elif vote.decision == vote.AGAINST %}
       <h4 class="text-danger">{{ vote.party.name_short }}</h4>
     {% else %}
-      <h4>{{ vote.party.name_short }}</h4>
+      <h4 class="text-warning">{{ vote.party.name_short }}</h4>
     {% endif %}
   </div>
   {% endfor %}

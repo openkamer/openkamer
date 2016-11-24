@@ -359,6 +359,7 @@ def create_or_update_dossier(dossier_id):
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
+    dossier.set_status()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
 
@@ -574,6 +575,8 @@ def get_result_choice(result_string):
         return Voting.INGETROKKEN
     elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
         return Voting.AANGEHOUDEN
+    elif 'controversieel verklaard' in result_string:
+        return Voting.CONTROVERSIEEL
     logger.error('could not interpret the voting result: ' + result_string)
     return Voting.ONBEKEND
 

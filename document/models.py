@@ -357,10 +357,11 @@ class Voting(models.Model):
     VERWORPEN = 'VER'
     INGETROKKEN = 'ING'
     AANGEHOUDEN = 'AGH'
+    CONTROVERSIEEL = 'CON'
     ONBEKEND = 'ONB'
     CHOICES = (
         (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
-        (AANGEHOUDEN, 'Aangehouden'), (ONBEKEND, 'ONB')
+        (AANGEHOUDEN, 'Aangehouden'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)

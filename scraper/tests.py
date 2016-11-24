@@ -296,6 +296,13 @@ class TestVotingScraper(TestCase):
         self.assertEqual(n_against, 70)
         self.assertEqual(n_novote + n_for + n_against, 150)
 
+    def test_get_voting_withdrawn(self):
+        url = 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P16766'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        self.assertEqual(len(voting_results), 1)
+        voting = voting_results[0]
+        self.assertEqual(voting.get_result(), 'Eerder ingetrokken (tijdens debat)')
+
 
 class TestDocumentScraper(TestCase):
 
