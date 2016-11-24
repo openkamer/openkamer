@@ -69,11 +69,13 @@ class Person(models.Model):
         best_score = 0
         for person in persons:
             score = 0
-            if surname.lower() == unidecode(person.surname.lower()):
+            surname_no_second = surname.split('-')[0].lower() # for example, Anne-Wil Lucas-Smeerdijk is called Anne-Wil Lucas on tweedekamer.nl
+            person_surname_no_second = person.surname.split('-')[0].lower()
+            if surname_no_second == unidecode(person_surname_no_second):
                 score += 1
-            elif surname.lower() == unidecode(person.surname.lower() + ' ' + person.surname_prefix.lower()):
+            elif surname_no_second == unidecode(person_surname_no_second + ' ' + person.surname_prefix.lower()):
                 score += 1
-            elif surname.lower() == unidecode(person.surname_prefix.lower() + ' ' + person.surname.lower()):
+            elif surname_no_second == unidecode(person.surname_prefix.lower() + ' ' + person_surname_no_second):
                 score += 1
             intials_letters = initials.split('.')
             forename = unidecode(person.forename)
