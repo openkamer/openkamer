@@ -12,7 +12,7 @@
 {% endif %}
 
 {% if kamerstuk.modifications %}
-  <h5 class="text-warning">Wijzigingen:
+  <h5><font class="text-warning">Wijzigingen:</font>
   {% for modification in kamerstuk.modifications %}
     <a href="{% url 'kamerstuk' modification.id_main modification.id_sub %}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
   {% endfor %}

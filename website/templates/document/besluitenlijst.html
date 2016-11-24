@@ -1,8 +1,9 @@
 {% extends "website/base.html" %}
 
-{% block title %}Besluitenlijst - {{ besluitenlijst.commission }} - {{ besluitenlijst.title }} - Tweede Kamer {{ block.super }}{% endblock %}
-
 {% load bootstrap_pagination %}
+{% load openkamer %}
+
+{% block title %}Besluitenlijst - {{ besluitenlijst.commission }} - {{ besluitenlijst.title }} - Tweede Kamer {{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -16,7 +17,12 @@
     <h5>
       Behandelde dossiers:
       {% for dossier_id in besluitenlijst.related_dossier_ids %}
+        {% get_dossier_exists dossier_id as dossier_exists %}
+        {% if dossier_exists %}
+        <a href="{% url 'dossier-timeline' dossier_id %}">{{ dossier_id }}</a>{% if not forloop.last %},{% endif %}
+        {% else %}
         {{ dossier_id }}{% if not forloop.last %},{% endif %}
+        {% endif %}
       {% endfor %}
     </h5>
     <hr/>
@@ -55,13 +61,13 @@
           </div>
           {% endfor %}
 
-          {% if case.related_document_ids %}
+          {% if case.related_kamerstukken %}
           <div class="row">
             <div class="col-sm-11 col-sm-offset-1">
-              <strong>Gerelateerde documenten:</strong>
-              {% for document_id in case.related_document_id_list %}
-                {{ document_id }}
-              {% if not forloop.last %},{% endif %}
+              <strong>Gerelateerde kamerstukken:</strong>
+              {% for kamerstuk in case.related_kamerstukken %}
+                <a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.id_full }}</a>
+                {% if not forloop.last %},{% endif %}
               {% endfor %}
             </div>
           </div>

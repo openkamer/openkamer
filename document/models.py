@@ -501,6 +501,7 @@ class BesluitenLijst(models.Model):
     def cases_all(self):
         return BesluitItemCase.objects.filter(besluit_item__in=self.items())
 
+    @cached_property
     def related_dossier_ids(self):
         dossier_ids = []
         for case in self.cases_all():
@@ -539,3 +540,20 @@ class BesluitItemCase(models.Model):
 
     def related_document_id_list(self):
         return self.related_document_ids.split(self.SEP_CHAR)
+
+    def related_kamerstukken(self):
+        document_ids = self.related_document_id_list()
+        related_stukken = []
+        for document_id in document_ids:
+            if not document_id:
+                continue
+            id_parts = document_id.split('-')
+            if len(id_parts) != 2:
+                logger.info('no kamerstuk found for id: ' + document_id)
+                continue
+            id_main = document_id.split('-')[0]
+            id_sub = document_id.split('-')[1]
+            kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
+            if kamerstukken:
+                related_stukken.append(kamerstukken[0])
+        return related_stukken

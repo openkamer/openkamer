@@ -1,11 +1,17 @@
 import datetime
 from django import template
 
+from document.models import Dossier
 from document.models import Kamerstuk
 from document.models import Voting
 from parliament.models import PartyMember
 
 register = template.Library()
+
+
+@register.assignment_tag
+def get_dossier_exists(dossier_id):
+    return Dossier.objects.filter(dossier_id=dossier_id).exists()
 
 
 @register.assignment_tag
