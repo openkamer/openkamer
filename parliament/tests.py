@@ -68,4 +68,5 @@ class TestParliamentMembers(TestCase):
     def test_get_members_at_date(self):
         tweede_kamer = Parliament.get_or_create_tweede_kamer()
         active_members = tweede_kamer.get_members_at_date(datetime.date(year=2016, month=6, day=1))
-        print(len(active_members))  # TODO: check for number if members have non null joined/left fields
+        self.assertEqual(len(active_members), 150)
+        # print(len(active_members))  # TODO: check for number if members have non null joined/left fields
