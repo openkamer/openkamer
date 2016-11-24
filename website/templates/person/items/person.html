@@ -30,8 +30,11 @@
     {% endif %}
   </tr>
   <tr>
-    <th>Parlement en Politiek</th>
-    <td>{% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">biografie</a>{% else %} onbekend {% endif %}</td>
+    <th>Biografie</th>
+    <td>
+      {% if person.wikipedia_url %}<a href="{{ person.wikipedia_url }}" target="_blank">Wikipedia</a>{% endif %}<br/>
+      {% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">Parlement en Politiek</a>{% endif %}
+    </td>
   </tr>
 </table>
 <img src="{{ person.wikimedia_image_url }}" height="200px">
