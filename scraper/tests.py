@@ -260,6 +260,14 @@ class TestVotingScraper(TestCase):
         self.assertEqual(voting_results[0].get_document_id_without_rijkswet(), '34158')
         self.assertEqual(voting_results[0].is_dossier_voting(), True)
 
+    def test_get_voting_not_voted(self):
+        url = 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P16759'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        for result in voting_results:
+            for vote in result.votes:
+                if vote.party_name == 'Van Vliet':
+                    self.assertEqual(vote.decision, scraper.votings.Vote.NOVOTE)
+
 
 class TestDocumentScraper(TestCase):
 

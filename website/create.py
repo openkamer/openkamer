@@ -579,12 +579,11 @@ def get_result_choice(result_string):
 
 
 def get_decision(decision_string):
-    decision_string = decision_string.lower()
-    if 'for' in decision_string:
+    if scraper.votings.Vote.FOR == decision_string:
         return Vote.FOR
-    elif 'against' in decision_string:
+    elif scraper.votings.Vote.AGAINST == decision_string:
         return Vote.AGAINST
-    elif 'none' in decision_string:
+    elif scraper.votings.Vote.NOVOTE == decision_string:
         return Vote.NONE
     elif 'mistake' in decision_string:
         return Vote.MISTAKE

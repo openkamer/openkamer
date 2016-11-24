@@ -12,6 +12,10 @@ SEARCH_URL = 'https://www.tweedekamer.nl/zoeken'
 
 
 class Vote(object):
+    AGAINST = 'AGAINST'
+    FOR = 'FOR'
+    NOVOTE = 'NOVOTE'
+
     def __init__(self, vote_table_row):
         self.vote_table_row = vote_table_row
         self.details = ''
@@ -38,11 +42,13 @@ class VoteParty(Vote):
             elif ncol == 2:
                 self.number_of_seats = int(column.text)
             elif ncol == 3 and column.tag == 'img':
-                self.decision = 'FOR'
+                self.decision = Vote.FOR
             elif ncol == 4 and column.tag == 'img':
-                self.decision = 'AGAINST'
+                self.decision = Vote.AGAINST
             elif ncol == 5 and column.tag == 'h4':
                 self.details = column.text
+                if 'niet deelgenomen' in self.details.lower():
+                    self.decision = Vote.NOVOTE
 
     def __str__(self):
         return 'Vote: ' + self.party_name + ' (' + str(self.number_of_seats) + '): ' + self.decision
