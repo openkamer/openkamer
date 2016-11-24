@@ -145,7 +145,7 @@ class VotingResult(object):
         if 'hoofdelijk' in result_content_elements[0].text.lower():
             return True
         result_content_elements = self.result_tree.xpath('div[@class="vote-result"]/p[@class="vote-type"]/span')
-        if 'hoofdelijk' in result_content_elements[0].text.lower():
+        if result_content_elements and 'hoofdelijk' in result_content_elements[0].text.lower():
             return True
         return False
 
