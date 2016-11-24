@@ -15,7 +15,7 @@
     <strong>Indiener:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
     <br/>
     {% for decision in case.decision_list %}
-      <strong>Besluit:</strong> {{ decision }}
+      <strong>Besluit:</strong> {{ decision }}<br/>
     {% endfor %}
     {% for note in case.notes_list %}
       Noot: {{ note }}

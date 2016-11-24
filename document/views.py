@@ -151,8 +151,9 @@ class TimelineItem(object):
 
 
 class TimelineKamerstukItem(TimelineItem):
-    def __init__(self, obj):
+    def __init__(self, obj, besluit_cases=None):
         super().__init__(obj)
+        self.besluit_cases = besluit_cases
 
     @staticmethod
     def template_name():
@@ -184,9 +185,19 @@ class DossierTimelineView(TemplateView):
         dossier = Dossier.objects.get(dossier_id=dossier_id)
         context['dossier'] = dossier
         timeline_items = []
+        besluitenlijst_cases = dossier.besluitenlijst_cases
+        to_exclude = []
         for kamerstuk in dossier.kamerstukken:
-            timeline_items.append(TimelineKamerstukItem(kamerstuk))
-        for case in dossier.besluitenlijst_cases:
+            besluit_cases = []
+            for case in besluitenlijst_cases:
+                if kamerstuk in case.related_kamerstukken:
+                    besluit_cases.append(case)
+            if besluit_cases:
+                for case in besluit_cases:
+                    to_exclude.append(case.id)
+            timeline_items.append(TimelineKamerstukItem(kamerstuk, besluit_cases=besluit_cases))
+        besluitenlijst_cases = besluitenlijst_cases.exclude(pk__in=to_exclude)
+        for case in besluitenlijst_cases:
             timeline_items.append(TimelineBesluitItem(case))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items

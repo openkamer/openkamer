@@ -1,9 +1,9 @@
 {% if kamerstuk.original %}
-  <strong>origineel</strong>: <a href="#{{ kamerstuk.original.id_full }}">{{ kamerstuk.original.id_full }}</a>
+  <strong>Origineel</strong>: <a href="#{{ kamerstuk.original.id_full }}">{{ kamerstuk.original.id_full }}</a>
 {% endif %}
 
 {% if kamerstuk.modifications %}
-  <strong>wijzigingen:</strong>
+  <strong>Wijzigingen:</strong>
   {% for modification in kamerstuk.modifications %}
     <a href="#{{ modification.id_full }}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
   {% endfor %}

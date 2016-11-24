@@ -95,7 +95,7 @@ class Dossier(models.Model):
 
     @cached_property
     def besluitenlijst_cases(self):
-        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id)
+        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id).select_related('besluit_item', 'besluit_item__besluiten_lijst')
 
     @cached_property
     def start_date(self):
@@ -541,6 +541,7 @@ class BesluitItemCase(models.Model):
     def related_document_id_list(self):
         return self.related_document_ids.split(self.SEP_CHAR)
 
+    @cached_property
     def related_kamerstukken(self):
         document_ids = self.related_document_id_list()
         related_stukken = []

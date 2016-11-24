@@ -68,7 +68,8 @@ def create_governments():
 @transaction.atomic
 def create_government(wikidata_id, max_members=None):
     gov_info = scraper.government.get_government(wikidata_id)
-    government, created = Government.objects.get_or_create(
+    Government.objects.filter(wikidata_id=wikidata_id).delete()
+    government = Government.objects.create(
         name=gov_info['name'],
         date_formed=gov_info['start_date'],
         date_dissolved=gov_info['end_date'],

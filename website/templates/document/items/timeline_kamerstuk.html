@@ -11,7 +11,7 @@
 
 <div class="cd-timeline-content">
   <div class="kamertuk-id-timeline-container">
-    Kamerstuk {{ kamerstuk.id_full }}
+    <a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">Kamerstuk {{ kamerstuk.id_full }}</a>
   </div>
   <h2><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_short }}</a>
   {% if kamerstuk.voting %}
@@ -37,6 +37,20 @@
     {% with voting=kamerstuk.voting %}
     {% include "document/items/voting_result_bar_small.html" %}
     {% endwith %}
+  {% endif %}
+
+  {% if item.besluit_cases %}
+    <hr class="hr-small"/>
+    {% for case in item.besluit_cases %}
+      <p>
+      <strong>Commissie besluit ({{ case.besluit_item.besluiten_lijst.date_published }})</strong> -
+      besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
+      <font class="text-info">{{ case.besluit_item.besluiten_lijst.commission }}</font><br/>
+      {% for decision in case.decision_list %}
+        {{ decision }}{% if not forloop.last %}<br/>{% endif %}
+      {% endfor %}
+      </p>
+    {% endfor %}
   {% endif %}
 
   <span class="cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
