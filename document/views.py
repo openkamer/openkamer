@@ -64,6 +64,18 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
             return Person.objects.filter(pk__in=person_ids)
         return persons
 
+    def get_result_value(self, result):
+        return result.slug
+
+
+class ModelSelect2PersonWidget(autocomplete.ModelSelect2):
+
+    def filter_choices_to_render(self, selected_choices):
+        """Override from QuerySetSelectMixin to use the slug instead of pk (pk will change on database reset)"""
+        self.choices.queryset = self.choices.queryset.filter(
+            slug__in=[c for c in selected_choices if c]
+        )
+
 
 class DossierFilter(django_filters.FilterSet):
     DOSSIER_STATUS_CHOICES = (
@@ -76,9 +88,10 @@ class DossierFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(method='title_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),
+        to_field_name='slug',
         method='submitter_filter',
         label='',
-        widget=autocomplete.ModelSelect2(url='person-autocomplete')
+        widget=ModelSelect2PersonWidget(url='person-autocomplete')
     )
     status = django_filters.ChoiceFilter(
         choices=DOSSIER_STATUS_CHOICES,
