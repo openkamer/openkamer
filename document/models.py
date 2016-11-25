@@ -82,18 +82,18 @@ class Dossier(models.Model):
         return Kamerstuk.objects.filter(document__dossier=self).select_related('document')
 
     def set_status(self):
-        if self.passed:
+        if self.is_withdrawn:
+            self.status = Dossier.INGETROKKEN
+        elif self.passed:
             self.status = Dossier.AANGENOMEN
         elif self.is_active:
             self.status = Dossier.IN_BEHANDELING
         elif self.voting and self.voting.result == Voting.VERWORPEN:
             self.status = Dossier.VERWORPEN
-        elif self.is_withdrawn:
-            self.status = Dossier.INGETROKKEN
+        elif self.voting and self.voting.result == Voting.CONTROVERSIEEL:
+            self.status = Dossier.CONTROVERSIEEL
         else:
             self.status = Dossier.ONBEKEND
-        if self.voting and self.voting.result == Voting.CONTROVERSIEEL:
-            self.status = Dossier.CONTROVERSIEEL
         self.save()
 
     @cached_property

@@ -43,7 +43,7 @@
     <hr class="hr-small"/>
     {% for case in item.besluit_cases %}
       <p>
-      <strong>Commissie besluit ({{ case.besluit_item.besluiten_lijst.date_published }})</strong> -
+      <strong>Commissie besluit</strong> - {{ case.besluit_item.besluiten_lijst.date_published }} -
       besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
       <font class="text-info">{{ case.besluit_item.besluiten_lijst.commission }}</font><br/>
       {% for decision in case.decision_list %}
