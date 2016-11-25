@@ -54,40 +54,40 @@ def get_kamerstuk_timeline_bg_color(kamerstuk):
     elif voting.result == Voting.AANGEHOUDEN:
         return 'bg-warning'
     elif voting.result == Voting.CONTROVERSIEEL:
-        return 'bg-danger'
+        return 'bg-warning'
     return 'bg-info'
 
 
 @register.assignment_tag
-def get_voting_result_color(voting):
-    if not voting:
+def get_dossier_status_color(dossier):
+    if not dossier:
         return 'info'
-    if voting.result == Voting.VERWORPEN:
+    if dossier.status == Dossier.VERWORPEN:
         return 'danger'
-    elif voting.result == Voting.AANGENOMEN:
+    elif dossier.status == Dossier.AANGENOMEN:
         return 'success'
-    elif voting.result == Voting.INGETROKKEN:
+    elif dossier.status == Dossier.INGETROKKEN:
         return 'warning'
-    elif voting.result == Voting.AANGEHOUDEN:
+    elif dossier.status == Dossier.AANGEHOUDEN:
         return 'warning'
-    elif voting.result == Voting.CONTROVERSIEEL:
+    elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'warning'
     return 'info'
 
 
 @register.assignment_tag
-def get_voting_result_icon(voting):
-    if not voting:
+def get_dossier_status_icon(dossier):
+    if not dossier:
         return 'fa-spinner'
-    if voting.result == Voting.VERWORPEN:
+    if dossier.status == Dossier.VERWORPEN:
         return 'fa-times'
-    elif voting.result == Voting.AANGENOMEN:
+    elif dossier.status == Dossier.AANGENOMEN:
         return 'fa-check'
-    elif voting.result == Voting.INGETROKKEN:
+    elif dossier.status == Dossier.INGETROKKEN:
         return 'fa-undo'
-    elif voting.result == Voting.AANGEHOUDEN:
+    elif dossier.status == Dossier.AANGEHOUDEN:
         return 'fa-pause'
-    elif voting.result == Voting.CONTROVERSIEEL:
+    elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'fa-warning'
     return 'fa-spinner'
 

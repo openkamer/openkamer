@@ -54,10 +54,11 @@ class Dossier(models.Model):
     INGETROKKEN = 'ING'
     AANGEHOUDEN = 'AGH'
     IN_BEHANDELING = 'INB'
+    CONTROVERSIEEL = 'CON'
     ONBEKEND = 'ONB'
     CHOICES = (
         (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
-        (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (ONBEKEND, 'ONB')
+        (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
     dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
@@ -91,6 +92,8 @@ class Dossier(models.Model):
             self.status = Dossier.INGETROKKEN
         else:
             self.status = Dossier.ONBEKEND
+        if self.voting and self.voting.result == Voting.CONTROVERSIEEL:
+            self.status = Dossier.CONTROVERSIEEL
         self.save()
 
     @cached_property
@@ -146,7 +149,7 @@ class Dossier(models.Model):
     def is_withdrawn(self):
         kamerstukken = self.kamerstukken
         if kamerstukken:
-            return 'intrekking' in kamerstukken[0].type_long  # latest kamerstuk
+            return 'intrekking' in kamerstukken[0].type_long.lower()  # latest kamerstuk
         return False
 
     @cached_property

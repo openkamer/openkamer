@@ -27,7 +27,7 @@
       <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
       <h4>{{ dossier.title }}</h4>
       {% if dossier.first_voorstel %}
-      <h4><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.first_voorstel.type_long }}</a></h4>
+      <h4><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.first_voorstel.type_short }}</a></h4>
       {% endif %}
       <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
     </div>
@@ -41,10 +41,10 @@
   <div class="cd-timeline-block">
 
     {% if dossier.voting %}
-      {% get_voting_result_color dossier.voting as voting_result_class %}
-      {% get_voting_result_icon dossier.voting as voting_result_icon %}
-      <div class="cd-timeline-img text-center bg-{{ voting_result_class }}">
-        <span style="font-size:24px;" class="fa {{ voting_result_icon }}"></span>
+      {% get_dossier_status_color dossier as dossier_status_class %}
+      {% get_dossier_status_icon dossier as dossier_status_icon %}
+      <div class="cd-timeline-img text-center bg-{{ dossier_status_class }}">
+        <span style="font-size:24px;" class="fa {{ dossier_status_icon }}"></span>
       </div>
       {% elif dossier.is_active %}
       <div class="cd-timeline-img text-center bg-info">
@@ -66,11 +66,13 @@
 
     <div class="cd-timeline-content">
       {% if dossier.voting %}
-      <h2>Dit wetsvoorstel is {{ dossier.voting.get_result_display }}</h2>
+      <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
+      <h6>Stemming van {{ dossier.voting.date }}</h6>
         {% with voting=dossier.voting %}
           {% include "document/items/voting_result_bar.html" %}
           {% include "document/items/voting_result_list.html" %}
         {% endwith %}
+      <strong>Besluit:</strong> {{ dossier.decision }}<br/>
       {% elif dossier.is_active %}
       <h2>Dit wetsvoorstel is in behandeling.</h2>
       <p><strong>Status:</strong> {{ dossier.decision }}</p>

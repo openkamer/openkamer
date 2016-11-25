@@ -90,3 +90,7 @@ hr.hr-small {
 .category-filter-checkboxes .checkbox input {
   position: relative;
 }
+
+.progress.vote-result {
+  margin-bottom: 10px;
+}
