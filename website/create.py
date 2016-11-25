@@ -380,6 +380,9 @@ def create_wetsvoorstellen(skip_existing=False, max_tries=3):
             failed_dossiers.append(dossier_id)
             logger.error('error for dossier id: ' + str(dossier_id))
             logger.error(traceback.format_exc())
+    if failed_dossiers:
+        logger.error('failed to created dossiers:')
+        logger.error(failed_dossiers)
     return failed_dossiers
 
 

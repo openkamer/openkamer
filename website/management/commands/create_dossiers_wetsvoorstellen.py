@@ -21,7 +21,4 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        failed_dossiers = website.create.create_wetsvoorstellen(options['skip-existing'])
-        if failed_dossiers:
-            logger.error('failed to created dossiers:')
-            logger.error(failed_dossiers)
+        website.create.create_wetsvoorstellen(options['skip-existing'])
