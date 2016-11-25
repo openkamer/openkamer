@@ -214,7 +214,7 @@ class Document(models.Model):
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
-    content_html = models.CharField(max_length=200000, blank=True)
+    content_html = models.CharField(max_length=4000000, blank=True)
 
     @cached_property
     def submitters(self):
