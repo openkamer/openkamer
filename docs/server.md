@@ -87,14 +87,13 @@ $ sudo service nginx restart
 #### uWSGI
 Install uWSGI,
 ```
-$ sudo apt-get install build-essential python3-dev
 $ source env/bin/activate
 $ pip install uwsgi
 ```
 
 Create a systemd startup config,
 ```
-$ sudo cp deploy/uwsgi.service /etc/systemd/system/uwsgi_openkamer.service
+$ sudo cp docs/config/uwsgi.service /etc/systemd/system/uwsgi_openkamer.service
 ```
 
 Create uwsgi log directory if it does not exist,
