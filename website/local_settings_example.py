@@ -9,6 +9,13 @@ DEBUG = True
 # SECURITY WARNING: Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': os.path.join(BASE_DIR, 'openkamer.sqlite'),                      # Or path to database file if using sqlite3.
+    }
+}
+
 LANGUAGE_CODE = 'nl-NL'
 TIME_ZONE = "Europe/Amsterdam"
 

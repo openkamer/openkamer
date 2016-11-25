@@ -29,9 +29,9 @@ $ python manage.py createsuperuser
 ```
 
 ### Create demo data
-Creating data (scraping) can take several minutes and mostly depends on response time of external sources,
+Creating demo data (scraping) can take several minutes and mostly depends on response time of external sources,
 ```
-$ python manage.py create_data
+$ python manage.py create_demo_data
 ```
 
 ### Run a development server
@@ -69,5 +69,5 @@ Openkamer has some optional cronjobs that do some cool stuff. You can review the
 Create the following cronjob (Linux) to kickstart the `django-cron` jobs,
 ```
 $ crontab -e
-*/5 * * * * source /home/bart/.bashrc && source /home/<path-to-openkamer>/openkamer/env/bin/activate && python /home/<path-to-openkamer>/responsivevideo/manage.py runcrons > /home/<path-to-openkamer>/log/cronjob.log
+*/5 * * * * source /home/bart/.bashrc && source /home/<path-to-openkamer>/openkamer/env/bin/activate && python /home/<path-to-openkamer>/website/manage.py runcrons > /home/<path-to-openkamer>/log/cronjob.log
 ```

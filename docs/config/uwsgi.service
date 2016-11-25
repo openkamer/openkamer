@@ -1,0 +1,8 @@
+[Unit]
+Description=uWSGI instance to serve openkamer
+
+[Service]
+ExecStart=/bin/bash -c 'cd /home/openkamer/openkamer; source env/bin/activate; uwsgi --ini docs/config/openkamer_uwsgi.ini'
+
+[Install]
+WantedBy=multi-user.target
