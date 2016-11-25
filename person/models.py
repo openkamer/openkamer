@@ -35,8 +35,8 @@ class Person(models.Model):
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikipedia_url = models.URLField(blank=True)
-    wikimedia_image_name = models.CharField(max_length=200, blank=True)
-    wikimedia_image_url = models.URLField(blank=True)
+    wikimedia_image_name = models.CharField(max_length=300, blank=True)
+    wikimedia_image_url = models.URLField(blank=True, max_length=300)
     parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
     slug = models.SlugField(max_length=250, default='')
 
