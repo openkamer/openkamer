@@ -157,6 +157,7 @@ def create_parliament_members():
 
 def create_parliament_members_from_wikidata(max_results=None, all_members=False):
     logger.info('BEGIN')
+    ParliamentMember.objects.all().delete()
     parliament = Parliament.get_or_create_tweede_kamer()
     if all_members:
         member_wikidata_ids = wikidata.search_parliament_member_ids()
@@ -362,6 +363,24 @@ def create_or_update_dossier(dossier_id):
     dossier.set_status()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
+
+
+def create_wetsvoorstellen(skip_existing=False, max_tries=3):
+    dossier_ids = Dossier.get_active_dossier_ids()
+    dossier_ids += Dossier.get_inactive_dossier_ids()
+    failed_dossiers = []
+    for dossier_id in dossier_ids:
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        if skip_existing and dossiers.exists():
+            logger.info('dossier already exists, skip')
+            continue
+        try:
+            create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=max_tries)
+        except Exception as e:
+            failed_dossiers.append(dossier_id)
+            logger.error('error for dossier id: ' + str(dossier_id))
+            logger.error(traceback.format_exc())
+    return failed_dossiers
 
 
 @transaction.atomic

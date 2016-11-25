@@ -9,21 +9,16 @@ import website.create
 
 
 class Command(BaseCommand):
-    MAX_TRIES = 3
-
-    def add_arguments(self, parser):
-        # Named (optional) arguments
-        parser.add_argument(
-            '--skip-existing',
-            action='store_true',
-            dest='skip-existing',
-            default=False,
-            help='Do not create dossiers that already exist.',
-        )
 
     def handle(self, *args, **options):
         website.create.create_parties()
         website.create.create_governments()
         website.create.create_parliament_members_from_wikidata()
-        website.create.create_wetsvoorstellen(options['skip-existing'])
+
+        # add a few demo dossiers
+        website.create.create_or_update_dossier('33885')
+        website.create.create_or_update_dossier('34344')
+        website.create.create_or_update_dossier('33506')
+
         website.create.create_besluitenlijsten(max_results_per_commission=20)
+
