@@ -255,8 +255,8 @@ class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
     id_main = models.CharField(max_length=40, blank=True)
     id_sub = models.CharField(max_length=40, blank=True)
-    type_short = models.CharField(max_length=40, blank=True)
-    type_long = models.CharField(max_length=100, blank=True)
+    type_short = models.CharField(max_length=200, blank=True)
+    type_long = models.CharField(max_length=500, blank=True)
     original_id = models.CharField(max_length=40, blank=True)  # format: 33885-22
 
     MOTIE = 'Motie'
@@ -349,7 +349,7 @@ class Agenda(models.Model):
 class AgendaItem(models.Model):
     agenda = models.ForeignKey(Agenda)
     dossier = models.ForeignKey(Dossier, null=True)
-    item_text = models.CharField(max_length=100, blank=True)
+    item_text = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return str(self.agenda)
