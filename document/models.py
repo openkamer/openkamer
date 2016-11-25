@@ -64,7 +64,7 @@ class Dossier(models.Model):
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
     url = models.URLField(blank=True)
-    decision = models.CharField(max_length=200, blank=True)
+    decision = models.CharField(max_length=400, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
 
     class Meta:
@@ -208,8 +208,8 @@ class Dossier(models.Model):
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)
     document_id = models.CharField(max_length=200, blank=True, db_index=True)
-    title_full = models.CharField(max_length=500)
-    title_short = models.CharField(max_length=200)
+    title_full = models.CharField(max_length=3000)
+    title_short = models.CharField(max_length=2000)
     publication_type = models.CharField(max_length=200, blank=True)
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
@@ -255,8 +255,8 @@ class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
     id_main = models.CharField(max_length=40, blank=True)
     id_sub = models.CharField(max_length=40, blank=True)
-    type_short = models.CharField(max_length=200, blank=True)
-    type_long = models.CharField(max_length=500, blank=True)
+    type_short = models.CharField(max_length=400, blank=True)
+    type_long = models.CharField(max_length=2000, blank=True)
     original_id = models.CharField(max_length=40, blank=True)  # format: 33885-22
 
     MOTIE = 'Motie'
@@ -465,7 +465,7 @@ class Vote(models.Model):
     voting = models.ForeignKey(Voting)
     number_of_seats = models.IntegerField()
     decision = models.CharField(max_length=2, choices=CHOICES)
-    details = models.CharField(max_length=2000, blank=True, null=False, default='')
+    details = models.CharField(max_length=200, blank=True, null=False, default='')
     is_mistake = models.BooleanField(default=False)
 
     def get_name(self):
@@ -490,8 +490,8 @@ class VoteIndividual(Vote):
 
 
 class BesluitenLijst(models.Model):
-    title = models.CharField(max_length=300)
-    commission = models.CharField(max_length=50)
+    title = models.CharField(max_length=1000)
+    commission = models.CharField(max_length=500)
     activity_id = models.CharField(max_length=100)
     date_published = models.DateField()
     url = models.URLField()
@@ -517,7 +517,7 @@ class BesluitenLijst(models.Model):
 
 
 class BesluitItem(models.Model):
-    title = models.CharField(max_length=300)
+    title = models.CharField(max_length=4000)
     besluiten_lijst = models.ForeignKey(BesluitenLijst)
 
     def cases(self):
@@ -525,12 +525,12 @@ class BesluitItem(models.Model):
 
 
 class BesluitItemCase(models.Model):
-    title = models.CharField(max_length=300)
+    title = models.CharField(max_length=500)
     besluit_item = models.ForeignKey(BesluitItem)
-    decisions = models.CharField(max_length=500)
-    notes = models.CharField(max_length=500)
+    decisions = models.CharField(max_length=7000)
+    notes = models.CharField(max_length=5000)
     related_commissions = models.CharField(max_length=500)
-    related_document_ids = models.CharField(max_length=300)
+    related_document_ids = models.CharField(max_length=500)
     SEP_CHAR = '|'
 
     def decision_list(self):
