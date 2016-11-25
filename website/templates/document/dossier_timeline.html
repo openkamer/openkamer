@@ -66,24 +66,26 @@
 
     <div class="cd-timeline-content">
       {% if dossier.voting %}
-      <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
-      <h6>Stemming van {{ dossier.voting.date }}</h6>
-        {% with voting=dossier.voting %}
-          {% include "document/items/voting_result_bar.html" %}
-          {% include "document/items/voting_result_list.html" %}
-        {% endwith %}
-      <strong>Besluit:</strong> {{ dossier.decision }}<br/>
+        <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
+        <h6>Stemming van {{ dossier.voting.date }}</h6>
+        <div>
+          {% with voting=dossier.voting %}
+            {% include "document/items/voting_result_bar.html" %}
+            {% include "document/items/voting_result_list.html" %}
+          {% endwith %}
+        </div>
+        <strong>Besluit:</strong> {{ dossier.decision }}<br/>
       {% elif dossier.is_active %}
-      <h2>Dit wetsvoorstel is in behandeling.</h2>
-      <p><strong>Status:</strong> {{ dossier.decision }}</p>
-      {% else %}
-      <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
-        {% if dossier.is_withdrawn %}
-        <h2>Voorstel is ingetrokken.</h2>
+        <h2>Dit wetsvoorstel is in behandeling.</h2>
+        <p><strong>Status:</strong> {{ dossier.decision }}</p>
         {% else %}
-        <h2>Er is niet over gestemd.</h2>
-        {% endif %}
-      <p><strong>Status:</strong> {{ dossier.decision }}</p>
+        <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
+          {% if dossier.is_withdrawn %}
+          <h2>Voorstel is ingetrokken.</h2>
+          {% else %}
+          <h2>Er is niet over gestemd.</h2>
+          {% endif %}
+        <p><strong>Status:</strong> {{ dossier.decision }}</p>
       {% endif %}
 
       <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>
