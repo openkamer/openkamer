@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'^kabinet/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
     url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
+    url(r'^wetsvoorstellen/testlist/$', TemplateView.as_view(template_name="document/dossiers_testlist.html")),
     url(r'^dossiers/$', RedirectView.as_view(url='/wetsvoorstellen/', permanent=False)),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),

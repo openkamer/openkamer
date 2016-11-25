@@ -1,0 +1,24 @@
+{% extends "website/base.html" %}
+
+{% block title %}Wetsvoorstellen Test Lijst - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12" align="center">
+    <h3>Wetsvoorstellen Test Lijst</h3>
+    <hr/>
+  </div>
+  <div class="col-md-6">
+    <h5><a href="{% url 'dossier-timeline' 33151 %}">33151 - voorstel controversieel verklaard</a></h5>
+  </div>
+  <div class="col-md-6">
+    <h5><a href="{% url 'dossier-timeline' 30615 %}">30615 - ingetrokken en afgevoerd van lijst van controversiële onderwerpen</a></h5>
+  </div>
+  <div class="col-md-6">
+    <h5><a href="{% url 'dossier-timeline' 32264 %}">32264 - controversieel verklaard in kamerstuk, later aangenomen</a></h5>
+  </div>
+</div>
+
+
+{% endblock %}
