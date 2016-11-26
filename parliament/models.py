@@ -99,7 +99,7 @@ class ParliamentMember(models.Model):
 
 class PoliticalParty(models.Model):
     name = models.CharField(max_length=200)
-    name_short = models.CharField(max_length=10)
+    name_short = models.CharField(max_length=200)
     founded = models.DateField(blank=True, null=True)
     dissolved = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
