@@ -365,6 +365,7 @@ def create_or_update_dossier(dossier_id):
 
 
 def create_wetsvoorstellen(skip_existing=False, max_tries=3):
+    logger.info('BEGIN')
     dossier_ids = Dossier.get_active_dossier_ids()
     dossier_ids += Dossier.get_inactive_dossier_ids()
     failed_dossiers = []
@@ -382,6 +383,7 @@ def create_wetsvoorstellen(skip_existing=False, max_tries=3):
     if failed_dossiers:
         logger.error('failed to created dossiers:')
         logger.error(failed_dossiers)
+    logger.info('END')
     return failed_dossiers
 
 
