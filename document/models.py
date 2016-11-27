@@ -494,7 +494,7 @@ class BesluitenLijst(models.Model):
     commission = models.CharField(max_length=500)
     activity_id = models.CharField(max_length=100)
     date_published = models.DateField()
-    url = models.URLField(max_length=400)
+    url = models.URLField(max_length=1000)
 
     class Meta:
         ordering = ['-date_published']
