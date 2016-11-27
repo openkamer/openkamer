@@ -114,6 +114,11 @@ class TestCreateBesluitenLijst(TestCase):
                     self.assertFalse('Noot:' in case.title)
             dossier_ids = besluitenlijst.related_dossier_ids
 
+    def test_create_besluitenlijst_to_commissions(self):
+        url = 'https://www.tweedekamer.nl/downloads/document?id=a458091b-5963-4b5d-becb-664a10f55b8f&title=Besluitenlijst%20extra%20procedurevergadering%20werkbezoek%20Auschwitz.pdf'
+        besluitenlijst = website.create.create_besluitenlijst(url)
+        self.assertEqual(besluitenlijst.commission, 'vaste commissie voor Volksgezondheid, Welzijn en Sport')
+
 
 class TestFindParliamentMembers(TestCase):
     fixtures = ['person.json', 'parliament.json']

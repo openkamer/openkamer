@@ -100,7 +100,7 @@ class BesluitenLijst(object):
     @staticmethod
     def get_voortouwcommissie(text):
         pattern = 'Voortouwcommissie:\s{0,}(.*)'
-        return BesluitenLijst.find_first(pattern, text)
+        return BesluitenLijst.find_first(pattern, text).split('Aan')[0].strip()
 
     @staticmethod
     def get_activiteitnummer(text):
