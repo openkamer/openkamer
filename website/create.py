@@ -622,6 +622,7 @@ def create_besluitenlijsten(max_commissions=None, max_results_per_commission=Non
         urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
         for url in urls:
             if skip_existing and BesluitenLijst.objects.filter(url=url).exists():
+                logger.info('besluitenlijst already exists, skip')
                 continue
             try:
                 besluiten_lijst = create_besluitenlijst(url)
