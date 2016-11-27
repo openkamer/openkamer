@@ -525,7 +525,7 @@ class BesluitItem(models.Model):
 
 
 class BesluitItemCase(models.Model):
-    title = models.CharField(max_length=500)
+    title = models.CharField(max_length=2000)
     besluit_item = models.ForeignKey(BesluitItem)
     decisions = models.CharField(max_length=7000)
     notes = models.CharField(max_length=5000)
