@@ -324,9 +324,9 @@ def create_or_update_dossier(dossier_id):
             main_dossier_id = metadata['dossier_id'].split(';')[0].strip()
             main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
             if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
-                dossier, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
+                dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
             else:
-                dossier = dossier_new
+                dossier_for_document = dossier_new
 
         documents = Document.objects.filter(document_id=document_id)
         if documents.exists():
@@ -334,7 +334,7 @@ def create_or_update_dossier(dossier_id):
             continue
 
         document = Document.objects.create(
-            dossier=dossier,
+            dossier=dossier_for_document,
             document_id=document_id,
             title_full=metadata['title_full'],
             title_short=metadata['title_short'],
@@ -352,15 +352,15 @@ def create_or_update_dossier(dossier_id):
 
         if metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in result['type']
-            create_kamerstuk(document, dossier.dossier_id, title, metadata, is_attachement)
+            create_kamerstuk(document, dossier_for_document.dossier_id, title, metadata, is_attachement)
             category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
-            dossier.categories.add(*category_list)
+            dossier_for_document.categories.add(*category_list)
 
         if metadata['is_agenda']:
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
-    dossier.set_status()
+    dossier_new.set_status()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
 
