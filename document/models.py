@@ -64,7 +64,7 @@ class Dossier(models.Model):
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
     url = models.URLField(blank=True)
-    decision = models.CharField(max_length=400, blank=True)
+    decision = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
 
     class Meta:
@@ -529,8 +529,8 @@ class BesluitItemCase(models.Model):
     besluit_item = models.ForeignKey(BesluitItem)
     decisions = models.CharField(max_length=7000)
     notes = models.CharField(max_length=5000)
-    related_commissions = models.CharField(max_length=500)
-    related_document_ids = models.CharField(max_length=500)
+    related_commissions = models.CharField(max_length=1000)
+    related_document_ids = models.CharField(max_length=1000)
     SEP_CHAR = '|'
 
     def decision_list(self):
