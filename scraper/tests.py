@@ -303,6 +303,12 @@ class TestVotingScraper(TestCase):
         voting = voting_results[0]
         self.assertEqual(voting.get_result(), 'Eerder ingetrokken (tijdens debat)')
 
+    def test_voting_no_document_id(self):
+        url = 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2010P04136'
+        voting_results = scraper.votings.get_votings_for_page(url)
+        for voting in voting_results:
+            voting.get_document_id_without_rijkswet()
+
 
 class TestDocumentScraper(TestCase):
 

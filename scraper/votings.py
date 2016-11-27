@@ -131,7 +131,10 @@ class VotingResult(object):
         return self.get_property_elements()[0].text
 
     def get_document_id_without_rijkswet(self):
-        return re.sub("-\(R\d+\)", '', self.get_document_id())   # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
+        document_id = self.get_document_id()
+        if not document_id:
+            return ''
+        return re.sub("-\(R\d+\)", '', document_id)   # A 'Rijkswet' has the format '34158-(R2048)', removing the last part because there is no use for it (yet)
 
     def is_dossier_voting(self):
         """
