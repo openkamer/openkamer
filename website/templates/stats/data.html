@@ -1,0 +1,60 @@
+{% extends "website/base.html" %}
+
+{% block title %}Data Statistieken {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="subnav subnav-default subnav-fixed-top">
+  <div class="container">
+    <ul class="nav navbar-nav">
+
+    </ul>
+  </div>
+</div>
+
+<div class="row" align="center">
+  <div class="col-md-12">
+    <h3>Data Statistieken</h3>
+  </div>
+</div>
+
+<div class="row" align="center">
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_dossiers }}</font> dossiers</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_kamerstukken }}</font> kamerstukken</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_documents }}</font> documenten</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_votings }}</font> stemmingen</h5>
+  </div>
+  <div class="hidden-xs clearfix"></div>
+
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_votes }}</font> stemmen</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_besluitenlijsten }}</font> besluitenlijsten</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_besluiten }}</font> besluiten</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_parliament_members }}</font> kamerleden</h5>
+  </div>
+  <div class="hidden-xs clearfix"></div>
+
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_government_members }}</font> kabinetsleden</h5>
+  </div>
+  <div class="col-sm-3">
+    <h5><font class="text-info">{{ n_persons }}</font> personen</h5>
+  </div>
+
+</div>
+<hr/>
+
+{% endblock %}

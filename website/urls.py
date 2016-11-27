@@ -26,6 +26,7 @@ from parliament.views import ParliamentMembersCurrentView
 from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
+from stats.views import DataStatsView
 
 from website.views import HomeView
 from website import settings
@@ -81,6 +82,8 @@ urlpatterns = [
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^stats/', DataStatsView.as_view(), name='stats'),
+    url(r'^stats/data/', DataStatsView.as_view()),
     url(r'^stats/exampleplots/', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
