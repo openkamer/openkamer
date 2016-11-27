@@ -25,7 +25,6 @@ from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
 from parliament.models import PoliticalParty
-from parliament.util import parse_name_initials_surname
 from parliament.util import parse_name_surname_initials
 
 from document.models import Agenda
@@ -456,7 +455,7 @@ def create_submitter(document, submitter):
     initials = ''
     surname = submitter
     if has_initials:
-        initials, surname = parse_name_initials_surname(submitter)
+        initials, surname, surname_prefix = parse_name_surname_initials(submitter)
     person = Person.find_surname_initials(surname=surname, initials=initials)
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
@@ -573,7 +572,7 @@ def create_votes_party(voting, votes):
 def create_votes_individual(voting, votes):
     logger.info('BEGIN')
     for vote in votes:
-        initials, surname = parse_name_surname_initials(vote.parliament_member)
+        initials, surname, surname_prefix = parse_name_surname_initials(vote.parliament_member)
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         if not parliament_member:
             logger.error('parliament member not found for vote: ' + str(vote))
