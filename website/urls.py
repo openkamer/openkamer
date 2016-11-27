@@ -82,9 +82,9 @@ urlpatterns = [
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^stats/', DataStatsView.as_view(), name='stats'),
-    url(r'^stats/data/', DataStatsView.as_view()),
-    url(r'^stats/exampleplots/', PlotExampleView.as_view()),
+    url(r'^stats/$', TemplateView.as_view(template_name='stats/base.html'), name='stats'),
+    url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
+    url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),

@@ -1,0 +1,15 @@
+{% extends "website/base.html" %}
+
+{% block title %}Statistieken {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="subnav subnav-default subnav-fixed-top">
+  <div class="container">
+    <ul class="nav navbar-nav">
+      <li><a href="{% url 'stats-data' %}">Data</a></li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
