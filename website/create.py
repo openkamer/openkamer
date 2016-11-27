@@ -307,7 +307,7 @@ def create_or_update_dossier(dossier_id):
 
         document_id, content_html, title = scraper.documents.get_document_id_and_content(result['page_url'])
         if not document_id:
-            logger.warning('No document id found, will not create document')
+            logger.error('No document id found for url: ' + result['page_url'] + ' - will not create document')
             continue
 
         metadata = scraper.documents.get_metadata(document_id)

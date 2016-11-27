@@ -20,7 +20,7 @@ def get_document_id_and_content(url):
     else:
         elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
         if not elements:
-            return None, ''
+            return None, '', ''
         document_id = elements[0].get('content')
     logger.info('document id: ' + document_id)
     elements = tree.xpath('//div[@class="stuk"]')
