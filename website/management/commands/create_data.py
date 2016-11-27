@@ -18,7 +18,7 @@ class Command(BaseCommand):
             action='store_true',
             dest='skip-existing',
             default=False,
-            help='Do not create dossiers that already exist.',
+            help='Do not create items that already exist.',
         )
 
     def handle(self, *args, **options):
@@ -26,4 +26,4 @@ class Command(BaseCommand):
         website.create.create_governments()
         website.create.create_parliament_members_from_wikidata()
         website.create.create_wetsvoorstellen(options['skip-existing'])
-        website.create.create_besluitenlijsten(max_results_per_commission=20)
+        website.create.create_besluitenlijsten(skip_existing=options['skip-existing'])

@@ -614,13 +614,15 @@ def get_decision(decision_string):
     return Vote.NONE
 
 
-def create_besluitenlijsten(max_commissions=None, max_results_per_commission=None):
+def create_besluitenlijsten(max_commissions=None, max_results_per_commission=None, skip_existing=False):
     logger.info('BEGIN')
     besluiten_lijsten = []
     commissies = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
     for index, commissie in enumerate(commissies):
         urls = scraper.besluitenlijst.get_besluitenlijsten_urls(commissie['url'], max_results=max_results_per_commission)
         for url in urls:
+            if skip_existing and BesluitenLijst.objects.filter(url=url).exists():
+                continue
             try:
                 besluiten_lijst = create_besluitenlijst(url)
                 besluiten_lijsten.append(besluiten_lijst)
