@@ -558,6 +558,9 @@ def create_votings(dossier_id):
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
     logger.info('votings found: ' + str(len(voting_results)))
     for voting_result in voting_results:
+        if not voting_result.get_result():
+            logger.warning('no result found for voting, probaly not voted yet, voting date: ' + str(voting_result.date))
+            continue
         result = get_result_choice(voting_result.get_result())
         document_id = voting_result.get_document_id_without_rijkswet()
         if not document_id:
