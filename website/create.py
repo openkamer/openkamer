@@ -458,6 +458,8 @@ def find_original_kamerstuk_id(dossier_id, type_long):
 
 
 def update_document_html_links(content_html):
+    if not content_html:
+        return content_html
     tree = lxml.html.fromstring(content_html)
     a_elements = tree.xpath('//a')
     for element in a_elements:

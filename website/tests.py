@@ -489,11 +489,11 @@ class TestDocumentLinks(TestCase):
     @classmethod
     def setUpTestData(cls):
         dosser_id = '33569'
-        dossier = Dossier.objects.create(dossier_id='33569')
+        dossier = Dossier.objects.create(dossier_id=dosser_id)
         document = Document.objects.create(dossier=dossier)
-        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='1')
-        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='2')
-        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='3')
+        Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='1')
+        Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='2')
+        Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='3')
 
     def test_update_document_html_links(self):
         url = 'https://zoek.officielebekendmakingen.nl/kst-33771-8.html'
