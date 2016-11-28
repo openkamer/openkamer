@@ -28,6 +28,7 @@ from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
 
+from website.views import DatabaseDumpsView
 from website.views import HomeView
 from website import settings
 from website.views import get_dossier_timeline_json
@@ -86,6 +87,8 @@ urlpatterns = [
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
+
+    url(r'^database/dumps/$', DatabaseDumpsView.as_view()),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
 ]

@@ -1,3 +1,4 @@
+import os
 import json
 
 from django.http import HttpResponse
@@ -8,6 +9,8 @@ from django.utils import timezone
 from document.models import Dossier
 from government.models import Government
 
+from website import settings
+
 from stats.views import get_example_plot_html
 
 
@@ -17,6 +20,26 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        return context
+
+
+class DatabaseDumpsView(TemplateView):
+    template_name = "website/database_dumps.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        backup_files = []
+        for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
+            for file in filenames:
+                if '.gitignore' in file or 'readme.txt' in file:
+                    continue
+                filepath = os.path.join(dirpath, file)
+                size = os.path.getsize(filepath)
+                backup_files.append({
+                    'file': file,
+                    'size': int(size)/1024/1024
+                })
+        context['backup_files'] = backup_files
         return context
 
 

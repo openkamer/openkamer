@@ -1,0 +1,28 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Database - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row" align="center">
+  <h3>Database dumps</h3>
+</div>
+
+<hr/>
+
+<div class="row">
+
+{% for backup in backup_files %}
+  <div class="col-sm-4" align="center">
+    <div class="well">
+        <h5><a href="{% static 'backup/' %}{{ backup.file }}">{{ backup.file }}</a></h5>
+        <h5>{{ backup.size|floatformat:0 }} MB</h5>
+    </div>
+  </div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
