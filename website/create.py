@@ -1,16 +1,20 @@
+from json.decoder import JSONDecodeError
 import logging
 import os
 import re
-import requests
-from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 import time
 import traceback
 import uuid
-from json.decoder import JSONDecodeError
+
+import lxml
+import requests
+from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 
 from pdfminer.pdfparser import PDFSyntaxError
 
 from django.db import transaction
+from django.urls import reverse
+from django.urls import resolve, Resolver404
 
 from wikidata import wikidata
 
@@ -332,6 +336,8 @@ def create_or_update_dossier(dossier_id):
             logger.warning('document with id: ' + document_id + ' already exists, skip creating document.')
             continue
 
+        content_html = update_document_html_links(content_html)
+
         document = Document.objects.create(
             dossier=dossier_for_document,
             document_id=document_id,
@@ -449,6 +455,43 @@ def find_original_kamerstuk_id(dossier_id, type_long):
     elif 'voorstel van wet' in type_long.lower() or 'nota van wijziging' in type_long.lower():
         return str(dossier_id) + '-voorstel_van_wet'
     return ''
+
+
+def update_document_html_links(content_html):
+    tree = lxml.html.fromstring(content_html)
+    a_elements = tree.xpath('//a')
+    for element in a_elements:
+        if not 'href' in element.attrib:
+            continue
+        url = element.attrib['href']
+        new_url = create_new_url(url)
+        element.attrib['href'] = new_url
+    return lxml.html.tostring(tree)
+
+
+def create_new_url(url):
+    match_kamerstuk = re.match("kst-(\d+)-(\d+)", url)
+    match_dossier = re.match("/dossier/(\d+)", url)
+    new_url = ''
+    if match_kamerstuk:
+        new_url = reverse('kamerstuk', args=(match_kamerstuk.group(1), match_kamerstuk.group(2),))
+    elif match_dossier:
+        dossier_id = match_dossier.group(1)
+        if Dossier.objects.filter(dossier_id=dossier_id).exists():
+            new_url = reverse('dossier-timeline', args=(dossier_id,))
+    if not new_url:
+        try:
+            resolve(url)
+            openkamer_url = True
+        except Resolver404:
+            openkamer_url = False
+        if openkamer_url or url[0] == '#' or 'http' in url:  # openkamer, anchor or external url
+            new_url = url
+        else:
+            if url[0] != '/':
+                url = '/' + url
+            new_url = 'https://zoek.officielebekendmakingen.nl' + url
+    return new_url
 
 
 @transaction.atomic

@@ -5,6 +5,8 @@ from django.test import Client
 from django.test import TestCase
 from django.urls import reverse
 
+import scraper.documents
+
 from person.models import Person
 
 from government.models import Government
@@ -480,3 +482,41 @@ class TestCategory(TestCase):
         self.assertEqual(len(categories), 2)
         for index, category in enumerate(categories):
             self.assertEqual(expected_names[index], category.name)
+
+
+class TestDocumentLinks(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        dosser_id = '33569'
+        dossier = Dossier.objects.create(dossier_id='33569')
+        document = Document.objects.create(dossier=dossier)
+        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='1')
+        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='2')
+        Kamerstuk.objects.create(document=document, id_main='33569', id_sub='3')
+
+    def test_update_document_html_links(self):
+        url = 'https://zoek.officielebekendmakingen.nl/kst-33771-8.html'
+        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
+        website.create.update_document_html_links(content_html)
+
+    def test_create_new_url(self):
+        url = 'kst-33569-1.html'
+        url_expected = '/kamerstuk/33569/1/'
+        self.check_url(url, url_expected)
+        url = 'kst-33569-A.html'
+        url_expected = 'https://zoek.officielebekendmakingen.nl/kst-33569-A.html'
+        self.check_url(url, url_expected)
+        url = 'http://www.google.com'
+        url_expected = 'http://www.google.com'
+        self.check_url(url, url_expected)
+        url = '#anchor-1'
+        url_expected = '#anchor-1'
+        self.check_url(url, url_expected)
+
+    def check_url(self, url, url_expected):
+        new_url = website.create.create_new_url(url)
+        self.assertEqual(new_url, url_expected)
+        url = new_url
+        new_url = website.create.create_new_url(url)
+        self.assertEqual(new_url, url)
