@@ -1,7 +1,7 @@
 django==1.10.3
 django-bootstrap3==7.1.0
 django-bootstrap-pagination==1.6.2
-django-filter==1.0.0
+django-filter==1.0.1
 django-autocomplete-light==3.2.1
 djangorestframework==3.5.3
 pillow==3.4.2
