@@ -13,7 +13,7 @@
   <div class="kamertuk-id-timeline-container">
     <a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">Kamerstuk {{ kamerstuk.id_full }}</a>
   </div>
-  <h2><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_short }}</a>
+  <h2><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_short|capfirst }}</a>
   {% if kamerstuk.voting %}
     {% with voting=kamerstuk.voting %}
     {% include "document/items/voting_result_small.html" %}

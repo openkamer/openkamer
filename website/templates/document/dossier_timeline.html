@@ -27,7 +27,7 @@
       <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
       <h4>{{ dossier.title }}</h4>
       {% if dossier.first_voorstel %}
-      <h4><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.first_voorstel.type_short }}</a></h4>
+      <h4><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.first_voorstel.type_short|capfirst }}</a></h4>
       {% endif %}
       <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
     </div>
