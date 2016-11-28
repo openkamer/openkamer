@@ -34,6 +34,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 #MEDIA_URL = 'http://www.<your-domain>.com/static/media/'
 MEDIA_URL = '/static/media/'
 
+# DBBACKUP
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'website/static/backup/')}
+
 # DOCUMENT
 NUMBER_OF_LATEST_DOSSIERS = 6
 AGENDAS_PER_PAGE = 50

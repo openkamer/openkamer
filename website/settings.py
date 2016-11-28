@@ -28,7 +28,9 @@ INSTALLED_APPS = (
     'dal',
     'dal_select2',
     'rest_framework',
+    'dbbackup',
     'django_cron',
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -140,6 +142,7 @@ CRON_CLASSES = [
     'website.cron.CreateCommitPartyCSV',
     'website.cron.CreateCommitParliamentMembersCSV',
     'website.cron.CreateCommitWetsvoorstellenIDs',
+    'website.cron.BackupDaily'
 ]
 
 ###########

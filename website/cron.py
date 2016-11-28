@@ -3,6 +3,7 @@ import os
 import traceback
 import datetime
 
+from django.core import management
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
 
@@ -171,3 +172,13 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             logger.error(traceback.format_exc())
             raise
         logger.info('END')
+
+
+class BackupDaily(CronJobBase):
+    RUN_AT_TIMES = ['01:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.BackupDaily'
+
+    def do(self):
+        logger.info('run daily backup cronjob')
+        management.call_command('dbbackup')

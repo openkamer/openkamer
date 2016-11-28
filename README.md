@@ -43,6 +43,13 @@ $ source env/bin/activate
 
 openkamers is now available at http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 
+### Configuration
+
+Configure (public) backups,
+```
+*/5 * * * * source /home/openkamer/.bashrc && source /home/openkamer/openkamer/env/bin/activate && python /home/openkamer/openkamer/manage.py runcrons > /home/openkamer/openkamer/log/cronjob.log
+```
+
 ## Development
 
 ### Testing
