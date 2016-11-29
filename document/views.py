@@ -293,6 +293,7 @@ class VotingFilter(django_filters.FilterSet):
         (Voting.CONTROVERSIEEL, 'Controversieel'),
         (Voting.ONBEKEND, 'Onbekend'),
     )
+    dossier_id = django_filters.CharFilter(method='dossier_id_filter', label='')
     status = django_filters.ChoiceFilter(
         choices=VOTING_RESULT_CHOICES,
         method='status_filter',
@@ -301,6 +302,9 @@ class VotingFilter(django_filters.FilterSet):
     class Meta:
         model = Voting
         exclude = '__all__'
+
+    def dossier_id_filter(selfs, queryset, name, value):
+        return queryset.filter(dossier__dossier_id__icontains=value)
 
     def result_filter(self, queryset, name, value):
         return queryset.filter(result=value)
