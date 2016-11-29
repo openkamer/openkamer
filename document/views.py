@@ -294,10 +294,8 @@ class VotingFilter(django_filters.FilterSet):
         (Voting.ONBEKEND, 'Onbekend'),
     )
     dossier_id = django_filters.CharFilter(method='dossier_id_filter', label='')
-    status = django_filters.ChoiceFilter(
-        choices=VOTING_RESULT_CHOICES,
-        method='status_filter',
-    )
+    title = django_filters.CharFilter(method='title_filter', label='')
+    status = django_filters.ChoiceFilter(method='status_filter', choices=VOTING_RESULT_CHOICES)
 
     class Meta:
         model = Voting
@@ -308,6 +306,9 @@ class VotingFilter(django_filters.FilterSet):
 
     def result_filter(self, queryset, name, value):
         return queryset.filter(result=value)
+
+    def title_filter(self, queryset, name, value):
+        return queryset.filter(dossier__title__icontains=value) | queryset.filter(kamerstuk__type_long__icontains=value)
 
 
 class VotingsView(TemplateView):
