@@ -88,7 +88,7 @@ urlpatterns = [
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
-    url(r'^database/dumps/$', DatabaseDumpsView.as_view()),
+    url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
 ]
