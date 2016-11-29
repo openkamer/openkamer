@@ -390,6 +390,18 @@ class TestWebsite(TestCase):
         self.assertEqual(response.status_code, 200)
         self.client.logout()
 
+    def test_database_dumps_view(self):
+        response = self.client.get(reverse('database-dumps'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_stats_view(self):
+        response = self.client.get(reverse('stats'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_data_stats_view(self):
+        response = self.client.get(reverse('stats-data'))
+        self.assertEqual(response.status_code, 200)
+
     def test_plot_example_view(self):
         response = self.client.get('/stats/exampleplots/')
         self.assertEqual(response.status_code, 200)

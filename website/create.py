@@ -365,7 +365,7 @@ def create_or_update_dossier(dossier_id):
             create_agenda(document, metadata)
 
     create_votings(dossier_id)
-    dossier_new.set_status()
+    dossier_new.set_derived_fields()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
 

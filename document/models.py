@@ -61,6 +61,7 @@ class Dossier(models.Model):
         (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
     dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
+    title = models.CharField(max_length=2000, blank=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
     url = models.URLField(blank=True)
@@ -80,21 +81,6 @@ class Dossier(models.Model):
     @cached_property
     def kamerstukken(self):
         return Kamerstuk.objects.filter(document__dossier=self).select_related('document')
-
-    def set_status(self):
-        if self.is_withdrawn:
-            self.status = Dossier.INGETROKKEN
-        elif self.passed:
-            self.status = Dossier.AANGENOMEN
-        elif self.is_active:
-            self.status = Dossier.IN_BEHANDELING
-        elif self.voting and self.voting.result == Voting.VERWORPEN:
-            self.status = Dossier.VERWORPEN
-        elif self.voting and self.voting.result == Voting.CONTROVERSIEEL:
-            self.status = Dossier.CONTROVERSIEEL
-        else:
-            self.status = Dossier.ONBEKEND
-        self.save()
 
     @cached_property
     def besluitenlijst_cases(self):
@@ -126,9 +112,25 @@ class Dossier(models.Model):
             return votings[0]
         return None
 
-    @cached_property
-    def title(self):
-        # TODO: improve performance
+    def set_derived_fields(self):
+        self.status = self.get_status()
+        self.title = self.get_title()
+        self.save()
+
+    def get_status(self):
+        if self.is_withdrawn:
+            return Dossier.INGETROKKEN
+        elif self.passed:
+            return Dossier.AANGENOMEN
+        elif self.is_active:
+            return Dossier.IN_BEHANDELING
+        elif self.voting and self.voting.result == Voting.VERWORPEN:
+            return Dossier.VERWORPEN
+        elif self.voting and self.voting.result == Voting.CONTROVERSIEEL:
+            return Dossier.CONTROVERSIEEL
+        return Dossier.ONBEKEND
+
+    def get_title(self):
         kamerstukken = self.kamerstukken
         titles = {}
         for stuk in kamerstukken:
@@ -182,10 +184,8 @@ class Dossier(models.Model):
     def get_active_dossier_ids(cls):
         if hasattr(cls, 'active_dossier_ids'):
             return cls.active_dossier_ids
-        lines = Dossier.get_lines_from_url(
-            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
-        lines += Dossier.get_lines_from_url(
-            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
+        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
         cls.active_dossier_ids = []
         for line in lines:
             cls.active_dossier_ids.append(line.strip())
@@ -195,10 +195,8 @@ class Dossier(models.Model):
     def get_inactive_dossier_ids(cls):
         if hasattr(cls, 'inactive_dossier_ids'):
             return cls.inactive_dossier_ids
-        lines = Dossier.get_lines_from_url(
-            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
-        lines += Dossier.get_lines_from_url(
-            'https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
+        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
         cls.inactive_dossier_ids = []
         for line in lines:
             cls.inactive_dossier_ids.append(line.strip())

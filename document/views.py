@@ -2,26 +2,27 @@ import datetime
 import logging
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django import forms
-from django.http import HttpResponseRedirect
-from django.http import HttpResponse
+
 from django.views.generic.base import RedirectView
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 
-import django_filters
+
 from dal import autocomplete
 
 from person.models import Person
 
-from document.models import Agenda, AgendaItem
+from document.models import Agenda
+from document.models import AgendaItem
 from document.models import BesluitenLijst
-from document.models import CategoryDossier
 from document.models import Document, Kamerstuk
 from document.models import Dossier
 from document.models import Voting
+from document.filters import DossierFilter
+from document.filters import VotingFilter
 from document import settings
+
 
 # TODO: remove dependency on website
 from website.create import create_or_update_dossier
@@ -68,65 +69,14 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
         return result.slug
 
 
-class ModelSelect2PersonWidget(autocomplete.ModelSelect2):
-
-    def filter_choices_to_render(self, selected_choices):
-        """Override from QuerySetSelectMixin to use the slug instead of pk (pk will change on database reset)"""
-        self.choices.queryset = self.choices.queryset.filter(
-            slug__in=[c for c in selected_choices if c]
-        )
-
-
-class DossierFilter(django_filters.FilterSet):
-    DOSSIER_STATUS_CHOICES = (
-        (Dossier.AANGENOMEN, 'Aangenomen'),
-        (Dossier.VERWORPEN, 'Verworpen'),
-        (Dossier.INGETROKKEN, 'Ingetrokken'),
-        (Dossier.IN_BEHANDELING, 'In behandeling'),
-        (Dossier.ONBEKEND, 'Onbekend'),
-    )
-    title = django_filters.CharFilter(method='title_filter', label='')
-    submitter = django_filters.ModelChoiceFilter(
-        queryset=Person.objects.all(),
-        to_field_name='slug',
-        method='submitter_filter',
-        label='',
-        widget=ModelSelect2PersonWidget(url='person-autocomplete')
-    )
-    status = django_filters.ChoiceFilter(
-        choices=DOSSIER_STATUS_CHOICES,
-        method='status_filter',
-        # widget=forms.ChoiceField()
-    )
-    categories = django_filters.ModelMultipleChoiceFilter(
-        name='categories',
-        queryset=CategoryDossier.objects.all(),
-        widget=forms.CheckboxSelectMultiple(),
-    )
-
-    class Meta:
-        model = Dossier
-        exclude = '__all__'
-
-    def title_filter(self, queryset, name, value):
-        dossiers = queryset.filter(document__title_full__icontains=value).distinct()
-        return dossiers
-
-    def submitter_filter(self, queryset, name, value):
-        dossiers = queryset.filter(document__submitter__person=value).distinct()
-        return dossiers
-
-    def status_filter(self, queryset, name, value):
-        return queryset.filter(status=value)
-
-
 class DossiersView(TemplateView):
     template_name = 'document/dossiers.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers_filtered = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
-        paginator = Paginator(dossiers_filtered, settings.DOSSIERS_PER_PAGE)
+        dossier_filter = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
+        dossiers_filtered = dossier_filter.qs
+        paginator = Paginator(dossier_filter.qs, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             dossiers = paginator.page(page)
@@ -137,7 +87,7 @@ class DossiersView(TemplateView):
         context['dossiers'] = dossiers
         two_month_ago = datetime.date.today()-datetime.timedelta(days=60)
         context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False, voting__date__gt=two_month_ago).distinct().order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
-        context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
+        context['filter'] = dossier_filter
         return context
 
 
@@ -288,7 +238,9 @@ class VotingsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Voting.objects.all().order_by('-date'), settings.VOTINGS_PER_PAGE)
+        voting_filter = VotingFilter(self.request.GET, queryset=Voting.objects.all())
+        votings_filtered = voting_filter.qs
+        paginator = Paginator(votings_filtered.order_by('-date'), settings.VOTINGS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             votings = paginator.page(page)
@@ -297,6 +249,7 @@ class VotingsView(TemplateView):
         except EmptyPage:
             votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
+        context['filter'] = voting_filter
         return context
 
 
