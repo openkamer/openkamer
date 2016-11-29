@@ -18,7 +18,8 @@
   <div class="col-sm-4" align="center">
     <div class="well">
         <h5><a href="{% static 'backup/' %}{{ backup.file }}">{{ backup.file }}</a></h5>
-        <h5>{{ backup.size|floatformat:0 }} MB</h5>
+        <h5>{{ backup.datetime_created|date:"Y-m-d H:i" }}</h5>
+        <h5 class="text-info">{{ backup.size|floatformat:0 }} MB</h5>
     </div>
   </div>
 {% endfor %}

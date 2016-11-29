@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 
 from django.http import HttpResponse
 from django.views.generic import TemplateView
@@ -20,26 +21,6 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        return context
-
-
-class DatabaseDumpsView(TemplateView):
-    template_name = "website/database_dumps.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        backup_files = []
-        for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
-            for file in filenames:
-                if '.gitignore' in file or 'readme.txt' in file:
-                    continue
-                filepath = os.path.join(dirpath, file)
-                size = os.path.getsize(filepath)
-                backup_files.append({
-                    'file': file,
-                    'size': int(size)/1024/1024
-                })
-        context['backup_files'] = backup_files
         return context
 
 
@@ -97,4 +78,27 @@ class PlotExampleView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['plot_html'] = mark_safe(get_example_plot_html())
+        return context
+
+
+class DatabaseDumpsView(TemplateView):
+    template_name = "website/database_dumps.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        backup_files = []
+        print(settings.DBBACKUP_STORAGE_OPTIONS['location'])
+        for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
+            for file in filenames:
+                if '.gitignore' in file or 'readme.txt' in file:
+                    continue
+                filepath = os.path.join(dirpath, file)
+                size = os.path.getsize(filepath)
+                datetime_created = os.path.getctime(filepath)
+                backup_files.append({
+                    'file': file,
+                    'size': int(size)/1024/1024,
+                    'datetime_created': datetime.datetime.fromtimestamp(datetime_created)
+                })
+        context['backup_files'] = sorted(backup_files, key=lambda backup: backup['datetime_created'], reverse=True)
         return context
