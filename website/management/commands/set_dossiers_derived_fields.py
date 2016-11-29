@@ -8,6 +8,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
-            dossier.set_status()
+            dossier.set_derived_fields()
 
 
