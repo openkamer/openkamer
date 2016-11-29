@@ -2,6 +2,7 @@
 
 {% block title %}Stemmingen - Stemmingsuitslagen van wetsvoorstellen, moties en amendementen - Tweede Kamer {{ block.super }}{% endblock %}
 
+{% load bootstrap3 %}
 {% load bootstrap_pagination %}
 
 {% block content %}
@@ -9,6 +10,27 @@
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
     <div align="center"><h3>Stemmingen</h3></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 well well-filters">
+
+    <div class="row">
+      <form action="" method="get">
+
+        <div class="col-sm-4">
+          <h6 class="text-primary">Uitslag</h6>
+          {% bootstrap_field filter.form.result bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-12">
+          {% bootstrap_button content='Zoek' button_type='submit' %}
+        </div>
+
+      </form>
+    </div>
+
   </div>
 </div>
 

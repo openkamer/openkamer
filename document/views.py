@@ -125,8 +125,9 @@ class DossiersView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        dossiers_filtered = DossierFilter(self.request.GET, queryset=Dossier.objects.all()).qs
-        paginator = Paginator(dossiers_filtered, settings.DOSSIERS_PER_PAGE)
+        dossier_filter = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
+        dossiers_filtered = dossier_filter.qs
+        paginator = Paginator(dossier_filter.qs, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             dossiers = paginator.page(page)
@@ -137,7 +138,7 @@ class DossiersView(TemplateView):
         context['dossiers'] = dossiers
         two_month_ago = datetime.date.today()-datetime.timedelta(days=60)
         context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False, voting__date__gt=two_month_ago).distinct().order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
-        context['filter'] = DossierFilter(self.request.GET, queryset=Dossier.objects.all())
+        context['filter'] = dossier_filter
         return context
 
 
@@ -283,12 +284,36 @@ class VotingView(TemplateView):
         return context
 
 
+class VotingFilter(django_filters.FilterSet):
+    VOTING_RESULT_CHOICES = (
+        (Voting.AANGENOMEN, 'Aangenomen'),
+        (Voting.VERWORPEN, 'Verworpen'),
+        (Voting.INGETROKKEN, 'Ingetrokken'),
+        (Voting.AANGEHOUDEN, 'Aangehouden'),
+        (Voting.CONTROVERSIEEL, 'Controversieel'),
+        (Voting.ONBEKEND, 'Onbekend'),
+    )
+    status = django_filters.ChoiceFilter(
+        choices=VOTING_RESULT_CHOICES,
+        method='status_filter',
+    )
+
+    class Meta:
+        model = Voting
+        exclude = '__all__'
+
+    def result_filter(self, queryset, name, value):
+        return queryset.filter(result=value)
+
+
 class VotingsView(TemplateView):
     template_name = 'document/votings.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Voting.objects.all().order_by('-date'), settings.VOTINGS_PER_PAGE)
+        voting_filter = VotingFilter(self.request.GET, queryset=Voting.objects.all())
+        votings_filtered = voting_filter.qs
+        paginator = Paginator(votings_filtered.order_by('-date'), settings.VOTINGS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             votings = paginator.page(page)
@@ -297,6 +322,7 @@ class VotingsView(TemplateView):
         except EmptyPage:
             votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
+        context['filter'] = voting_filter
         return context
 
 
