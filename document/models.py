@@ -295,7 +295,7 @@ class Kamerstuk(models.Model):
 
     @cached_property
     def voting(self):
-        votings = Voting.objects.filter(kamerstuk=self).select_related('kamerstuk')
+        votings = Voting.objects.filter(kamerstuk=self).select_related('kamerstuk').order_by('-date')
         if votings.exists():
             return votings[0]
         return None
