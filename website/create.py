@@ -561,28 +561,36 @@ def create_votings(dossier_id):
         if not voting_result.get_result():
             logger.warning('no result found for voting, probaly not voted yet, voting date: ' + str(voting_result.date))
             continue
-        result = get_result_choice(voting_result.get_result())
         document_id = voting_result.get_document_id_without_rijkswet()
         if not document_id:
             logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
             continue
-        else:
-            id_main = document_id.split('-')[0]
+        id_main = document_id.split('-')[0]
         dossiers = Dossier.objects.filter(dossier_id=id_main)
         if dossiers.count() != 1:
             logger.error('number of dossiers found: ' + str(dossiers.count()) + ', which is not 1, so we have to skip this voting')
             continue
         assert dossiers.count() == 1
+        result = get_result_choice(voting_result.get_result())
         voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result, is_dossier_voting=voting_result.is_dossier_voting())
         if document_id and len(document_id.split('-')) == 2:
             id_sub = document_id.split('-')[1]
             kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
             if kamerstukken.exists():
-                voting_obj.kamerstuk = kamerstukken[0]
+                kamerstuk = kamerstukken[0]
+                voting_obj.kamerstuk = kamerstuk
+                if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
+                    logger.info('newer voting for this kamerstuk already exits, skip this voting')
+                    continue
+                elif kamerstuk.voting:
+                    kamerstuk.voting.delete()
             else:
                 logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
-        elif document_id == '':
-            logger.error('No document ID found')
+        elif dossiers[0].voting and dossiers[0].voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
+            logger.info('newer voting for this dossier already exits, skip this voting')
+            continue
+        elif dossiers[0].voting:
+            dossiers[0].voting.delete()
         voting_obj.save()
         if voting_result.is_individual():
             create_votes_individual(voting_obj, voting_result.votes)
