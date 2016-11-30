@@ -37,7 +37,7 @@
 
 <hr/>
 
-{% if kamerstuk.voting %}
+{% if kamerstuk.voting and kamerstuk.voting.votes %}
   {% with voting=kamerstuk.voting %}
 
   <div class="row">
@@ -51,8 +51,6 @@
       {% include "document/items/voting_result_list_large.html" %}
     </div>
   </div>
-
-
 
   <hr/>
 
