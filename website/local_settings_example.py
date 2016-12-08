@@ -38,6 +38,17 @@ MEDIA_URL = '/static/media/'
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, STATIC_ROOT, 'backup/')}
 
+# DJANGO-CRON
+CRON_CLASSES = [
+    'website.cron.BackupDaily'
+    'website.cron.CreateCommitPartyCSV',
+    'website.cron.CreateCommitParliamentMembersCSV',
+    'website.cron.CreateCommitWetsvoorstellenIDs',
+    # 'website.cron.UpdateParliamentAndGovernment',
+    # 'website.cron.UpdateActiveDossiers',
+    # 'website.cron.UpdateBesluitenLijsten',
+]
+
 # DOCUMENT
 NUMBER_OF_LATEST_DOSSIERS = 6
 AGENDAS_PER_PAGE = 50

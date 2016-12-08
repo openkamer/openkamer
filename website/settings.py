@@ -135,17 +135,6 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-4',
 }
 
-###############
-# DJANGO-CRON #
-###############
-CRON_CLASSES = [
-    'website.cron.UpdateActiveDossiers',
-    'website.cron.UpdateBesluitenLijsten',
-    'website.cron.CreateCommitPartyCSV',
-    'website.cron.CreateCommitParliamentMembersCSV',
-    'website.cron.CreateCommitWetsvoorstellenIDs',
-    'website.cron.BackupDaily'
-]
 
 ###########
 # LOGGING #
