@@ -15,8 +15,43 @@ import scraper.political_parties
 import scraper.parliament_members
 
 from website import settings
+import website.create
+
 
 logger = logging.getLogger(__name__)
+
+
+class UpdateActiveDossiers(CronJobBase):
+    RUN_AT_TIMES = ['19:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateActiveDossiers'
+
+    def do(self):
+        # TODO: also update dossiers that have closed since last update
+        logger.info('update active dossiers cronjob')
+        failed_dossiers = website.create.create_wetsvoorstellen_active()
+        if failed_dossiers:
+            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+
+
+class UpdateBesluitenLijsten(CronJobBase):
+    RUN_AT_TIMES = ['02:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateBesluitenLijsten'
+
+    def do(self):
+        logger.info('update besluitenlijsten')
+        website.create.create_besluitenlijsten()
+
+
+class BackupDaily(CronJobBase):
+    RUN_AT_TIMES = ['01:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.BackupDaily'
+
+    def do(self):
+        logger.info('run daily backup cronjob')
+        management.call_command('dbbackup')
 
 
 class CreateCommitWetsvoorstellenIDs(CronJobBase):
@@ -172,13 +207,3 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             logger.error(traceback.format_exc())
             raise
         logger.info('END')
-
-
-class BackupDaily(CronJobBase):
-    RUN_AT_TIMES = ['01:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.BackupDaily'
-
-    def do(self):
-        logger.info('run daily backup cronjob')
-        management.call_command('dbbackup')

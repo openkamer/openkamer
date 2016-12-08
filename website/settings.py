@@ -139,6 +139,8 @@ BOOTSTRAP3 = {
 # DJANGO-CRON #
 ###############
 CRON_CLASSES = [
+    'website.cron.UpdateActiveDossiers',
+    'website.cron.UpdateBesluitenLijsten',
     'website.cron.CreateCommitPartyCSV',
     'website.cron.CreateCommitParliamentMembersCSV',
     'website.cron.CreateCommitWetsvoorstellenIDs',
