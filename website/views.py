@@ -87,7 +87,6 @@ class DatabaseDumpsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         backup_files = []
-        print(settings.DBBACKUP_STORAGE_OPTIONS['location'])
         for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
             for file in filenames:
                 if '.gitignore' in file or 'readme.txt' in file:
