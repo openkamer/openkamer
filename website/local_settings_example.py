@@ -40,7 +40,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, STATIC_ROOT, 'bac
 
 # DJANGO-CRON
 CRON_CLASSES = [
-    'website.cron.BackupDaily'
+    'website.cron.BackupDaily',
     'website.cron.CreateCommitPartyCSV',
     'website.cron.CreateCommitParliamentMembersCSV',
     'website.cron.CreateCommitWetsvoorstellenIDs',
