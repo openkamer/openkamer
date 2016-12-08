@@ -51,7 +51,7 @@ class BackupDaily(CronJobBase):
 
     def do(self):
         logger.info('run daily backup cronjob')
-        management.call_command('dbbackup')
+        management.call_command('dbbackup', '--clean')
 
 
 class CreateCommitWetsvoorstellenIDs(CronJobBase):
