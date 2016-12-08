@@ -183,7 +183,7 @@ def get_voting_pages_for_dossier(dossier_id):
         'Type': 'Kamerstukken',
         'clusterName': 'Stemmingsuitslagen',
     }
-    page = requests.get(SEARCH_URL, params)
+    page = requests.get(SEARCH_URL, params, timeout=60)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//div[@class="search-result-content"]/h3/a')
     voting_urls = []
@@ -199,7 +199,7 @@ def get_votings_for_page(votings_page_url):
     :return: a list of VotingResult
     """
     logger.info('url: ' + votings_page_url)
-    page = requests.get(votings_page_url)
+    page = requests.get(votings_page_url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     date = tree.xpath('//p[@class="vote-info"]/span[@class="date"]')[0].text
     date = dateparser.parse(date).date()  # dateparser needed because of Dutch month names

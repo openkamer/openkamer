@@ -177,7 +177,7 @@ class Dossier(models.Model):
 
     @staticmethod
     def get_lines_from_url(url):
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         return response.content.decode('utf-8').splitlines()
 
     @classmethod

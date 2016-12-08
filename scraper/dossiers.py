@@ -14,7 +14,7 @@ def search_dossier_url(dossier_id):
         'qry': str(dossier_id),
         'Type': 'Wetsvoorstellen'
     }
-    response = requests.get(url, params)
+    response = requests.get(url, params, timeout=60)
     tree = lxml.html.fromstring(response.content)
     elements = tree.xpath('//div[@class="search-result-content"]/h3/a')
     if elements:
@@ -23,7 +23,7 @@ def search_dossier_url(dossier_id):
 
 
 def get_dossier_decision(dossier_url):
-    response = requests.get(dossier_url)
+    response = requests.get(dossier_url, timeout=60)
     tree = lxml.html.fromstring(response.content)
     elements = tree.xpath('//div[@class="bill-header"]/p[@class="status"]/span')
     if elements:
@@ -47,7 +47,7 @@ def get_dossier_ids_wetsvoorstellen_regering(max_results=None, filter_active=Fal
 
 def get_number_of_wetsvoorstellen():
     url = 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/?qry=%2A&fld_tk_categorie=Kamerstukken&fld_tk_subcategorie=Wetsvoorstellen&Type=Wetsvoorstellen&srt=date%3Adesc%3Adate'
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     result = re.search("Wetsvoorstellen regering \((\d+)\)", response.content.decode('utf-8'))
     number_regering = int(result.group(1))
     result = re.search("Initiatiefwetsvoorstellen \((\d+)\)", response.content.decode('utf-8'))
@@ -79,7 +79,7 @@ def get_wetsvoorstellen_dossier_ids(subsubcategorie, max_results=None, filter_ac
     while new_dossiers_found:
         logger.info('start item nr: ' + str(start))
         params['sta'] = str(start)
-        response = requests.get(url, params)
+        response = requests.get(url, params, timeout=60)
         response.raise_for_status()
         tree = lxml.html.fromstring(response.content)
         elements = tree.xpath('//div[@class="search-result-properties"]/p')

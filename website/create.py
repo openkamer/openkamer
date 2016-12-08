@@ -726,7 +726,7 @@ def create_besluitenlijst(url):
     filename = uuid.uuid4().hex + '.pdf'
     filepath = 'data/tmp/' + filename
     with open(filepath, 'wb') as pdffile:
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         response.raise_for_status()
         pdffile.write(response.content)
     text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filepath)

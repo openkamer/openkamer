@@ -15,7 +15,7 @@ def search(search_str, language='en'):
         'search': search_str,
         'language': language,
     }
-    response = requests.get(search_url, params)
+    response = requests.get(search_url, params, timeout=60)
     return response.json()
 
 
@@ -57,7 +57,7 @@ def search_parliament_member_ids_with_start_date():
     ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
         'format': 'json',
     }
-    response = requests.get(url, params)
+    response = requests.get(url, params, timeout=60)
     response_json = response.json()
     member_ids = []
     for item in response_json['results']['bindings']:
@@ -75,7 +75,7 @@ def search_parliament_member_ids():
     ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
         'format': 'json',
     }
-    response = requests.get(url, params)
+    response = requests.get(url, params, timeout=60)
     response_json = response.json()
     member_ids = []
     for item in response_json['results']['bindings']:
@@ -107,7 +107,7 @@ class WikidataItem(object):
             params['props'] = props
         import time
         start = time.time()
-        response = requests.get(url, params)
+        response = requests.get(url, params, timeout=60)
         logger.info(response.url)
         reponse_json = response.json()
         roundtrip = time.time() - start
@@ -228,7 +228,7 @@ class WikidataItem(object):
             'iiurlwidth': str(image_width_px),
             'format': 'json',
         }
-        response = requests.get(url, params)
+        response = requests.get(url, params, timeout=60)
         response_json = response.json()
         pages = response_json['query']['pages']
         for page in pages.values():  #TODO: rewrite, does not loop

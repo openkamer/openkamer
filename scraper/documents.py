@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 def get_document_id_and_content(url):
     logger.info('get document id for url: ' + url)
-    page = requests.get(url)
+    page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
     if elements:
@@ -43,7 +43,7 @@ def get_metadata(document_id):
     logger.info('get metadata url for document id: ' + str(document_id))
     xml_url = 'https://zoek.officielebekendmakingen.nl/' + document_id + '/metadata.xml'
     logger.info('get metadata url: ' + xml_url)
-    page = requests.get(xml_url)
+    page = requests.get(xml_url, timeout=60)
     tree = lxml.etree.fromstring(page.content)
     attributes_transtable = {
         'OVERHEIDop.dossiernummer': 'dossier_id',
@@ -104,7 +104,7 @@ def get_metadata(document_id):
 
 def search_politieknl_dossier(dossier_id):
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/' + str(dossier_id)
-    page = requests.get(dossier_url)
+    page = requests.get(dossier_url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     element = tree.xpath('//p[@class="info marge-onder"]/strong')
     n_publications = int(element[0].text)
@@ -123,7 +123,7 @@ def search_politieknl_dossier(dossier_id):
         }
         pagnr += 1
         # print('request url: ' + dossier_url)
-        page = requests.get(dossier_url, params)
+        page = requests.get(dossier_url, params, timeout=60)
         tree = lxml.html.fromstring(page.content)
 
         elements = tree.xpath('//div[@class="lijst"]/ul/li/a')

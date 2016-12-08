@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def search_members():
     url = 'http://www.tweedekamer.nl/kamerleden/alle_kamerleden'
-    page = requests.get(url)
+    page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     rows = tree.xpath("//tbody/tr")
     members = []
@@ -55,7 +55,7 @@ def search_members_check():
     url = ''  # This url becomes invalid after time, goto http://www.parlement.com/id/vg7zoaah7lqb/selectiemenu_tweede_kamerleden and create a new one
     if not url:
         logger.error('please set a valid url')
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(response.content)
     rows = tree.xpath('//div[@class="seriekeuze seriekeuze_align"]')
     members = []

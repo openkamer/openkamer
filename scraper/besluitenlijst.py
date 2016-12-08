@@ -21,7 +21,7 @@ def get_voortouwcommissies_besluiten_urls():
     logger.info('BEGIN')
     url = 'https://www.tweedekamer.nl/kamerstukken/besluitenlijsten'
     commissions = []
-    page = requests.get(url)
+    page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//div[@class="filter-container"]/ul/li/a')
     elements += tree.xpath('//div[@class="filter-container"]/div[@class="readmore"]/ul/li/a')
@@ -46,7 +46,7 @@ def get_besluitenlijsten_urls(overview_url, max_results=None, ignore_agendas=Tru
     while new_url_found:
         logger.info('start at: ' + str(start))
         url = overview_url + '&sta=' + str(start)
-        page = requests.get(url)
+        page = requests.get(url, timeout=60)
         tree = lxml.html.fromstring(page.content)
         elements = tree.xpath('//ul[@class="decisionlist"]/li/a')
         new_url_found = len(elements) != 0

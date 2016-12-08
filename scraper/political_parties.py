@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def search_parties():
     logger.info('START')
     url = 'https://www.tweedekamer.nl/kamerleden/fracties'
-    page = requests.get(url)
+    page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     rows = tree.xpath("//ul[@class='reset grouped-list']/li/a")
     parties = []
