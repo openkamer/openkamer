@@ -21,6 +21,23 @@ import website.create
 logger = logging.getLogger(__name__)
 
 
+class UpdateParliamentAndGovernment(CronJobBase):
+    RUN_AT_TIMES = ['18:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateParliamentAndGovernment'
+
+    def do(self):
+        logger.info('BEGIN')
+        try:
+            website.create.create_parties()
+            website.create.create_governments()
+            website.create.create_parliament_members_from_wikidata()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
+
+
 class UpdateActiveDossiers(CronJobBase):
     RUN_AT_TIMES = ['19:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
