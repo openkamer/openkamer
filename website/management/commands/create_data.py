@@ -25,5 +25,5 @@ class Command(BaseCommand):
         website.create.create_parties()
         website.create.create_governments()
         website.create.create_parliament_members_from_wikidata()
-        website.create.create_wetsvoorstellen(options['skip-existing'])
+        website.create.create_wetsvoorstellen_all(options['skip-existing'])
         website.create.create_besluitenlijsten(skip_existing=options['skip-existing'])

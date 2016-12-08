@@ -21,4 +21,4 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        website.create.create_wetsvoorstellen(options['skip-existing'])
+        website.create.create_wetsvoorstellen_all(options['skip-existing'])

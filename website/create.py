@@ -370,10 +370,32 @@ def create_or_update_dossier(dossier_id):
     return dossier_new
 
 
-def create_wetsvoorstellen(skip_existing=False, max_tries=3):
+def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
     dossier_ids = Dossier.get_active_dossier_ids()
-    dossier_ids += Dossier.get_inactive_dossier_ids()
+    failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
+    logger.info('END')
+    return failed_dossiers
+
+
+def create_wetsvoorstellen_inactive(skip_existing=False, max_tries=3):
+    logger.info('BEGIN')
+    dossier_ids = Dossier.get_inactive_dossier_ids()
+    failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
+    logger.info('END')
+    return failed_dossiers
+
+
+def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
+    logger.info('BEGIN')
+    failed_dossiers = create_wetsvoorstellen_active(skip_existing=skip_existing, max_tries=max_tries)
+    failed_dossiers += create_wetsvoorstellen_inactive(skip_existing=skip_existing, max_tries=max_tries)
+    logger.info('END')
+    return failed_dossiers
+
+
+def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
+    logger.info('BEGIN')
     failed_dossiers = []
     for dossier_id in dossier_ids:
         dossiers = Dossier.objects.filter(dossier_id=dossier_id)
@@ -386,9 +408,6 @@ def create_wetsvoorstellen(skip_existing=False, max_tries=3):
             failed_dossiers.append(dossier_id)
             logger.error('error for dossier id: ' + str(dossier_id))
             logger.error(traceback.format_exc())
-    if failed_dossiers:
-        logger.error('failed to created dossiers:')
-        logger.error(failed_dossiers)
     logger.info('END')
     return failed_dossiers
 
