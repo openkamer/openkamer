@@ -39,11 +39,13 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, STATIC_ROOT, 'backup/')}
 
 # DJANGO-CRON
+CRON_LOCK_DIR = '/tmp'
 CRON_CLASSES = [
+    # 'website.cron.TestJob',
     'website.cron.BackupDaily',
-    'website.cron.CreateCommitPartyCSV',
-    'website.cron.CreateCommitParliamentMembersCSV',
-    'website.cron.CreateCommitWetsvoorstellenIDs',
+    # 'website.cron.CreateCommitPartyCSV',
+    # 'website.cron.CreateCommitParliamentMembersCSV',
+    # 'website.cron.CreateCommitWetsvoorstellenIDs',
     # 'website.cron.UpdateParliamentAndGovernment',
     # 'website.cron.UpdateActiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',

@@ -1,7 +1,10 @@
+import datetime
 import logging
 import os
 import traceback
-import datetime
+import time
+
+import fasteners
 
 from django.core import management
 from django.conf import settings
@@ -21,6 +24,46 @@ import website.create
 logger = logging.getLogger(__name__)
 
 
+class LockJob(CronJobBase):
+    """
+    django-cron does provide a file lock backend,
+    but this is not working due to issue https://github.com/Tivix/django-cron/issues/74
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.code = ''
+
+    def do(self):
+        logger.info('BEGIN')
+        lockfilepath = os.path.join(settings.CRON_LOCK_DIR, 'tmp_' + self.code + '_lockfile')
+        a_lock = fasteners.InterProcessLock(lockfilepath)
+        gotten = a_lock.acquire(timeout=1.0)
+        try:
+            if gotten:
+                self.do_imp()
+            else:
+                logger.info('Not able to acquire lock, job is already running')
+        finally:
+            if gotten:
+                a_lock.release()
+        logger.info('END')
+
+    def do_imp(self):
+        raise NotImplementedError
+
+
+class TestJob(LockJob):
+    RUN_EVERY_MINS = 0
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'website.cron.TestJob'
+
+    def do_imp(self):
+        logger.info('BEGIN')
+        time.sleep(10)
+        logger.info('END')
+
+
 class UpdateParliamentAndGovernment(CronJobBase):
     RUN_AT_TIMES = ['18:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
@@ -38,12 +81,12 @@ class UpdateParliamentAndGovernment(CronJobBase):
         logger.info('END')
 
 
-class UpdateActiveDossiers(CronJobBase):
+class UpdateActiveDossiers(LockJob):
     RUN_AT_TIMES = ['19:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateActiveDossiers'
 
-    def do(self):
+    def do_imp(self):
         # TODO: also update dossiers that have closed since last update
         logger.info('update active dossiers cronjob')
         failed_dossiers = website.create.create_wetsvoorstellen_active()
@@ -51,12 +94,12 @@ class UpdateActiveDossiers(CronJobBase):
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
 
 
-class UpdateBesluitenLijsten(CronJobBase):
+class UpdateBesluitenLijsten(LockJob):
     RUN_AT_TIMES = ['02:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateBesluitenLijsten'
 
-    def do(self):
+    def do_imp(self):
         logger.info('update besluitenlijsten')
         website.create.create_besluitenlijsten()
 
