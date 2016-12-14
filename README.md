@@ -1,9 +1,12 @@
 # openkamer
 [![Build Status](https://travis-ci.org/openkamer/openkamer.svg?branch=master)](https://travis-ci.org/openkamer/openkamer) [![Coverage Status](https://coveralls.io/repos/github/openkamer/openkamer/badge.svg?branch=master)](https://coveralls.io/github/openkamer/openkamer?branch=master) [![Dependency Status](https://gemnasium.com/badges/github.com/openkamer/openkamer.svg)](https://gemnasium.com/github.com/openkamer/openkamer)
 
-This is a work in progress...
+Openkamer gives insight into the Dutch parliament by gathering and visualizing parliamentary data.
 
-A Python 3.4+ and Django 1.10 project.
+Openkamer gathers (scrapes) parliamentary data from several external sources, creates relations, and visualizes this data in a web application.
+
+Openkamer is a Python 3.4+ and Django 1.10+ project under MIT license. 
+
 
 ## Installation (Linux)
 
