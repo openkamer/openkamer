@@ -34,7 +34,7 @@ There are two options to fill your local development database with data.
 #### Option 1: Load a json dump from openkamer.org (5 min)
 This will fill your database with all openkamer data.
 Download the latest `openkamer-<date>.json.gz` file from http://www.openkamer.org/database/dumps/.
-Load this data with the following Django command,
+Load this data into your local database with the following Django command,
 ```
 $ python manage.py loaddata openkamer-<date>.json.gz
 ```
