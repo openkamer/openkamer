@@ -140,7 +140,7 @@ class BackupDaily(CronJobBase):
                 'person',
                 'parliament',
                 'government',
-                # 'document',
+                'document',
                 'stats',
                 'website',
                 stdout=fileout
