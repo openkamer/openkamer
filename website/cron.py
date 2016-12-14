@@ -30,10 +30,6 @@ class LockJob(CronJobBase):
     but this is not working due to issue https://github.com/Tivix/django-cron/issues/74
     """
 
-    def __init__(self):
-        super().__init__()
-        self.code = ''
-
     def do(self):
         logger.info('BEGIN')
         lockfilepath = os.path.join(settings.CRON_LOCK_DIR, 'tmp_' + self.code + '_lockfile')
