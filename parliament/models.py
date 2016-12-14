@@ -22,7 +22,7 @@ class Parliament(models.Model):
     def get_members_at_date(self, check_date):
         members = self.members
         members_active = members.filter(joined__lte=check_date, left__gt=check_date) | members.filter(joined__lte=check_date, left=None)
-        return members_active
+        return members_active.order_by('person__surname')
 
     @cached_property
     def members(self):
