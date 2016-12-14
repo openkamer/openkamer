@@ -135,7 +135,7 @@ def create_parties():
 
 
 @transaction.atomic
-def create_parliament_members():
+def create_parliament_members_from_tweedekamer_data():
     parliament = Parliament.get_or_create_tweede_kamer()
     members = scraper.parliament_members.search_members()
     for member in members:
@@ -158,7 +158,8 @@ def create_parliament_members():
         logger.info("new parliament member: " + str(parliament_member))
 
 
-def create_parliament_members_from_wikidata(max_results=None, all_members=False):
+@transaction.atomic
+def create_parliament_members(max_results=None, all_members=False):
     logger.info('BEGIN')
     ParliamentMember.objects.all().delete()
     parliament = Parliament.get_or_create_tweede_kamer()

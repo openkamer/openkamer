@@ -38,12 +38,15 @@ class TestExample(TestCase):
 
 class TestCreateParliament(TestCase):
 
-    def test_create_parliament(self):
+    @classmethod
+    def setUpTestData(cls):
         website.create.create_parties()
-        website.create.create_parliament_members()
+
+    def test_create_parliament(self):
+        website.create.create_parliament_members_from_tweedekamer_data()
 
     def test_create_parliament_from_wikidata(self):
-        website.create.create_parliament_members_from_wikidata(max_results=20)
+        website.create.create_parliament_members(max_results=20)
 
 
 class TestCreateGovernment(TestCase):

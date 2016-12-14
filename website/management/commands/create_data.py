@@ -23,7 +23,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         website.create.create_parties()
         website.create.create_governments()
-        website.create.create_parliament_members_from_wikidata()
+        website.create.create_parliament_members()
         failed_dossiers = website.create.create_wetsvoorstellen_all(options['skip-existing'])
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))

@@ -74,7 +74,7 @@ class UpdateParliamentAndGovernment(CronJobBase):
         try:
             website.create.create_parties()
             website.create.create_governments()
-            website.create.create_parliament_members_from_wikidata()
+            website.create.create_parliament_members()
         except Exception as error:
             logger.exception(error)
             raise

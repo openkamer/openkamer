@@ -6,4 +6,4 @@ import website.create
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        website.create.create_parliament_members()
+        website.create.create_parliament_members_from_tweedekamer_data()
