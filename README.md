@@ -63,7 +63,7 @@ $ source env/bin/activate
 (env)$ python manage.py runserver
 ```
 
-openkamers is now available at http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
+Openkamer is now available at http://127.0.0.1:8000 and http://127.0.0.1:8000/admin.
 
 ### Configuration
 
