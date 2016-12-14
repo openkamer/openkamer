@@ -48,6 +48,7 @@ CRON_CLASSES = [
     # 'website.cron.CreateCommitWetsvoorstellenIDs',
     # 'website.cron.UpdateParliamentAndGovernment',
     # 'website.cron.UpdateActiveDossiers',
+    # 'website.cron.UpdateInactiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',
 ]
 

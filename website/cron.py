@@ -90,6 +90,18 @@ class UpdateActiveDossiers(LockJob):
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
 
 
+class UpdateInactiveDossiers(LockJob):
+    RUN_EVERY_MINS = 60*24*3  # 3 days
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'website.cron.UpdateInactiveDossiers'
+
+    def do_imp(self):
+        logger.info('update inactive dossiers cronjob')
+        failed_dossiers = website.create.create_wetsvoorstellen_inactive()
+        if failed_dossiers:
+            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+
+
 class UpdateBesluitenLijsten(LockJob):
     RUN_AT_TIMES = ['02:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
