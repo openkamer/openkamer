@@ -23,11 +23,6 @@ Activate the virtualenv,
 $ source env/bin/activate
 ```
 
-Create a superuser,
-```
-$ python manage.py createsuperuser
-```
-
 ### Data
 There are 3 options to fill your database with data.
 
