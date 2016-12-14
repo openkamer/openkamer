@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from django.utils.functional import cached_property
 
 from person.models import Person
+from person.util import parse_name_surname_initials
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
@@ -469,19 +470,33 @@ class Vote(models.Model):
     def get_name(self):
         raise NotImplementedError
 
+    def set_derived(self):
+        raise NotImplementedError
+
     def __str__(self):
         return str(self.voting) + ' - ' + str(self.decision)
 
 
 class VoteParty(Vote):
-    party = models.ForeignKey(PoliticalParty)
+    party_name = models.CharField(max_length=300, blank=True)
+    party = models.ForeignKey(PoliticalParty, blank=True, null=True, on_delete=models.SET_NULL)
+
+    def set_derived(self):
+        self.party = PoliticalParty.find_party(self.party_name)
+        self.save()
 
     def get_name(self):
         return self.party.name_short
 
 
 class VoteIndividual(Vote):
-    parliament_member = models.ForeignKey(ParliamentMember, blank=True, null=True)
+    person_name = models.CharField(max_length=500, blank=True)
+    parliament_member = models.ForeignKey(ParliamentMember, blank=True, null=True, on_delete=models.SET_NULL)
+
+    def set_derived(self):
+        initials, surname, surname_prefix = parse_name_surname_initials(self.person_name)
+        self.parliament_member = ParliamentMember.find(surname=surname, initials=initials, date=self.voting.date)
+        self.save()
 
     def get_name(self):
         return str(self.parliament_member)

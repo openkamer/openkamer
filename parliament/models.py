@@ -21,7 +21,7 @@ class Parliament(models.Model):
 
     def get_members_at_date(self, check_date):
         members = self.members
-        members_active = members.filter(joined__lt=check_date, left__gte=check_date) | members.filter(joined__lt=check_date, left=None)
+        members_active = members.filter(joined__lte=check_date, left__gt=check_date) | members.filter(joined__lte=check_date, left=None)
         return members_active
 
     @cached_property
@@ -44,14 +44,23 @@ class ParliamentMember(models.Model):
     left = models.DateField(blank=True, null=True)
 
     @staticmethod
-    def find(surname, initials=''):
+    def find(surname, initials='', date=None):
         logger.info('surname: ' + surname + ', initials: ' + initials)
         person = Person.find_surname_initials(surname, initials)
-        members = ParliamentMember.objects.filter(person=person)
+        if date:
+            members = ParliamentMember.find_at_date(person, date)
+        else:
+            members = ParliamentMember.objects.filter(person=person).order_by('-joined')
         if members.exists():
             return members[0]
         logger.info('ParliamentMember not found.')
         return None
+
+    @staticmethod
+    def find_at_date(person, date):
+        members = ParliamentMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
+                  ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
+        return members
 
     def political_party(self):
         memberships = PartyMember.objects.filter(person=self.person).select_related('party', 'person')

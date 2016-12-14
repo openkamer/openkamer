@@ -1,60 +1,53 @@
-from json.decoder import JSONDecodeError
 import logging
 import os
 import re
 import time
 import traceback
 import uuid
+from json.decoder import JSONDecodeError
 
 import lxml
 import requests
+from django.db import transaction
+from django.urls import resolve, Resolver404
+from django.urls import reverse
+from pdfminer.pdfparser import PDFSyntaxError
 from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 
-from pdfminer.pdfparser import PDFSyntaxError
-
-from django.db import transaction
-from django.urls import reverse
-from django.urls import resolve, Resolver404
-
-from wikidata import wikidata
-
-from person.models import Person
-
-from government.models import Government
-from government.models import Ministry
-from government.models import GovernmentPosition
-from government.models import GovernmentMember
-
-from parliament.models import Parliament
-from parliament.models import ParliamentMember
-from parliament.models import PartyMember
-from parliament.models import PoliticalParty
-from parliament.util import parse_name_surname_initials
-
+import scraper.besluitenlijst
+import scraper.documents
+import scraper.dossiers
+import scraper.government
+import scraper.parliament_members
+import scraper.persons
+import scraper.political_parties
+import scraper.votings
 from document.models import Agenda
 from document.models import AgendaItem
-from document.models import BesluitenLijst
 from document.models import BesluitItem
 from document.models import BesluitItemCase
+from document.models import BesluitenLijst
 from document.models import CategoryDocument
 from document.models import CategoryDossier
 from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
 from document.models import Submitter
-from document.models import Voting
 from document.models import Vote
-from document.models import VoteParty
 from document.models import VoteIndividual
-
-import scraper.besluitenlijst
-import scraper.documents
-import scraper.dossiers
-import scraper.government
-import scraper.persons
-import scraper.parliament_members
-import scraper.political_parties
-import scraper.votings
+from document.models import VoteParty
+from document.models import Voting
+from government.models import Government
+from government.models import GovernmentMember
+from government.models import GovernmentPosition
+from government.models import Ministry
+from parliament.models import Parliament
+from parliament.models import ParliamentMember
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
+from person.models import Person
+from person.util import parse_name_surname_initials
+from wikidata import wikidata
 
 logger = logging.getLogger(__name__)
 
@@ -170,12 +163,12 @@ def create_parliament_members(max_results=None, all_members=False):
     counter = 0
     members = []
     for wikidata_id in member_wikidata_ids:
-        print('=========================')
+        logger.info('=========================')
         try:
             wikidata_item = wikidata.WikidataItem(wikidata_id)
             person = create_person(wikidata_id, wikidata_item=wikidata_item, add_initials=True)
-            print(person)
-            print(person.wikipedia_url)
+            logger.info(person)
+            logger.info(person.wikipedia_url)
             positions = wikidata_item.get_parliament_positions_held()
             for position in positions:
                 parliament_member = ParliamentMember.objects.create(
@@ -184,7 +177,7 @@ def create_parliament_members(max_results=None, all_members=False):
                     joined=position['start_time'],
                     left=position['end_time']
                 )
-                print(parliament_member)
+                logger.info(parliament_member)
                 members.append(parliament_member)
         except (JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
             logger.error(traceback.format_exc())
@@ -196,10 +189,23 @@ def create_parliament_members(max_results=None, all_members=False):
         counter += 1
         if max_results and counter >= max_results:
             logger.info('END: max results reached')
-            return members
-        print(counter)
+            break
+    set_votes_derived_info()
     logger.info('END')
     return members
+
+
+@transaction.atomic
+def set_votes_derived_info():
+    """ sets the derived foreign keys in votes, needed after parties or parliament members have changed """
+    logger.info('BEGIN')
+    votes = VoteIndividual.objects.all()
+    for vote in votes:
+        vote.set_derived()
+    votes = VoteParty.objects.all()
+    for vote in votes:
+        vote.set_derived()
+    logger.info('END')
 
 
 @transaction.atomic
@@ -641,8 +647,15 @@ def create_votes_party(voting, votes):
             party.update_info()
         if not vote.decision:
             logger.warning('vote has no decision, vote.details: ' + str(vote.details))
-        VoteParty.objects.create(voting=voting, party=party, number_of_seats=vote.number_of_seats,
-                                 decision=get_decision(vote.decision), details=vote.details, is_mistake=vote.is_mistake)
+        VoteParty.objects.create(
+            voting=voting,
+            party=party,
+            party_name=vote.party_name,
+            number_of_seats=vote.number_of_seats,
+            decision=get_decision(vote.decision),
+            details=vote.details,
+            is_mistake=vote.is_mistake
+        )
     logger.info('END')
 
 
@@ -659,8 +672,15 @@ def create_votes_individual(voting, votes):
                 logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
             else:
                 logger.error('voting.kamerstuk does not exist')
-        VoteIndividual.objects.create(voting=voting, parliament_member=parliament_member, number_of_seats=vote.number_of_seats,
-                                      decision=get_decision(vote.decision), details=vote.details, is_mistake=vote.is_mistake)
+        VoteIndividual.objects.create(
+            voting=voting,
+            person_name=vote.parliament_member,
+            parliament_member=parliament_member,
+            number_of_seats=vote.number_of_seats,
+            decision=get_decision(vote.decision),
+            details=vote.details,
+            is_mistake=vote.is_mistake
+        )
     logger.info('END')
 
 

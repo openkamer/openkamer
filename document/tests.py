@@ -7,8 +7,12 @@ from document.models import Dossier
 from document.models import Submitter
 from document.models import CategoryDossier
 from document.models import CategoryDocument
+from document.models import Voting
+from document.models import Vote, VoteIndividual, VoteParty
 
 from person.models import Person
+from parliament.models import ParliamentMember
+from parliament.models import PoliticalParty
 from government.models import Government
 from government.models import Ministry
 from government.models import GovernmentMember
@@ -102,3 +106,48 @@ class TestDossier(TestCase):
         inactive_ids = Dossier.get_inactive_dossier_ids()
         inactive_ids_cached = Dossier.get_inactive_dossier_ids()
         self.assertEqual(len(inactive_ids), len(inactive_ids_cached))
+
+
+class TestVoting(TestCase):
+    fixtures = ['person.json', 'parliament.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.dossier = Dossier.objects.create(dossier_id='33333', title='test dossier')
+        cls.voting = Voting.objects.create(
+            dossier=cls.dossier,
+            is_dossier_voting=True,
+            date=datetime.date(year=2016, month=6, day=1)
+        )
+
+    def test_party_voting(self):
+        vote = VoteParty.objects.create(
+            voting=self.voting,
+            party_name='PvdA',
+            number_of_seats=10
+        )
+        party_expected = PoliticalParty.objects.filter(name_short='PvdA')[0]
+        vote.set_derived()
+        self.assertEqual(vote.party, party_expected)
+
+    def test_individual_voting(self):
+        vote = VoteIndividual.objects.create(
+            voting=self.voting,
+            person_name='Dijkstra, P.A.',
+            number_of_seats=1
+        )
+        vote.set_derived()
+        self.assertEqual(vote.parliament_member.person.surname, 'Dijkstra')
+
+    def test_delete_parliament_member(self):
+        member = ParliamentMember.find('Dijkstra', initials='P.A.')
+        vote = VoteIndividual.objects.create(
+            voting=self.voting,
+            person_name='Dijkstra, P.A.',
+            number_of_seats=1
+        )
+        vote.set_derived()
+        self.assertEqual(member, vote.parliament_member)
+        ParliamentMember.objects.all().delete()
+        vote = VoteIndividual.objects.filter(id=vote.id)
+        self.assertEqual(vote, vote)
