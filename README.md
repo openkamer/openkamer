@@ -28,11 +28,24 @@ Create a superuser,
 $ python manage.py createsuperuser
 ```
 
-### Create demo data
-Creating demo data (scraping) can take several minutes and mostly depends on response time of external sources,
+### Data
+There are two options to fill your local development database with data.
+
+#### Option 1: Load a json dump from openkamer.org (5 min)
+This will fill your database with all openkamer data.
+Download the latest `openkamer-<date>.json.gz` file from http://www.openkamer.org/database/dumps/.
+Load this data with the following Django command,
+```
+$ python manage.py loaddata openkamer-<date>.json.gz
+```
+
+#### Option 2: Scrape a small demo data set (10-15 min)
+Scrape a demo data subset from external sources. This is the longer, but more exciting method.
+Scraping demo data can take several minutes and mostly depends on response time of external sources,
 ```
 $ python manage.py create_demo_data
 ```
+
 
 ### Run a development server
 Run the Django dev web server in the virtualenv,
@@ -45,11 +58,7 @@ openkamers is now available at http://127.0.0.1:8000 and http://127.0.0.1:8000/a
 
 ### Configuration
 
-Configure (public) backups,
-```
-crontab -e
-*/5 * * * * source /home/openkamer/.bashrc && source /home/openkamer/openkamer/env/bin/activate && python /home/openkamer/openkamer/manage.py runcrons > /home/openkamer/openkamer/log/cronjob.log
-```
+See `website/local_settings.py` and `website/settings.py` for settings.
 
 ## Development
 
@@ -68,7 +77,7 @@ $ python manage.py test website.test.TestCreateParliament
 
 ##### Create test json fixtures
 ```
-$ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament document website > website/fixtures/<fixture_name>.json
+$ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament government document website > website/fixtures/<fixture_name>.json
 ```
 
 ## CronJobs
