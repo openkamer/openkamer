@@ -29,11 +29,11 @@ $ python manage.py createsuperuser
 ```
 
 ### Data
-There are two options to fill your local development database with data.
+There are 3 options to fill your database with data.
 
 #### Option 1: Load a json dump from openkamer.org (5 min)
 This will fill your database with all openkamer data.
-Download the latest `openkamer-<date>.json.gz` file from http://www.openkamer.org/database/dumps/.
+Download the latest `openkamer-<date>.json.gz` file from http://www.openkamer.org/database/dumps/.  
 Load this data into your local database with the following Django command,
 ```
 $ python manage.py loaddata openkamer-<date>.json.gz
@@ -45,6 +45,15 @@ Scraping demo data can take several minutes and mostly depends on response time 
 ```
 $ python manage.py create_demo_data
 ```
+
+#### Option 3: Scrape all data from scratch (12-24 hours)
+This is how you get all data from scratch; scrape everything from external sources.
+This will take several hours, but is independent of openkamer.org.  
+Use the following command,
+```
+$ python manage.py create_data
+```
+
 
 
 ### Run a development server
