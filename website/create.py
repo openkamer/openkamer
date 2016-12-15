@@ -49,6 +49,8 @@ from person.models import Person
 from person.util import parse_name_surname_initials
 from wikidata import wikidata
 
+from website import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -745,7 +747,7 @@ def create_besluitenlijst(url):
     logger.info('BEGIN')
     logger.info('url: ' + url)
     filename = uuid.uuid4().hex + '.pdf'
-    filepath = 'data/tmp/' + filename
+    filepath = os.path.join(settings.OK_TMP_DIR, filename)
     with open(filepath, 'wb') as pdffile:
         response = requests.get(url, timeout=60)
         response.raise_for_status()
