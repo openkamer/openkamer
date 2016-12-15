@@ -34,9 +34,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 #MEDIA_URL = 'http://www.<your-domain>.com/static/media/'
 MEDIA_URL = '/static/media/'
 
-# OPENKAMER
-OK_TMP_DIR = os.path.join(BASE_DIR, 'data/tmp/')
-
 # DBBACKUP
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, STATIC_ROOT, 'backup/')}
@@ -54,6 +51,9 @@ CRON_CLASSES = [
     # 'website.cron.UpdateInactiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',
 ]
+
+# OPENKAMER
+OK_TMP_DIR = os.path.join(BASE_DIR, 'data/tmp/')
 
 # DOCUMENT
 NUMBER_OF_LATEST_DOSSIERS = 6

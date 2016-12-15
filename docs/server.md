@@ -3,7 +3,7 @@
 ### Basics
 
 ```
-$ sudo apt-get install git build-essential python3-dev
+$ sudo apt-get install git build-essential python3-dev libxml2-dev libxslt-dev
 ```
 
 ### Firewall
