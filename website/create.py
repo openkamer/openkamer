@@ -503,9 +503,9 @@ def create_new_url(url):
     match_kamerstuk = re.match("kst-(\d+)-(\d+)", url)
     match_dossier = re.match("/dossier/(\d+)", url)
     new_url = ''
-    dossier_id = match_kamerstuk.group(1)
-    sub_id = match_kamerstuk.group(2)
     if match_kamerstuk:
+        dossier_id = match_kamerstuk.group(1)
+        sub_id = match_kamerstuk.group(2)
         kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
         if kamerstukken.exists():
             new_url = reverse('kamerstuk', args=(dossier_id, sub_id,))
