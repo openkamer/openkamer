@@ -29,8 +29,16 @@
   <div class="row">
     <div class="col-sm-12">
       <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
+      {% with submitters=dossier.first_voorstel.document.submitters %}
+      {% if submitters %}
+        <p>
+          {% include "document/items/submitters_list.html" %}
+        </p>
+      {% endif %}
+      {% endwith %}
     </div>
   </div>
+
 
   {% if dossier.voting %}
   <div class="row">
