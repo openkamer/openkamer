@@ -1,15 +1,14 @@
 
 {% if voting.votes_party %}
-
 <div class="row">
-  {% for vote in kamerstuk.voting.votes %}
+  {% for vote in voting.votes %}
   <div class="col-xs-3" align="center">
     {% if vote.decision == vote.FOR %}
-      <h4 class="text-success">{{ vote.party.name_short }}</h4>
+      <h4 class="text-success" title="Voor">{{ vote.party.name_short }}</h4>
     {% elif vote.decision == vote.AGAINST %}
-      <h4 class="text-danger">{{ vote.party.name_short }}</h4>
+      <h4 class="text-danger" title="Tegen">{{ vote.party.name_short }}</h4>
     {% else %}
-      <h4 class="text-warning">{{ vote.party.name_short }}</h4>
+      <h4 class="text-warning" title="Niet gestemd">{{ vote.party.name_short }}</h4>
     {% endif %}
   </div>
   {% endfor %}
