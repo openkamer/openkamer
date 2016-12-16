@@ -1,5 +1,7 @@
 {% extends "website/base.html" %}
 
+{% load openkamer %}
+
 {% block title %}Personen Check {{ block.super }}{% endblock %}
 
 {% block content %}
@@ -19,7 +21,9 @@
           <th>naam</th>
           <th>voornaam</th>
           <th>achternaam</th>
+          <th>initialen</th>
           <th>slug</th>
+          <th>submitters</th>
         </tr>
       </thead>
       <tbody>
@@ -28,7 +32,14 @@
           <td>{{ person.fullname }}</td>
           <td>{{ person.forename }}</td>
           <td>{{ person.surname }}</td>
+          <td>{{ person.initials }}</td>
           <td>{{ person.slug }}</td>
+          <td>
+            {% get_submitters person as submitters %}
+            {% for submitter in submitters %}
+            {{ submitter.document.document_id }},
+            {% endfor %}
+          </td>
         </tr>
       {% endfor %}
       </tbody>

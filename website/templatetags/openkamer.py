@@ -3,6 +3,7 @@ from django import template
 
 from document.models import Dossier
 from document.models import Kamerstuk
+from document.models import Submitter
 from document.models import Voting
 from parliament.models import PartyMember
 
@@ -99,3 +100,8 @@ def get_extra_category_button_class(category_slug, active_category_slug):
     elif category_slug.lower() == 'all' and active_category_slug == '':
         return 'active'
     return ''
+
+
+@register.assignment_tag
+def get_submitters(person):
+    return Submitter.objects.filter(person=person)
