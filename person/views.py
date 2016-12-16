@@ -35,4 +35,11 @@ class PersonsCheckView(TemplateView):
                 for p in persons_same_name:
                     same_name_ids.append(p.id)
         context['persons_same_surname'] = Person.objects.filter(pk__in=same_name_ids).order_by('surname')
+        same_slug_ids = []
+        for person in persons:
+            persons_same_slug = Person.objects.filter(slug=person.slug)
+            if persons_same_slug.count() > 1:
+                for p in persons_same_slug:
+                    same_slug_ids.append(p.id)
+        context['persons_same_slug'] = Person.objects.filter(pk__in=same_slug_ids).order_by('slug')
         return context
