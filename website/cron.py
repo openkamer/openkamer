@@ -115,7 +115,7 @@ class UpdateBesluitenLijsten(LockJob):
 
 
 class BackupDaily(CronJobBase):
-    RUN_AT_TIMES = ['01:00']
+    RUN_AT_TIMES = ['18:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.BackupDaily'
 
