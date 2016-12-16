@@ -538,8 +538,10 @@ def create_submitter(document, submitter):
     person = Person.find_surname_initials(surname=surname, initials=initials)
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
+        if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
+            initials = ''
         person = Person.objects.create(surname=surname, initials=initials)
-    Submitter.objects.create(person=person, document=document)
+    return Submitter.objects.create(person=person, document=document)
 
 
 @transaction.atomic
