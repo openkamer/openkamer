@@ -22,6 +22,10 @@
         <h5 class="text-info">{{ backup.size|floatformat:0 }} MB</h5>
     </div>
   </div>
+
+  {% if forloop.counter|divisibleby:3 %}
+  <div class="clearfix"></div>
+  {% endif %}
 {% endfor %}
 
 </div>
