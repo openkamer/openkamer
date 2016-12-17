@@ -68,6 +68,7 @@ class Dossier(models.Model):
     url = models.URLField(blank=True)
     decision = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-dossier_id']
