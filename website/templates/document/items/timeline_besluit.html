@@ -1,4 +1,5 @@
 {% load openkamer %}
+{% load document %}
 
 {% with case=item.obj %}
 
@@ -10,7 +11,8 @@
   <div class="kamertuk-id-timeline-container">
     Besluitenlijst {{ case.besluit_item.besluiten_lijst.activity_id }}
   </div>
-    <h6><a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}">{{ case.title }}</a></h6>
+    {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
+    <h6><a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.title }}</a></h6>
   <p>
     <strong>Indiener:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
     <br/>
