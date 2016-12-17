@@ -46,6 +46,7 @@ CRON_CLASSES = [
     # 'website.cron.CreateCommitPartyCSV',
     # 'website.cron.CreateCommitParliamentMembersCSV',
     # 'website.cron.CreateCommitWetsvoorstellenIDs',
+    'website.cron.CleanUnusedPersons',
     # 'website.cron.UpdateParliamentAndGovernment',
     # 'website.cron.UpdateActiveDossiers',
     # 'website.cron.UpdateInactiveDossiers',

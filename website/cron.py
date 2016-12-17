@@ -19,6 +19,12 @@ import scraper.documents
 import scraper.political_parties
 import scraper.parliament_members
 
+from document.models import Submitter
+from government.models import GovernmentMember
+from parliament.models import PartyMember
+from parliament.models import ParliamentMember
+from person.models import Person
+
 from website import settings
 import website.create
 
@@ -112,6 +118,34 @@ class UpdateBesluitenLijsten(LockJob):
     def do_imp(self):
         logger.info('update besluitenlijsten')
         website.create.create_besluitenlijsten()
+
+
+class CleanUnusedPersons(CronJobBase):
+    RUN_AT_TIMES = ['04:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.CleanUnusedPersons'
+
+    def do(self):
+        logger.info('run unused persons cleanup')
+        persons = Person.objects.all()
+        persons_to_delete_ids = []
+        for person in persons:
+            members = PartyMember.objects.filter(person=person)
+            if members:
+                continue
+            members = ParliamentMember.objects.filter(person=person)
+            if members:
+                continue
+            members = GovernmentMember.objects.filter(person=person)
+            if members:
+                continue
+            submitters = Submitter.objects.filter(person=person)
+            if submitters:
+                continue
+            persons_to_delete_ids.append(person.id)
+        Person.objects.filter(id__in=persons_to_delete_ids).delete()
+        logger.info('deleted persons: ' + str(persons_to_delete_ids))
+        logger.info('END')
 
 
 class BackupDaily(CronJobBase):
