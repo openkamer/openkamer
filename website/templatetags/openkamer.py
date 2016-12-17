@@ -6,6 +6,8 @@ from document.models import Kamerstuk
 from document.models import Submitter
 from document.models import Voting
 from parliament.models import PartyMember
+from parliament.models import ParliamentMember
+from government.models import GovernmentMember
 
 register = template.Library()
 
@@ -105,3 +107,19 @@ def get_extra_category_button_class(category_slug, active_category_slug):
 @register.assignment_tag
 def get_submitters(person):
     return Submitter.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_government_members_for_person(person):
+    return GovernmentMember.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_parliament_members_for_person(person):
+    return ParliamentMember.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_party_members_for_person(person):
+    return PartyMember.objects.filter(person=person)
+

@@ -24,6 +24,9 @@
           <th>initialen</th>
           <th>slug</th>
           <th>submitters</th>
+          <th>kamerleden</th>
+          <th>kabinetsleden</th>
+          <th>partijleden</th>
         </tr>
       </thead>
       <tbody>
@@ -36,9 +39,19 @@
           <td>{{ person.slug }}</td>
           <td>
             {% get_submitters person as submitters %}
-            {% for submitter in submitters %}
-            {{ submitter.document.document_id }},
-            {% endfor %}
+            {{ submitters|length }}
+          </td>
+          <td>
+            {% get_parliament_members_for_person person as members %}
+            {{ members|length }}
+          </td>
+          <td>
+            {% get_government_members_for_person person as members %}
+            {{ members|length }}
+          </td>
+          <td>
+            {% get_party_members_for_person person as members %}
+            {{ members|length }}
           </td>
         </tr>
       {% endfor %}
