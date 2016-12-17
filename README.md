@@ -52,8 +52,6 @@ Use the following command,
 $ python manage.py create_data
 ```
 
-
-
 ### Run a development server
 Run the Django dev web server in the virtualenv,
 ```

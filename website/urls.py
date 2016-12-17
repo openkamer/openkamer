@@ -21,7 +21,7 @@ from document.views import VotingsView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
-from parliament.views import PartiesView, PartyView
+from parliament.views import PartiesView, PartyView, PartyMembersCheckView
 from parliament.views import ParliamentMembersCurrentView
 from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
@@ -48,6 +48,7 @@ urlpatterns = [
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
+    url(r'^partijleden/check$', PartyMembersCheckView.as_view(), name='party-members-check'),
 
     url(r'^tweedekamerleden/$', ParliamentMembersCurrentView.as_view(), name='parliament-members'),
     url(r'^tweedekamerleden/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', ParliamentMembersAtDateView.as_view(), name='parliament-members-at-date'),

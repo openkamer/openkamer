@@ -128,6 +128,22 @@ class PoliticalParty(models.Model):
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 
+    @cached_property
+    def parliament_members_current(self):
+        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
+        pm_person_ids = []
+        for member in parliament_members:
+            pm_person_ids.append(member.person.id)
+        return PartyMember.objects.filter(person_id__in=pm_person_ids, party=self, left__isnull=True)
+
+    @cached_property
+    def total_parliament_members(self):
+        parties = PoliticalParty.objects.all()
+        count = 0
+        for party in parties:
+            count += party.parliament_members_current.count()
+        return count
+
     def find_wikidata_id(self, language='en', top_level_domain='com'):
         wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
         if not wikidata_ids:
