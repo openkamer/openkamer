@@ -64,7 +64,7 @@ class PartyMembersCheckView(TemplateView):
         member_double_ids = []
         members = PartyMember.objects.filter(left__isnull=True)
         for member in members:
-            members_same_person = PartyMember.objects.filter(person=member.person)
+            members_same_person = PartyMember.objects.filter(person=member.person, left__isnull=True)
             if members_same_person.count() > 1:
                 for member_same_person in members_same_person:
                     member_double_ids.append(member_same_person.id)

@@ -130,6 +130,41 @@ def create_parties():
 
 
 @transaction.atomic
+def create_party_members():
+    logger.info('BEGIN')
+    persons = Person.objects.filter(wikidata_id__isnull=False)
+    for person in persons:
+        create_party_members_for_person(person)
+    logger.info('END')
+
+
+@transaction.atomic
+def create_party_members_for_person(person):
+    logger.info('BEGIN, person: ' + str(person))
+    if not person.wikidata_id:
+        logger.warning('could not update party member for person: ' + str(person) + ' because person has no wikidata id.')
+        return
+    PartyMember.objects.filter(person=person).delete()
+    wikidata_item = wikidata.WikidataItem(person.wikidata_id)
+    memberships = wikidata_item.get_political_party_memberships()
+    for membership in memberships:
+        parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
+        if parties.exists():
+            party = parties[0]
+        else:
+            logger.error('could not find party with wikidata id: ' + str(membership['wikidata_id']))
+            continue
+        new_member = PartyMember.objects.create(
+            person=person,
+            party=party,
+            joined=membership['start_date'],
+            left=membership['end_date']
+        )
+        logger.info(new_member.joined)
+    logger.info('END')
+
+
+@transaction.atomic
 def create_parliament_members_from_tweedekamer_data():
     parliament = Parliament.get_or_create_tweede_kamer()
     members = scraper.parliament_members.search_members()
