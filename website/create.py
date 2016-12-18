@@ -270,20 +270,7 @@ def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=Fal
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
-        memberships = wikidata_item.get_political_party_memberships()
-        for membership in memberships:
-            parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
-            if parties.exists():
-                party = parties[0]
-            else:
-                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ', for person with wikidata id: ' + str(wikidata_id) + ' does not exist')
-                continue
-            PartyMember.objects.create(
-                person=person,
-                party=party,
-                joined=membership['start_date'],
-                left=membership['end_date']
-            )
+        create_party_members_for_person(person)
     return person
 
 
