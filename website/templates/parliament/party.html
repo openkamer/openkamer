@@ -28,15 +28,11 @@
       </tr>
       <tr>
         <th>Opgericht</th>
-        <td>{{ party.founded }}</td>
+        <td>{% if party.founded %} {{ party.founded }} {% endif %}</td>
       </tr>
       <tr>
         <th>Officiële website</th>
         <td><a href="{{ party.official_website_url }}" target="_blank">{{ party.official_website_url }}</a></td>
-      </tr>
-      <tr>
-        <th>Wikidata</th>
-        <td><a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">https://www.wikidata.org/wiki/{{ party.wikidata_id }}</a></td>
       </tr>
     </table>
 
