@@ -80,3 +80,18 @@ class TestFindPoliticalParty(TestCase):
         item = wikidata.WikidataItem(wikidata_id)
         is_pp = item.is_political_party()
         self.assertTrue(is_pp)
+
+
+class TestDate(TestCase):
+
+    def test_date(self):
+        date_str = '+2016-12-25T00:00:00Z'
+        date = wikidata.WikidataItem.get_date(date_str)
+        self.assertEqual(date.day, 25)
+        self.assertEqual(date.month, 12)
+        self.assertEqual(date.year, 2016)
+        date_str = '+2016-00-00T00:00:00Z'
+        date = wikidata.WikidataItem.get_date(date_str)
+        self.assertEqual(date.day, 1)
+        self.assertEqual(date.month, 1)
+        self.assertEqual(date.year, 2016)
