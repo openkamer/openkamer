@@ -210,6 +210,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'wikidata': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
         'scraper': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
