@@ -15,6 +15,7 @@
   <div class="col-sm-3" align="center">
     <div class="well">
       <h4><a href="{% url 'party' party.slug %}">{{ party.name_short }}</a></h4>
+      <h5>{{ party.parliament_members_current|length }} zetels</h5>
       <p>
         <small>{{ party.name }}</small>
       </p>
