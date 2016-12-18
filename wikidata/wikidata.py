@@ -1,6 +1,7 @@
 import datetime
-import urllib.parse
 import logging
+import re
+import urllib.parse
 
 import requests
 
@@ -241,6 +242,9 @@ class WikidataItem(object):
             date = datetime.datetime.strptime(date_str[1:11], '%Y-%m-%d')
             return date.date()
         except ValueError as error:
+            result = re.findall("(\d{4})-00-00", date_str)
+            if result:
+                return datetime.date(year=int(result[0]), day=1, month=1)
             logger.error(error)
             return None
 
