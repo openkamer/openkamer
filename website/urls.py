@@ -42,17 +42,14 @@ urlpatterns = [
     url(r'^colofon/$', TemplateView.as_view(template_name="website/about.html"), name='about'),
 
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
-    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
     url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
-    url(r'^partijleden/check$', PartyMembersCheckView.as_view(), name='party-members-check'),
 
     url(r'^tweedekamerleden/$', ParliamentMembersCurrentView.as_view(), name='parliament-members'),
     url(r'^tweedekamerleden/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', ParliamentMembersAtDateView.as_view(), name='parliament-members-at-date'),
-    url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
 
     url(r'^kabinetten/$', GovernmentsView.as_view(), name='governments'),
     url(r'^kabinet/huidig/$', GovernmentCurrentView.as_view(), name='government-current'),
@@ -89,6 +86,11 @@ urlpatterns = [
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
+
+    url(r'^checks/$', TemplateView.as_view(template_name='website/checks.html'), name='checks'),
+    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
+    url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
+    url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
 
     url(r'^testlist/$', TemplateView.as_view(template_name="website/testlist.html")),
 
