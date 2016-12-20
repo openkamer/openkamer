@@ -226,6 +226,14 @@ class Document(models.Model):
     @cached_property
     def document_url(self):
         return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
+        
+    def get_kamerstuk(self):
+        ok_url = self.document_url
+        if self.publication_type == 'Kamerstuk':
+            q=Kamerstuk.objects.filter(document=self)
+            ok_url = q[0]
+        
+        return ok_url
 
     def __str__(self):
         return self.title_short

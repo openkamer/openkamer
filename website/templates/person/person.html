@@ -9,6 +9,14 @@
     {% include "person/items/person.html" %}
   </div>
 </div>
+
+{% if list_of_submitters %}
+<h4>Ingediende documenten</h4>
+{% for submitter in list_of_submitters %}
+
+<li><a href={% url 'kamerstuk' submitter.document.get_kamerstuk.id_main submitter.document.get_kamerstuk.id_sub %}>{{submitter.document.title_short}}</>   
+{% endfor %}
+{% else %} no {% endif %}
 <hr/>
 
 {% endblock %}

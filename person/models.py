@@ -183,4 +183,6 @@ class Person(models.Model):
             surname = name_parts[-1]
             forename = fullname.replace(surname, '')
             return forename.strip(), surname.strip(), surname_prefix.strip()
+            
+    
 

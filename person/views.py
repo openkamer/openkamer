@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 
 from person.models import Person
+from document.models import Submitter
 
 
 class PersonsView(TemplateView):
@@ -19,6 +20,7 @@ class PersonView(TemplateView):
     def get_context_data(self, slug, **kwargs):
         context = super().get_context_data(**kwargs)
         context['person'] = Person.objects.get(slug=slug)
+        context['list_of_submitters']=Submitter.objects.filter(person=context['person'])
         return context
 
 
