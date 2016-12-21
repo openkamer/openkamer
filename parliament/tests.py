@@ -6,6 +6,7 @@ from person.models import Person
 
 from parliament.models import Parliament
 from parliament.models import ParliamentMember
+from parliament.models import PoliticalParty
 from wikidata import wikidata
 
 
@@ -16,6 +17,12 @@ class TestPoliticalParty(TestCase):
         item = wikidata.WikidataItem(mark_rutte_wikidata_id)
         parties = item.get_political_party_memberships()
         self.assertEqual(len(parties), 1)
+
+    def test_create_political_party(self):
+        name = 'Houwers'
+        name_short = 'Houwers'
+        party = PoliticalParty.objects.create(name=name, name_short=name_short)
+        party.update_info(language='nl')
 
 
 class TestParliamentMembers(TestCase):

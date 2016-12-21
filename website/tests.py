@@ -51,6 +51,13 @@ class TestCreateParliament(TestCase):
         website.create.create_parliament_members(max_results=20)
 
 
+class TestCreatePoliticalParty(TestCase):
+
+    def test_create_socialist_party(self):
+        party = website.create.create_party('Socialistische Partij', 'SP')
+        self.assertEqual(party.wikidata_id, 'Q849580')
+
+
 class TestCreateGovernment(TestCase):
     fixtures = ['person.json', 'parliament.json']
 

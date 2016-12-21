@@ -143,33 +143,16 @@ class PoliticalParty(models.Model):
             count += party.parliament_members_current.count()
         return count
 
-    def find_wikidata_id(self, language='en', top_level_domain='com'):
-        wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
-        if not wikidata_ids:
-            return ''
-        # find the first result with a website with the given domain
-        for wid in wikidata_ids:
-            item = wikidata.WikidataItem(wid)
-            if item.is_political_party():
-                return wid
-            elif item.is_fractie():
-                return wid
-            elif item.get_official_website():
-                tld = item.get_official_website().split('.')[-1]
-                if tld == top_level_domain or tld == top_level_domain + '/':
-                    return wid
-        return wikidata_ids[0]
+    def find_wikidata_id(self, language='en'):
+        return wikidata.search_political_party_id(self.name, language=language)
 
-    def update_info(self, language='en', top_level_domain='com'):
+    def update_info(self, language='en'):
         """
         update the party with wikidata info
         :param language: the language to search for in wikidata
-        :param top_level_domain: the top level domain of the party website, also used to determine country
         """
-        if top_level_domain[0] == '.':
-            logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
         if not self.wikidata_id:
-            self.wikidata_id = self.find_wikidata_id(language, top_level_domain)
+            self.wikidata_id = self.find_wikidata_id(language)
             if not self.wikidata_id:
                 return
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)

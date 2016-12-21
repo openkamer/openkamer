@@ -119,14 +119,18 @@ def create_goverment_member(government, member, person, position):
 def create_parties():
     parties = scraper.political_parties.search_parties()
     for party_info in parties:
-        party = PoliticalParty.find_party(party_info['name'])
-        if party:
-            logger.warning('party ' + party_info['name'] + ' already exists!')
-        else:
-            party = PoliticalParty.objects.create(name=party_info['name'], name_short=party_info['name_short'])
-            logger.info('created: ' + str(party))
-        party.update_info('nl', 'nl')
-        party.save()
+        create_party(party_info['name'], party_info['name_short'])
+    set_party_votes_derived_info()
+
+
+@transaction.atomic
+def create_party(name, name_short):
+    party = PoliticalParty.find_party(name)
+    if party:
+        party.delete()
+    party = PoliticalParty.objects.create(name=name, name_short=name_short)
+    party.update_info(language='nl')
+    return party
 
 
 @transaction.atomic
@@ -227,18 +231,25 @@ def create_parliament_members(max_results=None, all_members=False):
         if max_results and counter >= max_results:
             logger.info('END: max results reached')
             break
-    set_votes_derived_info()
+    set_individual_votes_derived_info()
     logger.info('END')
     return members
 
 
 @transaction.atomic
-def set_votes_derived_info():
-    """ sets the derived foreign keys in votes, needed after parties or parliament members have changed """
+def set_individual_votes_derived_info():
+    """ sets the derived foreign keys in individual votes, needed after parliament members have changed """
     logger.info('BEGIN')
     votes = VoteIndividual.objects.all()
     for vote in votes:
         vote.set_derived()
+    logger.info('END')
+
+
+@transaction.atomic
+def set_party_votes_derived_info():
+    """ sets the derived foreign keys in party votes, needed after parties have changed """
+    logger.info('BEGIN')
     votes = VoteParty.objects.all()
     for vote in votes:
         vote.set_derived()
@@ -674,7 +685,7 @@ def create_votes_party(voting, votes):
                 name_short=vote.party_name,
                 wikidata_id=wikidata_id
             )
-            party.update_info()
+            party.update_info(language='nl')
         if not vote.decision:
             logger.warning('vote has no decision, vote.details: ' + str(vote.details))
         VoteParty.objects.create(

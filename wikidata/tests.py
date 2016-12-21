@@ -87,6 +87,20 @@ class TestFindPoliticalParty(TestCase):
         is_fractie = item.is_fractie()
         self.assertTrue(is_fractie)
 
+    def test_search_group_houwers(self):
+        wikidata_id = wikidata.search_political_party_id('Houwers', language='nl')
+        self.assertEqual(wikidata_id, 'Q28044763')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Lid-Houwers')
+
+    def test_search_socialist_party(self):
+        wikidata_id = wikidata.search_political_party_id('Socialistische Partij', language='nl')
+        self.assertEqual(wikidata_id, 'Q849580')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Socialistische Partij')
+
 
 class TestDate(TestCase):
 

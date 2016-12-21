@@ -36,12 +36,21 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
-def search_political_party_id(search_str, language='en'):
+def search_political_party_id(search_str, country_id='Q55', language='en'):
     wikidata_ids = search_wikidata_ids(search_str, language)
+    wikidata_ids += search_wikidata_ids('Lid-' + search_str, language)
+    possible_items = []
     for wikidata_id in wikidata_ids:
         item = WikidataItem(wikidata_id)
         if item.is_political_party():
-            return wikidata_id
+            possible_items.append(item)
+        elif item.is_fractie():
+            possible_items.append(item)
+    if len(possible_items) == 1:
+        return possible_items[0].id
+    for item in possible_items:
+        if item.get_country_id() == country_id:
+            return item.id
     return ''
 
 
