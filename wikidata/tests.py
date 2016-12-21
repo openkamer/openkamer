@@ -75,11 +75,17 @@ class TestFindPoliticalParty(TestCase):
         label = item.get_label(language='nl')
         self.assertEqual(label, 'Volkspartij voor Vrijheid en Democratie')
 
-    def test_is_policital_party(self):
+    def test_is_political_party(self):
         wikidata_id = 'Q275441'  # PvdA
         item = wikidata.WikidataItem(wikidata_id)
         is_pp = item.is_political_party()
         self.assertTrue(is_pp)
+
+    def test_is_fractie(self):
+        wikidata_id = 'Q28044800'  # Lid-Monasch
+        item = wikidata.WikidataItem(wikidata_id)
+        is_fractie = item.is_fractie()
+        self.assertTrue(is_fractie)
 
 
 class TestDate(TestCase):

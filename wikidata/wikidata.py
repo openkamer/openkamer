@@ -182,6 +182,14 @@ class WikidataItem(object):
             return claims['P856'][0]['mainsnak']['datavalue']['value']
         return ''
 
+    def is_fractie(self):
+        claims = self.get_claims()
+        if 'P31' in claims:
+            for instance_of in claims['P31']:
+                if instance_of['mainsnak']['datavalue']['value']['id'] == 'Q848197':
+                    return True
+        return False
+
     def get_image_filename(self):
         claims = self.get_claims()
         if 'P18' in claims:
