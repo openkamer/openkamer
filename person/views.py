@@ -22,6 +22,16 @@ class PersonView(TemplateView):
         return context
 
 
+class TwitterPersonsView(TemplateView):
+    template_name = 'person/twitter_users.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        persons = Person.objects.exclude(twitter_username='')
+        context['persons'] = persons
+        return context
+
+
 class PersonsCheckView(TemplateView):
     template_name = 'person/persons_check.html'
 

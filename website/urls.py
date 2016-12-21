@@ -5,6 +5,7 @@ from django.views.generic.base import RedirectView
 
 from person.views import PersonView
 from person.views import PersonsView
+from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
@@ -42,6 +43,7 @@ urlpatterns = [
     url(r'^colofon/$', TemplateView.as_view(template_name="website/about.html"), name='about'),
 
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
+    url(r'^personen/twitter/$', TwitterPersonsView.as_view(), name='persons-twitter'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
     url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 
