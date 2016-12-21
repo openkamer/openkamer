@@ -75,6 +75,10 @@ def get_dossier_status_color(dossier):
         return 'warning'
     elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'warning'
+    elif dossier.status == Dossier.IN_BEHANDELING:
+        return 'info'
+    elif dossier.status == Dossier.ONBEKEND:
+        return 'info'
     return 'info'
 
 
@@ -92,6 +96,10 @@ def get_dossier_status_icon(dossier):
         return 'fa-pause'
     elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'fa-warning'
+    elif dossier.status == Dossier.IN_BEHANDELING:
+        return 'fa-spinner'
+    elif dossier.status == Dossier.ONBEKEND:
+        return 'fa-question'
     return 'fa-spinner'
 
 
