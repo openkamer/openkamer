@@ -61,7 +61,6 @@ class Person(models.Model):
 
     @staticmethod
     def find_surname_initials(surname, initials=''):
-        logger.info('surname: ' + surname + ', initials: ' + initials)
         surname = unidecode(surname)
         initials = unidecode(initials)
         persons = Person.objects.all()
@@ -86,8 +85,8 @@ class Person(models.Model):
             if score >= 1.5 and score > best_score:
                 best_match = person
                 best_score = score
-        if best_match:
-            logger.info('person found: ' + surname + ', ' + initials + ' : ' + str(best_match))
+        if not best_match:
+            logger.info('person not found: ' + surname + ', ' + initials)
         return best_match
 
     @staticmethod

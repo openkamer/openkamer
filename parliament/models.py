@@ -45,7 +45,6 @@ class ParliamentMember(models.Model):
 
     @staticmethod
     def find(surname, initials='', date=None):
-        logger.info('surname: ' + surname + ', initials: ' + initials)
         person = Person.find_surname_initials(surname, initials)
         if date:
             members = ParliamentMember.find_at_date(person, date)
@@ -53,7 +52,7 @@ class ParliamentMember(models.Model):
             members = ParliamentMember.objects.filter(person=person).order_by('-joined')
         if members.exists():
             return members[0]
-        logger.info('ParliamentMember not found.')
+        logger.info('ParliamentMember not found for: ' + str(surname) + ' (' + initials + ')')
         return None
 
     @staticmethod
