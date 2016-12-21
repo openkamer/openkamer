@@ -149,16 +149,20 @@ class PoliticalParty(models.Model):
             return ''
         # find the first result with a website with the given domain
         for wid in wikidata_ids:
-            official_website = wikidata.WikidataItem(wid).get_official_website()
-            if official_website:
-                tld = official_website.split('.')[-1]
+            item = wikidata.WikidataItem(wid)
+            if item.is_political_party():
+                return wid
+            elif item.is_fractie():
+                return wid
+            elif item.get_official_website():
+                tld = item.get_official_website().split('.')[-1]
                 if tld == top_level_domain or tld == top_level_domain + '/':
                     return wid
         return wikidata_ids[0]
 
     def update_info(self, language='en', top_level_domain='com'):
         """
-        update the model derived info
+        update the party with wikidata info
         :param language: the language to search for in wikidata
         :param top_level_domain: the top level domain of the party website, also used to determine country
         """
