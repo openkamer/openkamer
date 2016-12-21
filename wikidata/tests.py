@@ -115,3 +115,11 @@ class TestDate(TestCase):
         self.assertEqual(date.day, 1)
         self.assertEqual(date.month, 1)
         self.assertEqual(date.year, 2016)
+
+
+class TestPersonProperties(TestCase):
+
+    def test_get_twitter_username(self):
+        wikidata_id = 'Q560780'
+        item = wikidata.WikidataItem(wikidata_id)
+        self.assertEqual(item.get_twitter_username(), 'diederiksamsom')

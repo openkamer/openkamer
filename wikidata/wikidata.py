@@ -265,6 +265,12 @@ class WikidataItem(object):
             logger.error(error)
             return None
 
+    def get_twitter_username(self):
+        claims = self.get_claims()
+        if 'P2002' in claims:
+            return claims['P2002'][0]['mainsnak']['datavalue']['value']
+        return ''
+
     def get_parlement_and_politiek_id(self):
         claims = self.get_claims()
         if 'P1749' in claims:
