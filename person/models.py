@@ -32,13 +32,14 @@ class Person(models.Model):
     surname = models.CharField(max_length=200, db_index=True)
     surname_prefix = models.CharField(max_length=200, blank=True, default='', db_index=True)
     initials = models.CharField(max_length=200, blank=True, default='', db_index=True)
+    slug = models.SlugField(max_length=250, default='')
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     wikipedia_url = models.URLField(blank=True)
     wikimedia_image_name = models.CharField(blank=True, max_length=300)
     wikimedia_image_url = models.URLField(blank=True, max_length=600)
     parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
-    slug = models.SlugField(max_length=250, default='')
+    twitter_username = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.get_full_name() + ' (' + self.initials + ')'
@@ -144,6 +145,7 @@ class Person(models.Model):
             self.wikimedia_image_name = image_filename
             self.wikimedia_image_url = wikidata.WikidataItem.get_wikimedia_image_url(self.wikimedia_image_name)
         self.parlement_and_politiek_id = wikidata_item.get_parlement_and_politiek_id()
+        self.twitter_username = wikidata_item.get_twitter_username()
 
     def wikidata_url(self):
         return 'https://www.wikidata.org/wiki/Special:EntityData/' + str(self.wikidata_id)
