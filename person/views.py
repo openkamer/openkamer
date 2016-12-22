@@ -27,7 +27,7 @@ class TwitterPersonsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        persons = Person.objects.exclude(twitter_username='')
+        persons = Person.objects.exclude(twitter_username='').order_by('surname')
         context['persons'] = persons
         return context
 
