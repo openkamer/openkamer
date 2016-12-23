@@ -17,6 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 INSTALLED_APPS = (
     'website',
     'stats',
+    'oktwitter',
     'scraper',
     'document',
     'parliament',
