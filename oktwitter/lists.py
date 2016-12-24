@@ -1,3 +1,4 @@
+import logging
 import datetime
 
 import twitter
@@ -5,27 +6,59 @@ import twitter
 from oktwitter import settings
 
 from parliament.models import Parliament
-from parliament.models import ParliamentMember
+
+from government.models import Government
+
+logger = logging.getLogger(__name__)
+
+
+api = twitter.Api(
+    consumer_key=settings.TWITTER_CONSUMER_KEY,
+    consumer_secret=settings.TWITTER_CONSUMER_SECRET,
+    access_token_key=settings.TWITTER_ACCESS_TOKEN_KEY,
+    access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
+)
 
 
 def update_current_parliament_members_list():
-    api = twitter.Api(
-        consumer_key=settings.TWITTER_CONSUMER_KEY,
-        consumer_secret=settings.TWITTER_CONSUMER_SECRET,
-        access_token_key=settings.TWITTER_ACCESS_TOKEN_KEY,
-        access_token_secret=settings.TWITTER_ACCESS_TOKEN_SECRET,
+    logger.info('BEGIN')
+    current_pms = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
+    update_members_list(list_name='tweedekamerleden', members=current_pms)
+    logger.info('END')
+
+
+def update_current_government_members_list():
+    logger.info('BEGIN')
+    current_gov = Government.current()
+    print(current_gov.name)
+    members = current_gov.members_latest
+    update_members_list(list_name='kabinetsleden', members=members)
+    logger.info('END')
+
+
+def update_members_list(list_name, members):
+    list_members = api.GetListMembers(
+        slug=list_name,
+        owner_screen_name='openkamer',
     )
 
-    current_pms = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
-    current_pm_usernames = []
-    for member in current_pms:
-        if member.person.twitter_username:
-            current_pm_usernames.append(member.person.twitter_username)
-            if len(current_pm_usernames) == 100:
-                api.CreateListsMember(slug='tweedekamerleden', owner_screen_name='openkamer', screen_name=current_pm_usernames)
-                current_pm_usernames = []
-    api.CreateListsMember(slug='tweedekamerleden', owner_screen_name='openkamer', screen_name=current_pm_usernames)
+    list_screen_names = []
+    for list_member in list_members:
+        list_screen_names.append(list_member.screen_name.lower())
 
-    # lists = api.GetLists(screen_name='openkamer')
-    members = api.GetListMembers(slug='tweedekamerleden', owner_screen_name='openkamer')
-    return members
+    for member in members:
+        if not member.person.twitter_username:
+            logger.info(str(member.person.fullname()) + ' has no twitter username defined')
+            continue
+        if member.person.twitter_username.lower() in list_screen_names:
+            logger.info(member.person.twitter_username + ' already in list')
+            continue
+        logger.info('adding ' + member.person.twitter_username + ' to ' + list_name + ' twitter list')
+        try:
+            api.CreateListsMember(
+                slug=list_name,
+                owner_screen_name='openkamer',
+                screen_name=member.person.twitter_username
+            )
+        except twitter.error.TwitterError as e:
+            logger.exception(e)
