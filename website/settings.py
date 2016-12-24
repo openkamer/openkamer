@@ -17,6 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 INSTALLED_APPS = (
     'website',
     'stats',
+    'oktwitter',
     'scraper',
     'document',
     'parliament',
@@ -241,6 +242,11 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'stats': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'oktwitter': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
             'level': 'DEBUG',

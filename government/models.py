@@ -21,6 +21,10 @@ class Government(models.Model):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
+    @staticmethod
+    def current():
+        return Government.objects.filter(date_dissolved__isnull=True)[0]
+
     @cached_property
     def prime_minister(self):
         pms = GovernmentPosition.objects.filter(
