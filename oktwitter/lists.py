@@ -4,9 +4,7 @@ import datetime
 import twitter
 
 from oktwitter import settings
-
 from parliament.models import Parliament
-
 from government.models import Government
 
 logger = logging.getLogger(__name__)
@@ -30,7 +28,6 @@ def update_current_parliament_members_list():
 def update_current_government_members_list():
     logger.info('BEGIN')
     current_gov = Government.current()
-    print(current_gov.name)
     members = current_gov.members_latest
     update_members_list(list_name='kabinetsleden', members=members)
     logger.info('END')
@@ -46,10 +43,13 @@ def update_members_list(list_name, members):
     for list_member in list_members:
         list_screen_names.append(list_member.screen_name.lower())
 
+    # add new members
+    twitter_usernames_lower = []
     for member in members:
         if not member.person.twitter_username:
             logger.info(str(member.person.fullname()) + ' has no twitter username defined')
             continue
+        twitter_usernames_lower.append(member.person.twitter_username.lower())
         if member.person.twitter_username.lower() in list_screen_names:
             logger.info(member.person.twitter_username + ' already in list')
             continue
@@ -62,3 +62,13 @@ def update_members_list(list_name, members):
             )
         except twitter.error.TwitterError as e:
             logger.exception(e)
+
+    # remove members
+    for username in list_screen_names:
+        if username.lower() not in twitter_usernames_lower:
+            logger.info('removing ' + username + ' from ' + list_name + ' twitter list')
+            api.DestroyListsMember(
+                slug=list_name,
+                owner_id='802459284646850560',
+                screen_name=username
+            )
