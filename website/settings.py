@@ -246,6 +246,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'oktwitter': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
         'django_cron': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
