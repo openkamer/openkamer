@@ -3,7 +3,8 @@ import datetime
 
 import twitter
 
-from oktwitter import settings
+from django.conf import settings
+
 from parliament.models import Parliament
 from government.models import Government
 
