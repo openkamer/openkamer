@@ -22,7 +22,7 @@
       <form action="" method="get">
 
         <div class="col-sm-4">
-          <h6 class="text-primary">Titel</h6>
+          <h6 class="text-primary">Type</h6>
           {% bootstrap_field filter.form.type bound_css_class='' show_label=False show_help=False %}
         </div>
 
@@ -44,7 +44,7 @@
           <th>Partij</th>
           {% with stat=stats|first %}
           {% for period in stat.periods %}
-            <th>{{ period.government.name }}</th>
+          <th><a href="{% url 'government' period.government.slug %}">{{ period.government.name }}</a></th>
           {% endfor %}
           {% endwith %}
         </tr>
@@ -52,7 +52,7 @@
       <tbody>
       {% for stat in stats %}
         <tr>
-          <td>{{ stat.party.name_short }}</td>
+          <td><a href="{% url 'party' stat.party.slug %}">{{ stat.party.name_short }}</a></td>
           {% for period in stat.periods %}
           <td>
             {% if period.n_votes != 0 %}
