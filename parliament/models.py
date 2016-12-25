@@ -61,16 +61,25 @@ class ParliamentMember(models.Model):
                   ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
         return members
 
-    def political_party(self):
-        memberships = PartyMember.objects.filter(person=self.person).select_related('party', 'person')
+    def political_parties(self):
+        memberships = PartyMember.objects.filter(person=self.person)
+        if memberships.count() == 1:
+            memberships = memberships
+        elif self.left:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gt=self.left)
+        else:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
+        party_ids = []
         for member in memberships:
-            if member.left is None:
-                return member.party
-        return None
+            party_ids.append(member.party.id)
+        return PoliticalParty.objects.filter(id__in=party_ids)
 
     @cached_property
     def party(self):
-        return self.political_party()
+        parties = self.political_parties()
+        if parties:
+            return parties[0]
+        return None
 
     def check_overlap(self):
         members = ParliamentMember.objects.filter(person=self.person)
