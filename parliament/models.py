@@ -136,6 +136,10 @@ class PoliticalParty(models.Model):
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 
+    @staticmethod
+    def sort_by_current_seats(parties):
+        return sorted(parties, key=lambda party: party.parliament_members_current.count(), reverse=True)
+
     @cached_property
     def parliament_members_current(self):
         parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())

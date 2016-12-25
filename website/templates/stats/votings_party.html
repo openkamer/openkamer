@@ -1,6 +1,8 @@
 {% extends "stats/base.html" %}
 
 {% load l10n %}
+{% load bootstrap3 %}
+{% load bootstrap_pagination %}
 
 {% block title %}Stemgedrag per Partij - {{ block.super }}{% endblock %}
 
@@ -10,6 +12,27 @@
 <div class="row" align="center">
   <div class="col-lg-12">
     <h3>Stemgedrag per Partij</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 well well-filters">
+
+    <div class="row">
+      <form action="" method="get">
+
+        <div class="col-sm-4">
+          <h6 class="text-primary">Titel</h6>
+          {% bootstrap_field filter.form.type bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-12">
+          {% bootstrap_button content='Filter' button_type='submit' %}
+        </div>
+
+      </form>
+    </div>
+
   </div>
 </div>
 

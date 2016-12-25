@@ -10,21 +10,25 @@ from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 
 
-def get_party_votes_for_government(government):
-    votes_party = VoteParty.objects.filter(voting__date__gte=government.date_formed)
+def get_party_votes_for_government(government, vote_party_qs=None):
+    if vote_party_qs:
+        votes_party = vote_party_qs.filter(voting__date__gte=government.date_formed)
+    else:
+        votes_party = VoteParty.objects.filter(voting__date__gte=government.date_formed)
     if government.date_dissolved:
         votes_party = votes_party.filter(voting__date__lt=government.date_dissolved)
     return votes_party
 
 
-def get_voting_stats_per_party():
+def get_voting_stats_per_party(vote_party_qs):
     parties = PoliticalParty.objects.all()
+    parties = PoliticalParty.sort_by_current_seats(parties)
     governments = Government.objects.all()
     stats = []
     for party in parties:
         periods = []
         for gov in governments:
-            party_votes = get_party_votes_for_government(gov)
+            party_votes = get_party_votes_for_government(gov, vote_party_qs=vote_party_qs)
             votes_for = party_votes.filter(party=party, decision=Vote.FOR)
             votes_against = party_votes.filter(party=party, decision=Vote.AGAINST)
             votes_none = party_votes.filter(party=party, decision=Vote.NONE)

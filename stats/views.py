@@ -19,8 +19,10 @@ from document.models import Document
 from document.models import Kamerstuk
 from document.models import Voting
 from document.models import Vote
+from document.models import VoteParty
 
 import stats.util
+from stats.filters import PartyVotesFilter
 
 
 class DataStatsView(TemplateView):
@@ -46,7 +48,10 @@ class VotingsPerPartyView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['stats'] = stats.util.get_voting_stats_per_party()
+        votes_filter = PartyVotesFilter(self.request.GET, queryset=VoteParty.objects.all())
+        votes_filtered = votes_filter.qs
+        context['stats'] = stats.util.get_voting_stats_per_party(votes_filtered)
+        context['filter'] = votes_filter
         return context
 
 
