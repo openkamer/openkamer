@@ -28,6 +28,7 @@ from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
+from stats.views import VotingsPerPartyView
 
 from website.views import DatabaseDumpsView
 from website.views import HomeView
@@ -84,6 +85,7 @@ urlpatterns = [
 
     url(r'^stats/$', TemplateView.as_view(template_name='stats/base.html'), name='stats'),
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
+    url(r'^stats/votings/parties/$', VotingsPerPartyView.as_view(), name='stats-votings-party'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 

@@ -20,6 +20,7 @@ from document.models import Kamerstuk
 from document.models import Voting
 from document.models import Vote
 
+import stats.util
 
 
 class DataStatsView(TemplateView):
@@ -37,6 +38,15 @@ class DataStatsView(TemplateView):
         context['n_parliament_members'] = ParliamentMember.objects.all().count()
         context['n_government_members'] = GovernmentMember.objects.all().count()
         context['n_persons'] = Person.objects.all().count()
+        return context
+
+
+class VotingsPerPartyView(TemplateView):
+    template_name =  "stats/votings_party.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stats'] = stats.util.get_voting_stats_per_party()
         return context
 
 
