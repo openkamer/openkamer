@@ -369,6 +369,7 @@ class Voting(models.Model):
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
     is_dossier_voting = models.BooleanField(default=False)
+    is_individual = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
     date = models.DateField(auto_now=False, blank=True, db_index=True)
 
