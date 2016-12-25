@@ -26,6 +26,11 @@
           {% bootstrap_field filter.form.type bound_css_class='' show_label=False show_help=False %}
         </div>
 
+        <div class="col-sm-4">
+          <h6 class="text-primary">Indiener</h6>
+          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+        </div>
+
         <div class="col-sm-12">
           {% bootstrap_button content='Filter' button_type='submit' %}
         </div>
@@ -52,7 +57,7 @@
       <tbody>
       {% for stat in stats %}
         <tr>
-          <td><a href="{% url 'party' stat.party.slug %}">{{ stat.party.name_short }}</a></td>
+          <td><a href="{% url 'party' stat.party.slug %}"><strong>{{ stat.party.name_short }}</strong></a></td>
           {% for period in stat.periods %}
           <td>
             {% if period.n_votes != 0 %}

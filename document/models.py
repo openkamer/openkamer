@@ -11,6 +11,7 @@ from person.util import parse_name_surname_initials
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
 
 from government.models import GovernmentMember
 
@@ -249,6 +250,12 @@ class Submitter(models.Model):
         gms = GovernmentMember.objects.filter(person=self.person, start_date__lte=date, end_date__gt=date) | GovernmentMember.objects.filter(person=self.person, start_date__lte=date, end_date=None)
         gms = gms.order_by('-end_date')
         return gms
+
+    @cached_property
+    def party(self):
+        members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
+        if members.exists():
+            return members[0].party
 
 
 class Kamerstuk(models.Model):

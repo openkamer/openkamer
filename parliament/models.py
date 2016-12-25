@@ -198,5 +198,13 @@ class PartyMember(models.Model):
     joined = models.DateField(blank=True, null=True, db_index=True)
     left = models.DateField(blank=True, null=True, db_index=True)
 
+    @staticmethod
+    def get_at_date(person, date):
+        return PartyMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__lte=date, left__isnull=True) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__isnull=True)
+
+
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'

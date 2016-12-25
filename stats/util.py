@@ -11,7 +11,7 @@ from parliament.models import ParliamentMember
 
 
 def get_party_votes_for_government(government, vote_party_qs=None):
-    if vote_party_qs:
+    if vote_party_qs is not None:
         votes_party = vote_party_qs.filter(voting__date__gte=government.date_formed)
     else:
         votes_party = VoteParty.objects.filter(voting__date__gte=government.date_formed)
