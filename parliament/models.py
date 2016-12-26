@@ -149,10 +149,13 @@ class PoliticalParty(models.Model):
     def sort_by_current_seats(parties):
         return sorted(parties, key=lambda party: party.parliament_seats_current(), reverse=True)
 
+    def set_current_parliament_seats(self):
+        self.current_parliament_seats = self.parliament_members_current.count()
+        self.save()
+
     def parliament_seats_current(self):
         if self.current_parliament_seats is None:
-            self.current_parliament_seats = self.parliament_members_current.count()
-            self.save()
+            return self.parliament_members_current.count()
         return self.current_parliament_seats
 
     @cached_property

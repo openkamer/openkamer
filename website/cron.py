@@ -23,7 +23,10 @@ from document.models import Submitter
 from government.models import GovernmentMember
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
+from parliament.models import PoliticalParty
 from person.models import Person
+
+import stats.models
 
 from website import settings
 import website.create
@@ -80,6 +83,9 @@ class UpdateParliamentAndGovernment(CronJobBase):
             website.create.create_governments()
             website.create.create_parliament_members()
             website.create.create_party_members()
+            for party in PoliticalParty.objects.all():
+                party.set_current_parliament_seats()
+            stats.models.StatsVotingSubmitter.create()
         except Exception as error:
             logger.exception(error)
             raise
