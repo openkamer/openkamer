@@ -24,7 +24,8 @@ def get_party_votes_for_government(government, vote_party_qs=None):
 def get_voting_stats_per_party(vote_party_qs):
     logger.info('BEGIN')
     vote_party_qs = vote_party_qs.select_related('voting')
-    parties = PoliticalParty.sort_by_current_seats(PoliticalParty.objects.all())
+    parties = PoliticalParty.objects.all()
+    parties = PoliticalParty.sort_by_current_seats(parties)
     governments = Government.objects.all()
     party_votes_per_gov = []
     for gov in governments:
@@ -41,17 +42,23 @@ def get_voting_stats_per_party(vote_party_qs):
             votes_against = party_votes.filter(party=party, decision=Vote.AGAINST)
             votes_none = party_votes.filter(party=party, decision=Vote.NONE)
             n_votes = party_votes.filter(party=party).count()
+            n_for = votes_for.count()
+            n_against = votes_against.count()
+            n_none = votes_none.count()
             if n_votes == 0:
                 for_percent = 0
                 against_percent = 0
                 none_percent = 0
             else:
-                for_percent = votes_for.count()/n_votes*100.0
-                against_percent = votes_against.count()/n_votes*100.0
-                none_percent = votes_none.count()/n_votes*100.0
+                for_percent = n_for/n_votes*100.0
+                against_percent = n_against/n_votes*100.0
+                none_percent = n_none/n_votes*100.0
             period = {
                 'government': votes_for_gov['government'],
                 'n_votes': n_votes,
+                'n_for': n_for,
+                'n_against': n_against,
+                'n_none': n_none,
                 'for': votes_for,
                 'against': votes_against,
                 'none': votes_none,

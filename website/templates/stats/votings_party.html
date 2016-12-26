@@ -62,9 +62,9 @@
           <td>
             {% if period.n_votes != 0 %}
             <div class="progress vote-result">
-              <div class="progress-bar progress-bar-success" style="width: {{ period.for_percent|unlocalize }}%" title="{{ period.for|length }} voor">{{ period.for_percent|floatformat:0 }} %</div>
-              <div class="progress-bar progress-bar-danger" style="width: {{ period.against_percent|unlocalize }}%" title="{{ period.against|length }} tegen">{{ period.against_percent|floatformat:0 }} %</div>
-              <div class="progress-bar progress-bar-warning" style="width: {{ period.none_percent|unlocalize }}%" title="{{ period.none|length }} niet gestemd"></div>
+              <div class="progress-bar progress-bar-success" style="width: {{ period.for_percent|unlocalize }}%" title="{{ period.n_for|length }} voor">{{ period.for_percent|floatformat:0 }} %</div>
+              <div class="progress-bar progress-bar-danger" style="width: {{ period.against_percent|unlocalize }}%" title="{{ period.n_against|length }} tegen">{{ period.against_percent|floatformat:0 }} %</div>
+              <div class="progress-bar progress-bar-warning" style="width: {{ period.none_percent|unlocalize }}%" title="{{ period.n_none|length }} niet gestemd"></div>
             </div>
             {% endif %}
           </td>
