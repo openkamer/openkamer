@@ -74,12 +74,15 @@ class ParliamentMember(models.Model):
             party_ids.append(member.party.id)
         return PoliticalParty.objects.filter(id__in=party_ids)
 
-    @cached_property
-    def party(self):
+    def political_party(self):
         parties = self.political_parties()
         if parties:
             return parties[0]
         return None
+
+    @cached_property
+    def party(self):
+        return self.political_party()
 
     def check_overlap(self):
         members = ParliamentMember.objects.filter(person=self.person)
