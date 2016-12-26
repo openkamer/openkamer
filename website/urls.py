@@ -83,7 +83,7 @@ urlpatterns = [
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^stats/$', TemplateView.as_view(template_name='stats/base.html'), name='stats'),
+    url(r'^stats/$', TemplateView.as_view(template_name='stats/index.html'), name='stats'),
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
     url(r'^stats/stemmingen/partijen/$', VotingsPerPartyView.as_view(), name='stats-votings-party'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
