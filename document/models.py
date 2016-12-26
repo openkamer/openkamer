@@ -416,6 +416,14 @@ class Voting(models.Model):
     def has_result_details(self):
         return len(self.votes) > 0
 
+    @cached_property
+    def submitters(self):
+        if self.is_dossier_voting and self.dossier.first_voorstel:
+            return self.dossier.first_voorstel.document.submitters
+        elif self.kamerstuk:
+            return self.kamerstuk.document.submitters
+        return []
+
     def entities_for_string(self):
         entities_str = ''
         for vote in self.votes:
