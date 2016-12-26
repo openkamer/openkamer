@@ -40,11 +40,12 @@ class DataStatsView(TemplateView):
         context['n_parliament_members'] = ParliamentMember.objects.all().count()
         context['n_government_members'] = GovernmentMember.objects.all().count()
         context['n_persons'] = Person.objects.all().count()
+        context['page_stats_data'] = True
         return context
 
 
 class VotingsPerPartyView(TemplateView):
-    template_name =  "stats/votings_party.html"
+    template_name = "stats/votings_party.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,6 +53,7 @@ class VotingsPerPartyView(TemplateView):
         votes_filtered = votes_filter.qs
         context['stats'] = stats.util.get_voting_stats_per_party(votes_filtered)
         context['filter'] = votes_filter
+        context['page_stats_votings_parties'] = True
         return context
 
 
