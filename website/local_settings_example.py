@@ -52,6 +52,7 @@ CRON_CLASSES = [
     # 'website.cron.UpdateInactiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',
     # 'oktwitter.cron.UpdateTwitterLists',
+    # 'stats.cron.UpdateStatsData',
 ]
 
 # OPENKAMER
