@@ -1,3 +1,5 @@
+import logging
+
 import django_filters
 
 from document.models import VoteParty
@@ -6,6 +8,10 @@ from parliament.models import PoliticalParty
 from parliament.models import PartyMember
 from document.models import Document
 from document.models import Submitter
+
+from stats.models import StatsVotingSubmitter
+
+logger = logging.getLogger(__name__)
 
 
 class PartyVotesFilter(django_filters.FilterSet):
@@ -32,18 +38,9 @@ class PartyVotesFilter(django_filters.FilterSet):
             return queryset.filter(voting__is_dossier_voting=False).distinct()
 
     def submitter_party_filter(self, queryset, name, value):
-        party_members = PartyMember.objects.filter(party=value).select_related('person')
-        party_person_ids = []
-        for member in party_members:
-            party_person_ids.append(member.person.id)
-        submitters = Submitter.objects.filter(person__in=party_person_ids).select_related('person')
-        submitter_ids = []
+        submitters = StatsVotingSubmitter.objects.filter(party=value).select_related('voting')
+        voting_ids = []
         for submitter in submitters:
-            pms = party_members.filter(person=submitter.person, joined__lte=submitter.document.date_published, left__gt=submitter.document.date_published) | \
-                  party_members.filter(person=submitter.person, joined__lte=submitter.document.date_published, left__isnull=True) | \
-                  party_members.filter(person=submitter.person, joined__isnull=True, left__isnull=True)
-            if pms:
-                submitter_ids.append(submitter.id)
-        documents = Document.objects.filter(submitter__id__in=submitter_ids)
-        votes = queryset.filter(voting__kamerstuk__document__in=documents)
+            voting_ids.append(submitter.voting.id)
+        votes = queryset.filter(voting__in=voting_ids).distinct()
         return votes
