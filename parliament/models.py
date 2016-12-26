@@ -127,6 +127,7 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
     slug = models.SlugField(max_length=250, default='')
+    current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
 
     def __str__(self):
         return str(self.name) + ' (' + str(self.name_short) + ')'
@@ -141,11 +142,17 @@ class PoliticalParty(models.Model):
 
     @staticmethod
     def sort_by_current_seats(parties):
-        return sorted(parties, key=lambda party: party.parliament_members_current.count(), reverse=True)
+        return sorted(parties, key=lambda party: party.parliament_seats_current(), reverse=True)
+
+    def parliament_seats_current(self):
+        if self.current_parliament_seats is None:
+            self.current_parliament_seats = self.parliament_members_current.count()
+            self.save()
+        return self.current_parliament_seats
 
     @cached_property
     def parliament_members_current(self):
-        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
+        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today()).select_related('person')
         pm_person_ids = []
         for member in parliament_members:
             pm_person_ids.append(member.person.id)
