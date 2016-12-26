@@ -130,7 +130,10 @@ class PoliticalParty(models.Model):
     current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
 
     def __str__(self):
-        return str(self.name) + ' (' + str(self.name_short) + ')'
+        name = self.name_short
+        if self.name_short != self.name:
+            name += ' (' + str(self.name) + ')'
+        return name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name_short)
