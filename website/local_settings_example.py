@@ -51,6 +51,8 @@ CRON_CLASSES = [
     # 'website.cron.UpdateActiveDossiers',
     # 'website.cron.UpdateInactiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',
+    # 'oktwitter.cron.UpdateTwitterLists',
+    # 'stats.cron.UpdateStatsData',
 ]
 
 # OPENKAMER
@@ -73,3 +75,9 @@ GIT_AUTHOR_EMAIL = ''
 PARTIES_REPO_DIR = '<path-to-repo>/ok-tknl-fracties/'
 MEMBERS_REPO_DIR = '<path-to-repo>/ok-tknl-kamerleden/'
 WETSVOORSTELLEN_REPO_DIR = '<path-to-repo>/ok-tknl-wetsvoorstellen/'
+
+# TWITTER
+TWITTER_CONSUMER_KEY = ''
+TWITTER_CONSUMER_SECRET = ''
+TWITTER_ACCESS_TOKEN_KEY = ''
+TWITTER_ACCESS_TOKEN_SECRET = ''

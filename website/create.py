@@ -658,8 +658,9 @@ def create_votings(dossier_id):
             continue
         elif dossiers[0].voting:
             dossiers[0].voting.delete()
+        voting_obj.is_individual = voting_result.is_individual()
         voting_obj.save()
-        if voting_result.is_individual():
+        if voting_obj.is_individual:
             create_votes_individual(voting_obj, voting_result.votes)
         else:
             create_votes_party(voting_obj, voting_result.votes)

@@ -1,0 +1,36 @@
+{% extends "stats/base.html" %}
+
+{% block content %}
+{{ block.super }}
+
+<div class="row" align="center">
+  <div class="col-lg-12">
+    <h3>Statistieken</h3>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+  <div class="col-sm-6 col-lg-4 col-lg-offset-2" align="center">
+    <div class="well">
+      <a href="{% url 'stats-votings-party' %}">
+        <h1><span class="fa fa-leaf"></span></h1>
+        <h3>Stemgedrag Partijen</h3>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-4" align="center">
+    <div class="well">
+      <a href="{% url 'stats-data' %}">
+        <h1><span class="fa fa-database"></span></h1>
+        <h3>Open Kamer Data</h3>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

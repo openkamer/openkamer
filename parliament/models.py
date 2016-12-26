@@ -61,11 +61,23 @@ class ParliamentMember(models.Model):
                   ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
         return members
 
-    def political_party(self):
-        memberships = PartyMember.objects.filter(person=self.person).select_related('party', 'person')
+    def political_parties(self):
+        memberships = PartyMember.objects.filter(person=self.person)
+        if memberships.count() == 1:
+            memberships = memberships
+        elif self.left:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gt=self.left)
+        else:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
+        party_ids = []
         for member in memberships:
-            if member.left is None:
-                return member.party
+            party_ids.append(member.party.id)
+        return PoliticalParty.objects.filter(id__in=party_ids)
+
+    def political_party(self):
+        parties = self.political_parties()
+        if parties:
+            return parties[0]
         return None
 
     @cached_property
@@ -115,9 +127,13 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
     slug = models.SlugField(max_length=250, default='')
+    current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
 
     def __str__(self):
-        return str(self.name) + ' (' + str(self.name_short) + ')'
+        name = self.name_short
+        if self.name_short != self.name:
+            name += ' (' + str(self.name) + ')'
+        return name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name_short)
@@ -127,9 +143,19 @@ class PoliticalParty(models.Model):
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 
+    @staticmethod
+    def sort_by_current_seats(parties):
+        return sorted(parties, key=lambda party: party.parliament_seats_current(), reverse=True)
+
+    def parliament_seats_current(self):
+        if self.current_parliament_seats is None:
+            self.current_parliament_seats = self.parliament_members_current.count()
+            self.save()
+        return self.current_parliament_seats
+
     @cached_property
     def parliament_members_current(self):
-        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
+        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today()).select_related('person')
         pm_person_ids = []
         for member in parliament_members:
             pm_person_ids.append(member.person.id)
@@ -184,6 +210,14 @@ class PartyMember(models.Model):
     party = models.ForeignKey(PoliticalParty)
     joined = models.DateField(blank=True, null=True, db_index=True)
     left = models.DateField(blank=True, null=True, db_index=True)
+
+    @staticmethod
+    def get_at_date(person, date):
+        return PartyMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__lte=date, left__isnull=True) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__isnull=True)
+
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'
