@@ -65,10 +65,12 @@ class ParliamentMember(models.Model):
         memberships = PartyMember.objects.filter(person=self.person)
         if memberships.count() == 1:
             memberships = memberships
-        elif self.left:
+        elif self.joined and self.left:
             memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gt=self.left)
-        else:
+        elif self.joined:
             memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
+        else:
+            logger.error('multiple or no parties for ' + str(self.person) + ' found without joined/end date')
         party_ids = []
         for member in memberships:
             party_ids.append(member.party.id)
