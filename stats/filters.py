@@ -5,9 +5,6 @@ import django_filters
 from document.models import VoteParty
 
 from parliament.models import PoliticalParty
-from parliament.models import PartyMember
-from document.models import Document
-from document.models import Submitter
 
 from stats.models import StatsVotingSubmitter
 
