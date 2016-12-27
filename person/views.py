@@ -2,8 +2,9 @@ from django.views.generic import TemplateView
 
 from person.models import Person
 from document.models import Submitter
+from parliament.models import ParliamentMember
 
-
+import datetime
 class PersonsView(TemplateView):
     template_name = 'person/persons.html'
 
@@ -21,6 +22,20 @@ class PersonView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['person'] = Person.objects.get(slug=slug)
         context['list_of_submitters']=Submitter.objects.filter(person=context['person'])
+        stats=dict()
+        context['list_of_parliamentmembers']=ParliamentMember.objects.filter(person=context['person'])
+        stats['period']=0
+        for n in context['list_of_parliamentmembers']:
+            left=n.left
+            if left==None:
+                left=datetime.datetime.now().date()
+                
+            
+            stats['period']+=(left-n.joined).days
+        
+        stats['n_of_documents']=len(context['list_of_submitters'])
+        stats['docs_per_day']=stats['n_of_documents']/stats['period']*365
+        context['stats']=stats
         return context
 
 

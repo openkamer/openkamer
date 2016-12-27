@@ -10,6 +10,18 @@
   </div>
 </div>
 
+{{stats.period}}
+{% if list_of_parliamentmembers %}
+<h4>Kamerlidmaatschap</h4>
+{% for parliamentmember in list_of_parliamentmembers %}
+<li>joined at{{parliamentmember.joined}}
+<li>left at{{parliamentmember.left}}
+
+{% endfor %}
+<li>delta {{stats.period}}
+<li>number of docs {{stats.n_of_documents}}
+<li>docs per year {{stats.docs_per_day}}
+{% endif %}
 {% if list_of_submitters %}
 <h4>Ingediende documenten</h4>
 {% for submitter in list_of_submitters %}
