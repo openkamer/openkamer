@@ -119,14 +119,53 @@ def create_goverment_member(government, member, person, position):
 def create_parties():
     parties = scraper.political_parties.search_parties()
     for party_info in parties:
-        party = PoliticalParty.find_party(party_info['name'])
-        if party:
-            logger.warning('party ' + party_info['name'] + ' already exists!')
+        create_party(party_info['name'], party_info['name_short'])
+    set_party_votes_derived_info()
+
+
+@transaction.atomic
+def create_party(name, name_short):
+    party = PoliticalParty.find_party(name)
+    if party:
+        party.delete()
+    party = PoliticalParty.objects.create(name=name, name_short=name_short)
+    party.update_info(language='nl')
+    return party
+
+
+@transaction.atomic
+def create_party_members():
+    logger.info('BEGIN')
+    persons = Person.objects.filter(wikidata_id__isnull=False)
+    for person in persons:
+        create_party_members_for_person(person)
+    logger.info('END')
+
+
+@transaction.atomic
+def create_party_members_for_person(person):
+    logger.info('BEGIN, person: ' + str(person))
+    if not person.wikidata_id:
+        logger.warning('could not update party member for person: ' + str(person) + ' because person has no wikidata id.')
+        return
+    PartyMember.objects.filter(person=person).delete()
+    wikidata_item = wikidata.WikidataItem(person.wikidata_id)
+    memberships = wikidata_item.get_political_party_memberships()
+    for membership in memberships:
+        parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
+        if parties.exists():
+            party = parties[0]
         else:
-            party = PoliticalParty.objects.create(name=party_info['name'], name_short=party_info['name_short'])
-            logger.info('created: ' + str(party))
-        party.update_info('nl', 'nl')
-        party.save()
+            logger.error('could not find party with wikidata id: ' + str(membership['wikidata_id']))
+            continue
+        new_member = PartyMember.objects.create(
+            person=person,
+            party=party,
+            joined=membership['start_date'],
+            left=membership['end_date']
+        )
+        logger.info(new_member.joined)
+    logger.info('END')
 
 
 @transaction.atomic
@@ -192,18 +231,25 @@ def create_parliament_members(max_results=None, all_members=False):
         if max_results and counter >= max_results:
             logger.info('END: max results reached')
             break
-    set_votes_derived_info()
+    set_individual_votes_derived_info()
     logger.info('END')
     return members
 
 
 @transaction.atomic
-def set_votes_derived_info():
-    """ sets the derived foreign keys in votes, needed after parties or parliament members have changed """
+def set_individual_votes_derived_info():
+    """ sets the derived foreign keys in individual votes, needed after parliament members have changed """
     logger.info('BEGIN')
     votes = VoteIndividual.objects.all()
     for vote in votes:
         vote.set_derived()
+    logger.info('END')
+
+
+@transaction.atomic
+def set_party_votes_derived_info():
+    """ sets the derived foreign keys in party votes, needed after parties have changed """
+    logger.info('BEGIN')
     votes = VoteParty.objects.all()
     for vote in votes:
         vote.set_derived()
@@ -235,20 +281,7 @@ def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=Fal
         assert person.wikidata_id == wikidata_id
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
-        memberships = wikidata_item.get_political_party_memberships()
-        for membership in memberships:
-            parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
-            if parties.exists():
-                party = parties[0]
-            else:
-                logger.error('political party with wikidata id: ' + str(membership['wikidata_id']) + ', for person with wikidata id: ' + str(wikidata_id) + ' does not exist')
-                continue
-            PartyMember.objects.create(
-                person=person,
-                party=party,
-                joined=membership['start_date'],
-                left=membership['end_date']
-            )
+        create_party_members_for_person(person)
     return person
 
 
@@ -504,7 +537,11 @@ def create_new_url(url):
     match_dossier = re.match("/dossier/(\d+)", url)
     new_url = ''
     if match_kamerstuk:
-        new_url = reverse('kamerstuk', args=(match_kamerstuk.group(1), match_kamerstuk.group(2),))
+        dossier_id = match_kamerstuk.group(1)
+        sub_id = match_kamerstuk.group(2)
+        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
+        if kamerstukken.exists():
+            new_url = reverse('kamerstuk', args=(dossier_id, sub_id,))
     elif match_dossier:
         dossier_id = match_dossier.group(1)
         if Dossier.objects.filter(dossier_id=dossier_id).exists():
@@ -531,11 +568,13 @@ def create_submitter(document, submitter):
     surname = submitter
     if has_initials:
         initials, surname, surname_prefix = parse_name_surname_initials(submitter)
+    if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
+        initials = ''
     person = Person.find_surname_initials(surname=surname, initials=initials)
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, initials=initials)
-    Submitter.objects.create(person=person, document=document)
+    return Submitter.objects.create(person=person, document=document)
 
 
 @transaction.atomic
@@ -619,8 +658,9 @@ def create_votings(dossier_id):
             continue
         elif dossiers[0].voting:
             dossiers[0].voting.delete()
+        voting_obj.is_individual = voting_result.is_individual()
         voting_obj.save()
-        if voting_result.is_individual():
+        if voting_obj.is_individual:
             create_votes_individual(voting_obj, voting_result.votes)
         else:
             create_votes_party(voting_obj, voting_result.votes)
@@ -646,7 +686,7 @@ def create_votes_party(voting, votes):
                 name_short=vote.party_name,
                 wikidata_id=wikidata_id
             )
-            party.update_info()
+            party.update_info(language='nl')
         if not vote.decision:
             logger.warning('vote has no decision, vote.details: ' + str(vote.details))
         VoteParty.objects.create(

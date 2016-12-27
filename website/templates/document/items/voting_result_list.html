@@ -44,7 +44,7 @@
     {% endif %}
   {% endfor %}
   {% for vote in voting.votes_against %}
-    {% if forloop.first == 0 %}
+    {% if forloop.first %}
       <strong>Tegen:</strong>
     {% endif %}
     <small>

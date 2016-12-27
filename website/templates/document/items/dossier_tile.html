@@ -10,19 +10,9 @@
       <small>{{ dossier.dossier_id }}</small>
     </div>
     <div class="col-xs-5" align="right">
-      {% if dossier.voting %}
       {% get_dossier_status_color dossier as dossier_status_class %}
       {% get_dossier_status_icon dossier as dossier_status_icon %}
-        <span class="fa {{ dossier_status_icon }} text-{{ dossier_status_class }}"></span>
-      {% elif dossier.is_active %}
-        <span class="fa fa-spinner text-info" title="In behandeling"></span>
-      {% elif dossier.is_withdrawn %}
-        <span class="fa fa-undo text-danger" title="Ingetrokken"></span>
-      {% elif dossier.passed %}
-        <span class="fa fa-check text-success" title="Aangenomen"></span>
-      {% else %}
-        <span class="fa fa-stop-circle-o text-warning" title="Niet meer in behandling. Resultaat onduidelijk."></span>
-      {% endif %}
+      <i class="fa {{ dossier_status_icon }} text-{{ dossier_status_class }}" title="{{ dossier.get_status_display }}"></i>
     </div>
   </div>
 

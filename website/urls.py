@@ -5,6 +5,7 @@ from django.views.generic.base import RedirectView
 
 from person.views import PersonView
 from person.views import PersonsView
+from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
@@ -21,12 +22,13 @@ from document.views import VotingsView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
-from parliament.views import PartiesView, PartyView
+from parliament.views import PartiesView, PartyView, PartyMembersCheckView
 from parliament.views import ParliamentMembersCurrentView
 from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
+from stats.views import VotingsPerPartyView
 
 from website.views import DatabaseDumpsView
 from website.views import HomeView
@@ -42,7 +44,7 @@ urlpatterns = [
     url(r'^colofon/$', TemplateView.as_view(template_name="website/about.html"), name='about'),
 
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
-    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
+    url(r'^personen/twitter/$', TwitterPersonsView.as_view(), name='persons-twitter'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
     url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
 
@@ -51,7 +53,6 @@ urlpatterns = [
 
     url(r'^tweedekamerleden/$', ParliamentMembersCurrentView.as_view(), name='parliament-members'),
     url(r'^tweedekamerleden/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', ParliamentMembersAtDateView.as_view(), name='parliament-members-at-date'),
-    url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
 
     url(r'^kabinetten/$', GovernmentsView.as_view(), name='governments'),
     url(r'^kabinet/huidig/$', GovernmentCurrentView.as_view(), name='government-current'),
@@ -82,12 +83,18 @@ urlpatterns = [
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^stats/$', TemplateView.as_view(template_name='stats/base.html'), name='stats'),
+    url(r'^stats/$', TemplateView.as_view(template_name='stats/index.html'), name='stats'),
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
+    url(r'^stats/stemmingen/partijen/$', VotingsPerPartyView.as_view(), name='stats-votings-party'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
 
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
+
+    url(r'^checks/$', TemplateView.as_view(template_name='website/checks.html'), name='checks'),
+    url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
+    url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
+    url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
 
     url(r'^testlist/$', TemplateView.as_view(template_name="website/testlist.html")),
 

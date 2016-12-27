@@ -26,13 +26,14 @@
   </div>
 </div>
 
+{% if voting.votes %}
 <hr/>
-
 <div class="row">
   <div class="col-sm-8 col-sm-offset-2">
     {% include "document/items/voting_result_list_large.html" %}
   </div>
 </div>
+{% endif %}
 
 <hr/>
 

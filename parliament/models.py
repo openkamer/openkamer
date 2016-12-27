@@ -45,7 +45,6 @@ class ParliamentMember(models.Model):
 
     @staticmethod
     def find(surname, initials='', date=None):
-        logger.info('surname: ' + surname + ', initials: ' + initials)
         person = Person.find_surname_initials(surname, initials)
         if date:
             members = ParliamentMember.find_at_date(person, date)
@@ -53,7 +52,7 @@ class ParliamentMember(models.Model):
             members = ParliamentMember.objects.filter(person=person).order_by('-joined')
         if members.exists():
             return members[0]
-        logger.info('ParliamentMember not found.')
+        logger.info('ParliamentMember not found for: ' + str(surname) + ' (' + initials + ')')
         return None
 
     @staticmethod
@@ -62,11 +61,25 @@ class ParliamentMember(models.Model):
                   ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
         return members
 
-    def political_party(self):
-        memberships = PartyMember.objects.filter(person=self.person).select_related('party', 'person')
+    def political_parties(self):
+        memberships = PartyMember.objects.filter(person=self.person)
+        if memberships.count() == 1:
+            memberships = memberships
+        elif self.joined and self.left:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gt=self.left)
+        elif self.joined:
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
+        else:
+            logger.error('multiple or no parties for ' + str(self.person) + ' found without joined/end date')
+        party_ids = []
         for member in memberships:
-            if member.left is None:
-                return member.party
+            party_ids.append(member.party.id)
+        return PoliticalParty.objects.filter(id__in=party_ids)
+
+    def political_party(self):
+        parties = self.political_parties()
+        if parties:
+            return parties[0]
         return None
 
     @cached_property
@@ -116,9 +129,13 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
     slug = models.SlugField(max_length=250, default='')
+    current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
 
     def __str__(self):
-        return str(self.name) + ' (' + str(self.name_short) + ')'
+        name = self.name_short
+        if self.name_short != self.name:
+            name += ' (' + str(self.name) + ')'
+        return name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name_short)
@@ -128,29 +145,45 @@ class PoliticalParty(models.Model):
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
 
-    def find_wikidata_id(self, language='en', top_level_domain='com'):
-        wikidata_ids = wikidata.search_wikidata_ids(self.name, language)
-        if not wikidata_ids:
-            return ''
-        # find the first result with a website with the given domain
-        for wid in wikidata_ids:
-            official_website = wikidata.WikidataItem(wid).get_official_website()
-            if official_website:
-                tld = official_website.split('.')[-1]
-                if tld == top_level_domain or tld == top_level_domain + '/':
-                    return wid
-        return wikidata_ids[0]
+    @staticmethod
+    def sort_by_current_seats(parties):
+        return sorted(parties, key=lambda party: party.parliament_seats_current(), reverse=True)
 
-    def update_info(self, language='en', top_level_domain='com'):
+    def set_current_parliament_seats(self):
+        self.current_parliament_seats = self.parliament_members_current.count()
+        self.save()
+
+    def parliament_seats_current(self):
+        if self.current_parliament_seats is None:
+            return self.parliament_members_current.count()
+        return self.current_parliament_seats
+
+    @cached_property
+    def parliament_members_current(self):
+        parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today()).select_related('person')
+        pm_person_ids = []
+        for member in parliament_members:
+            pm_person_ids.append(member.person.id)
+        return PartyMember.objects.filter(person_id__in=pm_person_ids, party=self, left__isnull=True)
+
+    @cached_property
+    def total_parliament_members(self):
+        parties = PoliticalParty.objects.all()
+        count = 0
+        for party in parties:
+            count += party.parliament_members_current.count()
+        return count
+
+    def find_wikidata_id(self, language='en'):
+        return wikidata.search_political_party_id(self.name, language=language)
+
+    def update_info(self, language='en'):
         """
-        update the model derived info
+        update the party with wikidata info
         :param language: the language to search for in wikidata
-        :param top_level_domain: the top level domain of the party website, also used to determine country
         """
-        if top_level_domain[0] == '.':
-            logger.warning("Top level domain should not start with a dot (use 'com' instead of '.com')" )
         if not self.wikidata_id:
-            self.wikidata_id = self.find_wikidata_id(language, top_level_domain)
+            self.wikidata_id = self.find_wikidata_id(language)
             if not self.wikidata_id:
                 return
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
@@ -182,6 +215,14 @@ class PartyMember(models.Model):
     party = models.ForeignKey(PoliticalParty)
     joined = models.DateField(blank=True, null=True, db_index=True)
     left = models.DateField(blank=True, null=True, db_index=True)
+
+    @staticmethod
+    def get_at_date(person, date):
+        return PartyMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__lte=date, left__isnull=True) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__gt=date) | \
+               PartyMember.objects.filter(person=person, joined__isnull=True, left__isnull=True)
+
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'

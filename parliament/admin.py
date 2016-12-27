@@ -11,6 +11,7 @@ class PoliticalPartyAdmin(admin.ModelAdmin):
         'founded',
         'dissolved',
         'slug',
+        'current_parliament_seats',
         'wikidata_id',
         'wikimedia_logo_url',
         'wikipedia_url',

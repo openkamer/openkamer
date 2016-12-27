@@ -36,7 +36,16 @@
       {% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">Parlement en Politiek</a>{% endif %}
     </td>
   </tr>
+  {% if person.twitter_username %}
+  <tr>
+    <th>Twitter</th>
+    <td>
+      <a href="https://www.twitter.com/{{ person.twitter_username }}">{{ person.twitter_username }}</a>
+    </td>
+  </tr>
+  {% endif %}
 </table>
+
 <img src="{{ person.wikimedia_image_url }}" height="200px">
 
 <hr/>

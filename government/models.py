@@ -17,9 +17,16 @@ class Government(models.Model):
     wikidata_id = models.CharField(max_length=200, blank=True)
     slug = models.SlugField(max_length=250, default='')
 
+    class Meta:
+        ordering = ['-date_formed']
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+    @staticmethod
+    def current():
+        return Government.objects.filter(date_dissolved__isnull=True)[0]
 
     @cached_property
     def prime_minister(self):

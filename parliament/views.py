@@ -4,6 +4,7 @@ from unidecode import unidecode
 
 from django.views.generic import TemplateView
 
+from parliament.models import PartyMember
 from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
@@ -16,6 +17,7 @@ class PartiesView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         parties = PoliticalParty.objects.all()
+        parties = PoliticalParty.sort_by_current_seats(parties)
         context['parties'] = parties
         return context
 
@@ -52,6 +54,22 @@ class ParliamentMembersAtDateView(ParliamentMembersView):
     def get_context_data(self, year, month, day, **kwargs):
         at_date = datetime.date(year=int(year), month=int(month), day=int(day))
         return super().get_context_data(at_date, **kwargs)
+
+
+class PartyMembersCheckView(TemplateView):
+    template_name = 'parliament/party_members_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        member_double_ids = []
+        members = PartyMember.objects.filter(left__isnull=True)
+        for member in members:
+            members_same_person = PartyMember.objects.filter(person=member.person, left__isnull=True)
+            if members_same_person.count() > 1:
+                for member_same_person in members_same_person:
+                    member_double_ids.append(member_same_person.id)
+        context['members_double_current'] = PartyMember.objects.filter(id__in=member_double_ids)
+        return context
 
 
 class ParliamentMembersCheckView(TemplateView):

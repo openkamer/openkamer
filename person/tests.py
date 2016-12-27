@@ -82,7 +82,7 @@ class TestCreatePerson(TestCase):
         person = Person.objects.create(forename=forename, surname=surname)
         self.assertEqual(Person.objects.count(), 1)
         self.assertTrue(Person.person_exists(forename, surname))
-        person.update_info()
+        person.update_info(language='nl')
         person.save()
         self.assertEqual(person.wikidata_id, 'Q57792')
         self.assertEqual(person.wikimedia_image_name.split('.')[1], 'jpg')

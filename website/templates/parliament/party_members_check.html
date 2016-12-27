@@ -1,0 +1,46 @@
+{% extends "website/base.html" %}
+
+{% block title %}Partijleden Checks {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Partijleden Check</h3></div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-12">
+
+    <h4>Partijleden met twee partijen (nu)</h4>
+
+    <table class="table table-striped table-hover table-condensed">
+      <thead>
+        <tr>
+          <th>naam</th>
+          <th>partij</th>
+          <th>begin</th>
+          <th>eind</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for member in members_double_current %}
+        <tr>
+          <td>{{ member.person.fullname }}</td>
+          <td>{{ member.party }}</td>
+          <td>{{ member.joined }}</td>
+          <td>{{ member.left }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<hr/>
+
+{% endblock %}

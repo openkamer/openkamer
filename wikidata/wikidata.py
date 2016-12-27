@@ -1,6 +1,7 @@
 import datetime
-import urllib.parse
 import logging
+import re
+import urllib.parse
 
 import requests
 
@@ -35,12 +36,21 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
-def search_political_party_id(search_str, language='en'):
+def search_political_party_id(search_str, country_id='Q55', language='en'):
     wikidata_ids = search_wikidata_ids(search_str, language)
+    wikidata_ids += search_wikidata_ids('Lid-' + search_str, language)
+    possible_items = []
     for wikidata_id in wikidata_ids:
         item = WikidataItem(wikidata_id)
         if item.is_political_party():
-            return wikidata_id
+            possible_items.append(item)
+        elif item.is_fractie():
+            possible_items.append(item)
+    if len(possible_items) == 1:
+        return possible_items[0].id
+    for item in possible_items:
+        if item.get_country_id() == country_id:
+            return item.id
     return ''
 
 
@@ -181,6 +191,14 @@ class WikidataItem(object):
             return claims['P856'][0]['mainsnak']['datavalue']['value']
         return ''
 
+    def is_fractie(self):
+        claims = self.get_claims()
+        if 'P31' in claims:
+            for instance_of in claims['P31']:
+                if instance_of['mainsnak']['datavalue']['value']['id'] == 'Q848197':
+                    return True
+        return False
+
     def get_image_filename(self):
         claims = self.get_claims()
         if 'P18' in claims:
@@ -241,8 +259,17 @@ class WikidataItem(object):
             date = datetime.datetime.strptime(date_str[1:11], '%Y-%m-%d')
             return date.date()
         except ValueError as error:
+            result = re.findall("(\d{4})-00-00", date_str)
+            if result:
+                return datetime.date(year=int(result[0]), day=1, month=1)
             logger.error(error)
             return None
+
+    def get_twitter_username(self):
+        claims = self.get_claims()
+        if 'P2002' in claims:
+            return claims['P2002'][0]['mainsnak']['datavalue']['value']
+        return ''
 
     def get_parlement_and_politiek_id(self):
         claims = self.get_claims()

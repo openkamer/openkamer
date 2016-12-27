@@ -3,8 +3,11 @@ from django import template
 
 from document.models import Dossier
 from document.models import Kamerstuk
+from document.models import Submitter
 from document.models import Voting
 from parliament.models import PartyMember
+from parliament.models import ParliamentMember
+from government.models import GovernmentMember
 
 register = template.Library()
 
@@ -16,10 +19,9 @@ def get_dossier_exists(dossier_id):
 
 @register.assignment_tag
 def get_current_party(person_id):
-    members = PartyMember.objects.filter(person=person_id).select_related('party', 'person')
-    for member in members:
-        if member.left is None:
-            return member.party
+    members = PartyMember.objects.filter(person=person_id, left__isnull=True).select_related('party', 'person')
+    if members.exists():
+        return members[0].party
     return None
 
 
@@ -72,6 +74,10 @@ def get_dossier_status_color(dossier):
         return 'warning'
     elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'warning'
+    elif dossier.status == Dossier.IN_BEHANDELING:
+        return 'info'
+    elif dossier.status == Dossier.ONBEKEND:
+        return 'info'
     return 'info'
 
 
@@ -89,6 +95,10 @@ def get_dossier_status_icon(dossier):
         return 'fa-pause'
     elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'fa-warning'
+    elif dossier.status == Dossier.IN_BEHANDELING:
+        return 'fa-spinner'
+    elif dossier.status == Dossier.ONBEKEND:
+        return 'fa-question'
     return 'fa-spinner'
 
 
@@ -99,3 +109,24 @@ def get_extra_category_button_class(category_slug, active_category_slug):
     elif category_slug.lower() == 'all' and active_category_slug == '':
         return 'active'
     return ''
+
+
+@register.assignment_tag
+def get_submitters(person):
+    return Submitter.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_government_members_for_person(person):
+    return GovernmentMember.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_parliament_members_for_person(person):
+    return ParliamentMember.objects.filter(person=person)
+
+
+@register.assignment_tag
+def get_party_members_for_person(person):
+    return PartyMember.objects.filter(person=person)
+

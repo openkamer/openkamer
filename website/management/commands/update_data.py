@@ -11,4 +11,4 @@ class Command(BaseCommand):
 
         parties = PoliticalParty.objects.all()
         for party in parties:
-            party.update_info(language='nl', top_level_domain='nl')
+            party.update_info(language='nl')

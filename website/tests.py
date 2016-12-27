@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.contrib.auth.models import User
@@ -22,6 +23,7 @@ from document.models import CategoryDocument
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
+from document.models import Submitter
 from document.models import Voting
 
 import website.create
@@ -47,6 +49,13 @@ class TestCreateParliament(TestCase):
 
     def test_create_parliament_from_wikidata(self):
         website.create.create_parliament_members(max_results=20)
+
+
+class TestCreatePoliticalParty(TestCase):
+
+    def test_create_socialist_party(self):
+        party = website.create.create_party('Socialistische Partij', 'SP')
+        self.assertEqual(party.wikidata_id, 'Q849580')
 
 
 class TestCreateGovernment(TestCase):
@@ -255,6 +264,13 @@ class TestCreatePerson(TestCase):
         self.assertEqual(person.surname_prefix, '')
         self.assertEqual(person.surname, 'Koşer Kaya')
         self.assertEqual(person.fullname(), 'Fatma Koşer Kaya')
+
+    def test_submitter(self):
+        document = Document.objects.create(date_published=datetime.date.today())
+        submitter = website.create.create_submitter(document, 'L. van Tongeren')
+        self.assertEqual(submitter.person.initials, 'L.')
+        submitter = website.create.create_submitter(document, 'Tongeren C.S.')
+        self.assertEqual(submitter.person.initials, '')
 
 
 class TestWebsite(TestCase):

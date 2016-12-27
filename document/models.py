@@ -11,6 +11,7 @@ from person.util import parse_name_surname_initials
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
+from parliament.models import PartyMember
 
 from government.models import GovernmentMember
 
@@ -68,6 +69,7 @@ class Dossier(models.Model):
     url = models.URLField(blank=True)
     decision = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-dossier_id']
@@ -257,6 +259,12 @@ class Submitter(models.Model):
         gms = gms.order_by('-end_date')
         return gms
 
+    @cached_property
+    def party(self):
+        members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
+        if members.exists():
+            return members[0].party
+
 
 class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
@@ -376,6 +384,7 @@ class Voting(models.Model):
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
     is_dossier_voting = models.BooleanField(default=False)
+    is_individual = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
     date = models.DateField(auto_now=False, blank=True, db_index=True)
 
@@ -414,6 +423,14 @@ class Voting(models.Model):
 
     def has_result_details(self):
         return len(self.votes) > 0
+
+    @cached_property
+    def submitters(self):
+        if self.is_dossier_voting and self.dossier.first_voorstel:
+            return self.dossier.first_voorstel.document.submitters
+        elif self.kamerstuk:
+            return self.kamerstuk.document.submitters
+        return []
 
     def entities_for_string(self):
         entities_str = ''

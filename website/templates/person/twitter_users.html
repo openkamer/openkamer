@@ -1,0 +1,47 @@
+{% extends "website/base.html" %}
+
+{% load openkamer %}
+
+{% block title %}Personen met Twitter - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Personen met Twitter ({{ persons|length }})</h3></div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row" align="center">
+  <div class="col-lg-12">
+    <table class="table table-striped table-hover table-condensed">
+      <thead>
+        <tr>
+          <th>naam</th>
+          <th>voornaam</th>
+          <th>achternaam</th>
+          <th>initialen</th>
+          <th>partij</th>
+          <th>twitter username</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for person in persons %}
+        <tr>
+          <td>{{ person.fullname }}</td>
+          <td>{{ person.forename }}</td>
+          <td>{{ person.surname }}</td>
+          <td>{{ person.initials }}</td>
+          {% get_current_party person.id as party %}
+          <td>{% if party %}<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>{% endif %}</td>
+          <td><a href="https://www.twitter.com/{{ person.twitter_username }}">{{ person.twitter_username }}</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

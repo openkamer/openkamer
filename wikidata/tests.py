@@ -75,8 +75,51 @@ class TestFindPoliticalParty(TestCase):
         label = item.get_label(language='nl')
         self.assertEqual(label, 'Volkspartij voor Vrijheid en Democratie')
 
-    def test_is_policital_party(self):
+    def test_is_political_party(self):
         wikidata_id = 'Q275441'  # PvdA
         item = wikidata.WikidataItem(wikidata_id)
         is_pp = item.is_political_party()
         self.assertTrue(is_pp)
+
+    def test_is_fractie(self):
+        wikidata_id = 'Q28044800'  # Lid-Monasch
+        item = wikidata.WikidataItem(wikidata_id)
+        is_fractie = item.is_fractie()
+        self.assertTrue(is_fractie)
+
+    def test_search_group_houwers(self):
+        wikidata_id = wikidata.search_political_party_id('Houwers', language='nl')
+        self.assertEqual(wikidata_id, 'Q28044763')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Lid-Houwers')
+
+    def test_search_socialist_party(self):
+        wikidata_id = wikidata.search_political_party_id('Socialistische Partij', language='nl')
+        self.assertEqual(wikidata_id, 'Q849580')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'Socialistische Partij')
+
+
+class TestDate(TestCase):
+
+    def test_date(self):
+        date_str = '+2016-12-25T00:00:00Z'
+        date = wikidata.WikidataItem.get_date(date_str)
+        self.assertEqual(date.day, 25)
+        self.assertEqual(date.month, 12)
+        self.assertEqual(date.year, 2016)
+        date_str = '+2016-00-00T00:00:00Z'
+        date = wikidata.WikidataItem.get_date(date_str)
+        self.assertEqual(date.day, 1)
+        self.assertEqual(date.month, 1)
+        self.assertEqual(date.year, 2016)
+
+
+class TestPersonProperties(TestCase):
+
+    def test_get_twitter_username(self):
+        wikidata_id = 'Q560780'
+        item = wikidata.WikidataItem(wikidata_id)
+        self.assertEqual(item.get_twitter_username(), 'diederiksamsom')
