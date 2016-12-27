@@ -79,13 +79,8 @@ class UpdateParliamentAndGovernment(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            website.create.create_parties()
-            website.create.create_governments()
-            website.create.create_parliament_members()
-            website.create.create_party_members()
-            for party in PoliticalParty.objects.all():
-                party.set_current_parliament_seats()
-            stats.models.StatsVotingSubmitter.create()
+            website.create.create_parliament_and_government()
+            stats.models.update_all()
         except Exception as error:
             logger.exception(error)
             raise

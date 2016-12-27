@@ -15,7 +15,7 @@ class UpdateStatsData(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            stats.models.StatsVotingSubmitter.create()
+            stats.models.update_all()
         except Exception as error:
             logger.exception(error)
             raise

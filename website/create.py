@@ -55,6 +55,16 @@ logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
+def create_parliament_and_government():
+    create_parties()
+    create_governments()
+    create_parliament_members()
+    create_party_members()
+    for party in PoliticalParty.objects.all():
+        party.set_current_parliament_seats()
+
+
+@transaction.atomic
 def create_governments():
     # Rutte I : Q168828
     # Rutte II : Q1638648

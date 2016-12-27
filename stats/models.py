@@ -12,6 +12,10 @@ from parliament.models import PoliticalParty
 logger = logging.getLogger(__name__)
 
 
+def update_all():
+    StatsVotingSubmitter.create()
+
+
 class StatsVotingSubmitter(models.Model):
     voting = models.ForeignKey(Voting)
     person = models.ForeignKey(Person)

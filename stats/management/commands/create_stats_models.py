@@ -6,4 +6,4 @@ import stats.models
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        stats.models.StatsVotingSubmitter.create()
+        stats.models.update_all()

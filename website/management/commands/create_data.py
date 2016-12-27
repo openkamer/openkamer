@@ -2,6 +2,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+import stats.models
+
 import website.create
 
 logger = logging.getLogger(__name__)
@@ -21,10 +23,9 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        website.create.create_parties()
-        website.create.create_governments()
-        website.create.create_parliament_members()
+        website.create.create_parliament_and_government()
         failed_dossiers = website.create.create_wetsvoorstellen_all(options['skip-existing'])
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
         website.create.create_besluitenlijsten(skip_existing=options['skip-existing'])
+        stats.models.update_all()
