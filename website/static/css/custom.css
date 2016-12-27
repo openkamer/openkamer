@@ -1,26 +1,14 @@
 html, body {
   overflow-x: hidden;
-  height: 100%;
-}
-
-#wrap {
-  min-height: 100%;
-}
-
-#main {
-  padding-bottom:120px; /* this needs to be bigger than footer height*/
-}
-
-#base-footer {
-  position: relative;
-  margin-top: -120px; /* negative value of footer height */
-  height: 120px;
-  clear:both;
-  padding-top:20px;
 }
 
 body {
   padding-top: 70px;
+}
+
+#base-footer {
+  position: relative;
+  height: 80px;
 }
 
 a.anchor {
