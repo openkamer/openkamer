@@ -87,24 +87,11 @@
               <li><a href="{% url 'government-current' %}">Kabinet</a></li>
               <li><a href="{% url 'parliament-members' %}">Kamerleden</a></li>
               <li><a href="{% url 'parties' %}">Partijen</a></li>
-              <li><a href="{% url 'stats' %}">Statistieken</a></li>
             </ul>
           </li>
 
         </ul>
 
-        <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Info <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'about' %}">Colofon</a></li>
-              <li><a href="https://github.com/openkamer/openkamer" target="_blank">Code</a></li>
-              {% if user.is_staff %}<li><a href="/admin" target="_blank">Admin</a></li>{% endif %}
-              <li role="presentation" class="divider"></li>
-              <li><a href="/">{{ openkamer_version }}</a></li>
-            </ul>
-          </li>
-        </ul>
       </div>
 
     </div>
@@ -123,6 +110,27 @@
 
   </div>
 
+  <footer class="footer">
+    <div class="container" align="center">
+      <hr/>
+
+      <div class="row" align="center">
+        <div class="col-sm-2 col-sm-offset-2">
+          <h5><a href="{% url 'about' %}">Colofon</a></h5>
+        </div>
+        <div class="col-sm-2">
+          <h5><a href="https://github.com/openkamer/openkamer" target="_blank">GitHub</a></h5>
+        </div>
+        <div class="col-sm-2">
+          <h5><a href="https://twitter.com/openkamer" target="_blank">Twitter</a></h5>
+        </div>
+        <div class="col-sm-2">
+          <h5>v{{ openkamer_version }}</h5>
+        </div>
+      </div>
+    </div>
+    <br/>
+  </footer>
 
 </body>
 
