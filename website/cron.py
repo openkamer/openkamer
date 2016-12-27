@@ -80,7 +80,6 @@ class UpdateParliamentAndGovernment(CronJobBase):
         logger.info('BEGIN')
         try:
             website.create.create_parliament_and_government()
-            stats.models.update_all()
         except Exception as error:
             logger.exception(error)
             raise

@@ -48,6 +48,7 @@ from parliament.models import PoliticalParty
 from person.models import Person
 from person.util import parse_name_surname_initials
 from wikidata import wikidata
+import stats.models
 
 from website import settings
 
@@ -62,6 +63,7 @@ def create_parliament_and_government():
     create_party_members()
     for party in PoliticalParty.objects.all():
         party.set_current_parliament_seats()
+    stats.models.update_all()
 
 
 @transaction.atomic
