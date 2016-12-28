@@ -38,13 +38,14 @@ def get_voting_stats_per_party(vote_party_qs):
         periods = []
         for votes_for_gov in party_votes_per_gov:
             party_votes = votes_for_gov['party_votes']
+            party_votes = party_votes.filter(party=party)
             votes_for = party_votes.filter(party=party, decision=Vote.FOR)
             votes_against = party_votes.filter(party=party, decision=Vote.AGAINST)
             votes_none = party_votes.filter(party=party, decision=Vote.NONE)
-            n_votes = party_votes.filter(party=party).count()
             n_for = votes_for.count()
             n_against = votes_against.count()
             n_none = votes_none.count()
+            n_votes = n_for + n_against + n_none
             if n_votes == 0:
                 for_percent = 0
                 against_percent = 0

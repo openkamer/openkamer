@@ -52,6 +52,7 @@ class VotingsPerPartyView(TemplateView):
         votes_filter = PartyVotesFilter(self.request.GET, queryset=VoteParty.objects.all())
         votes_filtered = votes_filter.qs
         context['stats'] = stats.util.get_voting_stats_per_party(votes_filtered)
+        context['n_votes'] = votes_filtered.count()
         context['filter'] = votes_filter
         context['page_stats_votings_parties'] = True
         return context
