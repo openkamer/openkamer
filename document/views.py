@@ -88,6 +88,7 @@ class DossiersView(TemplateView):
         two_month_ago = datetime.date.today()-datetime.timedelta(days=60)
         context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False, voting__date__gt=two_month_ago).distinct().order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
         context['filter'] = dossier_filter
+        context['n_results'] = dossier_filter.qs.count()
         return context
 
 
@@ -250,6 +251,7 @@ class VotingsView(TemplateView):
             votings = paginator.page(paginator.num_pages)
         context['votings'] = votings
         context['filter'] = voting_filter
+        context['n_results'] = votings_filtered.count()
         return context
 
 

@@ -46,7 +46,7 @@
 
 <div class="row">
   <div class="col-md-6">
-    <h6>{% if filter.qs|length == 0%}geen stemmingen{% elif filter.qs|length == 1%}1 stemming{% else %}{{ filter.qs|length }} stemmingen{% endif %} gevonden</h6>
+    <h6>{% if n_results == 0 %}geen stemmingen{% elif n_results == 1 %}1 stemming{% else %}{{ n_results }} stemmingen{% endif %} gevonden</h6>
   </div>
   <div class="col-md-6" align="right">
   </div>

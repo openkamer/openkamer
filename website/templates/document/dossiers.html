@@ -97,7 +97,7 @@
 <div class="row">
   <h5>Alle</h5>
   <div class="col-md-6">
-    <h6>{% if filter.qs|length == 0%}geen wetsvoorstellen{% elif filter.qs|length == 1%}1 wetsvoorstel{% else %}{{ filter.qs|length }} wetsvoorstellen{% endif %} gevonden</h6>
+    <h6>{% if n_results == 0 %}geen wetsvoorstellen{% elif n_results == 1 %}1 wetsvoorstel{% else %}{{ n_results }} wetsvoorstellen{% endif %} gevonden</h6>
   </div>
   <div class="col-md-6" align="right">
   </div>
