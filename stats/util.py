@@ -6,6 +6,7 @@ from document.models import VoteParty
 from government.models import Government
 from parliament.models import PoliticalParty
 
+
 logger = logging.getLogger(__name__)
 
 

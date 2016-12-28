@@ -31,6 +31,11 @@
           {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
         </div>
 
+        <div class="col-sm-4">
+          <h6 class="text-primary">Kabinetsperiode</h6>
+          {% bootstrap_field filter.form.government bound_css_class='' show_label=False show_help=False %}
+        </div>
+
         <div class="col-sm-12">
           {% bootstrap_button content='Filter' button_type='submit' %}
         </div>
@@ -56,28 +61,22 @@
       <thead>
         <tr>
           <th style="max-width: 100px;">Partij</th>
-          {% with stat=stats|first %}
-          {% for period in stat.periods %}
-          <th><a href="{% url 'government' period.government.slug %}">{{ period.government.name }}</a></th>
-          {% endfor %}
-          {% endwith %}
+          <th>Stemverhouding</th>
         </tr>
       </thead>
       <tbody>
       {% for stat in stats %}
         <tr>
           <td style="max-width: 100px;"><a href="{% url 'party' stat.party.slug %}">{{ stat.party.name_short }}</a></td>
-          {% for period in stat.periods %}
           <td>
-            {% if period.n_votes != 0 %}
+            {% if stat.n_votes != 0 %}
             <div class="progress vote-result">
-              <div class="progress-bar progress-bar-success" style="width: {{ period.for_percent|unlocalize }}%" title="{{ period.n_for }} voor">{{ period.for_percent|floatformat:0 }} %</div>
-              <div class="progress-bar progress-bar-danger" style="width: {{ period.against_percent|unlocalize }}%" title="{{ period.n_against }} tegen">{{ period.against_percent|floatformat:0 }} %</div>
-              <div class="progress-bar progress-bar-warning" style="width: {{ period.none_percent|unlocalize }}%" title="{{ period.n_none }} niet gestemd"></div>
+              <div class="progress-bar progress-bar-success" style="width: {{ stat.for_percent|unlocalize }}%" title="{{ stat.n_for }} voor">{{ stat.for_percent|floatformat:0 }} %</div>
+              <div class="progress-bar progress-bar-danger" style="width: {{ stat.against_percent|unlocalize }}%" title="{{ stat.n_against }} tegen">{{ stat.against_percent|floatformat:0 }} %</div>
+              <div class="progress-bar progress-bar-warning" style="width: {{ stat.none_percent|unlocalize }}%" title="{{ stat.n_none }} niet gestemd"></div>
             </div>
             {% endif %}
           </td>
-          {% endfor %}
         </tr>
       {% endfor %}
       </tbody>
