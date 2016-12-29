@@ -13,6 +13,7 @@ from person.models import Person
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 from government.models import GovernmentMember
+from government.models import Government
 
 from document.models import BesluitenLijst
 from document.models import BesluitItemCase
@@ -26,6 +27,7 @@ from document.models import VoteParty
 import stats.util
 from stats.filters import PartyVotesFilter
 from stats.filters import PartyVoteBehaviour
+from stats.models import StatsVotingSubmitter
 
 logger = logging.getLogger(__name__)
 
@@ -56,18 +58,19 @@ class VotingsPerPartyView(TemplateView):
         context = super().get_context_data(**kwargs)
         votes_filter = PartyVotesFilter(self.request.GET, queryset=PartyVoteBehaviour.objects.all())
         votes_filtered = votes_filter.qs
-        votes_filtered.distinct()
-        logger.info(votes_filtered.count())
         results = []
         parties = PoliticalParty.sort_by_current_seats(PoliticalParty.objects.all())
         n_votes_total = 0
         for party in parties:
-            vote_behaviour = votes_filtered.filter(party=party)
-            logger.info(str(party) + ': ' + str(vote_behaviour.count()))
+            vote_behaviours = votes_filtered.filter(party=party)
+            for vote_behaviour in vote_behaviours:
+                if vote_behaviour.submitter is None:
+                    vote_behaviours = vote_behaviours.filter(submitter__isnull=True)
+                    break
             n_votes_for = 0
             n_votes_against = 0
             n_votes_none = 0
-            for result in vote_behaviour:
+            for result in vote_behaviours:
                 n_votes_for += result.votes_for
                 n_votes_against += result.votes_against
                 n_votes_none += result.votes_none
