@@ -9,6 +9,7 @@ from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
+from document.views import DossiersCheckView
 from document.views import DossiersView
 from document.views import DossierView, AddDossierView
 from document.views import DossierTimelineView
@@ -19,6 +20,7 @@ from document.views import KamerstukView
 from document.views import KamerstukRedirectView
 from document.views import VotingView
 from document.views import VotingsView
+from document.views import VotingsCheckView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
@@ -95,6 +97,8 @@ urlpatterns = [
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
     url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
+    url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
+    url(r'^dossiers/check/$', DossiersCheckView.as_view(), name='dossiers-check'),
 
     url(r'^testlist/$', TemplateView.as_view(template_name="website/testlist.html")),
 

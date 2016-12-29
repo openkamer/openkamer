@@ -19,6 +19,7 @@ from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import Dossier
 from document.models import Voting
+from document.models import VoteParty
 from document.filters import DossierFilter
 from document.filters import VotingFilter
 from document import settings
@@ -278,4 +279,29 @@ class BesluitenLijstView(TemplateView):
     def get_context_data(self, activity_id, **kwargs):
         context = super().get_context_data(**kwargs)
         context['besluitenlijst'] = BesluitenLijst.objects.get(activity_id=activity_id)
+        return context
+
+
+class DossiersCheckView(TemplateView):
+    template_name = 'document/dossiers_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        wetsvoorstel_ids = Dossier.get_active_dossier_ids()
+        wetsvoorstel_ids += Dossier.get_inactive_dossier_ids()
+        context['dossiers_no_wetsvoorstel'] = Dossier.objects.exclude(dossier_id__in=wetsvoorstel_ids)
+        return context
+
+
+class VotingsCheckView(TemplateView):
+    template_name = 'document/votings_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        votings = Voting.objects.all()
+        votings_no_submitters = []
+        for voting in votings:
+            if not voting.submitters:
+                votings_no_submitters.append(voting.id)
+        context['votings_no_submitters'] = Voting.objects.filter(id__in=votings_no_submitters)
         return context
