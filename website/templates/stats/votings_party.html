@@ -4,14 +4,14 @@
 {% load bootstrap3 %}
 {% load bootstrap_pagination %}
 
-{% block title %}Stemgedrag van Partijen - {{ block.super }}{% endblock %}
+{% block title %}Stemgedrag Partijen - {{ block.super }}{% endblock %}
 
 {% block content %}
 {{ block.super }}
 
 <div class="row">
   <div class="col-lg-12" align="center">
-    <h3>Stemgedrag van Partijen</h3>
+    <h3>Stemgedrag Partijen</h3>
   </div>
 </div>
 
@@ -66,18 +66,18 @@
       </thead>
       <tbody>
       {% for stat in stats %}
+        {% if stat.n_votes != 0 %}
         <tr>
           <td style="max-width: 100px;"><a href="{% url 'party' stat.party.slug %}">{{ stat.party.name_short }}</a></td>
           <td>
-            {% if stat.n_votes != 0 %}
             <div class="progress vote-result">
               <div class="progress-bar progress-bar-success" style="width: {{ stat.for_percent|unlocalize }}%" title="{{ stat.n_for }} voor">{{ stat.for_percent|floatformat:0 }} %</div>
               <div class="progress-bar progress-bar-danger" style="width: {{ stat.against_percent|unlocalize }}%" title="{{ stat.n_against }} tegen">{{ stat.against_percent|floatformat:0 }} %</div>
               <div class="progress-bar progress-bar-warning" style="width: {{ stat.none_percent|unlocalize }}%" title="{{ stat.n_none }} niet gestemd"></div>
             </div>
-            {% endif %}
           </td>
         </tr>
+        {% endif %}
       {% endfor %}
       </tbody>
     </table>
