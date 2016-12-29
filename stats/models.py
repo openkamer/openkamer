@@ -113,6 +113,52 @@ class PartyVoteBehaviour(models.Model):
             voting_ids.add(submitter.voting.id)
         return voting_ids
 
+    @staticmethod
+    def get_vote_behaviour_stats_for_party(party, vote_behaviours):
+        """
+        Return the vote behaviour for a given party, based on a queryset.
+        Warning: this QuerySet should be filtered on one or no submitter (party), NOT multiple submitter parties.
+        This would give incorrect (unexpected) results because one voting can have multiple submitters,
+        causing votes to be counted more than once.
+
+        :param party: the party for which to return the vote behaviour
+        :param vote_behaviours: PartyVoteBehaviour QuerySet that is filtered on one, and only one submitter party,
+        or not filtered by submitter at all
+        :return: a dictionary of party vote behaviour
+        """
+        vote_behaviours = vote_behaviours.filter(party=party)
+        # we either filter by no submitter (any party), or one party
+        vote_behaviours_any_party = vote_behaviours.filter(submitter__isnull=True)
+        if vote_behaviours_any_party:
+            vote_behaviours = vote_behaviours_any_party
+        n_votes_for = 0
+        n_votes_against = 0
+        n_votes_none = 0
+        for result in vote_behaviours:
+            n_votes_for += result.votes_for
+            n_votes_against += result.votes_against
+            n_votes_none += result.votes_none
+        n_votes = n_votes_for + n_votes_against + n_votes_none
+        if n_votes == 0:
+            for_percent = 0
+            against_percent = 0
+            none_percent = 0
+        else:
+            for_percent = n_votes_for / n_votes * 100.0
+            against_percent = n_votes_against / n_votes * 100.0
+            none_percent = n_votes_none / n_votes * 100.0
+        result = {
+            'party': party,
+            'n_votes': n_votes,
+            'n_for': n_votes_for,
+            'n_against': n_votes_against,
+            'n_none': n_votes_for,
+            'for_percent': for_percent,
+            'against_percent': against_percent,
+            'none_percent': none_percent,
+        }
+        return result
+
 
 class StatsVotingSubmitter(models.Model):
     voting = models.ForeignKey(Voting)
