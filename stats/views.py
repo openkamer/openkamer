@@ -61,7 +61,7 @@ class VotingsPerPartyView(TemplateView):
         stats = []
         parties = PoliticalParty.sort_by_current_seats(PoliticalParty.objects.all())
         for party in parties:
-            stat = PartyVoteBehaviour.get_vote_behaviour_stats_for_party(party, votes_filter.qs)
+            stat = PartyVoteBehaviour.get_stats_party_for_qs(party, votes_filter.qs)
             stats.append(stat)
             n_votes_total += stat['n_votes']
         context['stats'] = stats

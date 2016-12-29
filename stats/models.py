@@ -6,7 +6,6 @@ from django.db import transaction
 from person.models import Person
 
 from document.models import Vote
-from document.models import VoteParty
 from document.models import Voting
 
 from government.models import Government
@@ -43,6 +42,43 @@ class PartyVoteBehaviour(models.Model):
         return self.votes_for + self.votes_against + self.votes_none
 
     @staticmethod
+    def get_stats_party(party, government=None, voting_type=None):
+        """
+        Returns voting behaviour stats for a given party during a given government period.
+
+        :param party: the party for which to get the stats
+        :param government: (optional) the government period for which to get the stats
+        :param voting_type: (optional) the type of voting
+        :return: a dictionary with basic voting stats
+        """
+        vote_behaviours = PartyVoteBehaviour.objects.filter(submitter__isnull=True)
+        vote_behaviours = PartyVoteBehaviour.filter_by_type_and_government(vote_behaviours, voting_type=voting_type, government=government)
+        return PartyVoteBehaviour.get_stats_party_for_qs(party, vote_behaviours)
+
+    @staticmethod
+    def get_stats_party_for_submitter(party_voting, party_submitting, government=None, voting_type=None):
+        """
+        Returns voting behaviour stats for a given party, for a given submitting party, during a given government period.
+
+        :param party_voting: the party for which to get the stats
+        :param party_submitting: the party who submitted/initiated the voting (or related document or bill)
+        :param government: the government period for which to get the stats
+        :param voting_type: (optional) the type of voting
+        :return: a dictionary with basic voting stats
+        """
+        vote_behaviours = PartyVoteBehaviour.objects.filter(submitter=party_submitting)
+        vote_behaviours = PartyVoteBehaviour.filter_by_type_and_government(vote_behaviours, voting_type=voting_type, government=government)
+        return PartyVoteBehaviour.get_stats_party_for_qs(party_voting, vote_behaviours)
+
+    @staticmethod
+    def filter_by_type_and_government(vote_behaviours, voting_type=None, government=None):
+        if government:
+            vote_behaviours = vote_behaviours.filter(government=government)
+        if voting_type:
+            vote_behaviours = vote_behaviours.filter(voting_type=voting_type)
+        return vote_behaviours
+
+    @staticmethod
     @transaction.atomic
     def create_all():
         logger.info('BEGIN')
@@ -50,7 +86,7 @@ class PartyVoteBehaviour(models.Model):
         parties = PoliticalParty.objects.all()
         for party in parties:
             PartyVoteBehaviour.create(party)
-        logger.info('END')
+        logger.info('END, number of objects created: ' + str(PartyVoteBehaviour.objects.all().count()))
 
     @staticmethod
     @transaction.atomic
@@ -114,7 +150,7 @@ class PartyVoteBehaviour(models.Model):
         return voting_ids
 
     @staticmethod
-    def get_vote_behaviour_stats_for_party(party, vote_behaviours):
+    def get_stats_party_for_qs(party, vote_behaviours):
         """
         Return the vote behaviour for a given party, based on a queryset.
         Warning: this QuerySet should be filtered on one or no submitter (party), NOT multiple submitter parties.
