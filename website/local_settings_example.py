@@ -25,13 +25,13 @@ ALLOWED_HOSTS = ['*']
 STATIC_ROOT = ''
 
 # URL prefix for static files.
-#STATIC_URL = 'http://www.openkamer.org/static/'
+#STATIC_URL = '//www.openkamer.org/static/'
 STATIC_URL = '/static/'
 
 #MEDIA_ROOT = '/home/<username>/webapps/<projectstatic>/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 
-#MEDIA_URL = 'http://www.<your-domain>.com/static/media/'
+#MEDIA_URL = '//www.<your-domain>.com/static/media/'
 MEDIA_URL = '/static/media/'
 
 # DBBACKUP

@@ -16,7 +16,8 @@ $ sudo apt-get instsall ufw
 Configure,
 ```
 $ sudo ufw allow ssh
-$ sudo ufw allow www
+$ sudo ufw allow http
+$ sudo ufw allow https
 $ sudo ufw default deny incoming
 $ sudo ufw default allow outgoing
 ```
@@ -78,6 +79,13 @@ Install nginx,
 $ sudo apt-get install nginx
 ```
 Copy the nginx config in `docs/config/` to `/etc/nginx/sites-enabled/` and set the correct project paths in the config file.
+
+The config assumes you are deploying with HTTPS. 
+Create certificates with 'Let's Encrypt', then create a `/etc/nginx/snippets/ssl-openkamer.org.conf` with the following content,
+```
+ssl_certificate /etc/letsencrypt/live/openkamer.org/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/openkamer.org/privkey.pem;
+```
 
 Restart nginx,
 ```
