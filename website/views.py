@@ -24,6 +24,16 @@ class HomeView(TemplateView):
         return context
 
 
+class ContactView(TemplateView):
+    template_name = "website/contact.html"
+    context_object_name = "contact"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contact_email'] = settings.CONTACT_EMAIL
+        return context
+
+
 def create_timeline_date(date):
     return {
         'year': date.year,

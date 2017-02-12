@@ -56,6 +56,7 @@ CRON_CLASSES = [
 ]
 
 # OPENKAMER
+CONTACT_EMAIL = 'info@openkamer.org'
 OK_TMP_DIR = os.path.join(BASE_DIR, 'data/tmp/')
 
 # DOCUMENT

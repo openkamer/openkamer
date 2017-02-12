@@ -34,6 +34,7 @@ from stats.views import VotingsPerPartyView
 
 from website.views import DatabaseDumpsView
 from website.views import HomeView
+from website.views import ContactView
 from website import settings
 from website.views import get_dossier_timeline_json
 from website.views import PlotExampleView
@@ -44,6 +45,7 @@ import website.api
 urlpatterns = [
     url(r'^$', HomeView.as_view()),
     url(r'^colofon/$', TemplateView.as_view(template_name="website/about.html"), name='about'),
+    url(r'^contact/$', ContactView.as_view(), name='contact'),
 
     url(r'^personen/$', PersonsView.as_view(), name='persons'),
     url(r'^personen/twitter/$', TwitterPersonsView.as_view(), name='persons-twitter'),
