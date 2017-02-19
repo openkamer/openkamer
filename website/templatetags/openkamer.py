@@ -2,6 +2,7 @@ import datetime
 from django import template
 
 from document.models import Dossier
+from document.models import Document
 from document.models import Kamerstuk
 from document.models import Submitter
 from document.models import Voting
@@ -130,3 +131,8 @@ def get_parliament_members_for_person(person):
 def get_party_members_for_person(person):
     return PartyMember.objects.filter(person=person)
 
+
+@register.assignment_tag
+def get_documents_for_person(person):
+    submitters = Submitter.objects.filter(person=person)
+    return Document.objects.filter(submitter__in=submitters)

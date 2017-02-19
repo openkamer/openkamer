@@ -18,6 +18,7 @@ from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import Dossier
+from document.models import Submitter
 from document.models import Voting
 from document.models import VoteParty
 from document.filters import DossierFilter
@@ -304,4 +305,17 @@ class VotingsCheckView(TemplateView):
             if not voting.submitters:
                 votings_no_submitters.append(voting.id)
         context['votings_no_submitters'] = Voting.objects.filter(id__in=votings_no_submitters)
+        return context
+
+
+class PersonDocumentsView(TemplateView):
+    template_name = 'document/person_docs.html'
+
+    def get_context_data(self, person_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        person = Person.objects.get(id=person_id)
+        submitters = Submitter.objects.filter(person=person)
+        context['person'] = person
+        documents = Document.objects.filter(submitter__in=submitters)
+        context['documents'] = documents
         return context

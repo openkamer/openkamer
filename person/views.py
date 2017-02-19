@@ -40,7 +40,7 @@ class PersonsCheckView(TemplateView):
         persons = Person.objects.all()
         same_name_ids = []
         for person in persons:
-            persons_same_name = Person.objects.filter(surname=person.surname)
+            persons_same_name = Person.objects.filter(surname__iexact=person.surname)
             if persons_same_name.count() > 1:
                 for p in persons_same_name:
                     same_name_ids.append(p.id)

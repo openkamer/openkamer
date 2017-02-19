@@ -18,6 +18,7 @@ from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import KamerstukView
 from document.views import KamerstukRedirectView
+from document.views import PersonDocumentsView
 from document.views import VotingView
 from document.views import VotingsView
 from document.views import VotingsCheckView
@@ -76,6 +77,8 @@ urlpatterns = [
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
+
+    url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
 
     url(r'^besluitenlijsten/$', BesluitenLijstenView.as_view(), name='besluitenlijsten'),
     url(r'^besluitenlijst/(?P<activity_id>.*)/$', BesluitenLijstView.as_view(), name='besluitenlijst'),

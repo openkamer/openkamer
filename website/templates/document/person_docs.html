@@ -1,0 +1,20 @@
+{% extends "website/base.html" %}
+
+{% load openkamer %}
+
+{% block title %}Documenten van {{ person }} {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Documenten van {{ person }}</h3></div>
+  </div>
+</div>
+
+
+{% for document in documents %}
+<a href="{% url 'document' document.document_id %}">document</a> <br/>
+{% endfor %}
+
+{% endblock %}
