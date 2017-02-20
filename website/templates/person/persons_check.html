@@ -23,6 +23,7 @@
           <th>achternaam</th>
           <th>initialen</th>
           <th>slug</th>
+          <th>documents</th>
           <th>submitters</th>
           <th>kamerleden</th>
           <th>kabinetsleden</th>
@@ -37,6 +38,8 @@
           <td>{{ person.surname }}</td>
           <td>{{ person.initials }}</td>
           <td>{{ person.slug }}</td>
+          {% get_documents_for_person person as documents %}
+          <td><a href="{% url 'person-documents' person.id %}">{{ documents|length }}</a></td>
           <td>
             {% get_submitters person as submitters %}
             {{ submitters|length }}
@@ -83,7 +86,7 @@
           <td>{{ person.initials }}</td>
           <td>{{ person.slug }}</td>
           {% get_documents_for_person person as documents %}
-          <td><a href="{% url 'person-documents' person.id %}">({{ documents|length }})</a></td>
+          <td><a href="{% url 'person-documents' person.id %}">{{ documents|length }}</a></td>
         </tr>
       {% endfor %}
       </tbody>
