@@ -68,9 +68,10 @@ def create_parliament_and_government():
 
 @transaction.atomic
 def create_governments():
+    # Balkenende IV : Q1719725
     # Rutte I : Q168828
     # Rutte II : Q1638648
-    government_ids = ['Q1638648', 'Q168828']
+    government_ids = ['Q1638648', 'Q168828', 'Q1719725']
     for wikidata_id in government_ids:
         create_government(wikidata_id)
 
