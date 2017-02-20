@@ -38,6 +38,7 @@ class PersonsCheckView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['persons_same_surname'] = Person.same_surname()
+        context['persons_surname_only'] = Person.objects.filter(forename='', initials='')
         same_slug_ids = []
         persons = Person.objects.all()
         for person in persons:
