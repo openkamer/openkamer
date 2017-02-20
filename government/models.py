@@ -85,7 +85,7 @@ class Ministry(models.Model):
     government = models.ForeignKey(Government)
 
     def positions(self):
-        return GovernmentPosition.objects.filter(ministry=self)
+        return GovernmentPosition.objects.filter(ministry=self).order_by('position')
 
     def has_members_replaced(self):
         positions = GovernmentPosition.objects.filter(ministry=self)
@@ -125,7 +125,10 @@ class GovernmentPosition(models.Model):
         if current:
             return current[0]
         else:
-            return GovernmentMember.objects.filter(position=self).order_by('-end_date')[0]
+            at_end = GovernmentMember.objects.filter(position=self, end_date__gte=self.government.date_dissolved).order_by('-end_date')
+        if at_end:
+            return at_end[0]
+        return None
 
     @cached_property
     def members_replaced(self):
