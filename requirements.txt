@@ -6,7 +6,7 @@ django-autocomplete-light==3.2.1
 djangorestframework==3.5.4
 pillow==4.0.0
 requests==2.13.0
-lxml==3.7.2
+lxml==3.7.3
 dateparser==0.5.1
 plotly==1.12.9
 unidecode==0.4.20
