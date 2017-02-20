@@ -407,7 +407,7 @@ def create_or_update_dossier(dossier_id):
 
         submitters = metadata['submitter'].split('|')
         for submitter in submitters:
-            create_submitter(document, submitter)
+            create_submitter(document, submitter, date_published)
 
         if metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in result['type']
@@ -573,8 +573,19 @@ def create_new_url(url):
     return new_url
 
 
+def get_active_persons(date):
+    pms = ParliamentMember.active_at_date(date)
+    gms = GovernmentMember.active_at_date(date)
+    person_ids = []
+    for pm in pms:
+        person_ids.append(pm.person.id)
+    for gm in gms:
+        person_ids.append(gm.person.id)
+    return Person.objects.filter(id__in=person_ids)
+
+
 @transaction.atomic
-def create_submitter(document, submitter):
+def create_submitter(document, submitter, date):
     has_initials = len(submitter.split('.')) > 1
     initials = ''
     surname = submitter
@@ -588,7 +599,8 @@ def create_submitter(document, submitter):
     if surname == 'JASPER VAN DIJK':
         person = Person.objects.filter(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
     if not person:
-        persons_similar = Person.objects.filter(surname__iexact=surname).exclude(initials='').exclude(
+        active_persons = get_active_persons(date)
+        persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(
             forename='')
         if persons_similar.count() == 1:
             person = persons_similar[0]

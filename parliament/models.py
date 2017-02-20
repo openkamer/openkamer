@@ -61,6 +61,11 @@ class ParliamentMember(models.Model):
                   ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
         return members
 
+    @staticmethod
+    def active_at_date(date):
+        return ParliamentMember.objects.filter(joined__lte=date, left__gt=date) | \
+               ParliamentMember.objects.filter(joined__lte=date, left__isnull=True)
+
     def political_parties(self):
         memberships = PartyMember.objects.filter(person=self.person)
         if memberships.count() == 1:

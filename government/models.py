@@ -167,3 +167,8 @@ class GovernmentMember(models.Model):
     @cached_property
     def is_active(self):
         return self.end_date is None
+
+    @staticmethod
+    def active_at_date(date):
+        return GovernmentMember.objects.filter(start_date__lte=date, end_date__gt=date) | \
+               GovernmentMember.objects.filter(start_date__lte=date, end_date__isnull=True)

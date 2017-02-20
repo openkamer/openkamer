@@ -12,6 +12,7 @@ from person.models import Person
 
 from government.models import Government
 
+from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
 from parliament.models import PoliticalParty
@@ -266,23 +267,27 @@ class TestCreatePerson(TestCase):
         self.assertEqual(person.fullname(), 'Fatma Koşer Kaya')
 
     def test_submitter(self):
+        date = datetime.date(day=30, month=1, year=2010)
         p1 = Person.objects.create(forename='Jeroen', surname='Dijsselbloem', initials='J.R.V.A.')
+        parliament = Parliament.get_or_create_tweede_kamer()
+        ParliamentMember.objects.create(person=p1, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = website.create.create_submitter(document, 'L. van Tongeren')
+        submitter = website.create.create_submitter(document, 'L. van Tongeren', date)
         self.assertEqual(submitter.person.initials, 'L.')
-        submitter = website.create.create_submitter(document, 'Tongeren C.S.')
+        submitter = website.create.create_submitter(document, 'Tongeren C.S.', date)
         self.assertEqual(submitter.person.initials, '')
-        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM')
+        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertEqual(submitter.person, p1)
         p2 = Person.objects.create(forename='Pieter', surname='Dijsselbloem', initials='P.')
-        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM')
+        ParliamentMember.objects.create(person=p2, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
+        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertNotEqual(submitter.person, p1)
         self.assertNotEqual(submitter.person, p2)
         p3 = Person.objects.create(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')
         p4 = Person.objects.create(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')
-        submitter = website.create.create_submitter(document, 'JAN JACOB VAN DIJK')
+        submitter = website.create.create_submitter(document, 'JAN JACOB VAN DIJK', date)
         self.assertEqual(submitter.person, p3)
-        submitter = website.create.create_submitter(document, 'JASPER VAN DIJK')
+        submitter = website.create.create_submitter(document, 'JASPER VAN DIJK', date)
         self.assertEqual(submitter.person, p4)
 
 
