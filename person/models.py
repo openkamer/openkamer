@@ -185,3 +185,13 @@ class Person(models.Model):
             forename = fullname.replace(surname, '')
             return forename.strip(), surname.strip(), surname_prefix.strip()
 
+    @staticmethod
+    def same_surname():
+        same_name_ids = []
+        persons = Person.objects.all()
+        for person in persons:
+            persons_same_name = Person.objects.filter(surname__iexact=person.surname)
+            if persons_same_name.count() > 1:
+                for p in persons_same_name:
+                    same_name_ids.append(p.id)
+        return Person.objects.filter(pk__in=same_name_ids).order_by('surname')

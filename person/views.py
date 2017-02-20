@@ -37,15 +37,9 @@ class PersonsCheckView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        persons = Person.objects.all()
-        same_name_ids = []
-        for person in persons:
-            persons_same_name = Person.objects.filter(surname__iexact=person.surname)
-            if persons_same_name.count() > 1:
-                for p in persons_same_name:
-                    same_name_ids.append(p.id)
-        context['persons_same_surname'] = Person.objects.filter(pk__in=same_name_ids).order_by('surname')
+        context['persons_same_surname'] = Person.same_surname()
         same_slug_ids = []
+        persons = Person.objects.all()
         for person in persons:
             persons_same_slug = Person.objects.filter(slug=person.slug)
             if persons_same_slug.count() > 1:

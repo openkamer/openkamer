@@ -266,11 +266,24 @@ class TestCreatePerson(TestCase):
         self.assertEqual(person.fullname(), 'Fatma Koşer Kaya')
 
     def test_submitter(self):
+        p1 = Person.objects.create(forename='Jeroen', surname='Dijsselbloem', initials='J.R.V.A.')
         document = Document.objects.create(date_published=datetime.date.today())
         submitter = website.create.create_submitter(document, 'L. van Tongeren')
         self.assertEqual(submitter.person.initials, 'L.')
         submitter = website.create.create_submitter(document, 'Tongeren C.S.')
         self.assertEqual(submitter.person.initials, '')
+        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM')
+        self.assertEqual(submitter.person, p1)
+        p2 = Person.objects.create(forename='Pieter', surname='Dijsselbloem', initials='P.')
+        submitter = website.create.create_submitter(document, 'DIJSSELBLOEM')
+        self.assertNotEqual(submitter.person, p1)
+        self.assertNotEqual(submitter.person, p2)
+        p3 = Person.objects.create(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')
+        p4 = Person.objects.create(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')
+        submitter = website.create.create_submitter(document, 'JAN JACOB VAN DIJK')
+        self.assertEqual(submitter.person, p3)
+        submitter = website.create.create_submitter(document, 'JASPER VAN DIJK')
+        self.assertEqual(submitter.person, p4)
 
 
 class TestWebsite(TestCase):

@@ -583,6 +583,15 @@ def create_submitter(document, submitter):
     if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
         initials = ''
     person = Person.find_surname_initials(surname=surname, initials=initials)
+    if surname == 'JAN JACOB VAN DIJK':  # 'Jan Jacob van Dijk' and ' Jasper van Dijk' have the same surname and initials, to solve this they have included the forename in the surname
+        person = Person.objects.filter(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
+    if surname == 'JASPER VAN DIJK':
+        person = Person.objects.filter(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
+    if not person:
+        persons_similar = Person.objects.filter(surname__iexact=surname).exclude(initials='').exclude(
+            forename='')
+        if persons_similar.count() == 1:
+            person = persons_similar[0]
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, initials=initials)
