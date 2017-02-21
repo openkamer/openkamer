@@ -290,6 +290,12 @@ class TestCreatePerson(TestCase):
         submitter = website.create.create_submitter(document, 'JASPER VAN DIJK', date)
         self.assertEqual(submitter.person, p4)
 
+    def test_submitter_empty(self):
+        p1 = Person.objects.create(forename='', surname='', initials='')
+        document = Document.objects.create(date_published=datetime.date.today())
+        submitter = website.create.create_submitter(document, '', datetime.date.today())
+        self.assertEqual(submitter.person, p1)
+
 
 class TestWebsite(TestCase):
     fixtures = ['person.json', 'parliament.json', 'government.json']

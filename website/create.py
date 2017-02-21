@@ -587,6 +587,7 @@ def get_active_persons(date):
 
 @transaction.atomic
 def create_submitter(document, submitter, date):
+    # TODO: fix this ugly if else mess
     has_initials = len(submitter.split('.')) > 1
     initials = ''
     surname = submitter
@@ -605,6 +606,11 @@ def create_submitter(document, submitter, date):
             forename='')
         if persons_similar.count() == 1:
             person = persons_similar[0]
+    if not person:
+        if surname == '' and initials == '':
+            persons = Person.objects.filter(surname='', initials='', forename='')
+            if persons:
+                person = persons[0]
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, initials=initials)
