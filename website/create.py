@@ -47,6 +47,7 @@ from parliament.models import PartyMember
 from parliament.models import PoliticalParty
 from person.models import Person
 from person.util import parse_name_surname_initials
+from person.util import parse_surname_comma_surname_prefix
 from wikidata import wikidata
 import stats.models
 
@@ -590,9 +591,10 @@ def create_submitter(document, submitter, date):
     # TODO: fix this ugly if else mess
     has_initials = len(submitter.split('.')) > 1
     initials = ''
-    surname = submitter
     if has_initials:
         initials, surname, surname_prefix = parse_name_surname_initials(submitter)
+    else:
+        surname, surname_prefix = parse_surname_comma_surname_prefix(submitter)
     if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
         initials = ''
     person = Person.find_surname_initials(surname=surname, initials=initials)
@@ -612,8 +614,12 @@ def create_submitter(document, submitter, date):
             if persons:
                 person = persons[0]
     if not person:
+        persons = Person.objects.filter(surname__iexact=surname, initials__iexact=initials)
+        if persons:
+            person = persons[0]
+    if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
-        person = Person.objects.create(surname=surname, initials=initials)
+        person = Person.objects.create(surname=surname, surname_prefix=surname_prefix, initials=initials)
     return Submitter.objects.create(person=person, document=document)
 
 

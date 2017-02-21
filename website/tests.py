@@ -296,6 +296,15 @@ class TestCreatePerson(TestCase):
         submitter = website.create.create_submitter(document, '', datetime.date.today())
         self.assertEqual(submitter.person, p1)
 
+    def test_submitter_surname_only(self):
+        p1 = Person.objects.create(forename='', surname='van Raak', initials='')
+        document = Document.objects.create(date_published=datetime.date.today())
+        submitter = website.create.create_submitter(document, 'VAN RAAK', datetime.date.today())
+        self.assertEqual(submitter.person, p1)
+        p2 = Person.objects.create(forename='', surname_prefix='van der', surname='Ham', initials='')
+        submitter = website.create.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
+        self.assertEqual(submitter.person, p2)
+
 
 class TestWebsite(TestCase):
     fixtures = ['person.json', 'parliament.json', 'government.json']

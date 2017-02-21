@@ -53,6 +53,7 @@ class Person(models.Model):
 
     @staticmethod
     def find_prefix(name):
+        # WARNING: does NOT work for prefix after the surname, for example, 'Ham, van der'.
         for prefix in NAME_PREFIXES:
             prefix_pos = name.find(prefix + ' ')
             if prefix_pos >= 0 and (prefix_pos == 0 or name[prefix_pos-1] == ' '):  # prefix must be at the start or there should be a whitespace in front
@@ -62,6 +63,7 @@ class Person(models.Model):
 
     @staticmethod
     def find_surname_initials(surname, initials=''):
+        # TODO: improve performance; use queries
         surname = unidecode(surname)
         initials = unidecode(initials)
         persons = Person.objects.all()
@@ -69,7 +71,7 @@ class Person(models.Model):
         best_score = 0
         for person in persons:
             score = 0
-            surname_no_second = surname.split('-')[0].lower() # for example, Anne-Wil Lucas-Smeerdijk is called Anne-Wil Lucas on tweedekamer.nl
+            surname_no_second = surname.split('-')[0].lower()  # for example, Anne-Wil Lucas-Smeerdijk is called Anne-Wil Lucas on tweedekamer.nl
             person_surname_no_second = person.surname.split('-')[0].lower()
             if surname_no_second == unidecode(person_surname_no_second):
                 score += 1
@@ -79,7 +81,7 @@ class Person(models.Model):
                 score += 1
             intials_letters = initials.split('.')
             forename = unidecode(person.forename)
-            if initials and initials.lower() == unidecode(person.initials.lower()):
+            if initials.lower() == unidecode(person.initials.lower()):
                 score += 1
             elif intials_letters and forename and intials_letters[0] == forename[0]:
                 score += 0.5
@@ -94,7 +96,7 @@ class Person(models.Model):
     def find_by_fullname(fullname):
         persons = Person.objects.all()
         for person in persons:
-            if person.fullname() == fullname:
+            if person.fullname().lower() == fullname.lower():
                 return person
         return None
 
@@ -102,8 +104,10 @@ class Person(models.Model):
         return self.get_full_name()
 
     def get_full_name(self):
-        fullname = self.forename
-        fullname += ' ' + self.surname_including_prefix()
+        fullname = ''
+        if self.forename:
+            fullname = self.forename + ' '
+        fullname += self.surname_including_prefix()
         return fullname
 
     def surname_including_prefix(self):

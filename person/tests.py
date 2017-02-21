@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from wikidata import wikidata
 from person.models import Person
-from person.util import parse_name_surname_initials
+from person.util import parse_name_surname_initials, parse_surname_comma_surname_prefix
 
 
 class TestFindName(TestCase):
@@ -19,6 +19,7 @@ class TestFindName(TestCase):
         cls.p4 = Person.objects.create(forename='Jan Peter', surname='Balkenende', surname_prefix='van', initials='J.P.')
         cls.p5 = Person.objects.create(forename='Fatma', surname='Koşer Kaya', surname_prefix='', initials='F.')
         cls.p6 = Person.objects.create(forename='Jan Peter', surname='Balkenende', initials='')
+        cls.p7 = Person.objects.create(forename='', surname='van Raak', initials='')
 
     def test_find_by_fullname(self):
         p_found = Person.find_by_fullname('Jan Peter Balkenende')
@@ -31,6 +32,8 @@ class TestFindName(TestCase):
         self.assertEqual(self.p4, p_found)
         p_found = Person.find_by_fullname('Jan Jaap van Balkenende')
         self.assertEqual(None, p_found)
+        p_found = Person.find_by_fullname('van Raak')
+        self.assertEqual(self.p7, p_found)
 
     def test_find_by_surname_initials(self):
         p_found = Person.find_surname_initials('Balkenende', 'J.P.')
@@ -76,6 +79,11 @@ class TestNamePrefix(TestCase):
         prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van')
 
+    def test_parse_surname_surname_prefix(self):
+        surname_expected = 'Ham'
+        surname_prefix_expected = 'van der'
+        surname, surname_prefix = parse_surname_comma_surname_prefix('Ham, van der')
+        self.assertEqual(surname, surname_expected)
 
 class TestCreatePerson(TestCase):
 
