@@ -41,7 +41,7 @@ class TestFindName(TestCase):
         p_found = Person.find_surname_initials('Balkenende', 'J.')
         self.assertEqual(p_found, self.p2)
         p_found = Person.find_surname_initials('Balkenende', '')
-        self.assertEqual(p_found, None)
+        self.assertEqual(p_found, self.p6)
         p_found = Person.find_surname_initials('van der Steur', 'J.P.')
         self.assertEqual(p_found, None)
         p_found = Person.find_surname_initials('Koşer Kaya', 'F.')
@@ -84,6 +84,8 @@ class TestNamePrefix(TestCase):
         surname_prefix_expected = 'van der'
         surname, surname_prefix = parse_surname_comma_surname_prefix('Ham, van der')
         self.assertEqual(surname, surname_expected)
+        self.assertEqual(surname_prefix, surname_prefix_expected)
+
 
 class TestCreatePerson(TestCase):
 
