@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
-{% load staticfiles %}
-{% load bootstrap3 %}
+{% load static %}
 
 <html>
 
@@ -24,14 +23,12 @@
 
   {% block headcontent %}{% endblock %}
 
-  {# Load CSS and JavaScript #}
-  {% bootstrap_css %}
-
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap_readable.min.css' %}" type="text/css">
   <link rel="stylesheet" href="{% static 'css/openkamer-1.0b4.css' %}" type="text/css">
   <link rel="stylesheet" href="{% static 'fonts/font-awesome-4.6.3/css/font-awesome.min.css' %}" type="text/css">
-  <script src="{% bootstrap_jquery_url %}" type="text/javascript"></script>
 
-  {% bootstrap_javascript %}
+  <script src="{% static 'jquery-3.1.1/jquery-3.1.1.min.js' %}" type="text/javascript"></script>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}" type="text/javascript"></script>
 
   {% block headcontent_end %}{% endblock %}
 

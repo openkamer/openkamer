@@ -127,11 +127,6 @@ from website.local_settings import *
 ##############
 
 BOOTSTRAP3 = {
-    'jquery_url': '//code.jquery.com/jquery-2.1.4.min.js', #'//code.jquery.com/jquery.min.js',
-    'base_url': '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/', #'//netdna.bootstrapcdn.com/bootstrap/3.0.3/'
-    'css_url':  os.path.join(STATIC_URL, 'bootstrap/css/bootstrap_readable.min.css'),
-    'theme_url': None,
-    'javascript_url': '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js',
     'horizontal_label_class': 'col-md-2',
     'horizontal_field_class': 'col-md-4',
 }
