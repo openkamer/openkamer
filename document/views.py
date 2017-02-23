@@ -2,7 +2,7 @@ import datetime
 import logging
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.db.models import Count
 from django.views.generic.base import RedirectView
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -305,6 +305,20 @@ class VotingsCheckView(TemplateView):
             if not voting.submitters:
                 votings_no_submitters.append(voting.id)
         context['votings_no_submitters'] = Voting.objects.filter(id__in=votings_no_submitters)
+        return context
+
+
+class KamerstukCheckView(TemplateView):
+    template_name = 'document/kamerstuk_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamerstukken = Kamerstuk.objects.all()
+        duplicate_ids = []
+        for stuk in kamerstukken:
+            if Kamerstuk.objects.filter(id_main=stuk.id_main, id_sub=stuk.id_sub).count() > 1:
+                duplicate_ids.append(stuk.id)
+        context['duplicate_kamerstuks'] = Kamerstuk.objects.filter(id__in=duplicate_ids)
         return context
 
 
