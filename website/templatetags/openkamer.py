@@ -119,12 +119,12 @@ def get_submitters(person):
 
 @register.assignment_tag
 def get_government_members_for_person(person):
-    return GovernmentMember.objects.filter(person=person)
+    return GovernmentMember.objects.filter(person=person).order_by('-start_date')
 
 
 @register.assignment_tag
 def get_parliament_members_for_person(person):
-    return ParliamentMember.objects.filter(person=person)
+    return ParliamentMember.objects.filter(person=person).order_by('-joined')
 
 
 @register.assignment_tag
