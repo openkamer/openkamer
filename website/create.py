@@ -602,6 +602,8 @@ def create_submitter(document, submitter, date):
         person = Person.objects.filter(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
     if surname == 'JASPER VAN DIJK':
         person = Person.objects.filter(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
+    if surname == 'JAN DE VRIES':
+        person = Person.objects.filter(forename='Jan', surname_prefix='de', surname='Vries', initials='J.M.')[0]
     if not person:
         active_persons = get_active_persons(date)
         persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(

@@ -41,7 +41,7 @@ class TestFindName(TestCase):
         p_found = Person.find_surname_initials('Balkenende', 'J.')
         self.assertEqual(p_found, self.p2)
         p_found = Person.find_surname_initials('Balkenende', '')
-        self.assertEqual(p_found, self.p6)
+        self.assertEqual(p_found, None)
         p_found = Person.find_surname_initials('van der Steur', 'J.P.')
         self.assertEqual(p_found, None)
         p_found = Person.find_surname_initials('Koşer Kaya', 'F.')

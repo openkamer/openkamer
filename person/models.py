@@ -81,7 +81,7 @@ class Person(models.Model):
                 score += 1
             intials_letters = initials.split('.')
             forename = unidecode(person.forename)
-            if initials.lower() == unidecode(person.initials.lower()):
+            if initials and initials.lower() == unidecode(person.initials.lower()):
                 score += 1
             elif intials_letters and forename and intials_letters[0] == forename[0]:
                 score += 0.5
