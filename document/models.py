@@ -216,6 +216,7 @@ class Document(models.Model):
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
     content_html = models.CharField(max_length=4000000, blank=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     @cached_property
     def submitters(self):
@@ -265,6 +266,7 @@ class Kamerstuk(models.Model):
     type_short = models.CharField(max_length=400, blank=True)
     type_long = models.CharField(max_length=2000, blank=True)
     original_id = models.CharField(max_length=40, blank=True)  # format: 33885-22
+    date_updated = models.DateTimeField(auto_now=True)
 
     MOTIE = 'Motie'
     AMENDEMENT = 'Amendement'
