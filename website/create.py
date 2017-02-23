@@ -413,9 +413,10 @@ def create_or_update_dossier(dossier_id):
 
         if metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in result['type']
-            create_kamerstuk(document, dossier_for_document.dossier_id, title, metadata, is_attachement)
-            category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
-            dossier_for_document.categories.add(*category_list)
+            if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=metadata['id_sub']).exists():
+                create_kamerstuk(document, dossier_for_document.dossier_id, title, metadata, is_attachement)
+                category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
+                dossier_for_document.categories.add(*category_list)
 
         if metadata['is_agenda']:
             create_agenda(document, metadata)
