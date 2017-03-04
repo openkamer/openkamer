@@ -38,7 +38,10 @@ class DocumentView(TemplateView):
 
     def get_context_data(self, document_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['document'] = Document.objects.get(document_id=document_id)
+        documents = Document.objects.filter(document_id=document_id)
+        if not documents:
+            raise Http404
+        context['document'] = documents[0]
         return context
 
 
