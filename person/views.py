@@ -8,8 +8,7 @@ class PersonsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        persons = Person.objects.all()
-        context['persons'] = persons
+        context['persons'] = Person.objects.all()
         return context
 
 

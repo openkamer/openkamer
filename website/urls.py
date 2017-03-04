@@ -73,7 +73,7 @@ urlpatterns = [
     url(r'^dossier/add/(?P<dossier_id>\d+)/$', AddDossierView.as_view()),
 
     url(r'^agendas/$', AgendasView.as_view()),
-    url(r'^agenda/(?P<pk>\d+)/$', AgendaView.as_view()),
+    url(r'^agenda/(?P<agenda_id>.*)/$', AgendaView.as_view()),
 
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),

@@ -3,10 +3,11 @@ import logging
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
-from django.views.generic.base import RedirectView
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 
 
 from dal import autocomplete
@@ -199,10 +200,13 @@ class AgendasView(TemplateView):
 class AgendaView(TemplateView):
     template_name = 'document/agenda.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, agenda_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        agenda = Agenda.objects.get(id=self.kwargs['pk'])
-        context['agenda'] = agenda
+        agendas = Agenda.objects.filter(agenda_id=agenda_id)
+        if not agendas:
+            raise Http404
+        agenda = agendas[0]
+        context['agenda'] = agendas
         context['agendaitems'] = AgendaItem.objects.filter(agenda=agenda)
         return context
 
