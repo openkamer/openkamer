@@ -397,7 +397,7 @@ class TestWebsite(TestCase):
     def test_agenda_view(self):
         agendas = Agenda.objects.all()
         for agenda in agendas:
-            response = self.client.get('/agenda/' + str(agenda.id) + '/')
+            response = self.client.get('/agenda/' + str(agenda.agenda_id) + '/')
             self.assertEqual(response.status_code, 200)
 
     def test_votings_overview(self):
