@@ -187,8 +187,8 @@ class Dossier(models.Model):
     def get_active_dossier_ids(cls):
         if hasattr(cls, 'active_dossier_ids'):
             return cls.active_dossier_ids
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
-        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
+        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
         cls.active_dossier_ids = []
         for line in lines:
             cls.active_dossier_ids.append(line.strip())
@@ -198,8 +198,8 @@ class Dossier(models.Model):
     def get_inactive_dossier_ids(cls):
         if hasattr(cls, 'inactive_dossier_ids'):
             return cls.inactive_dossier_ids
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
-        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tknl-wetsvoorstellen/master/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
+        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
         cls.inactive_dossier_ids = []
         for line in lines:
             cls.inactive_dossier_ids.append(line.strip())

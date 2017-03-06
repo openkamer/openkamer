@@ -73,9 +73,7 @@ PIWIK_SITE_ID = 0
 # TWEEDEKAMER DATA REPO
 GIT_AUTHOR_NAME = ''
 GIT_AUTHOR_EMAIL = ''
-PARTIES_REPO_DIR = '<path-to-repo>/ok-tknl-fracties/'
-MEMBERS_REPO_DIR = '<path-to-repo>/ok-tknl-kamerleden/'
-WETSVOORSTELLEN_REPO_DIR = '<path-to-repo>/ok-tknl-wetsvoorstellen/'
+DATA_REPO_DIR = '<path-to-repo>/ok-tk-data/'
 
 # TWITTER
 TWITTER_CONSUMER_KEY = ''

@@ -214,29 +214,29 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            repo = Repo(settings.WETSVOORSTELLEN_REPO_DIR)
+            repo = Repo(settings.DATA_REPO_DIR)
             assert not repo.bare
             # origin = repo.create_remote('origin', repo.remotes.origin.url)
             # origin.pull()
 
-            filename_iaan = 'wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt'
-            filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaan)
+            filename_iaan = 'wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt'
+            filepath = os.path.join(settings.DATA_REPO_DIR, filename_iaan)
             dossier_ids_in_ac = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_active=True)
             self.dossier_ids_to_file(dossier_ids_in_ac, filepath)
 
-            filename_iaf = 'wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt'
-            filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_iaf)
+            filename_iaf = 'wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt'
+            filepath = os.path.join(settings.DATA_REPO_DIR, filename_iaf)
             dossier_ids_in_in = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(filter_inactive=True)
             assert len(dossier_ids_in_in) > 68
             self.dossier_ids_to_file(dossier_ids_in_in, filepath)
 
-            filename_raan = 'wetsvoorstellen_dossier_ids_regering_aanhangig.txt'
-            filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raan)
+            filename_raan = 'wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_aanhangig.txt'
+            filepath = os.path.join(settings.DATA_REPO_DIR, filename_raan)
             dossier_ids_re_ac = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_active=True)
             self.dossier_ids_to_file(dossier_ids_re_ac, filepath)
 
-            filename_raf = 'wetsvoorstellen_dossier_ids_regering_afgedaan.txt'
-            filepath = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, filename_raf)
+            filename_raf = 'wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_afgedaan.txt'
+            filepath = os.path.join(settings.DATA_REPO_DIR, filename_raf)
             dossier_ids_re_in = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(filter_inactive=True)
             assert len(dossier_ids_re_in) > 1266
             self.dossier_ids_to_file(dossier_ids_re_in, filepath)
@@ -254,12 +254,12 @@ class CreateCommitWetsvoorstellenIDs(CronJobBase):
                 logger.info('END')
                 return
 
-            filepath_date = os.path.join(settings.WETSVOORSTELLEN_REPO_DIR, 'date.txt')
+            filepath_date = os.path.join(settings.DATA_REPO_DIR, 'wetsvoorstellen/date.txt')
             with open(filepath_date, 'w') as fileout:
                 fileout.write(datetime.date.today().strftime('%Y-%m-%d'))
 
             index = repo.index
-            index.add([filename_iaan, filename_iaf, filename_raan, filename_raf, 'date.txt'])
+            index.add([filename_iaan, filename_iaf, filename_raan, filename_raf, 'wetsvoorstellen/date.txt'])
             author = Actor(settings.GIT_AUTHOR_NAME, settings.GIT_AUTHOR_EMAIL)
             index.commit(
                 message='update of wetsvoorstellen dossier ids',
@@ -280,13 +280,13 @@ class CreateCommitPartyCSV(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            repo = Repo(settings.PARTIES_REPO_DIR)
+            repo = Repo(settings.DATA_REPO_DIR)
             assert not repo.bare
             # origin = repo.create_remote('origin', repo.remotes.origin.url)
             # origin.pull()
 
             parties = scraper.political_parties.search_parties()
-            filepath = os.path.join(settings.PARTIES_REPO_DIR, 'fracties.csv')
+            filepath = os.path.join(settings.DATA_REPO_DIR, 'fracties/fracties.csv')
             scraper.political_parties.create_parties_csv(parties, filepath)
 
             changed_files = repo.git.diff(name_only=True)
@@ -295,12 +295,12 @@ class CreateCommitPartyCSV(CronJobBase):
                 logger.info('END')
                 return
 
-            filepath_date = os.path.join(settings.PARTIES_REPO_DIR, 'date.txt')
+            filepath_date = os.path.join(settings.DATA_REPO_DIR, 'fracties/date.txt')
             with open(filepath_date, 'w') as fileout:
                 fileout.write(datetime.date.today().strftime('%Y-%m-%d'))
 
             index = repo.index
-            index.add(['fracties.csv', 'date.txt'])
+            index.add(['fracties/fracties.csv', 'fracties/date.txt'])
             author = Actor(settings.GIT_AUTHOR_NAME, settings.GIT_AUTHOR_EMAIL)
             index.commit(
                 message='update of tweedekamer.nl fracties',
@@ -321,13 +321,13 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            repo = Repo(settings.MEMBERS_REPO_DIR)
+            repo = Repo(settings.DATA_REPO_DIR)
             assert not repo.bare
             # origin = repo.create_remote('origin', repo.remotes.origin.url)
             # origin.pull()
 
             parties = scraper.parliament_members.search_members()
-            filepath = os.path.join(settings.MEMBERS_REPO_DIR, 'tweedekamerleden.csv')
+            filepath = os.path.join(settings.DATA_REPO_DIR, 'kamerleden/tweedekamerleden.csv')
             scraper.parliament_members.create_members_csv(parties, filepath)
 
             changed_files = repo.git.diff(name_only=True)
@@ -336,12 +336,12 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
                 logger.info('END')
                 return
 
-            filepath_date = os.path.join(settings.MEMBERS_REPO_DIR, 'date.txt')
+            filepath_date = os.path.join(settings.DATA_REPO_DIR, 'kamerleden/date.txt')
             with open(filepath_date, 'w') as fileout:
                 fileout.write(datetime.date.today().strftime('%Y-%m-%d'))
 
             index = repo.index
-            index.add(['tweedekamerleden.csv', 'date.txt'])
+            index.add(['kamerleden/tweedekamerleden.csv', 'kamerleden/date.txt'])
             author = Actor(settings.GIT_AUTHOR_NAME, settings.GIT_AUTHOR_EMAIL)
             index.commit(
                 message='update of tweedekamer.nl kamerleden',
