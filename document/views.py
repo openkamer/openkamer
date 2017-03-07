@@ -350,3 +350,15 @@ class KamervragenView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['kamervragen'] = Kamervraag.objects.all()
         return context
+
+
+class KamervraagView(TemplateView):
+    template_name = 'document/kamervraag.html'
+
+    def get_context_data(self, document_id, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamervragen = Kamervraag.objects.filter(document__document_id=document_id)
+        if not kamervragen:
+            raise Http404
+        context['kamervraag'] = kamervragen[0]
+        return context

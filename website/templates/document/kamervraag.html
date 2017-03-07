@@ -1,0 +1,28 @@
+{% extends "website/base.html" %}
+
+{% block title %}Kamervraag {{ kamervraag.document.document_id }} - {{ kamervraag.document.title_short }} - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="center"><h3>Kamervraag</h3></div>
+    <div align="left">
+      {% with document=kamervraag.document %}
+      {% include "document/items/document_info.html" %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="left">
+      {{ kamervraag.document.content_html|safe }}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

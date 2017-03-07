@@ -20,6 +20,7 @@ from document.views import KamerstukView
 from document.views import KamerstukRedirectView
 from document.views import KamerstukCheckView
 from document.views import KamervragenView
+from document.views import KamervraagView
 from document.views import PersonDocumentsView
 from document.views import VotingView
 from document.views import VotingsView
@@ -81,7 +82,8 @@ urlpatterns = [
     url(r'^kamerstuk/check/$', KamerstukCheckView.as_view(), name='kamerstuk-check'),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 
-    url(r'^kamervragen//$', KamervragenView.as_view(), name='kamervragen'),
+    url(r'^kamervragen/$', KamervragenView.as_view(), name='kamervragen'),
+    url(r'^kamervragen/(?P<document_id>.*)/$', KamervraagView.as_view(), name='kamervraag'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
 

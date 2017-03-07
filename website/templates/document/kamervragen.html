@@ -22,22 +22,39 @@
     <div class="well well-small" align="left">
 
       <div class="row">
-        <div class="col-xs-5" align="left">
-          <small>{{ dossier.last_date }}</small>
+        <div class="col-xs-3" align="left">
+          <small>{{ kamervraag.document.date_published }}</small>
         </div>
-        <div class="col-xs-2" align="center">
-          <small>{{ kamervraag.document.document_id }}</small>
+        <div class="col-xs-6" align="center">
+          <small>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</small>
+        </div>
+        <div class="col-xs-3" align="right">
+          status
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-12">
-          <h6><a href="">{{ kamervraag.document.title }}</a></h6>
+          <h6><a href="{% url 'kamervraag' kamervraag.document.document_id %}">{{ kamervraag.document.title }}</a></h6>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h6>Indiener(s):
+            {% with submitters=kamervraag.document.submitters %}
+              {% include "document/items/submitters_list.html" %}
+            {% endwith %}
+          </h6>
         </div>
       </div>
 
     </div>
   </div>
+
+  {% if forloop.counter|divisibleby:2 %}
+    <div class="clearfix"></div>
+  {% endif %}
 
   {% endfor %}
 </div>

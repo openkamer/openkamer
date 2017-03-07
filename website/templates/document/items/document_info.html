@@ -1,6 +1,8 @@
 <h4>{{ document.title }}</h4>
 <H5>{{ document.date_published|date:"Y-m-d" }}</H5>
+{% if document.dossier.dossier_id %}
 <h5>Dossier: <a href="{% url 'dossier-timeline' document.dossier.dossier_id %}">{{ document.dossier.dossier_id }}</a></h5>
+{% endif %}
 <h5>Indiener(s):
   {% with submitters=document.submitters %}
     {% include "document/items/submitters_list.html" %}

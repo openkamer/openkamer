@@ -402,6 +402,7 @@ def create_or_update_dossier(dossier_id):
             publication_type=metadata['publication_type'],
             publisher=metadata['publisher'],
             date_published=date_published,
+            source_url=result['page_url'],
             content_html=content_html,
         )
         category_list = get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
@@ -544,7 +545,7 @@ def update_document_html_links(content_html):
         url = element.attrib['href']
         new_url = create_new_url(url)
         element.attrib['href'] = new_url
-    return lxml.html.tostring(tree)
+    return lxml.html.tostring(tree).decode('utf-8')
 
 
 def create_new_url(url):

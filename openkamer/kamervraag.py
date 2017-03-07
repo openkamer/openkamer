@@ -1,8 +1,10 @@
 import logging
+import re
 
 from django.db import transaction
 
 from document.models import Kamervraag
+from document.models import CategoryDocument
 
 from document.models import Document
 
@@ -13,10 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_kamervraag_metadata(kamervraag_info):
-    infos = Kamervraag.get_kamervragen_info(2016)
-    kamervraag_info = infos[0]
     metadata = scraper.documents.get_metadata(kamervraag_info['overheidnl_document_id'])
     return metadata
+
 
 @transaction.atomic
 def create_kamervragen(year):
@@ -36,7 +37,8 @@ def create_kamervraag(kamervraag_info):
 def create_kamervraag_document(kamervraag_info):
     print('BEGIN')
     print(kamervraag_info['document_url'])
-    document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(kamervraag_info['document_url'] + '.html')
+    document_html_url = kamervraag_info['document_url'] + '.html'
+    document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(document_html_url)
     print(document_id)
     # print(content_html)
     print('title: ' + title)
@@ -67,7 +69,16 @@ def create_kamervraag_document(kamervraag_info):
         publication_type=metadata['publication_type'],
         publisher=metadata['publisher'],
         date_published=date_published,
+        source_url=document_html_url,
         content_html=content_html,
     )
+    category_list = website.create.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
+    document.categories.add(*category_list)
+
+    submitters = metadata['submitter'].split('|')
+    for submitter in submitters:
+        print(submitter)
+        website.create.create_submitter(document, submitter, date_published)
+
     print('END')
     return document
