@@ -16,6 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Application definition
 INSTALLED_APPS = (
     'website',
+    'openkamer',
     'stats',
     'oktwitter',
     'scraper',

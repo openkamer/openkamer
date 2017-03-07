@@ -1,0 +1,45 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+
+{% load bootstrap3 %}
+
+{% block title %}Kamervragen - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% load bootstrap_pagination %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Kamervragen</h3></div>
+  </div>
+</div>
+
+<div class="row">
+  {% for kamervraag in kamervragen %}
+  <div class="col-md-6">
+    <div class="well well-small" align="left">
+
+      <div class="row">
+        <div class="col-xs-5" align="left">
+          <small>{{ dossier.last_date }}</small>
+        </div>
+        <div class="col-xs-2" align="center">
+          <small>{{ kamervraag.document.document_id }}</small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h6><a href="">{{ kamervraag.document.title }}</a></h6>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% endfor %}
+</div>
+
+{% endblock %}

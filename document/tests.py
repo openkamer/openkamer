@@ -9,6 +9,7 @@ from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import Voting
 from document.models import Vote, VoteIndividual, VoteParty
+from document.models import Kamervraag
 
 from person.models import Person
 from parliament.models import ParliamentMember
@@ -151,3 +152,10 @@ class TestVoting(TestCase):
         ParliamentMember.objects.all().delete()
         vote = VoteIndividual.objects.filter(id=vote.id)
         self.assertEqual(vote, vote)
+
+
+class TestKamervraag(TestCase):
+
+    def test_get_kamervragen_info(self):
+        infos = Kamervraag.get_kamervragen_info(2016)
+        self.assertEqual(len(infos), 2626)

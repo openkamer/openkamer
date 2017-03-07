@@ -259,6 +259,31 @@ class Submitter(models.Model):
             return members[0].party
 
 
+class Kamervraag(models.Model):
+    document = models.ForeignKey(Document)
+
+    @classmethod
+    def get_kamervragen_info(cls, year):
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/kamervragen_' + str(year) + '.csv')
+        lines.pop(0)  # remove table headers
+        cls.kamervragen_info = []
+        for line in lines:
+            colums = line.split(',')
+            info = {
+                'datum': colums[0],
+                'document_number': colums[1],
+                'overheidnl_document_id': colums[2].replace('https://zoek.officielebekendmakingen.nl/', ''),
+                'document_url': colums[2],
+            }
+            cls.kamervragen_info.append(info)
+        return cls.kamervragen_info
+
+
+class Antwoord(models.Model):
+    document = models.ForeignKey(Document)
+    antwoord = models.ForeignKey(Kamervraag)
+
+
 class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
     id_main = models.CharField(max_length=40, blank=True)

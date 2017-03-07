@@ -19,6 +19,7 @@ from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import Dossier
+from document.models import Kamervraag
 from document.models import Submitter
 from document.models import Voting
 from document.models import VoteParty
@@ -339,4 +340,13 @@ class PersonDocumentsView(TemplateView):
         context['person'] = person
         documents = Document.objects.filter(submitter__in=submitters)
         context['documents'] = documents
+        return context
+
+
+class KamervragenView(TemplateView):
+    template_name = 'document/kamervragen.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['kamervragen'] = Kamervraag.objects.all()
         return context

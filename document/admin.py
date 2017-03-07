@@ -6,6 +6,7 @@ from document.models import Document
 from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import Kamerstuk
+from document.models import Kamervraag
 from document.models import Submitter
 from document.models import Vote
 from document.models import VoteParty
@@ -61,6 +62,12 @@ class BesluitenLijstAdmin(admin.ModelAdmin):
     )
 
 
+class KamervraagAdmin(admin.ModelAdmin):
+    list_display = (
+        'document',
+    )
+
+
 class SubmitterAdmin(admin.ModelAdmin):
     list_display = ('person', 'document')
 
@@ -87,6 +94,7 @@ admin.site.register(Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
+admin.site.register(Kamervraag, KamervraagAdmin)
 
 admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 

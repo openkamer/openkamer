@@ -10,6 +10,29 @@ import lxml.etree
 logger = logging.getLogger(__name__)
 
 
+def get_kamervraag_document_id_and_content(url):
+    logger.info('get document id for url: ' + url)
+    page = requests.get(url, timeout=60)
+    tree = lxml.html.fromstring(page.content)
+    elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
+    if elements:
+        document_id = elements[0].get('href').split('/')[-1]
+    else:
+        elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
+        if not elements:
+            return None, '', ''
+        document_id = elements[0].get('content')
+    logger.info('document id: ' + document_id)
+    content_html = ''
+    if tree.xpath('//div[@id="main-column"]'):
+        content_html = lxml.etree.tostring(tree.xpath('//div[@id="main-column"]')[0])
+    titles = tree.xpath('//h1[@class="kamervraagomschrijving_kop no-toc"]')
+    title = ''
+    if titles:
+        title = titles[0].text_content()
+    return document_id, content_html, title
+
+
 def get_document_id_and_content(url):
     logger.info('get document id for url: ' + url)
     page = requests.get(url, timeout=60)
@@ -53,16 +76,20 @@ def get_metadata(document_id):
         'OVERHEIDop.ondernummer': 'id_sub',
         'OVERHEIDop.publicationName': 'publication_type',
         'DCTERMS.issued': 'date_published',
+        'OVERHEIDop.datumIndiening': 'date_submitted',
         'OVERHEID.organisationType': 'organisation_type',
         'OVERHEID.category': 'category',
-        'DC.creator': 'publisher'
+        'DC.creator': 'publisher',
+        "OVERHEIDop.vergaderjaar": 'vergaderjaar',
+        "OVERHEIDop.vraagnummer": 'vraagnummer',
+        "OVERHEIDop.aanhangsel": 'aanhangsel',
     }
 
     metadata = {}
     for key, name in attributes_transtable.items():
         elements = tree.xpath('/metadata_gegevens/metadata[@name="' + key + '"]')
         if not elements:
-            logger.warning('' + key + ' was not found')
+            # logger.warning('' + key + ' was not found')
             metadata[name] = ''
             continue
         if len(elements) > 1:
