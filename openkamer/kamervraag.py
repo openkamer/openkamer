@@ -73,7 +73,7 @@ def create_kamervraag_document(kamervraag_info):
         dossier=None,
         document_id=document_id,
         title_full=title,
-        title_short=metadata['title_short'],
+        title_short=create_title_short(metadata['title_short']),
         publication_type=metadata['publication_type'],
         publisher=metadata['publisher'],
         date_published=date_published,
@@ -85,11 +85,24 @@ def create_kamervraag_document(kamervraag_info):
 
     submitters = metadata['submitter'].split('|')
     for submitter in submitters:
-        print(submitter)
         website.create.create_submitter(document, submitter, date_published)
 
     print('END')
     return document, metadata['vraagnummer']
+
+
+def create_title_short(title_full):
+    title = title_full.strip()
+    title = re.sub('\s{2,}', ' ', title)
+    pattern = 'Vragen\s(.*aan de)\s(.*)over\s.*(\s\(ingezonden.*\)\.)'
+    result = re.findall(pattern, title)
+    if result:
+        title = title.replace(result[0][0], '')
+        title = title.replace(result[0][1], '')
+        title = title.replace(result[0][2], '')
+        title = title.replace('«', '"')
+        title = title.replace('»', '"')
+    return title.strip()
 
 
 def get_antwoord_metadata(antwoord_info):
