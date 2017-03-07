@@ -15,6 +15,20 @@
   </div>
 </div>
 
+{% if kamervraag.kamerantwoord %}
+<hr>
+<div class="row">
+  <div class="col-lg-8 col-lg-offset-2">
+    <div align="center"><h3>Antwoord</h3></div>
+    <div align="left">
+      {% with document=kamervraag.kamerantwoord.document %}
+      {% include "document/items/document_info.html" %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <hr/>
 
 <div class="row">
