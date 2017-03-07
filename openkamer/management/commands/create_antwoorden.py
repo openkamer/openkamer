@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from openkamer.kamervraag import create_kamervragen
+from openkamer.kamervraag import create_antwoord, create_antwoorden
 
-from document.models import Kamervraag
+from document.models import Antwoord
 
 
 class Command(BaseCommand):
@@ -12,8 +12,8 @@ class Command(BaseCommand):
         parser.add_argument('--max', type=int, help='The max number of documents to create, used for testing.', default=None)
 
     def handle(self, *args, **options):
-        Kamervraag.objects.all().delete()
+        Antwoord.objects.all().delete()
         year = options['year'][0]
         max_n = options['max']
-        create_kamervragen(year, max_n)
+        create_antwoorden(year, max_n)
 

@@ -4,6 +4,7 @@ import re
 from django.db import transaction
 
 from document.models import Kamervraag
+from document.models import Antwoord
 from document.models import CategoryDocument
 
 from document.models import Document
@@ -20,17 +21,21 @@ def get_kamervraag_metadata(kamervraag_info):
 
 
 @transaction.atomic
-def create_kamervragen(year):
+def create_kamervragen(year, max_n):
     infos = Kamervraag.get_kamervragen_info(year)
+    counter = 0
     for info in infos:
         create_kamervraag(info)
+        if max_n and counter >= max_n:
+            return
+        counter += 1
 
 
 @transaction.atomic
 def create_kamervraag(kamervraag_info):
-    document = create_kamervraag_document(kamervraag_info)
+    document, vraagnummer = create_kamervraag_document(kamervraag_info)
     Kamervraag.objects.filter(document=document).delete()
-    Kamervraag.objects.create(document=document)
+    Kamervraag.objects.create(document=document, vraagnummer=vraagnummer)
 
 
 @transaction.atomic
@@ -81,4 +86,41 @@ def create_kamervraag_document(kamervraag_info):
         website.create.create_submitter(document, submitter, date_published)
 
     print('END')
-    return document
+    return document, metadata['vraagnummer']
+
+
+def get_antwoord_metadata(antwoord_info):
+    metadata = scraper.documents.get_metadata(antwoord_info['overheidnl_document_id'])
+    return metadata
+
+
+@transaction.atomic
+def create_antwoorden(year, max_n=None):
+    infos = Antwoord.get_antwoorden_info(year)
+    counter = 0
+    for info in infos:
+        create_antwoord(info)
+        if max_n and counter >= max_n:
+            break
+        counter += 1
+    find_kamervragen()
+
+
+@transaction.atomic
+def find_kamervragen():
+    logger.info('BEGIN')
+    antwoorden = Antwoord.objects.all()
+    for antwoord in antwoorden:
+        vragen = Kamervraag.objects.filter(vraagnummer=antwoord.vraagnummer)
+        if vragen:
+            logger.info('vraag found!!!')
+            antwoord.kamervraag = vragen[0]
+            antwoord.save()
+    logger.info('END')
+
+
+@transaction.atomic
+def create_antwoord(kamervraag_info):
+    document, vraagnummer = create_kamervraag_document(kamervraag_info)
+    Antwoord.objects.filter(document=document).delete()
+    Antwoord.objects.create(document=document, vraagnummer=vraagnummer)

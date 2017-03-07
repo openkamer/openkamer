@@ -29,6 +29,9 @@
           <small>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</small>
         </div>
         <div class="col-xs-3" align="right">
+          {% if kamervraag.antwoord %}
+            antwoord!!!
+          {% endif %}
           status
         </div>
       </div>

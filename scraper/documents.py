@@ -99,7 +99,6 @@ def get_metadata(document_id):
                 if metadata[name]:
                     metadata[name] += '|'
                 metadata[name] += element.get('content')
-                logger.warning('more than 1 element found for key: ' + key + '!')
         else:
             metadata[name] = elements[0].get('content')
 
