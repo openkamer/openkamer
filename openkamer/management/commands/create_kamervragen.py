@@ -12,7 +12,6 @@ class Command(BaseCommand):
         parser.add_argument('--max', type=int, help='The max number of documents to create, used for testing.', default=None)
 
     def handle(self, *args, **options):
-        Kamervraag.objects.all().delete()
         year = options['year'][0]
         max_n = options['max']
         create_kamervragen(year, max_n)

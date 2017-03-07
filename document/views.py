@@ -20,6 +20,7 @@ from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import Dossier
 from document.models import Kamervraag
+from document.models import Antwoord
 from document.models import Submitter
 from document.models import Voting
 from document.models import VoteParty
@@ -348,7 +349,8 @@ class KamervragenView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['kamervragen'] = Kamervraag.objects.all()
+        kamervragen = Kamervraag.objects.all()
+        context['kamervragen'] = kamervragen
         return context
 
 
