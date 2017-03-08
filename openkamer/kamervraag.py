@@ -217,7 +217,7 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
             antwoord = Antwoord.objects.create(nr=number, kamerantwoord=kamerantwoord, text=answer_text, see_answer_nr=first_number)
             antwoorden.append(antwoord)
             counter += 1
-    logger.info('END: ' + str(counter) + ' antwoorden found')
+    logger.info('END')
 
 
 def create_footnotes(footnotes_html):

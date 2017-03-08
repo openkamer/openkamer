@@ -142,7 +142,7 @@
 
         <div id="vragen-{{ kamervraag.id }}" class="collapse">
           <div class="vertical-spacer-15"></div>
-            {% if kamervraag.document.footnote_set %}
+            {% if kamervraag.document.footnote_set.exists %}
               {% with footnotes=kamervraag.document.footnote_set.all %}
               {% include 'document/items/footnote_panel.html' %}
               {% endwith %}
