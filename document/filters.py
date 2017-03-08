@@ -75,6 +75,7 @@ class KamervraagFilter(django_filters.FilterSet):
         ('ONB', 'Onbeantwoord'),
     )
     title = django_filters.CharFilter(method='title_filter', label='')
+    content = django_filters.CharFilter(method='content_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),
         to_field_name='slug',
@@ -99,6 +100,10 @@ class KamervraagFilter(django_filters.FilterSet):
 
     def title_filter(self, queryset, name, value):
         return queryset.filter(document__title_full__icontains=value).distinct()
+
+    def content_filter(self, queryset, name, value):
+        value = ' ' + value + ' '
+        return queryset.filter(document__content_html__icontains=value).distinct()
 
     def submitter_filter(self, queryset, name, value):
         return queryset.filter(document__submitter__person=value).distinct()
