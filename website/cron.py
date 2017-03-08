@@ -130,10 +130,11 @@ class UpdateKamervragen(LockJob):
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
-        year = 2016
-        openkamer.kamervraag.create_kamervragen(year, skip_if_exists=True)
-        openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
-        openkamer.kamervraag.link_kamervragen_and_antwoorden()
+        years = ['2016', '2015']
+        for year in years:
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=True)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
 class CleanUnusedPersons(CronJobBase):
