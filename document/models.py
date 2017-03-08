@@ -331,9 +331,17 @@ class Antwoord(models.Model):
     nr = models.IntegerField()
     kamerantwoord = models.ForeignKey(Kamerantwoord)
     text = models.CharField(max_length=10000)
+    see_answer_nr = models.IntegerField(null=True, blank=False)
 
     def __str__(self):
-        return 'Antwoord ' +  str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
+        return 'Antwoord ' + str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
+
+
+class FootNote(models.Model):
+    document = models.ForeignKey(Document)
+    nr = models.IntegerField()
+    text = models.CharField(max_length=1000, blank=True, default='')
+    url = models.URLField(max_length=1000, blank=True, default='')
 
 
 class Kamerstuk(models.Model):

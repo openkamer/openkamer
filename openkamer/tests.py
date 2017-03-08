@@ -10,7 +10,7 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        metadata = openkamer.kamervraag.create_kamervraag_document(infos[0])
+        metadata = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
         # print(metadata)
 
     def test_get_receiver_from_title(self):
@@ -18,6 +18,22 @@ class TestKamervraag(TestCase):
         title = "Vragen van het lid Monasch (PvdA) aan de Staatssecretaris van Infrastructuur en Milieu over het artikel «Schiphol kan verder met uitbreiding» (ingezonden 23 november 2015)."
         receiver = openkamer.kamervraag.get_receiver_from_title(title)
         self.assertEqual(receiver, receiver_expected)
+
+    def test_parse_footnotes(self):
+        footnote_html = """
+        <div id="noten">
+            <hr />
+            <div class="voet noot snp-mouseoffset snb-pinned notedefault" id="supernote-note-ID-2016Z00047-d37e61">
+               <h5 class="note-close"><a class="note-close" href="#close-ID-2016Z00047-d37e61">X</a> Noot
+               </h5><sup><span class="nootnum"><a id="ID-2016Z00047-d37e61" name="ID-2016Z00047-d37e61"></a>1</span></sup><p><a href="http://nos.nl/l/2077649" title="link naar http://nos.nl/l/2077649" class="externe_link">http://nos.nl/l/2077649</a></p>
+            </div>
+            <div class="voet noot snp-mouseoffset snb-pinned notedefault" id="supernote-note-ID-2016Z00047-d37e69">
+               <h5 class="note-close"><a class="note-close" href="#close-ID-2016Z00047-d37e69">X</a> Noot
+               </h5><sup><span class="nootnum"><a id="ID-2016Z00047-d37e69" name="ID-2016Z00047-d37e69"></a>2</span></sup><p>VOG: verklaring omtrent gedrag</p>
+            </div>
+        </div>
+        """
+        footnotes = openkamer.kamervraag.create_footnotes(footnote_html)
 
     def test_find_question_in_html(self):
         document = Document.objects.create(content_html="""<div class="vraag">
@@ -51,3 +67,17 @@ class TestKamervraag(TestCase):
          </div>""")
         kamervraag = Kamervraag.objects.create(document=document, vraagnummer='dummy')
         openkamer.kamervraag.create_vragen_from_kamervraag_html(kamervraag)
+
+
+class TestKamerantwoord(TestCase):
+
+    def test_combined_answers(self):
+        document_number = '2016D07289'
+        overheidnl_document_id = 'ah-tk-20152016-1580'
+        kamerantwoord = openkamer.kamervraag.create_kamerantwoord(document_number, overheidnl_document_id)
+        self.assertEqual(kamerantwoord.antwoord_set.count(), 4)
+        antwoorden = kamerantwoord.antwoord_set.all()
+        self.assertEqual(antwoorden[0].see_answer_nr, None)
+        self.assertEqual(antwoorden[1].see_answer_nr, None)
+        self.assertEqual(antwoorden[2].see_answer_nr, 2)
+        self.assertEqual(antwoorden[3].see_answer_nr, None)
