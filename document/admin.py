@@ -65,7 +65,13 @@ class BesluitenLijstAdmin(admin.ModelAdmin):
 
 class KamervraagAdmin(admin.ModelAdmin):
     list_display = (
-        'document',
+        'vraagnummer', 'document',
+    )
+
+
+class KamerantwoordAdmin(admin.ModelAdmin):
+    list_display = (
+        'vraagnummer', 'document',
     )
 
 
@@ -96,7 +102,7 @@ admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
 admin.site.register(Kamervraag, KamervraagAdmin)
-admin.site.register(Kamerantwoord)
+admin.site.register(Kamerantwoord, KamerantwoordAdmin)
 
 admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 
