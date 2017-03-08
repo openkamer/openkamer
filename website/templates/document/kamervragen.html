@@ -89,13 +89,13 @@
     <div class="panel panel-default" align="left">
       <div class="panel-heading">
         <div class="row">
-          <div class="col-xs-8" align="left">
+          <div class="col-xs-10 col-sm-8" align="left">
             <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
           </div>
-          <div class="col-xs-3" align="right">
+          <div class="hidden-xs col-sm-3" align="right">
             <h6 class="date">{{ kamervraag.duration }} dagen</h6>
           </div>
-          <div class="col-xs-1" align="right">
+          <div class="col-xs-2 col-sm-1" align="right">
             {% if kamervraag.kamerantwoord %}
               <i class="fa fa-check text-success" title="Beantwoord"></i>
             {% else %}
@@ -126,7 +126,7 @@
             {% else %}
             <h6 class="small">Ontvanger: {{ kamervraag.receiver }}</h6>
             {% endif %}
-            <h6 class="small">Onderwerpen: {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h6>
+            <h6 class="small"><span class="hidden-xs">Onderwerpen:</span> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h6>
           </div>
         </div>
       </div>
