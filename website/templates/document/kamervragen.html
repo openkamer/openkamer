@@ -22,17 +22,12 @@
     <div class="row">
       <form action="" method="get">
 
-        <div class="col-sm-3 col-lg-3">
+        <div class="col-sm-3 col-lg-4">
           <h6 class="text-primary">Titel</h6>
           {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-3 col-lg-3">
-          <h6 class="text-primary">Inhoud</h6>
-          {% bootstrap_field filter.form.content bound_css_class='' show_label=False show_help=False %}
-        </div>
-
-        <div class="col-sm-3 col-lg-2">
+        <div class="col-sm-3 col-lg-4">
           <h6 class="text-primary">Status</h6>
           {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
         </div>
@@ -121,7 +116,7 @@
             </h6>
             {% if kamervraag.kamerantwoord %}
               {% with submitters=kamervraag.kamerantwoord.document.submitters %}
-                <h6 class="small">Beantwoord door: {% include "document/items/submitters_list.html" %}</h6>
+                <h6 class="small">Antwoord: {% include "document/items/submitters_list.html" %}</h6>
               {% endwith %}
             {% else %}
             <h6 class="small">Ontvanger: {{ kamervraag.receiver }}</h6>
