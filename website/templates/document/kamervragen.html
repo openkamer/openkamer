@@ -22,17 +22,22 @@
     <div class="row">
       <form action="" method="get">
 
-        <div class="col-sm-5 col-lg-3">
+        <div class="col-sm-3 col-lg-2">
           <h6 class="text-primary">Titel</h6>
           {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-4 col-lg-3">
+        <div class="col-sm-3 col-lg-3">
+          <h6 class="text-primary">Inhoud</h6>
+          {% bootstrap_field filter.form.content bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-3 col-lg-3">
           <h6 class="text-primary">Status</h6>
           {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-4 col-lg-4">
+        <div class="col-sm-12 col-lg-4">
           <h6 class="text-primary">Indiener</h6>
           {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
@@ -114,8 +119,14 @@
                 <strong>{% include "document/items/submitters_list.html" %}</strong>
               {% endwith %}
             </h6>
+            {% if kamervraag.kamerantwoord %}
+              {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+                <h6 class="small">Beantwoord door: <strong>{% include "document/items/submitters_list.html" %}</strong></h6>
+              {% endwith %}
+            {% else %}
             <h6 class="small">Ontvanger: <strong>{{ kamervraag.receiver }}</strong></h6>
-            <!--<h6 class="small">Categoriën: <strong>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</strong></h6>-->
+            {% endif %}
+            <h6 class="small">Onderwerpen: <strong>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</strong></h6>
           </div>
         </div>
       </div>
@@ -141,8 +152,7 @@
             {% for vraag in kamervraag.vragen %}
               <li class="list-group-item">
                 <small>
-                  <strong class="text-info">Vraag {{ vraag.nr }}</strong>
-                  <br/>
+                  <h6 class="text-info">Vraag {{ vraag.nr }}</h6>
                   <strong><i>{{ vraag.text }}</i></strong>
                 </small>
                 {% if vraag.antwoord %}

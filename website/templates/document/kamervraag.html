@@ -1,41 +1,75 @@
 {% extends "website/base.html" %}
 
-{% block title %}Kamervraag {{ kamervraag.document.document_id }} - {{ kamervraag.document.title_short }} - Tweede Kamer {{ block.super }}{% endblock %}
+{% block title %}Kamervraag - {{ kamervraag.document.title_short }} - {{ kamervraag.document.document_id }} - Tweede Kamer {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
     <div align="center"><h3>Kamervraag</h3></div>
-    <div align="left">
-      {% with document=kamervraag.document %}
-      {% include "document/items/document_info.html" %}
-      {% endwith %}
-    </div>
+      <div align="center"><h4>{{ kamervraag.document.title_short }}</h4></div>
+      <table class="table table-striped table-condensed">
+        <tbody>
+          <tr>
+            <th>Ingediend:</th> <td>{{ kamervraag.document.date_published }}</td>
+          </tr>
+          {% if kamervraag.kamerantwoord %}
+          <tr>
+           <th>Beantwoord:</th> <td>{{ kamervraag.kamerantwoord.document.date_published }} (na {{ kamervraag.duration }} dagen)</td>
+          </tr>
+          {% endif %}
+          <tr>
+          <th>Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:</th>
+            {% with submitters=kamervraag.document.submitters %}
+            <td>{% include "document/items/submitters_list.html" %}</td>
+            {% endwith %}
+          </tr>
+          {% if kamervraag.kamerantwoord %}
+          <tr>
+          <th>Beantwoord door:</th>
+            {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+            <td>{% include "document/items/submitters_list.html" %}</td>
+            {% endwith %}
+          </tr>
+          {% endif %}
+          <tr>
+            <th>Onderwerpen:</th><td> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</td>
+          </tr>
+          <tr>
+            <th>Bron vraag:</th><td> <a href="{{ kamervraag.document.document_url }}">{{ kamervraag.document.document_url }}</a></td>
+          </tr>
+          {% if kamervraag.kamerantwoord %}
+          <tr>
+            <th>Bron antwoord:</th><td> <a href="{{ kamervraag.kamerantwoord.document.document_url }}">{{ kamervraag.kamerantwoord.document.document_url }}</a></td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
   </div>
 </div>
 
-{% if kamervraag.kamerantwoord %}
-<hr>
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
-    <div align="center"><h3>Antwoord</h3></div>
-    <div align="left">
-      {% with document=kamervraag.kamerantwoord.document %}
-      {% include "document/items/document_info.html" %}
+
+    {% if kamervraag.document.footnote_set %}
+      {% with footnotes=kamervraag.document.footnote_set.all %}
+      {% include 'document/items/footnote_panel.html' %}
       {% endwith %}
-    </div>
-  </div>
-</div>
-{% endif %}
+    {% endif %}
 
-<hr/>
-
-<div class="row">
-  <div class="col-lg-8 col-lg-offset-2">
-    <div align="left">
-      {{ kamervraag.document.content_html|safe }}
-    </div>
+    <ul class="list-group">
+    {% for vraag in kamervraag.vragen %}
+      <li class="list-group-item">
+          <h5 class="text-info">Vraag {{ vraag.nr }}</h5>
+          <strong>{{ vraag.text }}</strong>
+        {% if vraag.antwoord %}
+          <br/>
+          <br/>
+          {{ vraag.antwoord.text }}
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
   </div>
 </div>
 
