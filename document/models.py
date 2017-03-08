@@ -361,6 +361,9 @@ class FootNote(models.Model):
     text = models.CharField(max_length=1000, blank=True, default='')
     url = models.URLField(max_length=1000, blank=True, default='')
 
+    class Meta:
+        ordering = ['nr']
+
 
 class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
