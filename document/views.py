@@ -101,6 +101,15 @@ class DossiersView(TemplateView):
         return context
 
 
+class DossiersTableView(TemplateView):
+    template_name = 'document/dossiers_table.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossiers'] = Dossier.objects.all()
+        return context
+
+
 class DossierView(TemplateView):
     template_name = 'document/dossier.html'
 
@@ -363,6 +372,15 @@ class KamervragenView(TemplateView):
         context['kamervragen'] = kamervragen
         context['filter'] = kamervraag_filter
         context['n_results'] = kamervraag_filter.qs.count()
+        return context
+
+
+class KamervragenTableView(TemplateView):
+    template_name = 'document/kamervragen_table.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['kamervragen'] = Kamervraag.objects.all()
         return context
 
 

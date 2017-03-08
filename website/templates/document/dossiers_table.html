@@ -1,0 +1,40 @@
+{% extends "website/base.html" %}
+
+{% block title %}Wetsvoorstellen Tabel - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h4>Wetsvoorstellen Tabel</h4>
+      <h5>{{ dossiers|length }} wetsvoorstellen gevonden</h5>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Dossier</th>
+            <th>Bron</th>
+            <th>Last updated</th>
+            <th>Actief</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dossier in dossiers %}
+          <tr>
+            <td><a href="/dossier/tijdlijn/{{ dossier.dossier_id }}/">{{ dossier.dossier_id }}</a></td>
+            <td><a href="{{ dossier.url }}">tweedekamer.nl</a></td>
+            <td>{{ dossier.date_updated }}</td>
+            <td>{{ dossier.is_active }}</td>
+            <td>{{ dossier.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

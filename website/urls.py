@@ -11,6 +11,7 @@ from document.views import PersonAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersCheckView
 from document.views import DossiersView
+from document.views import DossiersTableView
 from document.views import DossierView, AddDossierView
 from document.views import DossierTimelineView
 from document.views import DossierTimelineHorizontalView
@@ -20,6 +21,7 @@ from document.views import KamerstukView
 from document.views import KamerstukRedirectView
 from document.views import KamerstukCheckView
 from document.views import KamervragenView
+from document.views import KamervragenTableView
 from document.views import KamervraagView
 from document.views import PersonDocumentsView
 from document.views import VotingView
@@ -67,6 +69,7 @@ urlpatterns = [
     url(r'^kabinet/(?P<slug>[-\w]+)/$', GovernmentView.as_view(), name='government'),
 
     url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
+    url(r'^wetsvoorstellen/tabel/$', DossiersTableView.as_view(), name='wetsvoorstellen-table'),
     url(r'^dossiers/$', RedirectView.as_view(url='/wetsvoorstellen/', permanent=False)),
     url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
@@ -83,6 +86,7 @@ urlpatterns = [
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 
     url(r'^kamervragen/$', KamervragenView.as_view(), name='kamervragen'),
+    url(r'^kamervragen/tabel/$', KamervragenTableView.as_view(), name='kamervragen-table'),
     url(r'^kamervraag/(?P<vraagnummer>.*)/$', KamervraagView.as_view(), name='kamervraag'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
