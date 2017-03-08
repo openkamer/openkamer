@@ -4,10 +4,10 @@
 
   <div class="row">
     <div class="col-xs-5" align="left">
-      <small>{{ dossier.last_date }}</small>
+      <h6 class="date">{{ dossier.last_date }}</h6>
     </div>
     <div class="col-xs-2" align="center">
-      <small>{{ dossier.dossier_id }}</small>
+      <h6 class="date">{{ dossier.dossier_id }}</h6>
     </div>
     <div class="col-xs-5" align="right">
       {% get_dossier_status_color dossier as dossier_status_class %}

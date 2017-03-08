@@ -28,6 +28,8 @@ from person.models import Person
 
 import stats.models
 
+import openkamer.kamervraag
+
 from website import settings
 import website.create
 
@@ -119,6 +121,20 @@ class UpdateBesluitenLijsten(LockJob):
     def do_imp(self):
         logger.info('update besluitenlijsten')
         website.create.create_besluitenlijsten()
+
+
+class UpdateKamervragen(LockJob):
+    RUN_AT_TIMES = ['02:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateKamervragen'
+
+    def do_imp(self):
+        logger.info('update kamervragen and kamerantwoorden')
+        years = ['2016', '2015']
+        for year in years:
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=True)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
 class CleanUnusedPersons(CronJobBase):

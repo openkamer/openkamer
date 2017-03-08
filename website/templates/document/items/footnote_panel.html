@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="col-sm-12" align="left">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        {% for footnote in footnotes %}
+            <small>
+              {{ footnote.nr }}.
+              {% if footnote.url %}
+                <a href="{{ footnote.url }}" target="_blank">{{ footnote.text|truncatechars:70 }}</a>
+              {% else %}
+                {{ footnote.text }}
+              {% endif %}
+            </small><br/>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+{% extends "website/base.html" %}
+
+{% block title %}Kamervragen Tabel - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center">
+      <h4>Kamervragen Tabel</h4>
+      <h5>{{ kamervragen|length }} kamervragen gevonden</h5>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Vraag nummer</th>
+            <th>Title</th>
+            <th>Ontvanger</th>
+            <th>Antwoord</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for kamervraag in kamervragen %}
+          <tr>
+            <td><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.vraagnummer }}</a></td>
+            <td>{{ kamervraag.document.title_short }}</td>
+            <td>{{ kamervraag.receiver }}</td>
+            <td>{{ kamervraag.kamerantwoord.document.document_id }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

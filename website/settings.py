@@ -16,6 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Application definition
 INSTALLED_APPS = (
     'website',
+    'openkamer',
     'stats',
     'oktwitter',
     'scraper',
@@ -202,6 +203,11 @@ LOGGING = {
             'level': 'ERROR',
         },
         'website': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'openkamer': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
             'level': 'DEBUG',

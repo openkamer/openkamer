@@ -1,0 +1,180 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+
+{% load bootstrap3 %}
+
+{% block title %}Kamervragen - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% load bootstrap_pagination %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Kamervragen</h3></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12 well well-filters">
+
+    <div class="row">
+      <form action="" method="get">
+
+        <div class="col-sm-3 col-lg-3">
+          <h6 class="text-primary">Titel</h6>
+          {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-3 col-lg-3">
+          <h6 class="text-primary">Inhoud</h6>
+          {% bootstrap_field filter.form.content bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-3 col-lg-2">
+          <h6 class="text-primary">Status</h6>
+          {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
+        </div>
+
+        <div class="col-sm-12 col-lg-4">
+          <h6 class="text-primary">Indiener</h6>
+          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
+        <div class="col-sm-12">
+          <a class="collapse-filter" data-toggle="collapse" href="#collapse-category-filter" aria-expanded="false" aria-controls="collapse-category-filter"><h6><i class="fa fa-chevron-right"></i> Onderwerpen</h6></a>
+          <div class="collapse" id="collapse-category-filter">
+            <div class="card card-block">
+              {% bootstrap_field filter.form.categories size='medium' field_class='category-filter-checkboxes text-primary' bound_css_class='' show_label=False show_help=False %}
+            </div>
+          </div>
+          <script type="text/javascript">
+            $('.collapse').on('show.bs.collapse', function() {
+              $(this).parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");
+            }).on('hide.bs.collapse', function() {
+              $(this).parent().find(".fa-chevron-down").removeClass("fa-chevron-down").addClass("fa-chevron-right");
+            });
+
+            if ($(".checkbox input").is(":checked")) { // checked
+              // console.log('at least one category is checked');
+              $("#collapse-category-filter").addClass("in");
+              $("#collapse-category-filter").parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");;
+            }
+          </script>
+        </div>
+
+        <div class="col-sm-12">
+          {% bootstrap_button content='Zoek' button_type='submit' %}
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<hr class="hr-small"/>
+
+<div class="row">
+  <div class="col-md-6">
+    <h6>{% if n_results == 0 %}geen kamervragen{% elif n_results == 1 %}1 kamervraag{% else %}{{ n_results }} kamervragen{% endif %} gevonden</h6>
+  </div>
+</div>
+
+<div class="row">
+  {% for kamervraag in kamervragen %}
+  <div class="col-md-6">
+    <div class="panel panel-default" align="left">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-xs-5" align="left">
+            <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
+          </div>
+          <div class="col-xs-4" align="left">
+            <h6 class="date">{{ kamervraag.duration }} dagen</h6>
+          </div>
+          <div class="col-xs-3" align="right">
+            {% if kamervraag.kamerantwoord %}
+              <i class="fa fa-check text-success" title="Beantwoord"></i>
+            {% else %}
+              <i class="fa fa-spinner text-primary" title="Nog niet beantwoord"></i>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-body-kamervraag" class="panel-body">
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <h5><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</a></h5>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h6 class="small">Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:
+              {% with submitters=kamervraag.document.submitters %}
+                <strong>{% include "document/items/submitters_list.html" %}</strong>
+              {% endwith %}
+            </h6>
+            {% if kamervraag.kamerantwoord %}
+              {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+                <h6 class="small">Beantwoord door: <strong>{% include "document/items/submitters_list.html" %}</strong></h6>
+              {% endwith %}
+            {% else %}
+            <h6 class="small">Ontvanger: <strong>{{ kamervraag.receiver }}</strong></h6>
+            {% endif %}
+            <h6 class="small">Onderwerpen: <strong>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</strong></h6>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-footer-kamervraag" class="panel-footer">
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <button class="btn btn-sm btn-link" data-toggle="collapse" data-target="#vragen-{{ kamervraag.id }}">
+              <strong>Vragen {% if kamervraag.kamerantwoord %}en antwoorden{% endif %}</strong> <i class="fa fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="vragen-{{ kamervraag.id }}" class="collapse">
+          <div class="vertical-spacer-15"></div>
+            {% if kamervraag.document.footnote_set.exists %}
+              {% with footnotes=kamervraag.document.footnote_set.all %}
+              {% include 'document/items/footnote_panel.html' %}
+              {% endwith %}
+            {% endif %}
+
+            <ul class="list-group">
+            {% for vraag in kamervraag.vragen %}
+              <li class="list-group-item">
+                <small>
+                  <h6 class="text-info">Vraag {{ vraag.nr }}</h6>
+                  <strong><i>{{ vraag.text }}</i></strong>
+                </small>
+                {% if vraag.antwoord %}
+                  <br/>
+                  <small>{{ vraag.antwoord.text }}</small>
+                {% endif %}
+              </li>
+            {% endfor %}
+            </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {% if forloop.counter|divisibleby:2 %}
+    <div class="clearfix"></div>
+  {% endif %}
+
+  {% endfor %}
+</div>
+
+<div class="row" align="center">{% bootstrap_paginate kamervragen range=10 show_prev_next="true" show_first_last="true" %}</div>
+
+{% endblock %}

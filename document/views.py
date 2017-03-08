@@ -19,10 +19,13 @@ from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import Dossier
+from document.models import Kamervraag
+from document.models import Antwoord
 from document.models import Submitter
 from document.models import Voting
 from document.models import VoteParty
 from document.filters import DossierFilter
+from document.filters import KamervraagFilter
 from document.filters import VotingFilter
 from document import settings
 
@@ -95,6 +98,15 @@ class DossiersView(TemplateView):
         context['dossiers_voted'] = dossiers_filtered.filter(voting__is_dossier_voting=True, voting__vote__isnull=False, voting__date__gt=two_month_ago).distinct().order_by('-voting__date')[0:settings.NUMBER_OF_LATEST_DOSSIERS]
         context['filter'] = dossier_filter
         context['n_results'] = dossier_filter.qs.count()
+        return context
+
+
+class DossiersTableView(TemplateView):
+    template_name = 'document/dossiers_table.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['dossiers'] = Dossier.objects.all()
         return context
 
 
@@ -339,4 +351,46 @@ class PersonDocumentsView(TemplateView):
         context['person'] = person
         documents = Document.objects.filter(submitter__in=submitters)
         context['documents'] = documents
+        return context
+
+
+class KamervragenView(TemplateView):
+    template_name = 'document/kamervragen.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
+        kamervragen_filtered = kamervraag_filter.qs
+        paginator = Paginator(kamervraag_filter.qs, settings.DOSSIERS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            kamervragen = paginator.page(page)
+        except PageNotAnInteger:
+            kamervragen = paginator.page(1)
+        except EmptyPage:
+            kamervragen = paginator.page(paginator.num_pages)
+        context['kamervragen'] = kamervragen
+        context['filter'] = kamervraag_filter
+        context['n_results'] = kamervraag_filter.qs.count()
+        return context
+
+
+class KamervragenTableView(TemplateView):
+    template_name = 'document/kamervragen_table.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['kamervragen'] = Kamervraag.objects.all()
+        return context
+
+
+class KamervraagView(TemplateView):
+    template_name = 'document/kamervraag.html'
+
+    def get_context_data(self, vraagnummer, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamervragen = Kamervraag.objects.filter(vraagnummer=vraagnummer)
+        if not kamervragen:
+            raise Http404
+        context['kamervraag'] = kamervragen[0]
         return context

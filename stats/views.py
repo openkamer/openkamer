@@ -20,6 +20,10 @@ from document.models import BesluitItemCase
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
+from document.models import Kamervraag
+from document.models import Kamerantwoord
+from document.models import Vraag
+from document.models import Antwoord
 from document.models import Voting
 from document.models import Vote
 from document.models import VoteParty
@@ -40,6 +44,10 @@ class DataStatsView(TemplateView):
         context['n_dossiers'] = Dossier.objects.all().count()
         context['n_documents'] = Document.objects.all().count()
         context['n_kamerstukken'] = Kamerstuk.objects.all().count()
+        context['n_kamervragen'] = Kamervraag.objects.all().count()
+        context['n_vragen'] = Vraag.objects.all().count()
+        context['n_antwoorden'] = Antwoord.objects.all().count()
+        context['n_kamerantwoorden'] = Kamerantwoord.objects.all().count()
         context['n_votings'] = Voting.objects.all().count()
         context['n_votes'] = Vote.objects.all().count()
         context['n_besluitenlijsten'] = BesluitenLijst.objects.all().count()

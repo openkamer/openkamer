@@ -7,7 +7,9 @@ import django_filters
 from person.models import Person
 
 from document.models import CategoryDossier
+from document.models import CategoryDocument
 from document.models import Dossier
+from document.models import Kamervraag
 from document.models import Voting
 
 
@@ -65,6 +67,57 @@ class DossierFilter(django_filters.FilterSet):
 
     def status_filter(self, queryset, name, value):
         return queryset.filter(status=value)
+
+
+class KamervraagFilter(django_filters.FilterSet):
+    KAMERVRAAG_STATUS_CHOICES = (
+        ('BEA', 'Beantwoord'),
+        ('ONB', 'Onbeantwoord'),
+    )
+    title = django_filters.CharFilter(method='title_filter', label='')
+    content = django_filters.CharFilter(method='content_filter', label='')
+    submitter = django_filters.ModelChoiceFilter(
+        queryset=Person.objects.all(),
+        to_field_name='slug',
+        method='submitter_filter',
+        label='',
+        widget=ModelSelect2PersonWidget(url='person-autocomplete')
+    )
+    status = django_filters.ChoiceFilter(
+        choices=KAMERVRAAG_STATUS_CHOICES,
+        method='status_filter',
+        # widget=forms.ChoiceField()
+    )
+    categories = django_filters.ModelMultipleChoiceFilter(
+        queryset=CategoryDocument.objects.all(),
+        widget=forms.CheckboxSelectMultiple(),
+        method='category_filter',
+    )
+
+    class Meta:
+        model = Kamervraag
+        exclude = '__all__'
+
+    def title_filter(self, queryset, name, value):
+        return queryset.filter(document__title_full__icontains=value).distinct()
+
+    def content_filter(self, queryset, name, value):
+        value = ' ' + value + ' '
+        return queryset.filter(document__content_html__icontains=value).distinct()
+
+    def submitter_filter(self, queryset, name, value):
+        return queryset.filter(document__submitter__person=value).distinct()
+
+    def category_filter(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(document__categories=value).distinct()
+
+    def status_filter(self, queryset, name, value):
+        if value == 'BEA':
+            return queryset.filter(kamerantwoord__isnull=False)
+        else:
+            return queryset.filter(kamerantwoord__isnull=True)
 
 
 class VotingFilter(django_filters.FilterSet):

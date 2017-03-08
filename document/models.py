@@ -1,5 +1,6 @@
-import requests
+import datetime
 import logging
+import requests
 from itertools import chain
 
 from django.db import models
@@ -31,6 +32,7 @@ class Category(models.Model):
 
 
 class CategoryDossier(Category):
+
     def __str__(self):
         return str(self.name)
 
@@ -41,8 +43,9 @@ class CategoryDossier(Category):
 
 
 class CategoryDocument(Category):
+
     def __str__(self):
-        return 'Document category: ' + str(self.name)
+        return str(self.name)
 
     class Meta:
         ordering = ['name']
@@ -215,6 +218,7 @@ class Document(models.Model):
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
+    source_url = models.URLField()
     content_html = models.CharField(max_length=4000000, blank=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -228,6 +232,8 @@ class Document(models.Model):
 
     @cached_property
     def document_url(self):
+        if self.source_url:
+            return self.source_url
         return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
 
     def __str__(self):
@@ -257,6 +263,97 @@ class Submitter(models.Model):
         members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
         if members.exists():
             return members[0].party
+
+
+class Kamerantwoord(models.Model):
+    document = models.ForeignKey(Document)
+    vraagnummer = models.CharField(max_length=200)
+
+    @classmethod
+    def get_antwoorden_info(cls, year):
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/antwoorden_' + str(year) + '.csv')
+        lines.pop(0)  # remove table headers
+        cls.antwoorden_info = []
+        for line in lines:
+            colums = line.split(',')
+            info = {
+                'datum': colums[0],
+                'document_number': colums[1],
+                'overheidnl_document_id': colums[2].replace('https://zoek.officielebekendmakingen.nl/', ''),
+                'document_url': colums[2],
+            }
+            if colums[2] == '':  # no document url
+                continue
+            cls.antwoorden_info.append(info)
+        return cls.antwoorden_info
+
+
+class Kamervraag(models.Model):
+    document = models.ForeignKey(Document)
+    vraagnummer = models.CharField(max_length=200)
+    receiver = models.CharField(max_length=1000)
+    kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-document__date_published']
+
+    @cached_property
+    def vragen(self):
+        return self.vraag_set.all()
+
+    @cached_property
+    def duration(self):
+        if not self.kamerantwoord:
+            return (datetime.date.today() - self.document.date_published).days
+        return (self.kamerantwoord.document.date_published - self.document.date_published).days
+
+    @classmethod
+    def get_kamervragen_info(cls, year):
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/kamervragen_' + str(year) + '.csv')
+        lines.pop(0)  # remove table headers
+        cls.kamervragen_info = []
+        for line in lines:
+            colums = line.split(',')
+            info = {
+                'datum': colums[0],
+                'document_number': colums[1],
+                'overheidnl_document_id': colums[2].replace('https://zoek.officielebekendmakingen.nl/', ''),
+                'document_url': colums[2],
+            }
+            if colums[2] == '':  # no document url
+                continue
+            cls.kamervragen_info.append(info)
+        return cls.kamervragen_info
+
+
+class Vraag(models.Model):
+    nr = models.IntegerField()
+    kamervraag = models.ForeignKey(Kamervraag)
+    text = models.CharField(max_length=10000)
+
+    @cached_property
+    def antwoord(self):
+        antwoorden = Antwoord.objects.filter(kamerantwoord=self.kamervraag.kamerantwoord, nr=self.nr)
+        if antwoorden:
+            return antwoorden[0]
+        return None
+
+
+class Antwoord(models.Model):
+    nr = models.IntegerField()
+    kamerantwoord = models.ForeignKey(Kamerantwoord)
+    text = models.CharField(max_length=10000)
+    see_answer_nr = models.IntegerField(null=True, blank=False)
+
+    def __str__(self):
+        return 'Antwoord ' + str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
+
+
+class FootNote(models.Model):
+    document = models.ForeignKey(Document)
+    nr = models.IntegerField()
+    text = models.CharField(max_length=1000, blank=True, default='')
+    url = models.URLField(max_length=1000, blank=True, default='')
 
 
 class Kamerstuk(models.Model):
