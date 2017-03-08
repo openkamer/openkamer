@@ -19,26 +19,36 @@ import scraper.documents
 logger = logging.getLogger(__name__)
 
 
-# @transaction.atomic
-def create_kamervragen(year, max_n, skip_if_exists=False):
+def create_kamervragen(year, max_n=None, skip_if_exists=False):
+    logger.info('BEGIN')
     infos = Kamervraag.get_kamervragen_info(year)
     counter = 0
     for info in infos:
-        create_kamervraag(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+        try:
+            create_kamervraag(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+        except Exception as error:
+            logger.error('error for kamervraag id: ' + str(info['overheidnl_document_id']))
+            logger.exception(error)
         if max_n and counter >= max_n:
             return
         counter += 1
+    logger.info('END')
 
 
-# @transaction.atomic
 def create_antwoorden(year, max_n=None, skip_if_exists=False):
+    logger.info('BEGIN')
     infos = Kamerantwoord.get_antwoorden_info(year)
     counter = 0
     for info in infos:
-        create_kamerantwoord(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+        try:
+            create_kamerantwoord(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+        except Exception as error:
+            logger.error('error for kamerantwoord id: ' + str(info['overheidnl_document_id']))
+            logger.exception(error)
         if max_n and counter >= max_n:
             break
         counter += 1
+    logger.info('END')
 
 
 @transaction.atomic
@@ -140,13 +150,12 @@ def get_receiver_from_title(title_full):
 
 
 @transaction.atomic
-def find_kamerantwoorden():
+def link_kamervragen_and_antwoorden():
     logger.info('BEGIN')
     kamerantwoorden = Kamerantwoord.objects.all()
     for kamerantwoord in kamerantwoorden:
         kamervragen = Kamervraag.objects.filter(vraagnummer=kamerantwoord.vraagnummer)
         if kamervragen:
-            logger.info('vraag found!!!')
             kamervraag = kamervragen[0]
             kamervraag.kamerantwoord = kamerantwoord
             kamervraag.save()

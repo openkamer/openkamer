@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from openkamer.kamervraag import find_kamerantwoorden
+from openkamer.kamervraag import link_kamervragen_and_antwoorden
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        find_kamerantwoorden()
+        link_kamervragen_and_antwoorden()

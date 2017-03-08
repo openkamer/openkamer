@@ -301,6 +301,7 @@ class Kamervraag(models.Model):
     def vragen(self):
         return self.vraag_set.all()
 
+    @cached_property
     def duration(self):
         if not self.kamerantwoord:
             return (datetime.date.today() - self.document.date_published).days
@@ -330,7 +331,7 @@ class Vraag(models.Model):
     kamervraag = models.ForeignKey(Kamervraag)
     text = models.CharField(max_length=10000)
 
-    @property
+    @cached_property
     def antwoord(self):
         antwoorden = Antwoord.objects.filter(kamerantwoord=self.kamervraag.kamerantwoord, nr=self.nr)
         if antwoorden:
