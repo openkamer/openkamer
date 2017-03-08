@@ -30,6 +30,7 @@ def get_kamervraag_document_id_and_content(url):
     title = ''
     if titles:
         title = titles[0].text_content()
+        title = re.sub('\s{2,}', ' ', title).strip()
     return document_id, content_html, title
 
 
@@ -73,6 +74,7 @@ def get_metadata(document_id):
         'DC.title': 'title_full',
         'OVERHEIDop.documenttitel': 'title_short',
         'OVERHEIDop.indiener': 'submitter',
+        'OVERHEIDop.ontvanger': 'receiver',
         'OVERHEIDop.ondernummer': 'id_sub',
         'OVERHEIDop.publicationName': 'publication_type',
         'DCTERMS.issued': 'date_published',

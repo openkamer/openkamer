@@ -11,7 +11,13 @@ class TestKamervraag(TestCase):
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
         metadata = openkamer.kamervraag.create_kamervraag_document(infos[0])
-        print(metadata)
+        # print(metadata)
+
+    def test_get_receiver_from_title(self):
+        receiver_expected = 'Staatssecretaris van Infrastructuur en Milieu'
+        title = "Vragen van het lid Monasch (PvdA) aan de Staatssecretaris van Infrastructuur en Milieu over het artikel «Schiphol kan verder met uitbreiding» (ingezonden 23 november 2015)."
+        receiver = openkamer.kamervraag.get_receiver_from_title(title)
+        self.assertEqual(receiver, receiver_expected)
 
     def test_find_question_in_html(self):
         document = Document.objects.create(content_html="""<div class="vraag">
@@ -44,4 +50,4 @@ class TestKamervraag(TestCase):
             </p>
          </div>""")
         kamervraag = Kamervraag.objects.create(document=document, vraagnummer='dummy')
-        openkamer.kamervraag.find_questions_in_html(kamervraag)
+        openkamer.kamervraag.create_vragen_from_kamervraag_html(kamervraag)

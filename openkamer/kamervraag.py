@@ -38,18 +38,20 @@ def create_kamervragen(year, max_n):
 def create_kamervraag(kamervraag_info):
     document, vraagnummer = create_kamervraag_document(kamervraag_info)
     Kamervraag.objects.filter(document=document).delete()
-    kamervraag = Kamervraag.objects.create(document=document, vraagnummer=vraagnummer)
+    kamervraag = Kamervraag.objects.create(
+        document=document,
+        vraagnummer=vraagnummer,
+        receiver=get_receiver_from_title(document.title_full)
+    )
     create_vragen_from_kamervraag_html(kamervraag)
 
 
 @transaction.atomic
 def create_kamervraag_document(kamervraag_info):
-    print('BEGIN')
-    print(kamervraag_info['document_url'])
+    logger.info('BEGIN')
+    logger.info(kamervraag_info['document_url'])
     document_html_url = kamervraag_info['document_url'] + '.html'
     document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(document_html_url)
-    # print(content_html)
-    print('title: ' + title)
     metadata = get_kamervraag_metadata(kamervraag_info)
     document_id = kamervraag_info['document_number']
 
@@ -73,7 +75,7 @@ def create_kamervraag_document(kamervraag_info):
         dossier=None,
         document_id=document_id,
         title_full=title,
-        title_short=create_title_short(metadata['title_short']),
+        title_short=metadata['title_full'],
         publication_type=metadata['publication_type'],
         publisher=metadata['publisher'],
         date_published=date_published,
@@ -87,13 +89,11 @@ def create_kamervraag_document(kamervraag_info):
     for submitter in submitters:
         website.create.create_submitter(document, submitter, date_published)
 
-    print('END')
+    logger.info('END')
     return document, metadata['vraagnummer']
 
 
-def create_title_short(title_full):
-    title = title_full.strip()
-    title = re.sub('\s{2,}', ' ', title)
+def create_title_short(title):
     pattern = 'Vragen\s(.*aan de)\s(.*)over\s.*(\s\(ingezonden.*\)\.)'
     result = re.findall(pattern, title)
     if result:
@@ -103,6 +103,15 @@ def create_title_short(title_full):
         title = title.replace('«', '"')
         title = title.replace('»', '"')
     return title.strip()
+
+
+def get_receiver_from_title(title_full):
+    print(title_full)
+    pattern = 'Vragen\s.*aan de\s(.*) over\s.*'
+    result = re.findall(pattern, title_full)
+    if result:
+        return result[0]
+    return ''
 
 
 def get_antwoord_metadata(antwoord_info):
@@ -148,13 +157,16 @@ def create_vragen_from_kamervraag_html(kamervraag):
     logger.info('BEGIN')
     Vraag.objects.filter(kamervraag=kamervraag).delete()
     tree = lxml.html.fromstring(kamervraag.document.content_html)
-    elements = tree.xpath('//div[@class="vraag"]/p')
+    elements = tree.xpath('//div[@class="vraag"]')
     counter = 1
     for element in elements:
-        if element.text == '':
-            logger.warning('empty vraag text found for kamervraag ' + str(kamervraag.document.document_url) + 'vraag nr: ' + str(counter))
-            continue
-        Vraag.objects.create(nr=counter, kamervraag=kamervraag, text=element.text)
+        vraag_text = ''
+        for paragraph in element.iter('p'):
+            if paragraph.text is None or paragraph.text == '':
+                logger.warning('empty vraag text found for antwoord ' + str(kamervraag.document.document_url) + 'vraat nr: ' + str(counter))
+            else:
+                vraag_text += paragraph.text + '\n'
+        Vraag.objects.create(nr=counter, kamervraag=kamervraag, text=vraag_text)
         counter += 1
     logger.info('END: ' + str(counter) + ' vragen found')
 
@@ -171,7 +183,7 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
         answer_text = ''
         for paragraph in element.iter('p'):
             if paragraph.text is None or paragraph.text == '':
-                logger.warning('empty vraag text found for antwoord ' + str(kamerantwoord.document.document_url) + 'vraag nr: ' + str(counter))
+                logger.warning('empty vraag text found for antwoord ' + str(kamerantwoord.document.document_url) + 'antwoord nr: ' + str(counter))
             else:
                 answer_text += paragraph.text + '\n'
         antwoord = Antwoord.objects.create(nr=counter, kamerantwoord=kamerantwoord, text=answer_text)

@@ -288,6 +288,7 @@ class Kamerantwoord(models.Model):
 class Kamervraag(models.Model):
     document = models.ForeignKey(Document)
     vraagnummer = models.CharField(max_length=200)
+    receiver = models.CharField(max_length=1000)
     kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True)
 
     @cached_property
