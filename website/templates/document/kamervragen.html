@@ -26,7 +26,7 @@
           <small>{{ kamervraag.document.date_published }}</small>
         </div>
         <div class="col-xs-6" align="center">
-          <small>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</small>
+          <!--<small>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</small>-->
         </div>
         <div class="col-xs-3" align="right">
           {% if kamervraag.kamerantwoord %}
@@ -38,24 +38,25 @@
       </div>
 
       <div class="row">
-        <div class="col-sm-12">
-          <h6><a href="{% url 'kamervraag' kamervraag.document.document_id %}">{{ kamervraag.document.title }}</a></h6>
+        <div class="col-sm-12" align="center">
+          <h5><a href="{% url 'kamervraag' kamervraag.document.document_id %}">{{ kamervraag.document.title_short }}</a></h5>
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-12">
-          <h6>Indiener(s):
+          <h6>Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:
             {% with submitters=kamervraag.document.submitters %}
               {% include "document/items/submitters_list.html" %}
             {% endwith %}
           </h6>
+          <h6>Ontvanger: {{ kamervraag.receiver }}</h6>
         </div>
       </div>
 
       <div class="row">
         <div class="col-sm-12" align="center">
-          <button class="btn btn-xs btn-link" data-toggle="collapse" data-target="#vragen-{{ kamervraag.id }}">
+          <button class="btn btn-sm btn-link" data-toggle="collapse" data-target="#vragen-{{ kamervraag.id }}">
             <strong>Vragen {% if kamervraag.kamerantwoord %}en antwoorden{% endif %}</strong> <i class="fa fa-chevron-down"></i>
           </button>
         </div>
@@ -68,14 +69,17 @@
             {% for vraag in kamervraag.vragen %}
               <li>
                 <small>
-                  <strong>Vraag {{ vraag.nr }}</strong>
+                  <strong class="text-info">Vraag {{ vraag.nr }}</strong>
                   <br/>
-                  {{ vraag.text }}</small>
-                  <br/>
+                  <strong><i>{{ vraag.text }}</i></strong>
+                </small>
+                  {% if vraag.antwoord %}
                   <small>
-                  <strong class="text-info">Antwoord</strong>
+                  <!--<strong class="text-info">Antwoord</strong>-->
                   <br/>
-                  {{ vraag.antwoord.text }}</small>
+                  {{ vraag.antwoord.text }}
+                  </small>
+                  {% endif %}
               </li>
               {% if vraag.antwoord %}
               {% endif %}
