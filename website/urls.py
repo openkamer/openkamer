@@ -83,7 +83,7 @@ urlpatterns = [
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 
     url(r'^kamervragen/$', KamervragenView.as_view(), name='kamervragen'),
-    url(r'^kamervragen/(?P<document_id>.*)/$', KamervraagView.as_view(), name='kamervraag'),
+    url(r'^kamervragen/(?P<vraagnummer>.*)/$', KamervraagView.as_view(), name='kamervraag'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
 
