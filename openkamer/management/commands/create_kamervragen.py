@@ -14,5 +14,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         year = options['year'][0]
         max_n = options['max']
-        create_kamervragen(year, max_n)
+        create_kamervragen(year, max_n, skip_if_exists=True)
 

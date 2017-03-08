@@ -20,29 +20,31 @@ logger = logging.getLogger(__name__)
 
 
 # @transaction.atomic
-def create_kamervragen(year, max_n):
+def create_kamervragen(year, max_n, skip_if_exists=False):
     infos = Kamervraag.get_kamervragen_info(year)
     counter = 0
     for info in infos:
-        create_kamervraag(info['document_number'], info['overheidnl_document_id'])
+        create_kamervraag(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
         if max_n and counter >= max_n:
             return
         counter += 1
 
 
 # @transaction.atomic
-def create_antwoorden(year, max_n=None):
+def create_antwoorden(year, max_n=None, skip_if_exists=False):
     infos = Kamerantwoord.get_antwoorden_info(year)
     counter = 0
     for info in infos:
-        create_kamerantwoord(info['document_number'], info['overheidnl_document_id'])
+        create_kamerantwoord(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
         if max_n and counter >= max_n:
             break
         counter += 1
 
 
 @transaction.atomic
-def create_kamervraag(document_number, overheidnl_document_id):
+def create_kamervraag(document_number, overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamervraag.objects.filter(document__document_id=document_number).exists():
+        return
     document, vraagnummer = create_kamervraag_document(document_number, overheidnl_document_id)
     Kamervraag.objects.filter(document=document).delete()
     kamervraag = Kamervraag.objects.create(
@@ -58,7 +60,9 @@ def create_kamervraag(document_number, overheidnl_document_id):
 
 
 @transaction.atomic
-def create_kamerantwoord(document_number, overheidnl_document_id):
+def create_kamerantwoord(document_number, overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=document_number).exists():
+        return
     document, vraagnummer = create_kamervraag_document(document_number, overheidnl_document_id)
     Kamerantwoord.objects.filter(document=document).delete()
     kamerantwoord = Kamerantwoord.objects.create(document=document, vraagnummer=vraagnummer)
@@ -84,6 +88,8 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
 
     if 'submitter' not in metadata:
         metadata['submitter'] = 'undefined'
+    if metadata['receiver']:
+        metadata['submitter'] = metadata['receiver']
 
     documents = Document.objects.filter(document_id=document_id).delete()
     if documents:
@@ -227,5 +233,4 @@ def create_footnotes(footnotes_html):
             'url': url
         }
         footnotes.append(footnote)
-    logger.info(footnotes)
     return footnotes
