@@ -32,6 +32,7 @@ class Category(models.Model):
 
 
 class CategoryDossier(Category):
+
     def __str__(self):
         return str(self.name)
 
@@ -42,8 +43,9 @@ class CategoryDossier(Category):
 
 
 class CategoryDocument(Category):
+
     def __str__(self):
-        return 'Document category: ' + str(self.name)
+        return str(self.name)
 
     class Meta:
         ordering = ['name']
@@ -291,6 +293,9 @@ class Kamervraag(models.Model):
     vraagnummer = models.CharField(max_length=200)
     receiver = models.CharField(max_length=1000)
     kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-document__date_published']
 
     @cached_property
     def vragen(self):

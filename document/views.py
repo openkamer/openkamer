@@ -25,6 +25,7 @@ from document.models import Submitter
 from document.models import Voting
 from document.models import VoteParty
 from document.filters import DossierFilter
+from document.filters import KamervraagFilter
 from document.filters import VotingFilter
 from document import settings
 
@@ -349,17 +350,28 @@ class KamervragenView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        kamervragen = Kamervraag.objects.all()
+        kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
+        kamervragen_filtered = kamervraag_filter.qs
+        paginator = Paginator(kamervraag_filter.qs, settings.DOSSIERS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            kamervragen = paginator.page(page)
+        except PageNotAnInteger:
+            kamervragen = paginator.page(1)
+        except EmptyPage:
+            kamervragen = paginator.page(paginator.num_pages)
         context['kamervragen'] = kamervragen
+        context['filter'] = kamervraag_filter
+        context['n_results'] = kamervraag_filter.qs.count()
         return context
 
 
 class KamervraagView(TemplateView):
     template_name = 'document/kamervraag.html'
 
-    def get_context_data(self, document_id, **kwargs):
+    def get_context_data(self, vraagnummer, **kwargs):
         context = super().get_context_data(**kwargs)
-        kamervragen = Kamervraag.objects.filter(document__document_id=document_id)
+        kamervragen = Kamervraag.objects.filter(vraagnummer=vraagnummer)
         if not kamervragen:
             raise Http404
         context['kamervraag'] = kamervragen[0]
