@@ -204,6 +204,7 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
                 answer_text += paragraph.text_content() + '\n'
         answer_text = re.sub('\s{2,}', ' ', answer_text).strip()
         counter = 0
+        see_answer_nr = None
         for number in vraag_numbers:
             try:
                 first_number = int(vraag_numbers[0])
@@ -214,7 +215,8 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
                 continue
             if counter > 0:
                 answer_text = 'Zie antwoord vraag ' + str(vraag_numbers[0] + '.')
-            antwoord = Antwoord.objects.create(nr=number, kamerantwoord=kamerantwoord, text=answer_text, see_answer_nr=first_number)
+                see_answer_nr = first_number
+            antwoord = Antwoord.objects.create(nr=number, kamerantwoord=kamerantwoord, text=answer_text, see_answer_nr=see_answer_nr)
             antwoorden.append(antwoord)
             counter += 1
     logger.info('END')
