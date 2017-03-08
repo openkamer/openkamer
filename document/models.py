@@ -1,5 +1,6 @@
-import requests
+import datetime
 import logging
+import requests
 from itertools import chain
 
 from django.db import models
@@ -294,6 +295,11 @@ class Kamervraag(models.Model):
     @cached_property
     def vragen(self):
         return self.vraag_set.all()
+
+    def duration(self):
+        if not self.kamerantwoord:
+            return (datetime.date.today() - self.document.date_published).days
+        return (self.kamerantwoord.document.date_published - self.document.date_published).days
 
     @classmethod
     def get_kamervragen_info(cls, year):

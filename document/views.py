@@ -349,7 +349,7 @@ class KamervragenView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        kamervragen = Kamervraag.objects.all()[:10]
+        kamervragen = Kamervraag.objects.all()
         context['kamervragen'] = kamervragen
         return context
 

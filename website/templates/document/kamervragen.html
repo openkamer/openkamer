@@ -22,12 +22,13 @@
     <div class="panel panel-default" align="left">
       <div class="panel-heading">
         <div class="row">
-          <div class="col-xs-6" align="left">
+          <div class="col-xs-5" align="left">
             <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
           </div>
-          <!--<div class="col-xs-6" align="center">-->
-          <!--</div>-->
-          <div class="col-xs-6" align="right">
+          <div class="col-xs-2" align="center">
+            <h6 class="date">{{ kamervraag.duration }} dagen</h6>
+          </div>
+          <div class="col-xs-5" align="right">
             {% if kamervraag.kamerantwoord %}
               <i class="fa fa-check text-success" title="Beantwoord"></i>
             {% else %}
