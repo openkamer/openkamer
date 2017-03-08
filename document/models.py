@@ -331,6 +331,9 @@ class Vraag(models.Model):
     kamervraag = models.ForeignKey(Kamervraag)
     text = models.CharField(max_length=10000)
 
+    class Meta:
+        ordering = ['nr']
+
     @cached_property
     def antwoord(self):
         antwoorden = Antwoord.objects.filter(kamerantwoord=self.kamervraag.kamerantwoord, nr=self.nr)
@@ -344,6 +347,9 @@ class Antwoord(models.Model):
     kamerantwoord = models.ForeignKey(Kamerantwoord)
     text = models.CharField(max_length=10000)
     see_answer_nr = models.IntegerField(null=True, blank=False)
+
+    class Meta:
+        ordering = ['nr']
 
     def __str__(self):
         return 'Antwoord ' + str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
