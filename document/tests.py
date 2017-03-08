@@ -158,4 +158,4 @@ class TestKamervraag(TestCase):
 
     def test_get_kamervragen_info(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        self.assertEqual(len(infos), 2626)
+        self.assertEqual(len(infos), 2624)
