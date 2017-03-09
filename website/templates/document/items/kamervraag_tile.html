@@ -1,0 +1,82 @@
+  <div class="col-md-6">
+    <div class="panel panel-default" align="left">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-xs-10 col-sm-8" align="left">
+            <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
+          </div>
+          <div class="hidden-xs col-sm-3" align="right">
+            <h6 class="date">{{ kamervraag.duration }} dagen</h6>
+          </div>
+          <div class="col-xs-2 col-sm-1" align="right">
+            {% if kamervraag.kamerantwoord %}
+              <i class="fa fa-check text-success" title="Beantwoord"></i>
+            {% else %}
+              <i class="fa fa-spinner text-primary" title="Nog niet beantwoord"></i>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-body-kamervraag" class="panel-body">
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <h5><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</a></h5>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h6 class="small">Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:
+              {% with submitters=kamervraag.document.submitters %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+            </h6>
+            {% if kamervraag.kamerantwoord %}
+              {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+                <h6 class="small">Antwoord: {% include "document/items/submitters_list.html" %}</h6>
+              {% endwith %}
+            {% else %}
+            <h6 class="small">Ontvanger: {{ kamervraag.receiver }}</h6>
+            {% endif %}
+            <h6 class="small"><span class="hidden-xs">Onderwerpen:</span> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h6>
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-footer-kamervraag" class="panel-footer">
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <button class="btn btn-sm btn-link" data-toggle="collapse" data-target="#vragen-{{ kamervraag.id }}">
+              <strong>Vragen {% if kamervraag.kamerantwoord %}en antwoorden{% endif %}</strong> <i class="fa fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="vragen-{{ kamervraag.id }}" class="collapse">
+          <div class="vertical-spacer-15"></div>
+            {% if kamervraag.document.footnote_set.exists %}
+              {% with footnotes=kamervraag.document.footnote_set.all %}
+              {% include 'document/items/footnote_panel.html' %}
+              {% endwith %}
+            {% endif %}
+
+            <ul class="list-group">
+            {% for vraag in kamervraag.vragen %}
+              <li class="list-group-item">
+                <small>
+                  <h6 class="text-info">Vraag {{ vraag.nr }}</h6>
+                  <strong><i>{{ vraag.text }}</i></strong>
+                </small>
+                {% if vraag.antwoord %}
+                  <br/>
+                  <small>{{ vraag.antwoord.text }}</small>
+                {% endif %}
+              </li>
+            {% endfor %}
+            </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>

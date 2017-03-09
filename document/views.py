@@ -360,8 +360,8 @@ class KamervragenView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
-        kamervragen_filtered = kamervraag_filter.qs
-        paginator = Paginator(kamervraag_filter.qs, settings.DOSSIERS_PER_PAGE)
+        recently_answered = kamervraag_filter.qs.order_by('-kamerantwoord__document__date_published')[0:4]
+        paginator = Paginator(kamervraag_filter.qs.exclude(id__in=recently_answered), settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
             kamervragen = paginator.page(page)
@@ -370,6 +370,7 @@ class KamervragenView(TemplateView):
         except EmptyPage:
             kamervragen = paginator.page(paginator.num_pages)
         context['kamervragen'] = kamervragen
+        context['kamervragen_answered_recently'] = recently_answered
         context['filter'] = kamervraag_filter
         context['n_results'] = kamervraag_filter.qs.count()
         return context

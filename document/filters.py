@@ -70,9 +70,11 @@ class DossierFilter(django_filters.FilterSet):
 
 
 class KamervraagFilter(django_filters.FilterSet):
+    ANSWERED = 'beantwoord'
+    UNANSWERED = 'onbeantwoord'
     KAMERVRAAG_STATUS_CHOICES = (
-        ('BEA', 'Beantwoord'),
-        ('ONB', 'Onbeantwoord'),
+        (ANSWERED, 'Beantwoord'),
+        (UNANSWERED, 'Onbeantwoord'),
     )
     title = django_filters.CharFilter(method='title_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
@@ -110,10 +112,11 @@ class KamervraagFilter(django_filters.FilterSet):
         return queryset.filter(document__categories=value).distinct()
 
     def status_filter(self, queryset, name, value):
-        if value == 'BEA':
+        if value == KamervraagFilter.ANSWERED:
             return queryset.filter(kamerantwoord__isnull=False)
-        else:
+        elif value == KamervraagFilter.UNANSWERED:
             return queryset.filter(kamerantwoord__isnull=True)
+        return queryset
 
 
 class VotingFilter(django_filters.FilterSet):
