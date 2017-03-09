@@ -129,18 +129,6 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
     return document, metadata['vraagnummer']
 
 
-def create_title_short(title):
-    pattern = 'Vragen\s(.*aan de)\s(.*)over\s.*(\s\(ingezonden.*\)\.)'
-    result = re.findall(pattern, title)
-    if result:
-        title = title.replace(result[0][0], '')
-        title = title.replace(result[0][1], '')
-        title = title.replace(result[0][2], '')
-        title = title.replace('«', '"')
-        title = title.replace('»', '"')
-    return title.strip()
-
-
 def get_receiver_from_title(title_full):
     pattern = 'Vragen\s.*aan de\s(.*) over\s.*'
     result = re.findall(pattern, title_full)
