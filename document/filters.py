@@ -100,7 +100,6 @@ class KamervraagFilter(django_filters.FilterSet):
         exclude = '__all__'
 
     def title_filter(self, queryset, name, value):
-        print('title filter')
         return queryset.filter(document__title_full__icontains=value).distinct()
 
     def submitter_filter(self, queryset, name, value):
