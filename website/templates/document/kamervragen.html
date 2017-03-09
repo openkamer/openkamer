@@ -22,23 +22,23 @@
     <div class="row">
       <form action="" method="get">
 
-        <div class="col-sm-3 col-lg-2">
+        <div class="col-sm-6 col-lg-2">
           <h6 class="text-primary">Titel</h6>
           {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-3 col-lg-2">
+        <div class="col-sm-6 col-lg-2">
           <h6 class="text-primary">Status</h6>
           {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-12 col-lg-4">
+        <div class="col-sm-6 col-lg-4">
           <h6 class="text-primary">Indiener (persoon)</h6>
           {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
         </div>
 
-        <div class="col-sm-12 col-lg-4">
+        <div class="col-sm-6 col-lg-4">
           <h6 class="text-primary">Indiener (partij)</h6>
           {% bootstrap_field filter.form.submitter_party bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
