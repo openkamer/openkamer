@@ -16,7 +16,6 @@
             <th>Vraag nummer</th>
             <th>Title</th>
             <th>Ontvanger</th>
-            <th>Antwoord</th>
           </tr>
         </thead>
         <tbody>
@@ -25,7 +24,6 @@
             <td><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.vraagnummer }}</a></td>
             <td>{{ kamervraag.document.title_short }}</td>
             <td>{{ kamervraag.receiver }}</td>
-            <td>{{ kamervraag.kamerantwoord.document.document_id }}</td>
           </tr>
           {% endfor %}
         </tbody>
