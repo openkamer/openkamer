@@ -78,6 +78,8 @@
   </div>
 </div>
 
+
+{% if kamervragen_answered_recently %}
 <div class="row">
   <h5>Recent beantwoord</h5>
   {% for kamervraag in kamervragen_answered_recently %}
@@ -92,7 +94,9 @@
 </div>
 
 <hr class="hr-small"/>
+{% endif %}
 
+{% if kamervragen %}
 <div class="row">
   <h5>Alle</h5>
   {% for kamervraag in kamervragen %}
@@ -105,6 +109,7 @@
 
   {% endfor %}
 </div>
+{% endif %}
 
 <div class="row" align="center">{% bootstrap_paginate kamervragen range=10 show_prev_next="true" show_first_last="true" %}</div>
 
