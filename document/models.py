@@ -251,6 +251,11 @@ class Submitter(models.Model):
     def __str__(self):
         return self.person.fullname()
 
+    def update_submitter_party_slug(self):
+        if self.party:
+            self.party_slug = self.party.slug
+            self.save()
+
     @cached_property
     def government_members(self):
         """ :returns the government members of this person at the time the documented was published """
@@ -261,9 +266,12 @@ class Submitter(models.Model):
 
     @cached_property
     def party(self):
+        if self.person.surname == '':
+            return None
         members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
         if members.exists():
             return members[0].party
+        return None
 
 
 class Kamerantwoord(models.Model):

@@ -11,6 +11,7 @@ import fasteners
 from django.core import management
 from django.conf import settings
 from django_cron import CronJobBase, Schedule
+from django.db import transaction
 
 from git import Repo, Actor
 
@@ -88,6 +89,31 @@ class UpdateParliamentAndGovernment(CronJobBase):
         logger.info('END')
 
 
+class UpdateSubmitters(CronJobBase):
+    RUN_AT_TIMES = ['05:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateSubmitters'
+
+    @transaction.atomic
+    def do(self):
+        logger.info('BEGIN')
+        try:
+            submitters = Submitter.objects.all()
+            n_total = submitters.count()
+            counter = 0
+            progress_percent = 0
+            for submitter in submitters:
+                submitter.update_submitter_party_slug()
+                if counter/n_total*100 > (progress_percent+1) :
+                    progress_percent = counter/n_total*100
+                    logger.info(str(int(progress_percent)) + '%')
+                counter += 1
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
+
+
 class UpdateActiveDossiers(LockJob):
     RUN_AT_TIMES = ['19:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
@@ -132,8 +158,8 @@ class UpdateKamervragen(LockJob):
         logger.info('update kamervragen and kamerantwoorden')
         years = ['2017', '2016', '2015', '2014']
         for year in years:
-            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=True)
-            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=False)
             openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
