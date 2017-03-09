@@ -1,55 +1,59 @@
 {% extends "website/base.html" %}
 
-{% block title %}Kamervraag - {{ kamervraag.document.title_short }} - {{ kamervraag.document.document_id }} - Tweede Kamer {{ block.super }}{% endblock %}
+{% block title %}Kamervraag - {{ kamervraag.document.title_short }} - {{ kamervraag.vraagnummer }} - Tweede Kamer {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
-    <div align="center"><h3>Kamervraag</h3></div>
-      <div align="center"><h4>{{ kamervraag.document.title_short }}</h4></div>
-      <table class="table table-condensed table-striped">
-        <tbody>
-          <tr>
-            <th>Ingediend:</th>
-            <td>{{ kamervraag.document.date_published }}</td>
-          </tr>
-          {% if kamervraag.kamerantwoord %}
-          <tr>
-            <th>Beantwoord:</th>
-            <td>{{ kamervraag.kamerantwoord.document.date_published }} (na {{ kamervraag.duration }} dagen)</td>
-          </tr>
-          {% endif %}
-          <tr>
-            <th>Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:</th>
-            {% with submitters=kamervraag.document.submitters %}
-            <td>{% include "document/items/submitters_list.html" %}</td>
-            {% endwith %}
-          </tr>
-          {% if kamervraag.kamerantwoord %}
-          <tr>
-            <th>Beantwoord door:</th>
-            {% with submitters=kamervraag.kamerantwoord.document.submitters %}
-            <td>{% include "document/items/submitters_list.html" %}</td>
-            {% endwith %}
-          </tr>
-          {% endif %}
-          <tr>
-            <th>Onderwerpen:</th>
-            <td>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</td>
-          </tr>
-          <tr>
-            <th>Bron vraag:</th>
-            <td style="word-break:break-all;"><a href="{{ kamervraag.document.document_url }}">{{ kamervraag.document.document_url }}</a></td>
-          </tr>
-          {% if kamervraag.kamerantwoord %}
-          <tr>
-            <th>Bron antwoord:</th>
-            <td style="word-break:break-all;"><a href="{{ kamervraag.kamerantwoord.document.document_url }}">{{ kamervraag.kamerantwoord.document.document_url }}</a></td>
-          </tr>
-          {% endif %}
-        </tbody>
-      </table>
+
+    <div align="center"><h4 class="text-info">Kamervraag {{ kamervraag.vraagnummer }}</h4>
+      <h4>{{ kamervraag.document.title_short }}</h4>
+    </div>
+
+    <table class="table table-condensed table-striped">
+      <tbody>
+        <tr>
+          <th>Ingediend:</th>
+          <td>{{ kamervraag.document.date_published }}</td>
+        </tr>
+        {% if kamervraag.kamerantwoord %}
+        <tr>
+          <th>Beantwoord:</th>
+          <td>{{ kamervraag.kamerantwoord.document.date_published }} (na {{ kamervraag.duration }} dagen)</td>
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:</th>
+          {% with submitters=kamervraag.document.submitters %}
+          <td>{% include "document/items/submitters_list.html" %}</td>
+          {% endwith %}
+        </tr>
+        {% if kamervraag.kamerantwoord %}
+        <tr>
+          <th>Beantwoord door:</th>
+          {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+          <td>{% include "document/items/submitters_list.html" %}</td>
+          {% endwith %}
+        </tr>
+        {% endif %}
+        <tr>
+          <th>Onderwerpen:</th>
+          <td>{% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</td>
+        </tr>
+        <tr>
+          <th>Bron vraag:</th>
+          <td style="word-break:break-all;"><a href="{{ kamervraag.document.document_url }}">{{ kamervraag.document.document_url }}</a></td>
+        </tr>
+        {% if kamervraag.kamerantwoord %}
+        <tr>
+          <th>Bron antwoord:</th>
+          <td style="word-break:break-all;"><a href="{{ kamervraag.kamerantwoord.document.document_url }}">{{ kamervraag.kamerantwoord.document.document_url }}</a></td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
   </div>
 </div>
 
