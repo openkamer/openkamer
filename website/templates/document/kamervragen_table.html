@@ -1,13 +1,13 @@
 {% extends "website/base.html" %}
 
-{% block title %}Kamervragen Tabel - Tweede Kamer {{ block.super }}{% endblock %}
+{% block title %}Kamervragen Tabel {{ year }}- Tweede Kamer {{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-lg-12">
     <div align="center">
-      <h4>Kamervragen Tabel</h4>
+      <h4>Kamervragen Tabel {{ year }}</h4>
       <h5>{{ kamervragen|length }} kamervragen gevonden</h5>
 
       <table class="table table-striped">

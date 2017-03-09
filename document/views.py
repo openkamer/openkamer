@@ -379,9 +379,13 @@ class KamervragenView(TemplateView):
 class KamervragenTableView(TemplateView):
     template_name = 'document/kamervragen_table.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, year, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['kamervragen'] = Kamervraag.objects.all()
+        year = int(year)
+        year_begin = datetime.date(year=year, month=1, day=1)
+        year_end = datetime.date(year=year+1, month=1, day=1)
+        context['year'] = year
+        context['kamervragen'] = Kamervraag.objects.filter(document__date_published__gte=year_begin, document__date_published__lt=year_end)
         return context
 
 
