@@ -118,8 +118,8 @@ class KamervraagFilter(django_filters.FilterSet):
     def submitter_party_filter(self, queryset, name, value):
         party = value
         submitters = Submitter.objects.filter(party_slug=party.slug)
-        party_person_ids = list(submitters.values_list('person__id', flat=True))
-        return queryset.filter(document__submitter__person__in=party_person_ids).distinct()
+        submitter_ids = list(submitters.values_list('id', flat=True))
+        return queryset.filter(document__submitter__in=submitter_ids).distinct()
 
     def category_filter(self, queryset, name, value):
         if not value:

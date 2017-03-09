@@ -254,7 +254,9 @@ class Submitter(models.Model):
     def update_submitter_party_slug(self):
         if self.party:
             self.party_slug = self.party.slug
-            self.save()
+        else:
+            self.party_slug = ''
+        self.save()
 
     @cached_property
     def government_members(self):
