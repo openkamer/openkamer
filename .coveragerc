@@ -1,5 +1,5 @@
 [run]
-source = website, wikidata, document, parliament, government, person, scraper, stats
+source = website, openkamer, wikidata, document, parliament, government, person, scraper, stats, oktwitter
 
 [report]
 omit =
