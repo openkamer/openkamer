@@ -9,10 +9,11 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
-
 from dal import autocomplete
 
 from person.models import Person
+
+from parliament.models import PoliticalParty
 
 from document.models import Agenda
 from document.models import AgendaItem
@@ -73,6 +74,21 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
                     person_ids.append(person.id)
             return Person.objects.filter(pk__in=person_ids)
         return persons
+
+    def get_result_value(self, result):
+        return result.slug
+
+
+class PartyAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        parties = PoliticalParty.objects.all().order_by('name')
+        party_ids = []
+        if self.q:
+            for party in parties:
+                if self.q.lower() in party.name.lower() or self.q.lower() in party.name_short.lower():
+                    party_ids.append(party.id)
+            return PoliticalParty.objects.filter(pk__in=party_ids)
+        return parties
 
     def get_result_value(self, result):
         return result.slug

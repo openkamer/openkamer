@@ -246,6 +246,7 @@ class Document(models.Model):
 class Submitter(models.Model):
     person = models.ForeignKey(Person)
     document = models.ForeignKey(Document)
+    party_slug = models.CharField(max_length=500, blank=True, default='')
 
     def __str__(self):
         return self.person.fullname()

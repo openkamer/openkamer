@@ -6,14 +6,17 @@ import django_filters
 
 from person.models import Person
 
+from parliament.models import PoliticalParty
+
 from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import Dossier
 from document.models import Kamervraag
+from document.models import Submitter
 from document.models import Voting
 
 
-class ModelSelect2PersonWidget(autocomplete.ModelSelect2):
+class ModelSelect2SlugWidget(autocomplete.ModelSelect2):
 
     def filter_choices_to_render(self, selected_choices):
         """Override from QuerySetSelectMixin to use the slug instead of pk (pk will change on database reset)"""
@@ -37,7 +40,7 @@ class DossierFilter(django_filters.FilterSet):
         to_field_name='slug',
         method='submitter_filter',
         label='',
-        widget=ModelSelect2PersonWidget(url='person-autocomplete')
+        widget=ModelSelect2SlugWidget(url='person-autocomplete')
     )
     status = django_filters.ChoiceFilter(
         choices=DOSSIER_STATUS_CHOICES,
@@ -82,7 +85,14 @@ class KamervraagFilter(django_filters.FilterSet):
         to_field_name='slug',
         method='submitter_filter',
         label='',
-        widget=ModelSelect2PersonWidget(url='person-autocomplete')
+        widget=ModelSelect2SlugWidget(url='person-autocomplete')
+    )
+    submitter_party = django_filters.ModelChoiceFilter(
+        queryset=PoliticalParty.objects.all(),
+        to_field_name='slug',
+        method='submitter_party_filter',
+        label='',
+        widget=ModelSelect2SlugWidget(url='party-autocomplete')
     )
     status = django_filters.ChoiceFilter(
         choices=KAMERVRAAG_STATUS_CHOICES,
@@ -104,6 +114,13 @@ class KamervraagFilter(django_filters.FilterSet):
 
     def submitter_filter(self, queryset, name, value):
         return queryset.filter(document__submitter__person=value).distinct()
+
+    def submitter_party_filter(self, queryset, name, value):
+        party = value
+        submitters = Submitter.objects.filter(party_slug=party.slug)
+        party_person_ids = list(submitters.values_list('person__id', flat=True))
+        print(party_person_ids)
+        return queryset.filter(document__submitter__person__in=party_person_ids).distinct()
 
     def category_filter(self, queryset, name, value):
         if not value:

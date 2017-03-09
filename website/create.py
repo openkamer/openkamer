@@ -624,7 +624,11 @@ def create_submitter(document, submitter, date):
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, surname_prefix=surname_prefix, initials=initials)
-    return Submitter.objects.create(person=person, document=document)
+    party_members = PartyMember.get_at_date(person, date)
+    party_slug = ''
+    if party_members:
+        party_slug = party_members[0].party.slug
+    return Submitter.objects.create(person=person, document=document, party_slug=party_slug)
 
 
 @transaction.atomic

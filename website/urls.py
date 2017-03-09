@@ -8,6 +8,7 @@ from person.views import PersonsView
 from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
+from document.views import PartyAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DossiersCheckView
 from document.views import DossiersView
@@ -60,6 +61,7 @@ urlpatterns = [
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
+    url(r'^party-autocomplete/$', PartyAutocomplete.as_view(), name='party-autocomplete'),
 
     url(r'^tweedekamerleden/$', ParliamentMembersCurrentView.as_view(), name='parliament-members'),
     url(r'^tweedekamerleden/(?P<year>\d+)/(?P<month>\d+)/(?P<day>\d+)/$', ParliamentMembersAtDateView.as_view(), name='parliament-members-at-date'),
