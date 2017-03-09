@@ -20,6 +20,12 @@ a.anchor {
 .vertical-spacer-15 {
     padding: 0;
     margin: 0;
+    height: 5px;
+}
+
+.vertical-spacer-15 {
+    padding: 0;
+    margin: 0;
     height: 15px;
 }
 

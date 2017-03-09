@@ -84,7 +84,9 @@
   <h5>Recent beantwoord</h5>
   {% for kamervraag in kamervragen_answered_recently %}
 
+    {% with group_name='recent' %}
     {% include 'document/items/kamervraag_tile.html' %}
+    {% endwith %}
 
     {% if forloop.counter|divisibleby:2 %}
       <div class="clearfix"></div>
@@ -101,7 +103,9 @@
   <h5>Alle</h5>
   {% for kamervraag in kamervragen %}
 
+    {% with group_name='all' %}
     {% include 'document/items/kamervraag_tile.html' %}
+    {% endwith %}
 
     {% if forloop.counter|divisibleby:2 %}
       <div class="clearfix"></div>
