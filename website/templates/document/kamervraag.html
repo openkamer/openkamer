@@ -82,11 +82,15 @@
   </div>
 </div>
 
+<hr/>
+
 <div class="row">
   <div class="col-lg-8 col-lg-offset-2">
     <h6 class="small">Kamervraag document nummer: {{ kamervraag.document.document_id }}</h6>
+    <h6 class="small">Volledige titel: {{ kamervraag.document.title_full }}</h6>
     {% if kamervraag.kamerantwoord %}
     <h6 class="small">Kamerantwoord document nummer: {{ kamervraag.kamerantwoord.document.document_id }}</h6>
+    <h6 class="small">Volledige titel: {{ kamervraag.kamerantwoord.document.title_full }}</h6>
     {% endif %}
   </div>
 </div>
