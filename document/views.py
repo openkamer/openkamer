@@ -54,7 +54,10 @@ class KamerstukView(TemplateView):
 
     def get_context_data(self, dossier_id, sub_id, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['kamerstuk'] = Kamerstuk.objects.get(id_main=dossier_id, id_sub=sub_id)
+        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
+        if not kamerstukken:
+            raise Http404
+        context['kamerstuk'] = kamerstukken[0]
         return context
 
 
