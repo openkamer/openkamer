@@ -67,14 +67,14 @@
         <a class="navbar-brand" href="/"><b>Open Kamer</b><sup class="text-danger">beta</sup></a>
       </div>
 
-      <div class="navbar-collapse collapse navbar-responsive-collapse">
+      <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
 
           <li><a href="{% url 'wetsvoorstellen' %}">Wetsvoorstellen</a></li>
 
           <li><a href="{% url 'kamervragen' %}">Kamervragen</a></li>
 
-          <li><a href="{% url 'votings' %}">Stemmingen</a></li>
+          <li class="hidden-sm"><a href="{% url 'votings' %}">Stemmingen</a></li>
 
           <li><a href="{% url 'stats' %}">Statistieken</a></li>
 
@@ -86,6 +86,7 @@
               <li><a href="{% url 'government-current' %}">Kabinet</a></li>
               <li><a href="{% url 'parliament-members' %}">Kamerleden</a></li>
               <li><a href="{% url 'parties' %}">Partijen</a></li>
+              <li class="visible-sm"><a href="{% url 'votings' %}">Stemmingen</a></li>
             </ul>
           </li>
 
