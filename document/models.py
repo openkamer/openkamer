@@ -340,7 +340,7 @@ class Kamervraag(models.Model):
 class Vraag(models.Model):
     nr = models.IntegerField()
     kamervraag = models.ForeignKey(Kamervraag)
-    text = models.CharField(max_length=10000)
+    text = models.CharField(max_length=50000)
 
     class Meta:
         ordering = ['nr']
@@ -356,7 +356,7 @@ class Vraag(models.Model):
 class Antwoord(models.Model):
     nr = models.IntegerField()
     kamerantwoord = models.ForeignKey(Kamerantwoord)
-    text = models.CharField(max_length=10000)
+    text = models.CharField(max_length=50000)
     see_answer_nr = models.IntegerField(null=True, blank=False)
 
     class Meta:
