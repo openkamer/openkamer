@@ -68,6 +68,10 @@ class ParliamentMember(models.Model):
 
     def political_parties(self):
         memberships = PartyMember.objects.filter(person=self.person)
+        if self.left:
+            memberships = memberships.exclude(joined__gte=self.left)
+        if self.joined:
+            memberships = memberships.exclude(left__lte=self.joined)
         if memberships.count() == 1:
             memberships = memberships
         elif self.joined and self.left:
@@ -82,6 +86,7 @@ class ParliamentMember(models.Model):
         return PoliticalParty.objects.filter(id__in=party_ids)
 
     def political_party(self):
+        # TODO: what if we find multiple parties?
         parties = self.political_parties()
         if parties:
             return parties[0]
@@ -227,7 +232,6 @@ class PartyMember(models.Model):
                PartyMember.objects.filter(person=person, joined__lte=date, left__isnull=True) | \
                PartyMember.objects.filter(person=person, joined__isnull=True, left__gt=date) | \
                PartyMember.objects.filter(person=person, joined__isnull=True, left__isnull=True)
-
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'
