@@ -124,7 +124,7 @@ class KamervraagFilter(django_filters.FilterSet):
     def category_filter(self, queryset, name, value):
         if not value:
             return queryset
-        return queryset.filter(document__categories=value).distinct()
+        return queryset.filter(document__categories__in=value).distinct()
 
     def status_filter(self, queryset, name, value):
         if value == KamervraagFilter.ANSWERED:
