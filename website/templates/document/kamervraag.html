@@ -8,7 +8,7 @@
 
 <meta property="og:url"                content="{{ request.build_absolute_uri }}" />
 <meta property="og:type"               content="article" />
-<meta property="og:image"              content="{{ request.scheme }}:{% static 'images/headers/openkamer-kamervraag.png' %}" />
+<meta property="og:image"              content="{{ request.scheme }}:{% static 'images/headers/kamervraag.png' %}" />
 <meta property="og:locale"             content="nl_NL" />
 <meta property="og:title"              content="Kamervraag - {{ kamervraag.document.title_short }}" />
 <meta property="og:description"        content='Kamervragen over "{{ kamervraag.document.title_short }}" gesteld op {{ kamervraag.document.date_published }} door{% for submitter in kamervraag.document.submitters %} {{ submitter }}{% if not forloop.last %},{% endif %}{%endfor%}.{% if kamervraag.kamerantwoord %} Beantwoord op {{ kamervraag.kamerantwoord.document.date_published }}.{% endif %}'>
