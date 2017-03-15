@@ -118,9 +118,8 @@ urlpatterns = [
     url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
     url(r'^dossiers/check/$', DossiersCheckView.as_view(), name='dossiers-check'),
 
-    url(r'^testlist/$', TemplateView.as_view(template_name="website/testlist.html")),
-
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
+    url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
 ]
 
 if settings.DEBUG:
