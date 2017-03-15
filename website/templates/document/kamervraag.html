@@ -10,7 +10,7 @@
 <meta property="og:type"               content="article" />
 <meta property="og:image"              content="" />
 <meta property="og:locale"             content="nl_NL" />
-<meta property="og:title"              content="Kamervraag - {{ kamervraag.document.title_short }}" />
+<meta property="og:title"              content="{{ kamervraag.document.title_short }}" />
 <meta property="og:description"        content='Kamervragen over "{{ kamervraag.document.title_short }}" gesteld op {{ kamervraag.document.date_published }} door{% for submitter in kamervraag.document.submitters %} {{ submitter }}{% if not forloop.last %},{% endif %}{%endfor%}.{% if kamervraag.kamerantwoord %} Beantwoord op {{ kamervraag.kamerantwoord.document.date_published }}.{% endif %}'>
 
 {% endblock %}
