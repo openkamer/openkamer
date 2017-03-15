@@ -2,6 +2,16 @@
 
 {% block title %}Kamervraag - {{ kamervraag.document.title_short }} - {{ kamervraag.vraagnummer }} - Tweede Kamer {{ block.super }}{% endblock %}
 
+{% block headcontent %}
+
+<meta property="og:url"                content="{{ request.build_absolute_uri }}" />
+<meta property="og:type"               content="article" />
+<meta property="og:locale"             content="nl_NL" />
+<meta property="og:title"              content="Kamervraag - {{ kamervraag.document.title_short }}" />
+<meta property="og:description"        content='Kamervragen gesteld op {{ kamervraag.document.date_published }} door{% for submitter in kamervraag.kamerantwoord.document.submitters %} {{ submitter }}{% if not forloop.last %},{% endif %} {%endfor%}over "{{ kamervraag.document.title_short }}". Beantwoord op {{ kamervraag.kamerantwoord.document.date_published }}'>
+
+{% endblock %}
+
 {% block content %}
 
 <div class="row">
