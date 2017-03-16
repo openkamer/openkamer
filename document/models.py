@@ -252,8 +252,9 @@ class Submitter(models.Model):
         return self.person.fullname()
 
     def update_submitter_party_slug(self):
-        if self.party:
-            self.party_slug = self.party.slug
+        party = self.get_party()
+        if party:
+            self.party_slug = party.slug
         else:
             self.party_slug = ''
         self.save()
@@ -268,6 +269,10 @@ class Submitter(models.Model):
 
     @cached_property
     def party(self):
+        return self.get_party()
+
+    def get_party(self):
+        """ this non cached version is needed for cron jobs that gave cache errors when using the cached_property """
         if self.person.surname == '':
             return None
         members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
@@ -369,7 +374,7 @@ class Antwoord(models.Model):
 class FootNote(models.Model):
     document = models.ForeignKey(Document)
     nr = models.IntegerField()
-    text = models.CharField(max_length=1000, blank=True, default='')
+    text = models.CharField(max_length=10000, blank=True, default='')
     url = models.URLField(max_length=1000, blank=True, default='')
 
     class Meta:
