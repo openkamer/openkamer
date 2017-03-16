@@ -82,3 +82,9 @@ TWITTER_CONSUMER_KEY = ''
 TWITTER_CONSUMER_SECRET = ''
 TWITTER_ACCESS_TOKEN_KEY = ''
 TWITTER_ACCESS_TOKEN_SECRET = ''
+
+# FACEBOOK API
+FACEBOOK_APP_ID = ''
+FACEBOOK_APP_SECRET = ''
+FACEBOOK_API_PAGE_TOKEN = ''  # use manage.py get_login_token <short-lived-page-token> to get a long lived token
+FACEBOOK_PROFLE_ID = ''

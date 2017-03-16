@@ -19,6 +19,7 @@ INSTALLED_APPS = (
     'openkamer',
     'stats',
     'oktwitter',
+    'okfacebook',
     'scraper',
     'document',
     'parliament',
