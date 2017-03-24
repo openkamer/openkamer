@@ -2,8 +2,6 @@
 
 {% get_current_party person.id as party %}
 
-<h4><a href="{% url 'person' person.slug %}">{{ person.fullname }}</a></h4>
-
 <table class="table">
   <tr>
     <th>Voornaam</th>
@@ -46,6 +44,6 @@
   {% endif %}
 </table>
 
-<img src="{{ person.wikimedia_image_url }}" height="200px">
+<!--<img src="{{ person.wikimedia_image_url }}" height="200px">-->
 
 

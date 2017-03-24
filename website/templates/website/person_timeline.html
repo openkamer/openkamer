@@ -1,0 +1,31 @@
+{% extends "website/base.html" %}
+
+{% block title %}Tijdlijn {{ person }} {{ block.super }}{% endblock %}
+
+{% load staticfiles %}
+
+{% block headcontent %}
+  <link rel="stylesheet" href="/static/css/timeline.css"> <!-- Resource style -->
+  <script src="/static/js/modernizr.min.js"></script> <!-- Modernizr -->
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+<section id="cd-timeline" class="cd-container">
+
+  {% for item in timeline_items %}
+	<div class="cd-timeline-block">
+      {% include item.template_name %}
+	</div>
+
+  {% endfor %}
+
+</section>
+
+</div>
+
+<script src="{% static 'js/timeline.js' %}"></script>
+
+{% endblock %}

@@ -1,10 +1,22 @@
 {% extends "website/base.html" %}
 
+{% load static %}
 {% load openkamer %}
 
 {% block title %}{{ person.fullname }} {{ block.super }}{% endblock %}
 
+{% block headcontent %}
+  <link rel="stylesheet" href="/static/css/timeline.css"> <!-- Resource style -->
+  <script src="/static/js/modernizr.min.js"></script> <!-- Modernizr -->
+{% endblock %}
+
 {% block content %}
+
+<div class="row" align="center">
+  <div class="col-md-12">
+    <h3>{{ person.fullname }}</h3>
+  </div>
+</div>
 
 <div class="row" align="center">
   <div class="col-md-4 col-md-offset-4">
@@ -15,64 +27,93 @@
 <hr/>
 
 <div class="row" align="center">
-  <div class="col-md-12">
-    <h4>Functies</h4>
+    <div class="col-md-12">
+      <h3>Functies</h3>
+    </div>
+    {% get_government_members_for_person person as government_members %}
+    {% if government_members %}
+    <div class="col-md-12">
+      <h5>Kabinet</h5>
+      <table class="position-table">
+      {% for member in government_members %}
+        <tr>
+          <td align="right">
+            {{ member.start_date }}
+          </td>
+          <td>
+            -
+          </td>
+          <td>
+            {% if member.end_date %}{{ member.end_date }}{% else %}heden{% endif %}
+          </td>
+          <td></td>
+          <td></td>
+          <td>
+            {{ member.position|lower }}{% if member.position.ministry %} {{ member.position.ministry }}{% endif %}{% if member.position.extra_info %} {{ member.position.extra_info }}{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+    {% endif %}
+    {% get_parliament_members_for_person person as parliament_members %}
+    {% if parliament_members %}
+    <div class="col-md-12">
+      <h5>Tweede Kamerlid</h5>
+      <table class="position-table">
+      {% for member in parliament_members %}
+        <tr>
+          <td align="right">
+            {{ member.joined }}
+          </td>
+          <td>
+            -
+          </td>
+          <td>
+            {% if member.left %}{{ member.left }}{% else %}heden{% endif %}
+          </td>
+          <td></td>
+          <td></td>
+          <td>
+            {% if member.party %}<a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </table>
+    </div>
+    {% endif %}
   </div>
-  {% get_government_members_for_person person as government_members %}
-  {% if government_members %}
-  <div class="col-md-12">
-    <h5>Kabinet</h5>
-    <table class="position-table">
-    {% for member in government_members %}
-      <tr>
-        <td align="right">
-          {{ member.start_date }}
-        </td>
-        <td>
-          -
-        </td>
-        <td>
-          {% if member.end_date %}{{ member.end_date }}{% else %}heden{% endif %}
-        </td>
-        <td></td>
-        <td></td>
-        <td>
-          {{ member.position|lower }}{% if member.position.ministry %} {{ member.position.ministry }}{% endif %}{% if member.position.extra_info %} {{ member.position.extra_info }}{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-    </table>
-  </div>
-  {% endif %}
-  {% get_parliament_members_for_person person as parliament_members %}
-  {% if parliament_members %}
-  <div class="col-md-12">
-    <h5>Tweede Kamerlid</h5>
-    <table class="position-table">
-    {% for member in parliament_members %}
-      <tr>
-        <td align="right">
-          {{ member.joined }}
-        </td>
-        <td>
-          -
-        </td>
-        <td>
-          {% if member.left %}{{ member.left }}{% else %}heden{% endif %}
-        </td>
-        <td></td>
-        <td></td>
-        <td>
-          {% if member.party %}<a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a>{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-    </table>
-  </div>
-  {% endif %}
 </div>
+
 <hr/>
 
+<div class="row">
+  <div class="col-md-12" align="center">
+    <h3>Activiteiten</h3>
+  </div>
+  <div id="person-timeline" class="col-md-12">
+    <div align="center">
+      <i class="fa fa-spinner fa-pulse fa-3x fa-fw text-primary"></i>
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    $.get(
+      "{% url 'get-person-timeline-html' %}",
+      {
+        person_id : {{ person.id }}
+      },
+      function(data) {
+        console.log('reply');
+        $("#person-timeline").html(data.html);
+      },
+      "json"
+    );
+  });
+</script>
 
 
 {% endblock %}

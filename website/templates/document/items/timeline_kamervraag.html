@@ -1,0 +1,57 @@
+{% load openkamer %}
+
+{% with kamervraag=item.obj %}
+
+<a class="anchor" id="{{ kamervraag.id }}"></a>
+
+<div class="cd-timeline-img text-center bg-success">
+  <span style="font-size:24px;" class="fa fa-question"></span>
+</div> <!-- cd-timeline-img -->
+
+<div class="panel panel-default cd-timeline-content">
+  <div class="panel-heading panel-heading-timeline">
+    <div class="row">
+
+      <div class="col-xs-3">
+        <h2>
+        {% if kamervraag.kamerantwoord %}
+          <i class="fa fa-check text-success" title="Beantwoord"></i>
+        {% else %}
+          <i class="fa fa-spinner text-primary" title="Nog niet beantwoord"></i>
+        {% endif %}
+        </h2>
+      </div>
+
+      <div class="col-xs-6" align="center">
+        <!--<h5><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">Kamervraag</a></h5>-->
+        <h6>Kamervraag</h6>
+      </div>
+
+      <div class="hidden-xs hidden-sm col-xs-3 kamertuk-id-timeline-container">
+        <a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.vraagnummer }}</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel-body panel-body-timeline" align="center">
+    <h6><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</a></h6>
+  </div>
+
+  <div class="panel-footer panel-footer-timeline">
+    {% with submitters=kamervraag.document.submitters %}
+    {% if submitters %}
+        <h6 class="small">
+          Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:
+          {% include "document/items/submitters_list.html" %}
+        </h6>
+    {% endif %}
+    {% endwith %}
+    <h6 class="visible-xs visible-sm small">{{ kamervraag.document.date_published|date:"j F Y" }}</h6>
+  </div>
+
+  <span class="hidden-xs hidden-sm cd-date"><h2>{{ kamervraag.document.date_published|date:"j F Y" }}</h2></span>
+
+</div> <!-- cd-timeline-content -->
+
+{% endwith %}

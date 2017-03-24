@@ -6,8 +6,15 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView
 from django.utils.safestring import mark_safe
 from django.utils import timezone
+from django.template.loader import render_to_string
 
+from person.models import Person
 from document.models import Dossier
+from document.models import Submitter
+from document.models import Kamervraag
+from document.models import Kamerstuk
+from document.views import TimelineKamervraagItem
+from document.views import TimelineKamerstukItem
 from government.models import Government
 
 from website import settings
@@ -111,3 +118,43 @@ class DatabaseDumpsView(TemplateView):
                 })
         context['backup_files'] = sorted(backup_files, key=lambda backup: backup['datetime_created'], reverse=True)
         return context
+
+
+class PersonTimelineView(TemplateView):
+    template_name = "website/person_timeline.html"
+
+    @staticmethod
+    def get_timeline_items(person):
+        submitters = Submitter.objects.filter(person=person)
+        submitter_ids = list(submitters.values_list('id', flat=True))
+        timeline_items = []
+        kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids).select_related('document', 'kamerantwoord')
+        for kamervraag in kamervragen:
+            timeline_items.append(TimelineKamervraagItem(kamervraag))
+        kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids).select_related('document')
+        for kamerstuk in kamerstukken:
+            timeline_items.append(TimelineKamerstukItem(kamerstuk))
+        timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
+        return timeline_items
+
+    def get_context_data(self, slug, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # person = Person.objects.get(id=request.GET['person_id'])
+        person = Person.objects.get(slug=slug)
+        timeline_items = PersonTimelineView.get_timeline_items(person)
+        context['timeline_items'] = timeline_items
+        context['person'] = person
+        context['is_person_timeline'] = True
+        return context
+        # html = render_to_string('website/person_timeline.html', {'timeline_items': timeline_items})
+        # response = json.dumps({'html': html})
+        # return HttpResponse(response, content_type='application/json')
+
+
+def get_person_timeline_html(request):
+    person = Person.objects.get(id=request.GET['person_id'])
+    # submitters = Submitter.objects.filter(person=person, document__date_published__gt=datetime.date(day=1, month=1, year=2015))
+    timeline_items = PersonTimelineView.get_timeline_items(person)
+    html = render_to_string('website/items/person_timeline.html', {'timeline_items': timeline_items, 'person': person, 'is_person_timeline': True})
+    response = json.dumps({'html': html})
+    return HttpResponse(response, content_type='application/json')

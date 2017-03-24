@@ -1,0 +1,12 @@
+{% load static %}
+
+<section id="cd-timeline" class="cd-container">
+
+  {% for item in timeline_items %}
+	<div class="cd-timeline-block">
+      {% include item.template_name %}
+	</div>
+  {% endfor %}
+
+</section>
+<script src="{% static 'js/timeline.js' %}"></script>

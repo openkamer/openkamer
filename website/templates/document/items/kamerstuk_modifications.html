@@ -1,10 +1,10 @@
 {% if kamerstuk.original %}
-  <strong>Origineel</strong>: <a href="#{{ kamerstuk.original.id_full }}">{{ kamerstuk.original.id_full }}</a>
+Origineel: <a href="#{{ kamerstuk.original.id_full }}"><strong class="text-info">{{ kamerstuk.original.id_full }}</strong></a>
 {% endif %}
 
 {% if kamerstuk.modifications %}
-  <strong>Wijzigingen:</strong>
+  Wijzigingen:
   {% for modification in kamerstuk.modifications %}
-    <a href="#{{ modification.id_full }}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
+    <a href="#{{ modification.id_full }}"><strong class="text-info">{{ modification.id_full }}</strong></a>{% if not forloop.last %},{% endif %}
   {% endfor %}
 {% endif %}
