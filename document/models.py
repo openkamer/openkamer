@@ -246,7 +246,7 @@ class Document(models.Model):
 class Submitter(models.Model):
     person = models.ForeignKey(Person)
     document = models.ForeignKey(Document)
-    party_slug = models.CharField(max_length=500, blank=True, default='')
+    party_slug = models.CharField(max_length=500, blank=True, default='', db_index=True)
 
     def __str__(self):
         return self.person.fullname()
@@ -269,7 +269,12 @@ class Submitter(models.Model):
 
     @cached_property
     def party(self):
-        return self.get_party()
+        if not self.party_slug:
+            return None
+        parties = PoliticalParty.objects.filter(slug=self.party_slug)
+        if parties:
+            return parties[0]
+        return None
 
     def get_party(self):
         """ this non cached version is needed for cron jobs that gave cache errors when using the cached_property """
@@ -283,7 +288,7 @@ class Submitter(models.Model):
 
 class Kamerantwoord(models.Model):
     document = models.ForeignKey(Document)
-    vraagnummer = models.CharField(max_length=200)
+    vraagnummer = models.CharField(max_length=200, db_index=True)
 
     @classmethod
     def get_antwoorden_info(cls, year):
@@ -306,7 +311,7 @@ class Kamerantwoord(models.Model):
 
 class Kamervraag(models.Model):
     document = models.ForeignKey(Document)
-    vraagnummer = models.CharField(max_length=200)
+    vraagnummer = models.CharField(max_length=200, db_index=True)
     receiver = models.CharField(max_length=1000)
     kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True)
 
@@ -383,11 +388,11 @@ class FootNote(models.Model):
 
 class Kamerstuk(models.Model):
     document = models.ForeignKey(Document)
-    id_main = models.CharField(max_length=40, blank=True)
-    id_sub = models.CharField(max_length=40, blank=True)
+    id_main = models.CharField(max_length=40, blank=True, db_index=True)
+    id_sub = models.CharField(max_length=40, blank=True, db_index=True)
     type_short = models.CharField(max_length=400, blank=True)
     type_long = models.CharField(max_length=2000, blank=True)
-    original_id = models.CharField(max_length=40, blank=True)  # format: 33885-22
+    original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-22
     date_updated = models.DateTimeField(auto_now=True)
 
     MOTIE = 'Motie'

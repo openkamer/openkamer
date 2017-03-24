@@ -40,10 +40,12 @@ from stats.views import DataStatsView
 from stats.views import VotingsPerPartyView
 
 from website.views import DatabaseDumpsView
+from website.views import PersonTimelineView
 from website.views import HomeView
 from website.views import ContactView
 from website import settings
 from website.views import get_dossier_timeline_json
+from website.views import get_person_timeline_html
 from website.views import PlotExampleView
 
 import website.api
@@ -58,6 +60,8 @@ urlpatterns = [
     url(r'^personen/twitter/$', TwitterPersonsView.as_view(), name='persons-twitter'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
     url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
+    url(r'^persoon/tijdlijn/(?P<slug>[-\w]+)/(?P<year>[\d{4}]+)/$', PersonTimelineView.as_view(), name='person-timeline-year'),
+    url(r'^persoon/tijdlijn/?', get_person_timeline_html, name='get-person-timeline-html'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),
     url(r'^partij/(?P<slug>[-\w]+)/$', PartyView.as_view(), name='party'),
@@ -112,6 +116,8 @@ urlpatterns = [
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
 
     url(r'^checks/$', TemplateView.as_view(template_name='website/checks.html'), name='checks'),
+    url(r'^testlist/$', TemplateView.as_view(template_name='website/testlist.html'), name='testlist'),
+
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
     url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),

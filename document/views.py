@@ -178,6 +178,19 @@ class TimelineBesluitItem(TimelineItem):
         return self.obj.besluit_item.besluiten_lijst.date_published
 
 
+class TimelineKamervraagItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_kamervraag.html'
+
+    @property
+    def date(self):
+        return self.obj.document.date_published
+
+
 class DossierTimelineView(TemplateView):
     template_name = 'document/dossier_timeline.html'
 

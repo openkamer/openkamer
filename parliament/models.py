@@ -40,8 +40,8 @@ class Parliament(models.Model):
 class ParliamentMember(models.Model):
     person = models.ForeignKey(Person)
     parliament = models.ForeignKey(Parliament)
-    joined = models.DateField(blank=True, null=True)
-    left = models.DateField(blank=True, null=True)
+    joined = models.DateField(blank=True, null=True, db_index=True)
+    left = models.DateField(blank=True, null=True, db_index=True)
 
     @staticmethod
     def find(surname, initials='', date=None):
@@ -138,7 +138,7 @@ class PoliticalParty(models.Model):
     wikimedia_logo_url = models.URLField(blank=True)
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
-    slug = models.SlugField(max_length=250, default='')
+    slug = models.SlugField(max_length=250, default='', db_index=True)
     current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
 
     def __str__(self):

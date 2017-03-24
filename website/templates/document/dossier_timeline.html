@@ -23,86 +23,127 @@
 
 <div class="row">
   <div class="col-lg-12">
+
     <div align="center">
-      <h5>Tijdlijn Wetsvoorstel {{ dossier.dossier_id }}</h5>
-      <h4>{{ dossier.title }}</h4>
-      {% if dossier.first_voorstel %}
-      <h4><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.first_voorstel.type_short|capfirst }}</a></h4>
-      {% endif %}
-      <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
-      <h6>Bijgewerkt: {{ dossier.date_updated }}</h6>
+      <h5>Wetsvoorstel {{ dossier.dossier_id }} - {{ dossier.first_voorstel.document.date_published }}</h5>
     </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading panel-small" align="center">
+        {% if dossier.first_voorstel %}
+        <h5><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.title }}</a></h5>
+        {% else %}
+        <h5>{{ dossier.title }}</h5>
+        {% endif %}
+      </div>
+
+      <div class="panel-body panel-small">
+        <h6>Indiener{% if dossier.first_voorstel.document.submitters|length > 1 %}s{% endif %}:
+          {% with submitters=dossier.first_voorstel.document.submitters %}
+            {% include "document/items/submitters_list.html" %}
+          {% endwith %}
+        </h6>
+      </div>
+
+      <div class="panel-footer panel-small">
+        <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
+        <h6 class="small">Bijgewerkt: {{ dossier.date_updated }}</h6>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div class="row">
+  <div class="col-lg-12" align="center">
+    <h4>Tijdlijn</h4>
+  </div>
 
-<section id="cd-timeline" class="cd-container">
+  <div class="col-lg-12">
+  <section id="cd-timeline" class="cd-container">
 
-  <div class="cd-timeline-block">
+    <div class="cd-timeline-block">
 
-    {% if dossier.voting %}
-      {% get_dossier_status_color dossier as dossier_status_class %}
-      {% get_dossier_status_icon dossier as dossier_status_icon %}
-      <div class="cd-timeline-img text-center bg-{{ dossier_status_class }}">
-        <span style="font-size:24px;" class="fa {{ dossier_status_icon }}"></span>
-      </div>
-      {% elif dossier.is_active %}
-      <div class="cd-timeline-img text-center bg-info">
-        <span style="font-size:24px;" class="fa fa-spinner" title="In behandeling"></span>
-      </div>
-      {% elif dossier.passed %}
-      <div class="cd-timeline-img text-center bg-success">
-        <span style="font-size:24px;" class="fa fa-check" title="Aangenomen"></span>
-      </div>
-      {% elif dossier.is_withdrawn %}
-      <div class="cd-timeline-img text-center bg-danger">
-        <span style="font-size:24px;" class="fa fa-undo" title="Ingetrokken"></span>
-      </div>
-      {% else %}
-      <div class="cd-timeline-img text-center bg-warning">
-        <span style="font-size:24px;" class="fa fa-stop-circle-o" title="Behandeld"></span>
-      </div>
-    {% endif %}
-
-    <div class="cd-timeline-content">
       {% if dossier.voting %}
-        <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
-        <h6>Stemming van {{ dossier.voting.date }}</h6>
-        <div>
+        {% get_dossier_status_color dossier as dossier_status_class %}
+        {% get_dossier_status_icon dossier as dossier_status_icon %}
+        <div class="cd-timeline-img text-center bg-{{ dossier_status_class }}">
+          <span style="font-size:24px;" class="fa {{ dossier_status_icon }}"></span>
+        </div>
+        {% elif dossier.is_active %}
+        <div class="cd-timeline-img text-center bg-info">
+          <span style="font-size:24px;" class="fa fa-spinner" title="In behandeling"></span>
+        </div>
+        {% elif dossier.passed %}
+        <div class="cd-timeline-img text-center bg-success">
+          <span style="font-size:24px;" class="fa fa-check" title="Aangenomen"></span>
+        </div>
+        {% elif dossier.is_withdrawn %}
+        <div class="cd-timeline-img text-center bg-danger">
+          <span style="font-size:24px;" class="fa fa-undo" title="Ingetrokken"></span>
+        </div>
+        {% else %}
+        <div class="cd-timeline-img text-center bg-warning">
+          <span style="font-size:24px;" class="fa fa-stop-circle-o" title="Behandeld"></span>
+        </div>
+      {% endif %}
+
+      <div class="panel panel-primary cd-timeline-content">
+
+        <div class="panel-heading panel-heading-timeline">
+          <div class="row" align="center">
+          {% if dossier.voting %}
+            <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
+          {% elif dossier.is_active %}
+            <h2>Dit wetsvoorstel is in behandeling.</h2>
+          {% else %}
+            <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
+          {% endif %}
+          </div>
+        </div>
+
+        <div class="panel-body panel-body-timeline">
+          {% if not dossier.voting and not dossier.is_active %}
+            {% if dossier.is_withdrawn %}
+              <h2>Voorstel is ingetrokken.</h2>
+            {% else %}
+              <h2>Er is niet over gestemd.</h2>
+            {% endif %}
+          {% endif %}
+
+          {% if dossier.voting %}
+            <h6>Stemming van {{ dossier.voting.date }}</h6>
+          {% endif %}
+
+          <h6>Besluit: {{ dossier.decision }}</h6>
+        </div>
+
+        {% if dossier.voting %}
+        <div class="panel-footer panel-footer-timeline">
           {% with voting=dossier.voting %}
-            {% include "document/items/voting_result_bar.html" %}
             {% include "document/items/voting_result_list.html" %}
           {% endwith %}
         </div>
-        <strong>Besluit:</strong> {{ dossier.decision }}<br/>
-      {% elif dossier.is_active %}
-        <h2>Dit wetsvoorstel is in behandeling.</h2>
-        <p><strong>Status:</strong> {{ dossier.decision }}</p>
-        {% else %}
-        <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
-          {% if dossier.is_withdrawn %}
-          <h2>Voorstel is ingetrokken.</h2>
-          {% else %}
-          <h2>Er is niet over gestemd.</h2>
-          {% endif %}
-        <p><strong>Status:</strong> {{ dossier.decision }}</p>
-      {% endif %}
+        <div class="panel-footer panel-footer-timeline-vote-bar">
+          {% with voting=dossier.voting %}
+            {% include "document/items/voting_result_bar.html" %}
+          {% endwith %}
+        </div>
+        {% endif %}
 
-      <p>Scroll naar beneden om alle stukken binnen dit wetsvoorstel te bekijken.</p>
+      </div>
 
-    </div>
+    </div> <!-- cd-timeline-block -->
 
-  </div> <!-- cd-timeline-block -->
+    {% for item in timeline_items %}
 
-  {% for item in timeline_items %}
+      <div class="cd-timeline-block">
+        {% include item.template_name %}
+      </div> <!-- cd-timeline-block -->
 
-	<div class="cd-timeline-block">
-      {% include item.template_name %}
-	</div> <!-- cd-timeline-block -->
-
-  {% endfor %}
-</section>
+    {% endfor %}
+  </section>
+  </div>
 
 </div>
 

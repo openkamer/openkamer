@@ -1,0 +1,15 @@
+{% load static %}
+
+  {% if next_year %}
+    {% include 'website/items/timeline_year.html' %}
+  {% endif %}
+
+  {% for item in timeline_items %}
+	<div class="cd-timeline-block">
+      {% include item.template_name %}
+	</div>
+  {% endfor %}
+
+<a href="{% url 'person-timeline-year' person.slug previous_year %}">next page</a>
+
+

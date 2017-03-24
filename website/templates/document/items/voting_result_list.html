@@ -1,6 +1,6 @@
 
+<h6>
 {% if voting.votes_party %}
-
   {% for vote in voting.votes_for %}
     {% if forloop.first %}
       <strong>Voor:</strong>
@@ -12,7 +12,7 @@
   {% endfor %}
   {% for vote in voting.votes_against %}
     {% if forloop.first %}
-      <strong>Tegen:</strong>
+      <strong >Tegen:</strong>
     {% endif %}
     <a href="{% url 'party' vote.party.slug %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
     {% if forloop.last %}
@@ -70,5 +70,5 @@
     {% endif %}
     </small>
   {% endfor %}
-
 {% endif %}
+</h6>
