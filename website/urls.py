@@ -37,6 +37,7 @@ from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
 from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
+from stats.views import KamervraagFootnotesView
 from stats.views import VotingsPerPartyView
 
 from website.views import DatabaseDumpsView
@@ -112,6 +113,7 @@ urlpatterns = [
     url(r'^stats/stemmingen/partijen/$', VotingsPerPartyView.as_view(), name='stats-votings-party'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
+    url(r'^stats/kamervraag/voetnoot/bron/$', KamervraagFootnotesView.as_view(), name='stats-kamervraag-sources'),
 
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
 

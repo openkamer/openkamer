@@ -1,12 +1,14 @@
 import json
 import random
 import logging
+from urllib.parse import urlparse
 
 from django.views.generic import TemplateView
 from django.http import HttpResponse
+from django.utils.safestring import mark_safe
 
 import plotly
-from plotly.graph_objs import Scatter, Layout
+from plotly.graph_objs import Scatter, Layout, Bar, Margin
 
 from person.models import Person
 
@@ -27,6 +29,7 @@ from document.models import Antwoord
 from document.models import Voting
 from document.models import Vote
 from document.models import VoteParty
+from document.models import FootNote
 
 import stats.util
 from stats.filters import PartyVotesFilter
@@ -77,6 +80,77 @@ class VotingsPerPartyView(TemplateView):
         context['filter'] = votes_filter
         context['page_stats_votings_parties'] = True
         return context
+
+
+class KamervraagFootnotesView(TemplateView):
+    template_name = "stats/kamervraag_footnote_sources.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        domains = self.get_domains()
+        x = []
+        y = []
+        domains_selection = []
+        min_mentions = 10
+        for domain in domains:
+            if domain[1] < min_mentions:
+                break
+            domains_selection.append(domain)
+        for domain in reversed(domains):
+            if domain[1] < 20:
+                continue
+            if domain[0] == 'zoek.officielebekendmakingen.nl':
+                continue
+            x.append(domain[0])
+            y.append(domain[1])
+        data = [Bar(
+            x=y,
+            y=x,
+            orientation='h'
+        )]
+        plot_html = plotly.offline.plot(
+            figure_or_data={
+                "data": data,
+                "layout": Layout(
+                    title="Vermeldingen per website",
+                    autosize=True,
+                    height=1200,
+                    margin=Margin(
+                        l=200,
+                        r=50,
+                        b=40,
+                        t=40,
+                        pad=4
+                    ),
+                )
+            },
+            show_link=False,
+            output_type='div',
+            include_plotlyjs=False,
+            auto_open=False,
+        )
+        context['plot_html'] = mark_safe(plot_html)
+        context['domains'] = domains_selection
+        context['min_mentions'] = min_mentions
+        return context
+
+    @staticmethod
+    def get_domains():
+        """ Returns an sorted list of domains and how often they are used in FootNotes """
+        footnotes = FootNote.objects.exclude(url='')
+        domains = {}
+        for note in footnotes:
+            parsed_url = urlparse(note.url)
+            hostname = parsed_url.hostname
+            if hostname is None:
+                continue
+            hostname = hostname.replace('www.', '').replace('m.', '')
+            if hostname in domains:
+                domains[hostname] += 1
+            else:
+                domains[hostname] = 1
+        domains_sorted = [(k, domains[k]) for k in sorted(domains, key=domains.get, reverse=True)]
+        return domains_sorted
 
 
 def get_example_plot_html(number_of_points=30):
