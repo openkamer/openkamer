@@ -24,8 +24,11 @@
       </div>
 
       <div class="col-xs-8" align="center">
-        <!--<h5><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_short|capfirst }}</a></h5>-->
+      {% if kamerstuk.type_short != kamerstuk.type_long %}
         <h6>{{ kamerstuk.type_short|capfirst }}</h6>
+      {% else %}
+        <h6><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_long }}</a></h6>
+      {% endif %}
       </div>
 
       <div class="hidden-xs hidden-sm col-xs-2 kamertuk-id-timeline-container">
@@ -35,14 +38,17 @@
     </div>
   </div>
 
+  {% if kamerstuk.type_short != kamerstuk.type_long %}
   <div class="panel-body panel-body-timeline" align="center">
     <h6><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_long }}</a></h6>
   </div>
-    {% if is_person_timeline %}
-    <div class="panel-footer panel-footer-timeline" align="left">
-      <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title }}</a></h6>
-    </div>
-    {% endif %}
+  {% endif %}
+
+  {% if is_person_timeline %}
+  <div class="panel-footer panel-footer-timeline" align="left">
+    <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title }}</a></h6>
+  </div>
+  {% endif %}
 
   <div class="panel-footer panel-footer-timeline">
     {% with submitters=kamerstuk.document.submitters %}
