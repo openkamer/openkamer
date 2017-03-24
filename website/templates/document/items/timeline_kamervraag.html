@@ -4,7 +4,11 @@
 
 <a class="anchor" id="{{ kamervraag.id }}"></a>
 
-<div class="cd-timeline-img text-center bg-success">
+{% if kamervraag.kamerantwoord %}
+  <div class="cd-timeline-img text-center bg-success">
+{% else %}
+  <div class="cd-timeline-img text-center bg-info">
+{% endif %}
   <span style="font-size:24px;" class="fa fa-question"></span>
 </div> <!-- cd-timeline-img -->
 
