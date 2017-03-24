@@ -63,10 +63,9 @@
         year : 2017
       },
       function(data) {
-        console.log('reply');
         $("#cd-timeline").html(data.html);
         $('#cd-timeline').jscroll({
-          padding: 50,
+          padding: 400,
           autoTriggerUntil: 20,
           nextSelector: 'a.next-year',
           loadingHtml: '<div align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw text-primary"></i></div>'

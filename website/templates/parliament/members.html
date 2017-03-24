@@ -43,11 +43,7 @@ datepickerElement.datepicker('update', new Date({{ date.year }}, {{ date.month }
 
 datepickerElement.datepicker()
     .on('hide', function(e) {
-        console.log(e.date.getFullYear());
-        console.log(e.date.getMonth());
-        console.log(e.date.getDate());
         var url = "/tweedekamerleden/" + e.date.getFullYear() + "/" + (e.date.getMonth()+1) + "/" + e.date.getDate() + "/";
-        console.log(url);
         window.location.href = url;
     });
 </script>

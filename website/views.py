@@ -149,6 +149,8 @@ class PersonTimelineView(TemplateView):
         has_next = True
         while len(timeline_items) == 0:
             timeline_items = PersonTimelineView.get_timeline_items(person, year)
+            if timeline_items:
+                break
             if year < 1996:
                 has_next = False
                 break
