@@ -60,7 +60,7 @@ urlpatterns = [
     url(r'^personen/twitter/$', TwitterPersonsView.as_view(), name='persons-twitter'),
     url(r'^persoon/(?P<slug>[-\w]+)/$', PersonView.as_view(), name='person'),
     url(r'^person-autocomplete/$', PersonAutocomplete.as_view(), name='person-autocomplete'),
-    url(r'^persoon/tijdlijn/(?P<slug>[-\w]+)/$', PersonTimelineView.as_view(), name='person-timeline'),
+    url(r'^persoon/tijdlijn/(?P<slug>[-\w]+)/(?P<year>[\d{4}]+)/$', PersonTimelineView.as_view(), name='person-timeline-year'),
     url(r'^persoon/tijdlijn/?', get_person_timeline_html, name='get-person-timeline-html'),
 
     url(r'^partijen/$', PartiesView.as_view(), name='parties'),

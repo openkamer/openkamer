@@ -1,0 +1,31 @@
+{% load openkamer %}
+
+{% get_current_party person.id as party %}
+<div class="panel panel-default">
+
+  <div class="panel-heading panel-small">
+    <h4>Overig</h4>
+  </div>
+
+  <table class="table">
+    <tr>
+      <th>Biografie</th>
+      <td>
+        {% if person.wikipedia_url %}<a href="{{ person.wikipedia_url }}" target="_blank">Wikipedia</a>{% endif %}<br/>
+        {% if person.parlement_and_politiek_id %}<a href="{{ person.parlement_and_politiek_url }}" target="_blank">Parlement en Politiek</a>{% endif %}
+      </td>
+    </tr>
+    {% if person.twitter_username %}
+    <tr>
+      <th>Twitter</th>
+      <td>
+        <a href="https://www.twitter.com/{{ person.twitter_username }}">{{ person.twitter_username }}</a>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+
+
+

@@ -1,0 +1,57 @@
+{% load openkamer %}
+
+  <div class="panel panel-default">
+    <div class="panel-heading panel-small">
+      <h4>Functies</h4>
+    </div>
+
+  {% get_government_members_for_person person as government_members %}
+  {% if government_members %}
+    <div class="panel-body panel-small">
+      <h5>Kabinet</h5>
+    </div>
+    <table class="table">
+    {% for member in government_members %}
+      <tr>
+        <td align="right">
+          {{ member.start_date }}
+        </td>
+        <td align="center">
+          -
+        </td>
+        <td>
+          {% if member.end_date %}{{ member.end_date }}{% else %}heden{% endif %}
+        </td>
+        <td>
+          {{ member.position|lower }}{% if member.position.ministry %} {{ member.position.ministry }}{% endif %}{% if member.position.extra_info %} {{ member.position.extra_info }}{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+
+  {% get_parliament_members_for_person person as parliament_members %}
+  {% if parliament_members %}
+    <div class="panel-body panel-small">
+      <h5>Tweede Kamerlid</h5>
+    </div>
+    <table class="table">
+    {% for member in parliament_members %}
+      <tr>
+        <td align="right">
+          {{ member.joined }}
+        </td>
+        <td align="center">
+          -
+        </td>
+        <td>
+          {% if member.left %}{{ member.left }}{% else %}heden{% endif %}
+        </td>
+        <td>
+          {% if member.party %}<a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
+  {% endif %}
+  </div>

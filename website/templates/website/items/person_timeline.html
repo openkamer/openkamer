@@ -1,6 +1,8 @@
 {% load static %}
 
-<section id="cd-timeline" class="cd-container">
+  {% if next_year %}
+    {% include 'website/items/timeline_year.html' %}
+  {% endif %}
 
   {% for item in timeline_items %}
 	<div class="cd-timeline-block">
@@ -8,5 +10,6 @@
 	</div>
   {% endfor %}
 
-</section>
-<script src="{% static 'js/timeline.js' %}"></script>
+<a href="{% url 'person-timeline-year' person.slug previous_year %}">next page</a>
+
+

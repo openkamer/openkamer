@@ -121,11 +121,15 @@ class DatabaseDumpsView(TemplateView):
 
 
 class PersonTimelineView(TemplateView):
-    template_name = "website/person_timeline.html"
+    template_name = "website/items/person_timeline.html"
 
     @staticmethod
-    def get_timeline_items(person):
-        submitters = Submitter.objects.filter(person=person)
+    def get_timeline_items(person, year=None):
+        if year:
+            year = int(year)
+            submitters = Submitter.objects.filter(person=person, document__date_published__range=[datetime.date(year=year, day=1, month=1), datetime.date(year=year, day=31, month=12)])
+        else:
+            submitters = Submitter.objects.filter(person=person)
         submitter_ids = list(submitters.values_list('id', flat=True))
         timeline_items = []
         kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids).select_related('document', 'kamerantwoord')
@@ -137,24 +141,37 @@ class PersonTimelineView(TemplateView):
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         return timeline_items
 
-    def get_context_data(self, slug, **kwargs):
+    def get_context_data(self, slug, year, **kwargs):
+        year = int(year)
         context = super().get_context_data(**kwargs)
-        # person = Person.objects.get(id=request.GET['person_id'])
         person = Person.objects.get(slug=slug)
-        timeline_items = PersonTimelineView.get_timeline_items(person)
+        timeline_items = PersonTimelineView.get_timeline_items(person, year)
+        if year == datetime.date.today().year:
+            next_year = None
+        else:
+            next_year = year + 1
         context['timeline_items'] = timeline_items
         context['person'] = person
         context['is_person_timeline'] = True
+        context['previous_year'] = year - 1
+        context['next_year'] = next_year
         return context
-        # html = render_to_string('website/person_timeline.html', {'timeline_items': timeline_items})
-        # response = json.dumps({'html': html})
-        # return HttpResponse(response, content_type='application/json')
 
 
 def get_person_timeline_html(request):
     person = Person.objects.get(id=request.GET['person_id'])
-    # submitters = Submitter.objects.filter(person=person, document__date_published__gt=datetime.date(day=1, month=1, year=2015))
-    timeline_items = PersonTimelineView.get_timeline_items(person)
-    html = render_to_string('website/items/person_timeline.html', {'timeline_items': timeline_items, 'person': person, 'is_person_timeline': True})
+    year = int(request.GET['year'])
+    timeline_items = PersonTimelineView.get_timeline_items(person, year)
+    if year == datetime.date.today().year:
+        next_year = None
+    else:
+        next_year = year + 1
+    html = render_to_string('website/items/person_timeline.html', {
+        'timeline_items': timeline_items,
+        'person': person,
+        'is_person_timeline': True,
+        'previous_year': year-1,
+        'year': next_year
+    })
     response = json.dumps({'html': html})
     return HttpResponse(response, content_type='application/json')
