@@ -145,7 +145,14 @@ class PersonTimelineView(TemplateView):
         year = int(year)
         context = super().get_context_data(**kwargs)
         person = Person.objects.get(slug=slug)
-        timeline_items = PersonTimelineView.get_timeline_items(person, year)
+        timeline_items = []
+        has_next = True
+        while len(timeline_items) == 0:
+            timeline_items = PersonTimelineView.get_timeline_items(person, year)
+            if year < 1996:
+                has_next = False
+                break
+            year -= 1
         if year == datetime.date.today().year:
             next_year = None
         else:
@@ -155,6 +162,7 @@ class PersonTimelineView(TemplateView):
         context['is_person_timeline'] = True
         context['previous_year'] = year - 1
         context['next_year'] = next_year
+        context['has_next'] = has_next
         return context
 
 
@@ -171,7 +179,8 @@ def get_person_timeline_html(request):
         'person': person,
         'is_person_timeline': True,
         'previous_year': year-1,
-        'year': next_year
+        'year': next_year,
+        'has_next': True
     })
     response = json.dumps({'html': html})
     return HttpResponse(response, content_type='application/json')

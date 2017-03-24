@@ -1,6 +1,6 @@
 {% load static %}
 
-  {% if next_year %}
+  {% if next_year and has_next %}
     {% include 'website/items/timeline_year.html' %}
   {% endif %}
 
@@ -10,6 +10,7 @@
 	</div>
   {% endfor %}
 
-<a href="{% url 'person-timeline-year' person.slug previous_year %}">next page</a>
-
+{% if has_next %}
+<a class="next-year" href="{% url 'person-timeline-year' person.slug previous_year %}">next page</a>
+{% endif %}
 
