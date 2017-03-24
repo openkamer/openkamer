@@ -116,6 +116,8 @@ urlpatterns = [
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
 
     url(r'^checks/$', TemplateView.as_view(template_name='website/checks.html'), name='checks'),
+    url(r'^testlist/$', TemplateView.as_view(template_name='website/testlist.html'), name='testlist'),
+
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
     url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
     url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
