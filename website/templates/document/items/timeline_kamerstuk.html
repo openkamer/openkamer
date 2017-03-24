@@ -46,7 +46,7 @@
 
   {% if is_person_timeline %}
   <div class="panel-footer panel-footer-timeline" align="left">
-    <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title }}</a></h6>
+    <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title|truncatechars:200 }}</a></h6>
   </div>
   {% endif %}
 
