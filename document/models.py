@@ -323,6 +323,12 @@ class Kamervraag(models.Model):
         return self.vraag_set.all()
 
     @cached_property
+    def antwoorden(self):
+        if not self.kamerantwoord:
+            return None
+        return Antwoord.objects.filter(kamerantwoord=self.kamerantwoord)
+
+    @cached_property
     def duration(self):
         if not self.kamerantwoord:
             return (datetime.date.today() - self.document.date_published).days
@@ -348,7 +354,7 @@ class Kamervraag(models.Model):
 
 
 class Vraag(models.Model):
-    nr = models.IntegerField()
+    nr = models.IntegerField(db_index=True)
     kamervraag = models.ForeignKey(Kamervraag)
     text = models.CharField(max_length=50000)
 
@@ -357,14 +363,16 @@ class Vraag(models.Model):
 
     @cached_property
     def antwoord(self):
-        antwoorden = Antwoord.objects.filter(kamerantwoord=self.kamervraag.kamerantwoord, nr=self.nr)
+        if not self.kamervraag.antwoorden:
+            return None
+        antwoorden = self.kamervraag.antwoorden.filter(nr=self.nr)
         if antwoorden:
             return antwoorden[0]
         return None
 
 
 class Antwoord(models.Model):
-    nr = models.IntegerField()
+    nr = models.IntegerField(db_index=True)
     kamerantwoord = models.ForeignKey(Kamerantwoord)
     text = models.CharField(max_length=50000)
     see_answer_nr = models.IntegerField(null=True, blank=False)
@@ -378,7 +386,7 @@ class Antwoord(models.Model):
 
 class FootNote(models.Model):
     document = models.ForeignKey(Document)
-    nr = models.IntegerField()
+    nr = models.IntegerField(db_index=True)
     text = models.CharField(max_length=10000, blank=True, default='')
     url = models.URLField(max_length=1000, blank=True, default='')
 
