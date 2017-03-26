@@ -1,6 +1,8 @@
 import logging
 import datetime
 
+from unidecode import unidecode
+
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -75,7 +77,7 @@ class ParliamentMember(models.Model):
         if memberships.count() == 1:
             memberships = memberships
         elif self.joined and self.left:
-            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gt=self.left)
+            memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__gte=self.left)
         elif self.joined:
             memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
         else:
@@ -123,7 +125,7 @@ class ParliamentMember(models.Model):
 
     def __str__(self):
         display_name = self.person.fullname()
-        party = self.party
+        party = self.political_party()  # do not use the cached_property here because this might fail tests during creation phase
         if party:
             display_name += ' (' + str(party.name_short) + ')'
         return display_name
@@ -139,7 +141,7 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
     slug = models.SlugField(max_length=250, default='', db_index=True)
-    current_parliament_seats = models.IntegerField(blank=True, null=True)  # used as optimization, use the function PoliticalParty.parliament_seats_current()
+    current_parliament_seats = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         name = self.name_short
@@ -157,37 +159,34 @@ class PoliticalParty(models.Model):
 
     @staticmethod
     def sort_by_current_seats(parties):
-        return sorted(parties, key=lambda party: party.parliament_seats_current(), reverse=True)
+        return sorted(parties, key=lambda party: party.current_parliament_seats, reverse=True)
 
     def set_current_parliament_seats(self):
         self.current_parliament_seats = self.parliament_members_current.count()
+        logger.info(self.name + ': ' + str(self.current_parliament_seats))
         self.save()
-
-    def parliament_seats_current(self):
-        if self.current_parliament_seats is None:
-            return self.parliament_members_current.count()
-        return self.current_parliament_seats
 
     @cached_property
     def parliament_members_current(self):
         parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today()).select_related('person')
-        pm_person_ids = []
+        pm_ids = []
         for member in parliament_members:
-            pm_person_ids.append(member.person.id)
-        return PartyMember.objects.filter(person_id__in=pm_person_ids, party=self, left__isnull=True)
+            if member.party.id == self.id:
+                pm_ids.append(member.id)
+        return ParliamentMember.objects.filter(id__in=pm_ids)
 
     @cached_property
     def total_parliament_members(self):
         parties = PoliticalParty.objects.all()
         count = 0
         for party in parties:
-            count += party.parliament_members_current.count()
+            count += party.current_parliament_seats
         return count
 
-    def find_wikidata_id(self, language='en'):
+    def find_wikidata_id(self, language='nl'):
         return wikidata.search_political_party_id(self.name, language=language)
 
-    def update_info(self, language='en'):
+    def update_info(self, language='nl'):
         """
         update the party with wikidata info
         :param language: the language to search for in wikidata
@@ -199,7 +198,7 @@ class PoliticalParty(models.Model):
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
         self.official_website_url = wikidata_item.get_official_website()
         self.wikipedia_url = wikidata_item.get_wikipedia_url(language)
-        logger.info(self.name + ' - id: ' + str(self.wikidata_id) + ', website: ' + str(self.official_website_url))
+        logger.info(self.name + ' - id: ' + str(self.wikidata_id))
         logo_filename = wikidata_item.get_logo_filename()
         self.founded = wikidata_item.get_inception()
         if logo_filename:
@@ -208,12 +207,19 @@ class PoliticalParty(models.Model):
 
     @staticmethod
     def find_party(name):
-        parties = PoliticalParty.objects.filter(name=name)
+        name_ascii = unidecode(name)
+        name_lid = 'Lid-' + name
+        parties = PoliticalParty.objects.filter(name__iexact=name) \
+                  | PoliticalParty.objects.filter(name__iexact=name_ascii) \
+                  | PoliticalParty.objects.filter(name__iexact=name_lid)
         if parties.exists():
             return parties[0]
-        parties = PoliticalParty.objects.filter(name_short=name)
+        parties = PoliticalParty.objects.filter(name_short__iexact=name) \
+                  | PoliticalParty.objects.filter(name_short__iexact=name_ascii) \
+                  | PoliticalParty.objects.filter(name__iexact=name_lid)
         if parties.exists():
             return parties[0]
+        logger.warning('party not found: ' + name)
         return None
 
     class Meta:

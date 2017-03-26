@@ -22,7 +22,7 @@
     </tr>
     <tr>
       <th>Geboortedatum</th>
-      <td>{{ person.birthdate }}</td>
+      <td>{% if person.birthdate %}{{ person.birthdate }}{% endif %}</td>
     </tr>
     <tr>
       <th>Politieke Partij</th>

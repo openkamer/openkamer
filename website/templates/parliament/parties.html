@@ -15,8 +15,8 @@
   <div class="col-sm-3" align="center">
     <div class="well">
       <h4><a href="{% url 'party' party.slug %}">{{ party.name_short }}</a></h4>
-      {% if party.parliament_members_current %}
-      <h5>{{ party.parliament_members_current|length }} zetel{{ party.parliament_members_current|length|pluralize }}</h5>
+      {% if party.current_parliament_seats %}
+      <h5>{{ party.current_parliament_seats }} zetel{{ party.current_parliament_seats|pluralize }}</h5>
       {% endif %}
       <p>
         <small>{{ party.name }}</small>

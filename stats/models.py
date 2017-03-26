@@ -82,8 +82,10 @@ class PartyVoteBehaviour(models.Model):
     @transaction.atomic
     def create_all():
         logger.info('BEGIN')
+        vote_submitters = StatsVotingSubmitter.objects.all()
+        party_ids = list(vote_submitters.values_list('party__id', flat=True))
         PartyVoteBehaviour.objects.all().delete()
-        parties = PoliticalParty.objects.all()
+        parties = PoliticalParty.objects.filter(id__in=party_ids)
         for party in parties:
             PartyVoteBehaviour.create(party)
         logger.info('END, number of objects created: ' + str(PartyVoteBehaviour.objects.all().count()))

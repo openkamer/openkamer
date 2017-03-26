@@ -126,12 +126,12 @@ class Person(models.Model):
             person.update_info(language=language)
             person.save()
 
-    def find_wikidata_id(self, language='en'):
+    def find_wikidata_id(self, language='nl'):
         wikidata_id = wikidata.search_wikidata_id(self.get_full_name(), language)
         logger.info('wikidata id: ' + str(wikidata_id))
         return wikidata_id
 
-    def update_info(self, language='en', wikidata_item=None):
+    def update_info(self, language='nl', wikidata_item=None):
         logger.info('get info from wikidata for ' + str(self.get_full_name()))
         if not self.wikidata_id:
             self.wikidata_id = self.find_wikidata_id(language)

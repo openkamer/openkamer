@@ -5,7 +5,7 @@
     {% if forloop.first %}
       <strong>Voor:</strong>
     {% endif %}
-    <a href="{% url 'party' vote.party.slug %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+    {% include 'document/items/vote_party_url.html' %}
     {% if forloop.last %}
       <br/>
     {% endif %}
@@ -14,7 +14,7 @@
     {% if forloop.first %}
       <strong >Tegen:</strong>
     {% endif %}
-    <a href="{% url 'party' vote.party.slug %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+    {% include 'document/items/vote_party_url.html' %}
     {% if forloop.last %}
       <br/>
     {% endif %}
@@ -23,7 +23,7 @@
     {% if forloop.first %}
       <strong>Niet gestemd:</strong>
     {% endif %}
-    <a href="{% url 'party' vote.party.slug %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+    {% include 'document/items/vote_party_url.html' %}
   {% endfor %}
 
 {% else %}

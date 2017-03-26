@@ -1,0 +1,5 @@
+{% if vote.party %}
+  <a href="{% url 'party' vote.party.slug %}">{{ vote.party.name_short }}</a>{% if not forloop.last %},{% endif %}
+{% else %}
+  {{ vote.party_name }}{% if not forloop.last %},{% endif %}
+{% endif %}

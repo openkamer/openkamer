@@ -640,6 +640,8 @@ class VoteParty(Vote):
         self.save()
 
     def get_name(self):
+        if not self.party:
+            return 'partij onbekend'
         return self.party.name_short
 
 

@@ -22,6 +22,23 @@ import scraper.parliament_members
 import scraper.persons
 import scraper.political_parties
 import scraper.votings
+
+from wikidata import wikidata
+
+from person.models import Person
+from person.util import parse_name_surname_initials
+from person.util import parse_surname_comma_surname_prefix
+
+from government.models import Government
+from government.models import GovernmentMember
+from government.models import GovernmentPosition
+from government.models import Ministry
+
+from parliament.models import Parliament
+from parliament.models import ParliamentMember
+from parliament.models import PartyMember
+from parliament.models import PoliticalParty
+
 from document.models import Agenda
 from document.models import AgendaItem
 from document.models import BesluitItem
@@ -37,18 +54,7 @@ from document.models import Vote
 from document.models import VoteIndividual
 from document.models import VoteParty
 from document.models import Voting
-from government.models import Government
-from government.models import GovernmentMember
-from government.models import GovernmentPosition
-from government.models import Ministry
-from parliament.models import Parliament
-from parliament.models import ParliamentMember
-from parliament.models import PartyMember
-from parliament.models import PoliticalParty
-from person.models import Person
-from person.util import parse_name_surname_initials
-from person.util import parse_surname_comma_surname_prefix
-from wikidata import wikidata
+
 import stats.models
 
 from website import settings
@@ -58,12 +64,17 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def create_parliament_and_government():
-    create_parties()
+    PoliticalParty.objects.all().delete()
+    PartyMember.objects.all().delete()
+    ParliamentMember.objects.all().delete()
+    create_parties(update_votes=False)
     create_governments()
-    create_parliament_members()
-    create_party_members()
+    create_parliament_members(update_votes=False)
     for party in PoliticalParty.objects.all():
         party.set_current_parliament_seats()
+    set_party_votes_derived_info()
+    set_individual_votes_derived_info()
+    Person.update_persons_all(language='nl')
     stats.models.update_all()
 
 
@@ -98,7 +109,7 @@ def create_government_members(government, max_members=None):
     for member in members:
         ministry = create_ministry(government, member)
         position = create_government_position(government, member, ministry)
-        person = create_person(member['wikidata_id'], member['name'], add_initials=True)
+        person = get_or_create_person(member['wikidata_id'], member['name'], add_initials=True)
         gov_member = create_goverment_member(government, member, person, position)
         members_created.append(gov_member)
     return members_created
@@ -130,11 +141,12 @@ def create_goverment_member(government, member, person, position):
 
 
 @transaction.atomic
-def create_parties():
+def create_parties(update_votes=True):
     parties = scraper.political_parties.search_parties()
     for party_info in parties:
         create_party(party_info['name'], party_info['name_short'])
-    set_party_votes_derived_info()
+    if update_votes:
+        set_party_votes_derived_info()
 
 
 @transaction.atomic
@@ -148,9 +160,20 @@ def create_party(name, name_short):
 
 
 @transaction.atomic
+def create_party_wikidata(wikidata_id):
+    wikidata_party_item = wikidata.WikidataItem(wikidata_id)
+    name = wikidata_party_item.get_label(language='nl')
+    name_short = wikidata_party_item.get_short_name(language='nl')
+    if not name_short:
+        name_short = name
+    party = create_party(name=name, name_short=name_short)
+    return party
+
+
+@transaction.atomic
 def create_party_members():
     logger.info('BEGIN')
-    persons = Person.objects.filter(wikidata_id__isnull=False)
+    persons = Person.objects.filter(wikidata_id__isnull=False).order_by('surname')
     for person in persons:
         create_party_members_for_person(person)
     logger.info('END')
@@ -162,54 +185,26 @@ def create_party_members_for_person(person):
     if not person.wikidata_id:
         logger.warning('could not update party member for person: ' + str(person) + ' because person has no wikidata id.')
         return
-    PartyMember.objects.filter(person=person).delete()
-    wikidata_item = wikidata.WikidataItem(person.wikidata_id)
-    memberships = wikidata_item.get_political_party_memberships()
+    wikidata_person_item = wikidata.WikidataItem(person.wikidata_id)
+    memberships = wikidata_person_item.get_political_party_memberships()
     for membership in memberships:
-        parties = PoliticalParty.objects.filter(wikidata_id=membership['wikidata_id'])
+        parties = PoliticalParty.objects.filter(wikidata_id=membership['party_wikidata_id'])
         if parties.exists():
             party = parties[0]
         else:
-            logger.error('could not find party with wikidata id: ' + str(membership['wikidata_id']))
-            continue
-        new_member = PartyMember.objects.create(
+            party = create_party_wikidata(membership['party_wikidata_id'])
+        PartyMember.objects.create(
             person=person,
             party=party,
             joined=membership['start_date'],
             left=membership['end_date']
         )
-        logger.info(new_member.joined)
     logger.info('END')
 
 
 @transaction.atomic
-def create_parliament_members_from_tweedekamer_data():
-    parliament = Parliament.get_or_create_tweede_kamer()
-    members = scraper.parliament_members.search_members()
-    for member in members:
-        forename = member['forename']
-        surname = member['surname']
-        if Person.person_exists(forename, surname):
-            person = Person.objects.get(forename=forename, surname=surname)
-        else:
-            person = Person.objects.create(
-                forename=forename,
-                surname=surname,
-                surname_prefix=member['prefix'],
-                initials=member['initials']
-            )
-        party = PoliticalParty.find_party(member['party'])
-        party_member = PartyMember.objects.create(person=person, party=party)
-        parliament_member = ParliamentMember.objects.create(person=person, parliament=parliament)
-        logger.info("new person: " + str(person))
-        logger.info("new party member: " + str(party_member))
-        logger.info("new parliament member: " + str(parliament_member))
-
-
-@transaction.atomic
-def create_parliament_members(max_results=None, all_members=False):
+def create_parliament_members(max_results=None, all_members=False, update_votes=True):
     logger.info('BEGIN')
-    ParliamentMember.objects.all().delete()
     parliament = Parliament.get_or_create_tweede_kamer()
     if all_members:
         member_wikidata_ids = wikidata.search_parliament_member_ids()
@@ -217,27 +212,12 @@ def create_parliament_members(max_results=None, all_members=False):
         member_wikidata_ids = wikidata.search_parliament_member_ids_with_start_date()
     counter = 0
     members = []
-    for wikidata_id in member_wikidata_ids:
+    for person_wikidata_id in member_wikidata_ids:
         logger.info('=========================')
         try:
-            wikidata_item = wikidata.WikidataItem(wikidata_id)
-            person = create_person(wikidata_id, wikidata_item=wikidata_item, add_initials=True)
-            logger.info(person)
-            logger.info(person.wikipedia_url)
-            positions = wikidata_item.get_parliament_positions_held()
-            for position in positions:
-                parliament_member = ParliamentMember.objects.create(
-                    person=person,
-                    parliament=parliament,
-                    joined=position['start_time'],
-                    left=position['end_time']
-                )
-                logger.info(parliament_member)
-                members.append(parliament_member)
+            members += create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
         except (JSONDecodeError, ConnectionError, ConnectTimeout, ChunkedEncodingError) as error:
-            logger.error(traceback.format_exc())
-            logger.error(error)
-            logger.error('')
+            logger.exception(error)
         except:
             logger.error(traceback.format_exc())
             raise
@@ -245,8 +225,37 @@ def create_parliament_members(max_results=None, all_members=False):
         if max_results and counter >= max_results:
             logger.info('END: max results reached')
             break
-    set_individual_votes_derived_info()
+    if update_votes:
+        set_individual_votes_derived_info()
     logger.info('END')
+    return members
+
+
+def create_parliament_member_from_wikidata_id(parliament, person_wikidata_id):
+    wikidata_item = wikidata.WikidataItem(person_wikidata_id)
+    person = get_or_create_person(person_wikidata_id, wikidata_item=wikidata_item, add_initials=True)
+    logger.info(person)
+    positions = wikidata_item.get_parliament_positions_held()
+    members = []
+    for position in positions:
+        parliament_member = ParliamentMember.objects.create(
+            person=person,
+            parliament=parliament,
+            joined=position['start_time'],
+            left=position['end_time']
+        )
+        logger.info(parliament_member)
+        members.append(parliament_member)
+        if position['part_of_id']:
+            party_item = wikidata.WikidataItem(position['part_of_id'])
+            parties = PoliticalParty.objects.filter(wikidata_id=position['part_of_id'])
+            if parties:
+                party = parties[0]
+            else:
+                party = PoliticalParty.find_party(party_item.get_label(language='nl'))
+            if not party:
+                party = create_party_wikidata(wikidata_id=position['part_of_id'])
+            PartyMember.objects.create(person=person, party=party, joined=position['start_time'], left=position['end_time'])
     return members
 
 
@@ -271,7 +280,7 @@ def set_party_votes_derived_info():
 
 
 @transaction.atomic
-def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=False):
+def get_or_create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=False):
     persons = Person.objects.filter(wikidata_id=wikidata_id)
     if not wikidata_item:
         wikidata_item = wikidata.WikidataItem(wikidata_id)
@@ -297,6 +306,14 @@ def create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=Fal
     if not party_members.exists():
         create_party_members_for_person(person)
     return person
+
+
+@transaction.atomic
+def update_initials():
+    persons = Person.objects.all()
+    for person in persons:
+        person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+        person.save()
 
 
 @transaction.atomic

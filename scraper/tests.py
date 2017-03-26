@@ -143,6 +143,10 @@ class TestPersonInfoScraper(TestCase):
         initials_expected = 'S.A.M.'
         initials = scraper.persons.get_initials(parlement_and_politiek_id)
         self.assertEqual(initials, initials_expected)
+        parlement_and_politiek_id = 'vjuuhtscjwpn'
+        initials_expected = 'T.H.P.'
+        initials = scraper.persons.get_initials(parlement_and_politiek_id)
+        self.assertEqual(initials, initials_expected)
 
 
 class TestGovernmentScraper(TestCase):

@@ -8,6 +8,9 @@ import requests
 logger = logging.getLogger(__name__)
 
 
+PARLIAMENT_MEMBER_DUTCH_ITEM_ID = 'Q18887908'
+
+
 def search(search_str, language='en'):
     search_url = 'https://www.wikidata.org/w/api.php'
     params = {
@@ -115,13 +118,8 @@ class WikidataItem(object):
             params['sites'] = sites
         if props:
             params['props'] = props
-        import time
-        start = time.time()
         response = requests.get(url, params, timeout=60)
-        logger.info(response.url)
         reponse_json = response.json()
-        roundtrip = time.time() - start
-        logger.info('response time: ' + str(roundtrip))
         item = reponse_json['entities'][id]
         return item
 
@@ -212,21 +210,29 @@ class WikidataItem(object):
         return ''
 
     @staticmethod
-    def get_label_for_id(id, language='en'):
+    def get_label_for_id(id, language='nl'):
         item = WikidataItem.get_item(id, props='labels')
         return WikidataItem.get_label_from_item(item, language=language)
 
-    def get_label(self, language='en'):
+    def get_label(self, language='nl'):
         return WikidataItem.get_label_from_item(self.item, language=language)
 
+    def get_short_name(self, language='nl'):
+        claims = self.get_claims()
+        if 'P1813' in claims:
+            for claim in claims['P1813']:
+                if claim['mainsnak']['datavalue']['value']['language'] == language:
+                    return claim['mainsnak']['datavalue']['value']['text']
+        return ''
+
     @staticmethod
-    def get_label_from_item(item, language='en'):
+    def get_label_from_item(item, language='nl'):
         if 'labels' not in item or language not in item['labels']:
             return ''
         title = item['labels'][language]['value']
         return title
 
-    def get_wikipedia_url(self, language='en'):
+    def get_wikipedia_url(self, language='nl'):
         site = language + 'wiki'
         if 'sitelinks' not in self.item or site not in self.item['sitelinks']:
             logger.info('wikipedia url not found for wikidata item: ' + str(self.id))
@@ -289,7 +295,7 @@ class WikidataItem(object):
                 logger.warning('datavalue not in party[\'mainsnak\'] for person with wikidata id: ' + str(id))
                 continue
             member_info = {
-                'wikidata_id': party['mainsnak']['datavalue']['value']['id'],
+                'party_wikidata_id': party['mainsnak']['datavalue']['value']['id'],
                 'start_date': None,
                 'end_date': None,
             }
@@ -319,6 +325,7 @@ class WikidataItem(object):
                 continue
             start_time = None
             end_time = None
+            part_of_id = None
             if 'qualifiers' in pos and 'P580' in pos['qualifiers']:
                 start_time = WikidataItem.get_date(pos['qualifiers']['P580'][0]['datavalue']['value']['time'])
                 if len(pos['qualifiers']['P580']) > 1:
@@ -327,14 +334,19 @@ class WikidataItem(object):
                 end_time = WikidataItem.get_date(pos['qualifiers']['P582'][0]['datavalue']['value']['time'])
                 if len(pos['qualifiers']['P582']) > 1:
                     logger.warning('multiple end-times for a single position for wikidata_id: ' + str(id))
+            if 'qualifiers' in pos and 'P361' in pos['qualifiers']:
+                part_of_id = pos['qualifiers']['P361'][0]['datavalue']['value']['id']
+                if len(pos['qualifiers']['P361']) > 1:
+                    logger.warning('multiple part of for a single position for wikidata_id: ' + str(id))
             position = {
                 'id': position_id,
                 # 'label': WikidataItem.get_label_for_id(position_id),
                 'start_time': start_time,
                 'end_time': end_time,
+                'part_of_id': part_of_id,
             }
             positions.append(position)
         return positions
 
     def get_parliament_positions_held(self):
-        return self.get_positions_held(filter_position_id='Q18887908')
+        return self.get_positions_held(filter_position_id=PARLIAMENT_MEMBER_DUTCH_ITEM_ID)

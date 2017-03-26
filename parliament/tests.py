@@ -7,6 +7,7 @@ from person.models import Person
 from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
+
 from wikidata import wikidata
 
 
@@ -23,6 +24,26 @@ class TestPoliticalParty(TestCase):
         name_short = 'Houwers'
         party = PoliticalParty.objects.create(name=name, name_short=name_short)
         party.update_info(language='nl')
+
+    def test_find_party(self):
+        name = 'Socialistische Partij'
+        name_short = 'SP'
+        party_expected = PoliticalParty.objects.create(name=name, name_short=name_short)
+        party = PoliticalParty.find_party(name)
+        self.assertEqual(party, party_expected)
+        party = PoliticalParty.find_party(name_short)
+        self.assertEqual(party, party_expected)
+        party = PoliticalParty.find_party('sp')
+        self.assertEqual(party, party_expected)
+        party = PoliticalParty.find_party('SocialIstische parTij')
+        self.assertEqual(party, party_expected)
+        name = 'Group K/Ö'
+        name_short = 'GrKO'
+        party_expected = PoliticalParty.objects.create(name=name, name_short=name_short)
+        party = PoliticalParty.find_party('GrKÖ')
+        self.assertEqual(party, party_expected)
+        party = PoliticalParty.find_party('GrKO')
+        self.assertEqual(party, party_expected)
 
 
 class TestParliamentMembers(TestCase):

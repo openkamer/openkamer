@@ -24,7 +24,6 @@ from document.models import CategoryDocument
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
-from document.models import Submitter
 from document.models import Voting
 
 import website.create
@@ -45,11 +44,31 @@ class TestCreateParliament(TestCase):
     def setUpTestData(cls):
         website.create.create_parties()
 
-    def test_create_parliament(self):
-        website.create.create_parliament_members_from_tweedekamer_data()
-
     def test_create_parliament_from_wikidata(self):
         website.create.create_parliament_members(max_results=20)
+
+
+class TestCreateParliamentMember(TestCase):
+
+    def test_create_parliament_member_from_wikidata_martin(self):
+        person_wikidata_id = 'Q2801440'  # Martin van Rooijen
+        parliament = Parliament.get_or_create_tweede_kamer()
+        members = website.create.create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
+        self.assertEqual(len(members), 1)
+        party_expected = PoliticalParty.find_party('50plus')
+        self.assertEqual(members[0].party, party_expected)
+
+    def test_create_parliament_member_from_wikidata_kuzu(self):
+        person_wikidata_id = 'Q616635'  # Tunahan Kuzu
+        parliament = Parliament.get_or_create_tweede_kamer()
+        members = website.create.create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
+        self.assertEqual(len(members), 3)
+        party_expected_0 = PoliticalParty.find_party('PvdA')
+        party_expected_1 = PoliticalParty.find_party('GrKÖ')
+        party_expected_2 = PoliticalParty.find_party('DENK')
+        self.assertEqual(members[0].party, party_expected_0)
+        self.assertEqual(members[1].party, party_expected_1)
+        self.assertEqual(members[2].party, party_expected_2)
 
 
 class TestCreatePoliticalParty(TestCase):
@@ -57,6 +76,14 @@ class TestCreatePoliticalParty(TestCase):
     def test_create_socialist_party(self):
         party = website.create.create_party('Socialistische Partij', 'SP')
         self.assertEqual(party.wikidata_id, 'Q849580')
+
+    def test_create_party_wikidata_id(self):
+        wikidata_id = 'Q849580'  # SP
+        party = website.create.create_party_wikidata(wikidata_id)
+        self.assertEqual(party.name, 'Socialistische Partij')
+        self.assertEqual(party.name_short, 'SP')
+        self.assertEqual(party.founded, datetime.date(year=1971, month=10, day=22))
+        self.assertEqual(party.slug, 'sp')
 
 
 class TestCreateGovernment(TestCase):
@@ -221,22 +248,22 @@ class TestCreatePerson(TestCase):
     name_ss = 'Sjoerd Sjoerdsma'
 
     def test_create_person_from_wikidata_id(self):
-        person = website.create.create_person(self.wikidata_id_ss, add_initials=True)
+        person = website.create.get_or_create_person(self.wikidata_id_ss, add_initials=True)
         self.check_sjoerd(person)
 
     def test_create_person_from_wikidata_id_and_fullname(self):
-        person = website.create.create_person(self.wikidata_id_ss, self.name_ss, add_initials=True)
+        person = website.create.get_or_create_person(self.wikidata_id_ss, self.name_ss, add_initials=True)
         self.check_sjoerd(person)
 
     def check_sjoerd(self, person):
         self.assertTrue('Sjoerdsma' in person.surname)
         self.assertEqual(person.forename, 'Sjoerd')
         self.assertEqual(person.surname, 'Sjoerdsma')
-        self.assertEqual(person.initials, 'Sj.W.')
+        self.assertEqual(person.initials, 'S.W.')
 
     def test_jeroen_wikidata(self):
         wikidata_id = 'Q17428405'
-        person = website.create.create_person(wikidata_id)
+        person = website.create.get_or_create_person(wikidata_id)
         self.assertEqual(person.forename, 'Jeroen')
         self.assertEqual(person.surname_prefix, 'van')
         self.assertEqual(person.surname, 'Wijngaarden')
@@ -244,7 +271,7 @@ class TestCreatePerson(TestCase):
 
     def test_jan_kees_wikidata(self):
         wikidata_id = 'Q1666631'
-        person = website.create.create_person(wikidata_id)
+        person = website.create.get_or_create_person(wikidata_id)
         self.assertEqual(person.forename, 'Jan Kees')
         self.assertEqual(person.surname_prefix, 'de')
         self.assertEqual(person.surname, 'Jager')
@@ -252,7 +279,7 @@ class TestCreatePerson(TestCase):
 
     def test_eelke_wikidata(self):
         wikidata_id = 'Q2710877'
-        person = website.create.create_person(wikidata_id)
+        person = website.create.get_or_create_person(wikidata_id)
         self.assertEqual(person.forename, 'Eeke')
         self.assertEqual(person.surname_prefix, 'van der')
         self.assertEqual(person.surname, 'Veen')
@@ -260,7 +287,7 @@ class TestCreatePerson(TestCase):
 
     def test_koser_kaya_wikidata(self):
         wikidata_id = 'Q467610'
-        person = website.create.create_person(wikidata_id)
+        person = website.create.get_or_create_person(wikidata_id)
         self.assertEqual(person.forename, 'Fatma')
         self.assertEqual(person.surname_prefix, '')
         self.assertEqual(person.surname, 'Koşer Kaya')
