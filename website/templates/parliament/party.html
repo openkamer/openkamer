@@ -43,7 +43,7 @@
 
 <div class="row" align="center">
   <h4>Leden</h4>
-  {% for member in party.members_current %}
+  {% for member in party.members_current_unique_person %}
   <div class="col-md-4">
     <a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a>
   </div>

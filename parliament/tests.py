@@ -45,6 +45,13 @@ class TestPoliticalParty(TestCase):
         party = PoliticalParty.find_party('GrKO')
         self.assertEqual(party, party_expected)
 
+    def test_find_party_dash(self):
+        party_expected = PoliticalParty.objects.create(name='Vrijzinnig Democratische Bond', name_short='VDB')
+        party = PoliticalParty.find_party('Vrijzinnig Democratische Bond')
+        self.assertEqual(party, party_expected)
+        party = PoliticalParty.find_party('Vrijzinnig-Democratische Bond')
+        self.assertEqual(party, party_expected)
+
 
 class TestParliamentMembers(TestCase):
     fixtures = ['person.json', 'parliament.json']
