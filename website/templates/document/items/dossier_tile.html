@@ -21,13 +21,14 @@
   <div class="panel-body panel-small">
     <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
   </div>
+
+  {% if dossier.first_voorstel.document.submitters %}
   <div class="panel-footer panel-small">
-    {% if dossier.first_voorstel.document.submitters %}
       {% with submitters=dossier.first_voorstel.document.submitters %}
         <h6 class="small">{% include "document/items/submitters_list.html" %}</h6>
       {% endwith %}
-    {% endif %}
   </div>
+  {% endif %}
 
   {% if dossier.voting %}
   <div class="panel-footer panel-footer-timeline-vote-bar">

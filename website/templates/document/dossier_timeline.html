@@ -115,7 +115,11 @@
             <h6>Stemming van {{ dossier.voting.date }}</h6>
           {% endif %}
 
-          <h6>Besluit: {{ dossier.decision }}</h6>
+          {% if dossier.decision %}
+            <h6>Besluit: {{ dossier.decision }}</h6>
+          {% else %}
+            <h6>De huidige status is onbekend</h6>
+          {% endif %}
         </div>
 
         {% if dossier.voting %}
