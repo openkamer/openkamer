@@ -63,32 +63,33 @@
     <h6 class="small">{% include "document/items/kamerstuk_modifications.html" %}</h6>
   </div>
 
-    {% if kamerstuk.voting %}
-    <div class="panel-footer panel-footer-timeline-vote-bar">
-      {% with voting=kamerstuk.voting %}
-      {% include "document/items/voting_result_bar_small.html" %}
-      {% endwith %}
-    </div>
-    {% endif %}
+  {% if kamerstuk.voting %}
+  <div class="panel-footer panel-footer-timeline-vote-bar">
+    {% with voting=kamerstuk.voting %}
+    {% include "document/items/voting_result_bar_small.html" %}
+    {% endwith %}
+  </div>
+  {% endif %}
 
-    {% if item.besluit_cases %}
-    <div class="panel-footer panel-footer-timeline">
-      {% for case in item.besluit_cases %}
-        <p>
-        {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
-        <strong>Commissie besluit</strong> - {{ case.besluit_item.besluiten_lijst.date_published }} -
-        besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
-        <font class="text-info">{{ case.besluit_item.besluiten_lijst.commission }}</font><br/>
-        {% for decision in case.decision_list %}
-          {{ decision }}{% if not forloop.last %}<br/>{% endif %}
-        {% endfor %}
-        </p>
+  {% if item.besluit_cases %}
+  <div class="panel-footer panel-footer-timeline">
+    {% for case in item.besluit_cases %}
+      <p>
+      {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
+      <strong>Commissie besluit</strong> - {{ case.besluit_item.besluiten_lijst.date_published }} -
+      besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
+      <font class="text-info">{{ case.besluit_item.besluiten_lijst.commission }}</font><br/>
+      {% for decision in case.decision_list %}
+        {{ decision }}{% if not forloop.last %}<br/>{% endif %}
       {% endfor %}
-    </div>
-    {% endif %}
-    <div class="visible-xs visible-sm panel-footer panel-footer-timeline">
-      <h6 class="small">{{ kamerstuk.document.date_published|date:"j F Y" }}</h6>
-    </div>
+      </p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="visible-xs visible-sm panel-footer panel-footer-timeline">
+    <h6 class="small">{{ kamerstuk.document.date_published|date:"j F Y" }}</h6>
+  </div>
   <span class="hidden-xs hidden-sm cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
 
 </div> <!-- cd-timeline-content -->
