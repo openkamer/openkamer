@@ -255,9 +255,11 @@ class WikidataItem(object):
         response = requests.get(url, params, timeout=60)
         response_json = response.json()
         pages = response_json['query']['pages']
-        for page in pages.values():  #TODO: rewrite, does not loop
-            wikimedia_image_url = page['imageinfo'][0]['thumburl']
-            return wikimedia_image_url
+        for page in pages.values():
+            if 'imageinfo' in page:
+                wikimedia_image_url = page['imageinfo'][0]['thumburl']
+                return wikimedia_image_url
+        return ''
 
     @staticmethod
     def get_date(date_str):
