@@ -19,32 +19,25 @@
         <h4><a href="{% url 'party' party.slug %}">{{ party.name_short }}</a></h4>
       </div>
 
-      <table class="table" >
-        <tr align="center">
-          <td><h6 class="small">{{ party.name }}</h6></td>
-        </tr>
+      <div class="panel-body panel-small">
         {% if party.current_parliament_seats %}
-        <tr align="center">
-          <td><h6>{{ party.current_parliament_seats }} zetel{{ party.current_parliament_seats|pluralize }}</h6></td>
-        </tr>
+          <h6>{{ party.current_parliament_seats }} zetel{{ party.current_parliament_seats|pluralize }}</h6></td>
         {% endif %}
-        <tr align="center">
-          <td>{% include "parliament/items/party_logo.html" %}</td>
-        </tr>
-        <tr align="center">
-          <td><h6 class="small">
-          {% if party.wikipedia_url %}
-            <a href="{{ party.wikipedia_url }}">wikipedia</a> |
-          {% endif %}
-          {% if party.official_website_url %}
-            <a href="{{ party.official_website_url }}" target="_blank">website</a> |
-          {% endif %}
-          {% if party.wikidata_id %}
+        {% include "parliament/items/party_logo.html" %}
+        <h6 class="small">{{ party.name }}</h6>
+      </div>
+      <div class="panel-footer panel-small">
+        <h6 class="small">
+        {% if party.wikipedia_url %}
+          <a href="{{ party.wikipedia_url }}">wikipedia</a> |
+        {% endif %}
+        {% if party.official_website_url %}
+          <a href="{{ party.official_website_url }}" target="_blank">website</a> |
+        {% endif %}
+        {% if party.wikidata_id %}
           <a href="https://www.wikidata.org/wiki/{{ party.wikidata_id }}" target="_blank">wikidata</a>
-          {% endif %}</h6>
-          </td>
-        </tr>
-      </table>
+        {% endif %}</h6>
+      </div>
 
     </div>
   </div>

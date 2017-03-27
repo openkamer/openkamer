@@ -54,48 +54,38 @@ datepickerElement.datepicker()
 {% for member in members %}
   <div class="col-sm-3 party-member-column" align="center">
     <div class="panel panel-default">
+
       <div class="panel-heading panel-small">
-      <h5><a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a></h5>
+        <h5><a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a></h5>
       </div>
 
-      <table class="table" >
+      <div class="panel-body">
         {% if member.party %}
-        <tr align="center">
-          <td>
-            <h6 class="small"><a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a></h6>
-          </td>
-        </tr>
-        {% endif %}
-        {% if member.party.wikimedia_logo_url %}
-        <tr align="center">
-          <td>
+          {% if member.party.wikimedia_logo_url %}
             <a href="{% url 'party' member.party.slug %}"><img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"></a> <br/>
-          </td>
-        </tr>
+          {% else %}
+            <h6 class="small"><a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a></h6>
+          {% endif %}
         {% endif %}
-        <tr align="center">
-          <td>
-            <h6 class="small">
-            {% if member.person.wikipedia_url %}
-              <a href="{{ member.person.wikipedia_url }}" target="_blank">wikipedia</a> |
-            {% endif %}
-            {% if user.is_superuser and member.person.wikidata_id %}
-              <a href="//www.wikidata.org/wiki/{{ member.person.wikidata_id }}" target="_blank">wikidata</a> |
-            {% endif %}
-            {% if member.person.parlement_and_politiek_id %}
-              <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}" target="_blank">parlement.com</a>
-            {% endif %}
-            </h6>
-          </td>
-        </tr>
+      </div>
+
+      <div class="panel-footer panel-small">
+        <h6 class="small">
+        {% if member.person.wikipedia_url %}
+          <a href="{{ member.person.wikipedia_url }}" target="_blank">wikipedia</a> |
+        {% endif %}
+        {% if user.is_superuser and member.person.wikidata_id %}
+          <a href="//www.wikidata.org/wiki/{{ member.person.wikidata_id }}" target="_blank">wikidata</a> |
+        {% endif %}
+        {% if member.person.parlement_and_politiek_id %}
+          <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}" target="_blank">parlement.com</a>
+        {% endif %}
+        </h6>
+
         {% if member.person.twitter_username %}
-        <tr align="center">
-          <td>
-            <a href="https://www.twitter.com/{{ member.person.twitter_username }}"><i class="fa fa-twitter"></i></a>
-          </td>
-        </tr>
+          <a href="https://www.twitter.com/{{ member.person.twitter_username }}"><i class="fa fa-twitter"></i></a>
         {% endif %}
-      </table>
+      </div>
 
     </div>
   </div>

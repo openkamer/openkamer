@@ -5,6 +5,6 @@
 <div class="progress person-vote-result">
   <div class="progress-bar progress-bar-success" style="width: {{ results.aangenomen_percent|unlocalize }}%" title="Aangenomen">{{ results.n_aangenomen }}</div>
   <div class="progress-bar progress-bar-danger" style="width: {{ results.verworpen_percent|unlocalize }}%" title="Verworpen">{{ results.n_verworpen }}</div>
-  <div class="progress-bar progress-bar-warning" style="width: {{ results.in_behandeling_percent|unlocalize }}%" title="In behandeling">{{ results.n_in_behandeling }}</div>
+  <div class="progress-bar progress-bar-default" style="width: {{ results.in_behandeling_percent|unlocalize }}%" title="In behandeling">{{ results.n_in_behandeling }}</div>
 </div>
 {% endif %}
