@@ -68,7 +68,7 @@ class ParliamentMember(models.Model):
         return ParliamentMember.objects.filter(joined__lte=date, left__gt=date) | \
                ParliamentMember.objects.filter(joined__lte=date, left__isnull=True)
 
-    def political_parties(self):
+    def party_memberships(self):
         memberships = PartyMember.objects.filter(person=self.person)
         if self.left:
             memberships = memberships.exclude(joined__gte=self.left)
@@ -82,16 +82,19 @@ class ParliamentMember(models.Model):
             memberships = PartyMember.objects.filter(person=self.person, joined__lte=self.joined, left__isnull=True)
         else:
             logger.error('multiple or no parties for ' + str(self.person) + ' found without joined/end date')
+        return memberships
+
+    def political_parties(self):
+        memberships = self.party_memberships()
         party_ids = []
         for member in memberships:
             party_ids.append(member.party.id)
         return PoliticalParty.objects.filter(id__in=party_ids)
 
     def political_party(self):
-        # TODO: what if we find multiple parties?
-        parties = self.political_parties()
-        if parties:
-            return parties[0]
+        memberships = self.party_memberships().order_by('-joined')
+        if memberships:
+            return memberships[0].party
         return None
 
     @cached_property

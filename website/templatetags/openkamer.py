@@ -20,7 +20,7 @@ def get_dossier_exists(dossier_id):
 
 @register.assignment_tag
 def get_current_party(person_id):
-    members = PartyMember.objects.filter(person=person_id, left__isnull=True).select_related('party', 'person')
+    members = PartyMember.objects.filter(person=person_id, left__isnull=True).select_related('party', 'person').order_by('-joined')
     if members.exists():
         return members[0].party
     return None
