@@ -141,7 +141,7 @@ class PoliticalParty(models.Model):
     wikipedia_url = models.URLField(blank=True)
     official_website_url = models.URLField(blank=True)
     slug = models.SlugField(max_length=250, default='', db_index=True)
-    current_parliament_seats = models.IntegerField(blank=True, null=True)
+    current_parliament_seats = models.IntegerField(default=0)
 
     def __str__(self):
         name = self.name_short
@@ -156,6 +156,16 @@ class PoliticalParty(models.Model):
     @cached_property
     def members_current(self):
         return PartyMember.objects.filter(party=self, left=None)
+
+    @cached_property
+    def members_current_unique_person(self):
+        person_ids = []
+        member_ids = []
+        for member in self.members_current:
+            if member.person.id not in person_ids:
+                member_ids.append(member.id)
+                person_ids.append(member.person.id)
+        return PartyMember.objects.filter(id__in=member_ids).order_by('person__surname')
 
     @staticmethod
     def sort_by_current_seats(parties):
@@ -209,14 +219,17 @@ class PoliticalParty(models.Model):
     def find_party(name):
         name_ascii = unidecode(name)
         name_lid = 'Lid-' + name
+        name_no_dash = name.replace('-', ' ')
         parties = PoliticalParty.objects.filter(name__iexact=name) \
                   | PoliticalParty.objects.filter(name__iexact=name_ascii) \
-                  | PoliticalParty.objects.filter(name__iexact=name_lid)
+                  | PoliticalParty.objects.filter(name__iexact=name_lid) \
+                  | PoliticalParty.objects.filter(name__iexact=name_no_dash)
         if parties.exists():
             return parties[0]
         parties = PoliticalParty.objects.filter(name_short__iexact=name) \
                   | PoliticalParty.objects.filter(name_short__iexact=name_ascii) \
-                  | PoliticalParty.objects.filter(name__iexact=name_lid)
+                  | PoliticalParty.objects.filter(name_short__iexact=name_lid) \
+                  | PoliticalParty.objects.filter(name_short__iexact=name_no_dash)
         if parties.exists():
             return parties[0]
         logger.warning('party not found: ' + name)
