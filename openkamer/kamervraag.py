@@ -101,8 +101,9 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
     if metadata['receiver']:
         metadata['submitter'] = metadata['receiver']
 
-    documents = Document.objects.filter(document_id=document_id).delete()
+    documents = Document.objects.filter(document_id=document_id)
     if documents:
+        documents.delete()
         logger.warning('document with id: ' + document_id + ' already exists, recreate document.')
 
     content_html = website.create.update_document_html_links(content_html)

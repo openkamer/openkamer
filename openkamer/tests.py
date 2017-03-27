@@ -2,8 +2,10 @@ from django.test import TestCase
 
 from document.models import Document
 from document.models import Kamervraag
+from document.models import Kamerstuk
 
 import openkamer.kamervraag
+import openkamer.verslag
 
 
 class TestKamervraag(TestCase):
@@ -81,3 +83,27 @@ class TestKamerantwoord(TestCase):
         self.assertEqual(antwoorden[1].see_answer_nr, None)
         self.assertEqual(antwoorden[2].see_answer_nr, 2)
         self.assertEqual(antwoorden[3].see_answer_nr, None)
+
+
+class TestVerslagAlgemeenOverleg(TestCase):
+
+    def test_create(self):
+        overheidnl_document_id = 'kst-34371-10'
+        dossier_id = '34371'
+        kamerstuk_nr = '10'
+        kamerstuk = openkamer.verslag.create_verslag(overheidnl_document_id, dossier_id, kamerstuk_nr)
+        self.assertEqual(kamerstuk.id_main, dossier_id)
+        self.assertEqual(kamerstuk.id_sub, kamerstuk_nr)
+
+    def test_create_verslagen(self):
+        create_n = 5
+        openkamer.verslag.create_verslagen_algemeen_overleg(year=2016, max_n=create_n)
+        self.assertEqual(Kamerstuk.objects.all().count(), create_n)
+        self.assertEqual(Document.objects.all().count(), create_n)
+        for kamerstuk in Kamerstuk.objects.all():
+            self.assertEqual(kamerstuk.type, Kamerstuk.VERSLAG_AO)
+
+    def test_improve_title(self):
+        title = 'Verslag van een algemeen overleg, gehouden op 21 december 2016, over Drugssmokkel bij douane in Rotterdam'
+        title_new = openkamer.verslag.get_verslag_document_title(title)
+        self.assertEqual(title_new, 'Drugssmokkel bij douane in Rotterdam')

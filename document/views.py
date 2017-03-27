@@ -431,3 +431,22 @@ class KamervraagView(TemplateView):
             raise Http404
         context['kamervraag'] = kamervragen[0]
         return context
+
+
+class VerslagenAlgemeenOverlegView(TemplateView):
+    template_name = 'document/commissie_verslagen.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        verslagen_all = Kamerstuk.objects.filter(type=Kamerstuk.VERSLAG_AO)
+        paginator = Paginator(verslagen_all, settings.DOSSIERS_PER_PAGE)
+        page = self.request.GET.get('page')
+        try:
+            verslagen = paginator.page(page)
+        except PageNotAnInteger:
+            verslagen = paginator.page(1)
+        except EmptyPage:
+            verslagen = paginator.page(paginator.num_pages)
+        context['verslagen'] = verslagen
+        context['n_results'] = verslagen_all.count()
+        return context

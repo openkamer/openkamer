@@ -1,0 +1,35 @@
+  <div class="col-md-6">
+    <div class="panel panel-default" align="left">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-xs-10 col-sm-8" align="left">
+            <h6 class="date">{{ verslag.document.date_published }}</h6>
+          </div>
+          <div class="hidden-xs col-sm-3" align="right">
+          </div>
+          <div class="col-xs-2 col-sm-1" align="right">
+          </div>
+        </div>
+      </div>
+
+      <div id="panel-body-kamervraag" class="panel-body">
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <h5><a href="{% url 'kamerstuk' verslag.id_main verslag.id_sub %}">{{ verslag.document.title_short }}</a></h5>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <h6 class="small">Indiener{% if verslag.document.submitters|length > 1 %}s{% endif %}:
+              {% with submitters=verslag.document.submitters %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+            </h6>
+            <h6 class="small"><span class="hidden-xs">Onderwerpen:</span> {% with categories=verslag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h6>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
