@@ -42,6 +42,7 @@ class KamerstukAdmin(admin.ModelAdmin):
         'id',
         'id_main',
         'id_sub',
+        'type',
         'type_short',
         'type_long',
         'document_date',

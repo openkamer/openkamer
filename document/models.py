@@ -395,6 +395,17 @@ class FootNote(models.Model):
 
 
 class Kamerstuk(models.Model):
+    MOTIE = 'Motie'
+    AMENDEMENT = 'Amendement'
+    WETSVOORSTEL = 'Wetsvoorstel'
+    VERSLAG = 'Verslag'
+    NOTA = 'Nota'
+    BRIEF = 'Brief'
+    UNKNOWN = 'Onbekend'
+    TYPE_CHOICES = (
+        (MOTIE, MOTIE), (AMENDEMENT, AMENDEMENT), (WETSVOORSTEL, WETSVOORSTEL),
+        (VERSLAG, VERSLAG), (NOTA, NOTA), (BRIEF, BRIEF), (UNKNOWN, UNKNOWN)
+    )
     document = models.ForeignKey(Document)
     id_main = models.CharField(max_length=40, blank=True, db_index=True)
     id_sub = models.CharField(max_length=40, blank=True, db_index=True)
@@ -402,13 +413,7 @@ class Kamerstuk(models.Model):
     type_long = models.CharField(max_length=2000, blank=True)
     original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-22
     date_updated = models.DateTimeField(auto_now=True)
-
-    MOTIE = 'Motie'
-    AMENDEMENT = 'Amendement'
-    WETSVOORSTEL = 'Wetsvoorstel'
-    VERSLAG = 'Verslag'
-    NOTA = 'Nota'
-    BRIEF = 'Brief'
+    type = models.CharField(choices=TYPE_CHOICES, default=UNKNOWN, max_length=30, db_index=True)
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'
@@ -416,11 +421,16 @@ class Kamerstuk(models.Model):
         index_together = ['id_main', 'id_sub']
         # unique_together = ['id_main', 'id_sub']
 
+    def save(self, *args, **kwargs):
+        type = self.get_type()
+        if type:
+            self.type = type
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
 
-    @cached_property
-    def type(self):
+    def get_type(self):
         if 'nota' in self.type_short.lower():
             return Kamerstuk.NOTA
         elif 'motie' in self.type_short.lower():
