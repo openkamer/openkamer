@@ -78,6 +78,11 @@ a.anchor {
   border-radius: 0 0 3px 3px;
 }
 
+.progress.person-vote-result {
+  margin: 0;
+  border-radius: 3px;
+}
+
 .col-progress-bar {
   margin: 0.5em 0 0 0;
 }

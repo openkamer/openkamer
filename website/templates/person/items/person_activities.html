@@ -1,0 +1,66 @@
+{% load openkamer %}
+  <div class="panel panel-default">
+    <div class="panel-heading panel-small">
+      <h4>Activiteiten</h4>
+    </div>
+
+    {% get_activities person as activities %}
+    <table class="table">
+      <tr>
+        <td>
+          {{ activities.wetsvoorstellen|length }}
+        </td>
+        <td>
+          {% if activities.wetsvoorstellen %}<a href="{% url 'wetsvoorstellen' %}?wetsvoorstel_submitter={{ person.slug }}">wetsvoorstellen</a>{% else %}wetsvoorstellen{% endif %}
+        </td>
+        <td style="width: 50%;">
+          {% get_dossiers_results activities.wetsvoorstellen as results %}
+          {% include 'person/items/person_vote_results_bar.html' %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ activities.moties|length }}
+        </td>
+        <td>
+          moties
+        </td>
+        <td>
+          {% get_kamerstukken_results activities.moties as results %}
+          {% include 'person/items/person_vote_results_bar.html' %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ activities.amendementen|length }}
+        </td>
+        <td>
+          amendementen
+        </td>
+        <td>
+          {% get_kamerstukken_results activities.amendementen as results %}
+          {% include 'person/items/person_vote_results_bar.html' %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ activities.kamervragen|length }}
+        </td>
+        <td>
+          {% if activities.kamervragen %}<a href="{% url 'kamervragen' %}?submitter={{ person.slug }}">kamervragen</a>{% else %}kamervragen{% endif %}
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          {{ activities.kamerstukken|length }}
+        </td>
+        <td>
+          kamerstukken
+        </td>
+        <td>
+        </td>
+      </tr>
+    </table>
+  </div>

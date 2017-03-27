@@ -4,6 +4,7 @@ from django import template
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
+from document.models import Kamervraag
 from document.models import Submitter
 from document.models import Voting
 from parliament.models import PartyMember
@@ -24,6 +25,114 @@ def get_current_party(person_id):
     if members.exists():
         return members[0].party
     return None
+
+
+def get_submitter_ids(person):
+    submitters = Submitter.objects.filter(person=person)
+    submitter_ids = list(submitters.values_list('id', flat=True))
+    return submitter_ids
+
+
+@register.assignment_tag
+def get_activities(person):
+    submitter_ids = get_submitter_ids(person)
+    documents = Document.objects.filter(submitter__in=submitter_ids)
+    kamervragen = Kamervraag.objects.filter(document__in=documents)
+    kamerstukken = Kamerstuk.objects.filter(document__in=documents)
+    moties = kamerstukken.filter(type=Kamerstuk.MOTIE)
+    amendementen = kamerstukken.filter(type=Kamerstuk.AMENDEMENT)
+    wetsvoorstellen = kamerstukken.filter(type=Kamerstuk.WETSVOORSTEL).select_related('dossier')
+    dossier_ids = list(wetsvoorstellen.values_list('document__dossier_id', flat=True))
+    wetsvoorstellen = Dossier.objects.filter(id__in=dossier_ids).distinct()
+    activities = {
+        'kamervragen': kamervragen,
+        'moties': moties,
+        'amendementen': amendementen,
+        'wetsvoorstellen': wetsvoorstellen,
+        'kamerstukken': kamerstukken,
+    }
+    return activities
+
+
+@register.assignment_tag
+def get_kamervragen(person):
+    submitter_ids = get_submitter_ids(person)
+    kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids)
+    return kamervragen
+
+
+@register.assignment_tag
+def get_kamerstukken(person):
+    submitter_ids = get_submitter_ids(person)
+    kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids)
+    return kamerstukken
+
+
+@register.assignment_tag
+def get_moties(person):
+    submitter_ids = get_submitter_ids(person)
+    kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.MOTIE)
+    return kamerstukken
+
+
+@register.assignment_tag
+def get_amendementen(person):
+    submitter_ids = get_submitter_ids(person)
+    kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.AMENDEMENT)
+    return kamerstukken
+
+
+@register.assignment_tag
+def get_wetsvoorstellen(person):
+    submitter_ids = get_submitter_ids(person)
+    kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.WETSVOORSTEL)
+    dossier_ids = list(kamerstukken.values_list('document__dossier_id', flat=True))
+    dossiers = Dossier.objects.filter(id__in=dossier_ids).distinct()
+    return dossiers
+
+
+@register.assignment_tag
+def get_dossiers_results(dossiers):
+    aangenomen = dossiers.filter(status=Dossier.AANGENOMEN)
+    verworpen = dossiers.filter(status=Dossier.VERWORPEN)
+    in_behandeling = dossiers.filter(status=Dossier.IN_BEHANDELING) | dossiers.filter(status=Dossier.AANGEHOUDEN)
+    results = creat_results(aangenomen, verworpen, in_behandeling)
+    return results
+
+
+@register.assignment_tag
+def get_kamerstukken_results(kamerstukken):
+    aangenomen = kamerstukken.filter(voting__result=Voting.AANGENOMEN)
+    verworpen = kamerstukken.filter(voting__result=Voting.VERWORPEN)
+    results = creat_results(aangenomen, verworpen, None)
+    return results
+
+
+def creat_results(aangenomen, verworpen, in_behandeling):
+    n_aangenomen = aangenomen.count()
+    n_verworpen = verworpen.count()
+    if in_behandeling:
+        n_in_behandeling = in_behandeling.count()
+    else:
+        n_in_behandeling = 0
+    n_total = n_aangenomen + n_verworpen + n_in_behandeling
+    aangenomen_percent = 0
+    verworpen_percent = 0
+    in_behandeling_percent = 0
+    if n_total != 0:
+        aangenomen_percent = n_aangenomen/n_total * 100
+        verworpen_percent = n_verworpen/n_total * 100
+        in_behandeling_percent = n_in_behandeling/n_total * 100
+    results = {
+        'n_total': n_total,
+        'n_aangenomen': n_aangenomen,
+        'n_verworpen': n_verworpen,
+        'n_in_behandeling': n_in_behandeling,
+        'aangenomen_percent': aangenomen_percent,
+        'verworpen_percent': verworpen_percent,
+        'in_behandeling_percent': in_behandeling_percent
+    }
+    return results
 
 
 @register.assignment_tag
