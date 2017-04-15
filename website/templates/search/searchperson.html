@@ -10,15 +10,15 @@
             {{ form }}   <input type="submit" value="Search">
 
         {% if query %}
-            <h3>Results</h3>
+            <h3>Resultaten</h3>
 
             {% for result in page.object_list %}
                 <p>
-                    <a href="{% url 'person' result.slug %}">{{ result.forename}} {{ result.text}}</a>
+                    <a href="{% url 'person' result.slug %}">{{ result.forename}} {% if result.surname_prefix %}{{ result.surname_prefix}} {% endif %}{{ result.surname}}</a>
                   
                 </p>
             {% empty %}
-                <p>No results found.</p>
+                <p>Niemand gevonden.</p>
             {% endfor %}
 
             {% if page.has_previous or page.has_next %}

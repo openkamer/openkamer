@@ -13,9 +13,10 @@ from document.models import Document
 class DocumentIndex(indexes.SearchIndex, indexes.Indexable):
     #text = indexes.CharField(document=True, use_template=True)
     title = indexes.CharField(model_attr='title_full')
-    text = indexes.CharField(model_attr='content_html',document=True)
+    text = indexes.CharField(use_template=True,document=True)
     #slug = indexes.CharField(model_attr='slug')
-    #birthdate = indexes.DateTimeField(model_attr='birthdate')
+    publication_type = indexes.CharField(model_attr='publication_type' )
+    date_published = indexes.DateField(model_attr='date_published')
 
 
     def get_model(self):

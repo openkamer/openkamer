@@ -1,0 +1,3 @@
+{{ object.title_full}}
+{{ object.publication_type }}
+{{ object.content_html|striptags }}

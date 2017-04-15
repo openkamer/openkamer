@@ -134,7 +134,7 @@ urlpatterns = [
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
     
     url(r'^search/', include('haystack.urls'), name="search"),
-    url(r'^personen/search/',PersonSearchView(template='search/searchperson.html', form_class=SearchForm, searchqueryset=SearchQuerySet().models(Person)) , name="search-person"),
+    url(r'^personen/search/',PersonSearchView(template='search/searchperson.html', load_all=False, form_class=SearchForm, searchqueryset=SearchQuerySet().models(Person)) , name="search-person"),
 
 
 ]
