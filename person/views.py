@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+from haystack.views import SearchView
 
 from person.models import Person
 
@@ -47,3 +48,12 @@ class PersonsCheckView(TemplateView):
                     same_slug_ids.append(p.id)
         context['persons_same_slug'] = Person.objects.filter(pk__in=same_slug_ids).order_by('slug')
         return context
+
+
+class PersonSearchView(SearchView):
+    
+    def extra_context(self):
+        return {
+            'yourValue': 112,
+        }
+    

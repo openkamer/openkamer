@@ -32,6 +32,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'dbbackup',
     'django_cron',
+    'haystack',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'website.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,"website")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -130,6 +131,19 @@ from website.local_settings import *
 BOOTSTRAP3 = {
     'horizontal_label_class': 'col-md-2',
     'horizontal_field_class': 'col-md-4',
+}
+
+##########
+# Search #
+##########
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8983/solr/default5'
+        # ...or for multicore...
+        # 'URL': 'http://127.0.0.1:8983/solr/mysite',
+    },
 }
 
 
