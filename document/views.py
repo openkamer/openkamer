@@ -8,7 +8,10 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
-from haystack.views import SearchView
+
+from haystack.query import SearchQuerySet
+from haystack.generic_views import FacetedSearchView 
+from haystack.forms import FacetedSearchForm
 
 
 from dal import autocomplete
@@ -434,9 +437,14 @@ class KamervraagView(TemplateView):
         context['kamervraag'] = kamervragen[0]
         return context
         
-class DocumentSearchView(SearchView):
+class DocumentSearchView(FacetedSearchView):
+    facet_fields = ['publication_type']
+    form_class = FacetedSearchForm
+    template_name = 'search/search.html'
+    load_all= False
+    searchqueryset=SearchQuerySet().models(Document).highlight().facet('publication_type')
     
-    def extra_context(self):
-        return {
-            'yourValue': 112,
-        }
+#    def extra_context(self):
+#        return {
+#            'yourValue': 112,
+#        }

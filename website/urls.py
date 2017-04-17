@@ -2,10 +2,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
-from haystack.forms import FacetedSearchForm, ModelSearchForm, SearchForm, HighlightedSearchForm
+from haystack.forms import SearchForm
 from haystack.query import SearchQuerySet
 from person.models import Person
-from document.models import Document
+
 
 from person.views import PersonView
 from person.views import PersonSearchView
@@ -135,9 +135,9 @@ urlpatterns = [
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
     
-#    url(r'^search/', include('haystack.urls'), name="search"),
+
     url(r'^personen/search/',PersonSearchView(template='search/searchperson.html', load_all=False, form_class=SearchForm, searchqueryset=SearchQuerySet().models(Person)) , name="search-person"),
-    url(r'^search/', DocumentSearchView(template='search/search.html', load_all=False, form_class=HighlightedSearchForm, searchqueryset=SearchQuerySet().models(Document)) , name="search"),
+    url(r'^search/', DocumentSearchView.as_view(), name="search"),
 
 
 

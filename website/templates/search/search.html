@@ -18,9 +18,29 @@
         </table>
 
         {% if query %}
+
+            <!-- Begin faceting. -->
+            <h2>By Publication Type</h2>
+        
+            <div>
+                <dl>
+                    {% if facets.fields.publication_type %}
+
+                        <dt>Type</dt>
+                        {# Provide only the top 5 authors #}
+                        {% for publication_type in facets.fields.publication_type %}
+                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=publication_type:{{ publication_type.0|urlencode }}">{{ publication_type.0 }}</a> ({{ publication_type.1 }})</dd>
+                        {% endfor %}
+                    {% else %}
+                        <p>No publication type facets.</p>
+                    {% endif %}
+                </dl>
+            </div>
+            <!-- End faceting -->
+
             <h3>Results</h3>
 
-            {% for result in page.object_list %}
+            {% for result in page_obj.object_list %}
                 <p>
                     <a href=link>{{result.title}}</a> <br>
                     {% highlight result.text with query %} 
@@ -31,11 +51,11 @@
                 <p>No results found.</p>
             {% endfor %}
 
-            {% if page.has_previous or page.has_next %}
+            {% if page_obj.has_previous or page_obj.has_next %}
                 <div>
-                    {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                    {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}">{% endif %}&laquo; Previous{% if page_obj.has_previous %}</a>{% endif %}
                     |
-                    {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+                    {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}">{% endif %}Next &raquo;{% if page_obj.has_next %}</a>{% endif %}
                 </div>
             {% endif %}
         {% else %}
