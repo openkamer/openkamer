@@ -72,18 +72,19 @@ start and create core
 ```
 $ bin/solr start
 $ bin/solr create -c default5
-´´´
+```
 You should now be able to visit the admin page at http://127.0.0.1:8983/solr
 from website/templates/search_configuration copy solrconfig.xml to [SOLR base folder]server/solr/default5/conf
 
 create schema.xml and refresh core:
 ```
 $ python manage.py build_solr_schema --filename=[SOLR base folder]/server/solr/default5/conf/schema.xml && curl 'http://localhost:8983/solr/admin/cores?action=RELOAD&core=default5&wt=json&indent=true'
-´´´
+```
 create search index
 ```
 $ python manage.py rebuild_index
-´´´
+```
+
 
 
 ## Development
