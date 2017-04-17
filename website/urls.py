@@ -2,9 +2,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
-from haystack.forms import FacetedSearchForm, ModelSearchForm, SearchForm
+from haystack.forms import FacetedSearchForm, ModelSearchForm, SearchForm, HighlightedSearchForm
 from haystack.query import SearchQuerySet
 from person.models import Person
+from document.models import Document
 
 from person.views import PersonView
 from person.views import PersonSearchView
@@ -32,6 +33,7 @@ from document.views import PersonDocumentsView
 from document.views import VotingView
 from document.views import VotingsView
 from document.views import VotingsCheckView
+from document.views import DocumentSearchView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
@@ -133,8 +135,10 @@ urlpatterns = [
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
     
-    url(r'^search/', include('haystack.urls'), name="search"),
+#    url(r'^search/', include('haystack.urls'), name="search"),
     url(r'^personen/search/',PersonSearchView(template='search/searchperson.html', load_all=False, form_class=SearchForm, searchqueryset=SearchQuerySet().models(Person)) , name="search-person"),
+    url(r'^search/', DocumentSearchView(template='search/search.html', load_all=False, form_class=HighlightedSearchForm, searchqueryset=SearchQuerySet().models(Document)) , name="search"),
+
 
 
 ]

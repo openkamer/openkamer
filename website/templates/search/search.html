@@ -1,17 +1,18 @@
 
 
 {% extends "website/base.html" %}
-
+{% load highlight %}
 {% block content %}
     <h2>Search</h2>
 
     <form method="get" action=".">
+{{ form}}<input type="submit" value="Search">   
         <table>
-            {{ form.as_table }}
-            <tr>
-                <td>&nbsp;</td>
+            
+            <tr> 
+                <td>&nbsp; </td>
                 <td>
-                    <input type="submit" value="Search">
+                    <!--<input type="submit" value="Search">-->
                 </td>
             </tr>
         </table>
@@ -21,7 +22,10 @@
 
             {% for result in page.object_list %}
                 <p>
-                    <a href=link>{{result.title}}</a>
+                    <a href=link>{{result.title}}</a> <br>
+                    {% highlight result.text with query %} 
+                    
+                    
                 </p>
             {% empty %}
                 <p>No results found.</p>

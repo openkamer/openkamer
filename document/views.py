@@ -8,6 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
+from haystack.views import SearchView
+
 
 from dal import autocomplete
 
@@ -431,3 +433,10 @@ class KamervraagView(TemplateView):
             raise Http404
         context['kamervraag'] = kamervragen[0]
         return context
+        
+class DocumentSearchView(SearchView):
+    
+    def extra_context(self):
+        return {
+            'yourValue': 112,
+        }
