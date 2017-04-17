@@ -85,6 +85,10 @@ $ python manage.py test website.test.TestCreateParliament
 $ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Group person parliament government document website > website/fixtures/<fixture_name>.json
 ```
 
+### Debug toolbar
+
+Enable the django debug toolbar by uncommenting the django_toolbar related lines in `INSTALLED_APPS` and `MIDDLEWARE_CLASSES` in `website/settings.py`.
+
 ## CronJobs
 
 Openkamer has some optional cronjobs that do some cool stuff. You can review them in `website/cron.py`.  
