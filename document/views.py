@@ -442,7 +442,7 @@ class DocumentSearchView(FacetedSearchView):
     form_class = FacetedSearchForm
     template_name = 'search/search.html'
     load_all= False
-    searchqueryset=SearchQuerySet().models(Document).highlight().facet('publication_type')
+    queryset=SearchQuerySet().models(Document)
     
 #    def extra_context(self):
 #        return {

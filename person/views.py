@@ -1,7 +1,10 @@
 from django.views.generic import TemplateView
-from haystack.views import SearchView
+from haystack.generic_views import SearchView
+from haystack.forms import SearchForm
+from haystack.query import SearchQuerySet
 
 from person.models import Person
+
 
 
 class PersonsView(TemplateView):
@@ -51,9 +54,13 @@ class PersonsCheckView(TemplateView):
 
 
 class PersonSearchView(SearchView):
+    template_name='search/searchperson.html'
+    load_all=False
+    form_class=SearchForm
+    queryset=SearchQuerySet().models(Person)
     
-    def extra_context(self):
-        return {
-            'yourValue': 112,
-        }
+#    def extra_context(self):
+#        return {
+#            'yourValue': 112,
+#        }
     
