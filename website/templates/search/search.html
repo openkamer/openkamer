@@ -104,7 +104,7 @@
 
             {% for result in page_obj.object_list %}
                 <p>
-                    <a href=link>{{result.title}}</a> <br>
+                    <a href={% url result.model_name result.object.id_main result.object.id_sub %}>{{result.title}}</a> <br> 
                     {% highlight result.text with query %} 
                     
                     
