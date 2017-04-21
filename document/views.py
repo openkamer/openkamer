@@ -438,13 +438,24 @@ class KamervraagView(TemplateView):
         return context
         
 class DocumentSearchView(FacetedSearchView):
-    facet_fields = ['publication_type']
+    facet_fields = ['publication_type', 'submitters','parties']
     form_class = FacetedSearchForm
     template_name = 'search/search.html'
     load_all= False
-    queryset=SearchQuerySet().models(Document)
     
-#    def extra_context(self):
-#        return {
-#            'yourValue': 112,
-#        }
+    
+    def get_queryset(self, **kwargs):
+        queryset = super().get_queryset(**kwargs)
+        queryset = queryset.models(Kamerstuk).facet('publication_type',mincount=1,).facet('submitters',mincount=1).facet('parties',mincount=1)
+        return queryset
+        
+    def get_context_data(request,**kwargs):
+        context = super().get_context_data(**kwargs)
+        sf = request.request.GET.getlist('selected_facets')
+        context['selected_facets']=sf
+        for n in sf:
+            if n.split(':')[0]=='parties':
+                context['selected_parties']=n.split(':')[1]
+                
+        return context
+        

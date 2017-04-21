@@ -3,25 +3,30 @@
 {% extends "website/base.html" %}
 {% load highlight %}
 {% block content %}
-    <h2>Search</h2>
+    <div class="row">
+        <div class="col-md-2">
+            <h2>Zoek</h2>
+        </div>
+        <div class="col-md-9">
+            <h2> </h2>
+            <form class="form-horizontal" method="get" action=".">
+                <div class="input-group">
+                    <input type="search" name="q" id="id_q" {% if query %} value="{{query}}"   {%endif%} class="form-control" width="80%"><span class="input-group-btn">
+                    <button type="submit"  class="btn btn-primary">   
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button></span>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <form method="get" action=".">
-{{ form}}<input type="submit" value="Search">   
-        <table>
-            
-            <tr> 
-                <td>&nbsp; </td>
-                <td>
-                    <!--<input type="submit" value="Search">-->
-                </td>
-            </tr>
-        </table>
 
+    <div class="row">
         {% if query %}
-
+            
+            <div class="col-md-2">
             <!-- Begin faceting. -->
-            <h2>By Publication Type</h2>
-        
+            
             <div>
                 <dl>
                     {% if facets.fields.publication_type %}
@@ -36,9 +41,38 @@
                     {% endif %}
                 </dl>
             </div>
-            <!-- End faceting -->
 
-            <h3>Results</h3>
+            <div>
+                <dl>
+                    {% if facets.fields.parties %}
+
+                        <dt>Partij</dt>
+                        {% for party in facets.fields.parties%}
+                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=parties:{{ party.0|urlencode }}">{{ party.0 }}</a> ({{ party.1 }})</dd>
+                        {% endfor %}
+                    {% else %}
+                        <p>No party facets.</p>
+                    {% endif %}
+                </dl>
+            </div>
+                  
+            <div>
+                <dl>
+                    {% if facets.fields.submitters %}
+
+                        <dt>Indiener</dt>
+                        {# Provide only the top 5 authors #}
+                        {% for submitters in facets.fields.submitters %}
+                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=submitters:{{ submitters.0|urlencode }}">{{ submitters.0 }}</a> ({{ submitters.1 }})</dd>
+                        {% endfor %}
+                    {% else %}
+                        <p>No submitters  facets.</p>
+                    {% endif %}
+                </dl>
+            </div>
+            <!-- End faceting -->
+            </div>
+            <div class="col-md-9">
 
             {% for result in page_obj.object_list %}
                 <p>
