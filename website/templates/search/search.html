@@ -32,12 +32,40 @@
                     {% if facets.fields.publication_type %}
 
                         <dt>Type</dt>
-                        {# Provide only the top 5 authors #}
                         {% for publication_type in facets.fields.publication_type %}
                             <dd><a href="{{ request.get_full_path }}&amp;selected_facets=publication_type:{{ publication_type.0|urlencode }}">{{ publication_type.0 }}</a> ({{ publication_type.1 }})</dd>
                         {% endfor %}
                     {% else %}
                         <p>No publication type facets.</p>
+                    {% endif %}
+                </dl>
+            </div>
+
+            <div>
+                <dl>
+                    {% if facets.fields.dossier %}
+
+                        <dt>Dossier</dt>
+                        {# Show only the top 5 dossiers#}
+                        {% for d in facets.fields.dossier|slice:":5"%}
+                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=dossier:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
+                        {% endfor %}
+                    {% else %}
+                        <p>No dossier facets.</p>
+                    {% endif %}
+                </dl>
+            </div>
+
+            <div>
+                <dl>
+                    {% if facets.fields.decision %}
+
+                        <dt>Status dossier</dt>
+                        {% for d in facets.fields.decision %}
+                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=decision:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
+                        {% endfor %}
+                    {% else %}
+                        <p>No dossier facets.</p>
                     {% endif %}
                 </dl>
             </div>

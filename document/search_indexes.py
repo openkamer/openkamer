@@ -34,9 +34,17 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
     submitters = indexes.MultiValueField(model_attr='document', faceted=True)
     
     parties= indexes.MultiValueField(model_attr='document', faceted=True)
+    dossier = indexes.CharField(model_attr='document', faceted=True)
+    decision = indexes.CharField(model_attr='document', faceted=True)
     #slug = indexes.CharField(model_attr='slug')
 #    publication_type = indexes.CharField(model_attr='document.publication_type', faceted=True )
 #    date_published = indexes.DateField(model_attr='date_published')
+
+    def prepare_dossier(self,obj):
+        return '' if not obj.document.dossier else obj.document.dossier.dossier_id
+        
+    def prepare_decision(self,obj):
+        return '' if not obj.document.dossier else obj.document.dossier.decision
 
     def prepare_title(self, obj):
         return '' if not obj.document else obj.document.title_full
@@ -54,3 +62,4 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
         """Used when the entire index for model is updated."""
         return self.get_model().objects.all()
         
+
