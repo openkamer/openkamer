@@ -89,7 +89,17 @@
               <li class="visible-sm"><a href="{% url 'votings' %}">Stemmingen</a></li>
             </ul>
           </li>
-
+        </ul>    
+        
+        <ul class="nav navbar-nav navbar-right">
+            <form class="navbar-form navbar-left" role="search" method="get" action="./search">
+                <div class="form-group">
+                    <input type="search" name="q" id="id_q" class="form-control">
+                    <button type="submit"  class="btn btn-primary">   
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </form>
         </ul>
 
       </div>
