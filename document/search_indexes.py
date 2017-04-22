@@ -36,9 +36,10 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
     parties= indexes.MultiValueField(model_attr='document', faceted=True)
     dossier = indexes.CharField(model_attr='document', faceted=True)
     decision = indexes.CharField(model_attr='document', faceted=True)
-    #slug = indexes.CharField(model_attr='slug')
-#    publication_type = indexes.CharField(model_attr='document.publication_type', faceted=True )
-#    date_published = indexes.DateField(model_attr='date_published')
+    date = indexes.FacetDateField(model_attr='document')
+    
+    def prepare_date(self, obj):
+        return '' if not obj.document else obj.document.date_published.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_dossier(self,obj):
         return '' if not obj.document.dossier else obj.document.dossier.dossier_id
@@ -47,7 +48,7 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
         return '' if not obj.document.dossier else obj.document.dossier.decision
 
     def prepare_title(self, obj):
-        return '' if not obj.document else obj.document.title_full
+        return '' if not obj.document else obj.document.title_short
         
     def prepare_submitters(self, obj):
         return '' if not obj.document else [n.person.fullname() for n in obj.document.submitters]

@@ -438,7 +438,7 @@ class KamervraagView(TemplateView):
         return context
         
 class DocumentSearchView(FacetedSearchView):
-    facet_fields = ['publication_type', 'submitters','parties','dossier','decision']
+    facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date']
     form_class = FacetedSearchForm
     template_name = 'search/search.html'
     load_all= False
