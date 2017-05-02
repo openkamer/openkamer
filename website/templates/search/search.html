@@ -22,83 +22,19 @@
 
 
     <div class="row">
+
+
         {% if query %}
             
             <div class="col-md-2">
             <!-- Begin faceting. -->
-            
-            <div>
-                <dl>
-                    {% if facets.fields.publication_type %}
-
-                        <dt>Type</dt>
-                        {% for publication_type in facets.fields.publication_type %}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=publication_type:{{ publication_type.0|urlencode }}">{{ publication_type.0 }}</a> ({{ publication_type.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No publication type facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-
-            <div>
-                <dl>
-                    {% if facets.fields.dossier %}
-
-                        <dt>Dossier</dt>
-                        {# Show only the top 5 dossiers#}
-                        {% for d in facets.fields.dossier|slice:":5"%}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=dossier:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No dossier facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-
-            <div>
-                <dl>
-                    {% if facets.fields.decision %}
-
-                        <dt>Status dossier</dt>
-                        {% for d in facets.fields.decision %}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=decision:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No dossier facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-
-            <div>
-                <dl>
-                    {% if facets.fields.parties %}
-
-                        <dt>Partij</dt>
-                        {% for party in facets.fields.parties%}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=parties:{{ party.0|urlencode }}">{{ party.0 }}</a> ({{ party.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No party facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-                  
-            <div>
-                <dl>
-                    {% if facets.fields.submitters %}
-
-                        <dt>Indiener</dt>
-                        {# Provide only the top 5 authors #}
-                        {% for submitters in facets.fields.submitters %}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=submitters:{{ submitters.0|urlencode }}">{{ submitters.0 }}</a> ({{ submitters.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No submitters  facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
-            <div>
+            {% include "search/facet.html" with facet=f.publication_type %}            
+            {% include "search/facet.html" with facet=f.dossier %}            
+            {% include "search/facet.html" with facet=f.decision %}            
+            {% include "search/facet.html" with facet=f.parties %}            
+            {% include "search/facet.html" with facet=f.submitters %}            
+           
+           <div>
                 <dl>
                     {% if facets.fields.date %}
 
@@ -117,7 +53,7 @@
 
             {% for result in page_obj.object_list %}
                 <p>
-                    <a href={% url result.model_name result.object.id_main result.object.id_sub %}>{{result.title}}</a> <br> 
+                    <a href={% url result.model_name result.object.id_main result.object.id_sub %}>{{result.title}}</a> <a class="text-muted" href={% url 'dossier-timeline' result.object.id_main %}>(Dossier {{result.object.id_main}})</a><br> 
                     {% highlight result.text with query %} 
                     
                     

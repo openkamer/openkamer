@@ -1,0 +1,11 @@
+{% load openkamer %}
+<dl>
+<dt>{{facet.label}}</dt>
+{% for i in facet.list_of_facetitems|slice:":5" %}            
+     {% if i.is_selected %}
+        <a href="{{i.url}}"><b>{{i.value}} ({{i.count}}) [X]</b></a><br>
+     {% else %}
+        <a href="{{i.url}}">{{i.value}} ({{i.count}})</a><br>
+     {% endif %}                
+{% endfor %}
+</dl>

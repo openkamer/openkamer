@@ -436,7 +436,8 @@ class KamervraagView(TemplateView):
             raise Http404
         context['kamervraag'] = kamervragen[0]
         return context
-        
+
+from website.facet import Facet, FacetItem
 class DocumentSearchView(FacetedSearchView):
     facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date']
     form_class = FacetedSearchForm
@@ -451,11 +452,34 @@ class DocumentSearchView(FacetedSearchView):
         
     def get_context_data(request,**kwargs):
         context = super().get_context_data(**kwargs)
-        sf = request.request.GET.getlist('selected_facets')
-        context['selected_facets']=sf
-        for n in sf:
-            if n.split(':')[0]=='parties':
-                context['selected_parties']=n.split(':')[1]
+        selected_facets = request.request.GET.getlist('selected_facets')
+        query = context['query'].replace(" ","+")
+        
+        base_url = "/search?q=" + query
+        
+        
+        for facet in selected_facets:
+            base_url += "&selected_facets=" + facet
+        
+        f = {}
+        for facet in context['facets']['fields']:
+            f[facet]=Facet(facet)
+            
+            d={}
+            for item in context['facets']['fields'][facet]:
+                i = FacetItem(item[0], item[1], base_url=base_url)                
+                i.facet = f[facet]                
+                f[facet].list_of_facetitems.append(i)
+                d[item[0]]=i
+            f[facet].d=d
                 
+        
+        for selected_facet in selected_facets:
+            facet=selected_facet.split(':')[0]
+            item=":".join(selected_facet.split(':')[1:])
+            f[facet].d[item].is_selected=True
+        
+        context['f']=f  
+        context['selected_facets']=selected_facets 
         return context
         
