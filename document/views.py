@@ -38,6 +38,7 @@ from document import settings
 
 # TODO: remove dependency on website
 from website.create import create_or_update_dossier
+from website.facet import Facet, FacetItem
 
 logger = logging.getLogger(__name__)
 
@@ -437,12 +438,13 @@ class KamervraagView(TemplateView):
         context['kamervraag'] = kamervragen[0]
         return context
 
-from website.facet import Facet, FacetItem
+
 class DocumentSearchView(FacetedSearchView):
     facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date']
     form_class = FacetedSearchForm
     template_name = 'search/search.html'
     load_all= False
+    
     
     
     def get_queryset(self, **kwargs):
@@ -456,14 +458,17 @@ class DocumentSearchView(FacetedSearchView):
         query = context['query'].replace(" ","+")
         
         base_url = "/search?q=" + query
-        
+        facetlabels = {'publication_type':'Publicatie','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Besluit'}
         
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
         
         f = {}
         for facet in context['facets']['fields']:
-            f[facet]=Facet(facet)
+            try:
+                f[facet]=Facet(facet, label=facetlabels[facet])
+            except:
+                f[facet]=Facet(facet)
             
             d={}
             for item in context['facets']['fields'][facet]:
