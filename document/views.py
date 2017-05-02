@@ -11,7 +11,7 @@ from django.views.generic.base import RedirectView
 
 from haystack.query import SearchQuerySet
 from haystack.generic_views import FacetedSearchView 
-from haystack.forms import FacetedSearchForm
+from website.facet import FacetedSearchForm
 
 
 from dal import autocomplete
@@ -463,7 +463,15 @@ class DocumentSearchView(FacetedSearchView):
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
         
-        f = {}
+        f = {}  
+        
+        try:
+            context['facets']['fields']
+        except:
+            return context
+                    
+        
+            
         for facet in context['facets']['fields']:
             try:
                 f[facet]=Facet(facet, label=facetlabels[facet])
@@ -482,9 +490,25 @@ class DocumentSearchView(FacetedSearchView):
         for selected_facet in selected_facets:
             facet=selected_facet.split(':')[0]
             item=":".join(selected_facet.split(':')[1:])
-            f[facet].d[item].is_selected=True
+            if not facet == 'date':            
+                f[facet].d[item].is_selected=True
+            else:
+                lower={}
+                upper={}
+                lower['string'], upper['string']=item.split('_TO_',1)
+                lower['year'] = int(lower['string'][0:4])
+                lower['month'] = int(lower['string'][5:7])
+                lower['day'] = int(lower['string'][8:10])
+                upper['year'] = int(upper['string'][0:4])
+                upper['month'] = int(upper['string'][5:7])
+                upper['day'] = int(upper['string'][8:10])
+                context['url_without_date']=base_url.replace("&selected_facets=" +selected_facet,"")
+                context['lower']=lower
+                context['upper']=upper
         
         context['f']=f  
         context['selected_facets']=selected_facets 
+        context['base_url']=base_url
+        
         return context
         

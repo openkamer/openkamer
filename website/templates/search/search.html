@@ -33,20 +33,8 @@
             {% include "search/facet.html" with facet=f.decision %}            
             {% include "search/facet.html" with facet=f.parties %}            
             {% include "search/facet.html" with facet=f.submitters %}            
-           
-           <div>
-                <dl>
-                    {% if facets.fields.date %}
+            {% include "search/datefacet.html" %}                  
 
-                        <dt>Datum</dt>
-                        {% for d in facets.fields.date%}
-                            <dd><a href="{{ request.get_full_path }}&amp;selected_facets=date_updated_start:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
-                        {% endfor %}
-                    {% else %}
-                        <p>No date facets.</p>
-                    {% endif %}
-                </dl>
-            </div>
             <!-- End faceting -->
             </div>
             <div class="col-md-9">
