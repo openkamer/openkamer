@@ -455,7 +455,10 @@ class DocumentSearchView(FacetedSearchView):
     def get_context_data(request,**kwargs):
         context = super().get_context_data(**kwargs)
         selected_facets = request.request.GET.getlist('selected_facets')
-        query = context['query'].replace(" ","+")
+        try:
+            query = context['query'].replace(" ","+")
+        except:
+            return context
         
         base_url = "/search?q=" + query
         facetlabels = {'publication_type':'Publicatie','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Besluit'}
