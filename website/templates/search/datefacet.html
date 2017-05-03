@@ -7,13 +7,14 @@
 
            <div>
                 <dl>
+                        <dt>Datum</dt>
+
                     {% if facets.fields.date %}
 
-                        <dt>Datum</dt>
                         <!--{% for d in facets.fields.date%}
                             <dd><a href="{{ request.get_full_path }}&amp;selected_facets=date_updated_start:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
                         {% endfor %}-->
-                        <dd><a href="{{ url_without_date }}&amp;selected_facets=date:2016-01-16T00:00:00Z_TO_2017-01-16T00:00:00Z">insert testvalues</a></dd>
+                        
 
                 
 <div class="row">
@@ -25,7 +26,7 @@
     </div>
   
 </div>
-
+<dd><a href="{{ url_without_date }}">Reset</a></dd>
 <div class="row">
   
     <div id="date-input-container2" class="input-group input-group-sm date">
@@ -36,7 +37,9 @@
   
 </div>
 
-
+<dd><a href="{{ url_without_date }}&selected_facets=date:{{ 2weeks }}_TO_{{ today }}">2 weken</a></dd>
+<dd><a href="{{ url_without_date }}&selected_facets=date:{{ 4weeks }}_TO_{{ today }}">4 weken</a></dd>
+<!--<a href="{{ base_url }}&amp;selected_facets=date:2016-01-16T00:00:00Z_TO_2017-01-16T00:00:00Z">insert testvalues</a>-->
 
 <script type="text/javascript">
 var datepickerElement = $("#date-input-container.input-group.date");
@@ -79,6 +82,7 @@ datepickerElement.datepicker()
 </script>
                     {% else %}
                         <p>No date facets.</p>
+                        <a href="{{ url_without_date }}">Reset</a>
                     {% endif %}
 </dl>
             </div>

@@ -445,16 +445,29 @@ class DocumentSearchView(FacetedSearchView):
     template_name = 'search/search.html'
     load_all= False
     
+    def parse_Solr_timestamp(self,string):
+        date={}
+        date['string'] = string
+        date['year'] = int(string[0:4])
+        date['month'] = int(string[5:7])
+        date['day'] = int(string[8:10])
+        return date
     
+    def create_Solr_timestamp(self,date):
+        return date.strftime('%Y-%m-%dT00:00:00Z')
+        
     
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset(**kwargs)
-        queryset = queryset.models(Kamerstuk).facet('publication_type',mincount=1,).facet('submitters',mincount=1).facet('parties',mincount=1)
+        queryset = queryset.models(Kamerstuk)
+        for facet in self.facet_fields:
+            queryset = queryset.facet(facet, mincount=1)
         return queryset
         
-    def get_context_data(request,**kwargs):
+    def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        selected_facets = request.request.GET.getlist('selected_facets')
+        selected_facets = self.request.GET.getlist('selected_facets')
+
         try:
             query = context['query'].replace(" ","+")
         except:
@@ -465,21 +478,33 @@ class DocumentSearchView(FacetedSearchView):
         
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
+            print(facet)
         
         f = {}  
         
-        try:
-            context['facets']['fields']
+#        try:
+#            context['facets']['fields']
+#        except:
+#            return context
+            
+        try: 
+            context['upper']
         except:
-            return context
-                    
+            context['upper']=self.parse_Solr_timestamp(self.create_Solr_timestamp(datetime.date.today()))
         
+        try: 
+            context['lower']
+        except:
+            context['lower']=self.parse_Solr_timestamp(self.create_Solr_timestamp(Document.objects.all().order_by('date_published')[0].date_published))
+        context['today']=self.create_Solr_timestamp(datetime.date.today())
+        context['2weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(14))
+        context['4weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(28))
             
         for facet in context['facets']['fields']:
             try:
                 f[facet]=Facet(facet, label=facetlabels[facet])
             except:
-                f[facet]=Facet(facet)
+                f[facet]=Facet(facet) 
             
             d={}
             for item in context['facets']['fields'][facet]:
@@ -496,18 +521,15 @@ class DocumentSearchView(FacetedSearchView):
             if not facet == 'date':            
                 f[facet].d[item].is_selected=True
             else:
-                lower={}
-                upper={}
-                lower['string'], upper['string']=item.split('_TO_',1)
-                lower['year'] = int(lower['string'][0:4])
-                lower['month'] = int(lower['string'][5:7])
-                lower['day'] = int(lower['string'][8:10])
-                upper['year'] = int(upper['string'][0:4])
-                upper['month'] = int(upper['string'][5:7])
-                upper['day'] = int(upper['string'][8:10])
+                lower, upper = item.split('_TO_',1)
+                context['lower']=self.parse_Solr_timestamp(lower)
+                context['upper']=self.parse_Solr_timestamp(upper)
                 context['url_without_date']=base_url.replace("&selected_facets=" +selected_facet,"")
-                context['lower']=lower
-                context['upper']=upper
+
+        try:
+            context['url_without_date']
+        except:
+            context['url_without_date'] = base_url
         
         context['f']=f  
         context['selected_facets']=selected_facets 
