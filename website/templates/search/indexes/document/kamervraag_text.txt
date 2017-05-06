@@ -1,0 +1,4 @@
+{{ object.document.title_full}}
+{{ object.document.publication_type }}
+{{ object.document.content_html|striptags }}
+{{ object.kamerantwoord.document.content_html|striptags }}

@@ -440,7 +440,7 @@ class KamervraagView(TemplateView):
 
 
 class DocumentSearchView(FacetedSearchView):
-    facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date']
+    facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date','receiver']
     form_class = FacetedSearchForm
     template_name = 'search/search.html'
     load_all= False
@@ -459,7 +459,7 @@ class DocumentSearchView(FacetedSearchView):
     
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset(**kwargs)
-        queryset = queryset.models(Kamerstuk)
+        queryset = queryset.models(Kamervraag,Kamerstuk)
         for facet in self.facet_fields:
             queryset = queryset.facet(facet, mincount=1)
         return queryset
@@ -474,7 +474,7 @@ class DocumentSearchView(FacetedSearchView):
             return context
         
         base_url = "/search?q=" + query
-        facetlabels = {'publication_type':'Publicatie','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Besluit'}
+        facetlabels = {'publication_type':'Soort','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Status'}
         
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
