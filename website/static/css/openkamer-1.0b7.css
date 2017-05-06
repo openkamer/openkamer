@@ -155,3 +155,13 @@ h6.date {
   margin-bottom: 5px;
   font-weight: normal;
 }
+
+.badge-outline {
+    color: black;
+    border: 1px solid #999;
+    background-color: transparent;
+    font-size: .8em;
+}
+.badge-outline.badge-muted {
+    border-color: #b3b3b3;
+}
