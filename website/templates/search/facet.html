@@ -8,4 +8,14 @@
         <a href="{{i.url}}">{{i.value}} ({{i.count}})</a><br>
      {% endif %}                
 {% endfor %}
+{% if facet.list_of_facetitems|length > 5 %}
+<div class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Meer... <span class="caret"></span></a>
+    <ul class="dropdown-menu">
+        {% for i in facet.list_of_facetitems|slice:"5:" %}                                         
+               <li><a href="{{i.url}}">{{i.value}} ({{i.count}})</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
 </dl>
