@@ -479,14 +479,7 @@ class DocumentSearchView(FacetedSearchView):
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
             print(facet)
-        
-        f = {}  
-        
-#        try:
-#            context['facets']['fields']
-#        except:
-#            return context
-            
+                   
         try: 
             context['upper']
         except:
@@ -499,7 +492,13 @@ class DocumentSearchView(FacetedSearchView):
         context['today']=self.create_Solr_timestamp(datetime.date.today())
         context['2weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(14))
         context['4weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(28))
+
+        try:
+            context['facets']['fields']
+        except:
+            return context       
             
+        f = {}  
         for facet in context['facets']['fields']:
             try:
                 f[facet]=Facet(facet, label=facetlabels[facet])

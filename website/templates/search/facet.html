@@ -1,28 +1,45 @@
 {% load openkamer %}
 <div class="panel panel-default">
   <div class="panel-heading">
-<dt>{{facet.label}}</dt>
+    <dt>{{facet.label}}</dt>
   </div>
   <div class="panel-body">
-  
+    <table class="table table-facet table-bordered f11">
+        <tbody>  
 {% for i in facet.list_of_facetitems|slice:":5" %}            
      {% if i.is_selected %}
-        <a href="{{i.url}}" title="Verwijder dit filter"><b>{{i.value}} <span class="badge">{{i.count}}</span></b></a><br>
+    <tr>
+        <td><a href="{{i.url}}" title="Verwijder {{facet.label}} = {{i.value}}"><b>{{i.value}}</b></a></td>
+        <td ><a href="{{i.url}}" title="Verwijder {{facet.label}} = {{i.value}}"><span class="badge">{{i.count}}</span></a></td>                
+    </tr>
+        
      {% else %}
-        <a href="{{i.url}}" title="Selecteer dit filter">{{i.value}} <span class="badge badge-outline badge-muted">{{i.count}}</span></a><br>
-     {% endif %}                
+    <tr>
+        <td><a href="{{i.url}}" title="Selecteer {{facet.label}} = {{i.value}}">{{i.value}}</a></td>
+        <td><a href="{{i.url}}" title="Selecteer {{facet.label}} = {{i.value}}"><span class="badge badge-outline badge-muted">{{i.count}}</span></a></td>                
+    </tr>
+        
+     {% endif %}
 {% endfor %}
-  
-  
+           </tbody>
+        </table>
 {% if facet.list_of_facetitems|length > 5 %}
-
 <div class="dropdown">
 
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Meer... <span class="caret"></span></a>
     <ul class="dropdown-menu">
-        {% for i in facet.list_of_facetitems|slice:"5:" %}                                         
-               <li><a href="{{i.url}}">{{i.value}} ({{i.count}})</a></li>
-        {% endfor %}
+<table class="table table-facet table-bordered f11">
+            <tbody>
+
+        {% for i in facet.list_of_facetitems|slice:"5:" %}     
+    <tr>
+    <td><a title="Selecteer {{facet.label}} = {{i.value}}" href="{{i.url}}">{{ i.value }}</a></td>
+    <td><span class="badge badge-outline badge-muted">{{ i.count }}</span></td>                                    
+
+    </tr>    
+    {% endfor %}
+           </tbody>
+        </table>
     </ul>
 </div>
   
