@@ -1,0 +1,13 @@
+# Set of overrides for the dutch stemmer
+# TODO: load this as a resource from the analyzer and sync it in build.xml
+fiets	fiets
+bromfiets	bromfiets
+ei	eier
+kind	kinder
+advies	advies
+wijziging	wijziging
+wijzigingen	wijziging
+gemeenten	gemeente
+gemeente	gemeente
+gemeentelijke	gemeente
+gemeentelijken	gemeente
