@@ -1,6 +1,6 @@
 {% load openkamer %}
 {% if facet.list_of_facetitems|length > 0 %}
-<div class="panel panel-default">
+<div class="panel panel-default" >
   <div class="panel-heading">
     <dt>{{facet.label}}</dt>
   </div>
@@ -27,10 +27,10 @@
 
 {% if facet.list_of_facetitems|length > 5 %}
 
-
-    <a href="#collapse{{facet}}" data-toggle="collapse">Meer... <span class="caret"></span></a>
-    <div id="collapse{{facet}}" class="panel-collapse collapse">
-<table class="table table-facet table-bordered f11">
+    <div class="panel" id="parent{{facet}}{{resp}}">
+    <a href="#collapse{{facet}}{{resp}}" data-toggle="collapse" data-parent="parent{{facet}}{{resp}}">Meer...<span class="caret"></span></a>
+    <div id="collapse{{facet}}{{resp}}" class="panel-collapse collapse" >
+    <table class="table table-facet table-bordered f11">
             <tbody>
 
         {% for i in facet.list_of_facetitems|slice:"5:20" %}     
@@ -43,10 +43,11 @@
            </tbody>
         </table>
 </div>
-
+</div>
   
 {% endif %}
 </div>
 </div>
 
 {% endif %}
+
