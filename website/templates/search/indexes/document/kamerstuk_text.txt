@@ -1,3 +1,5 @@
 {{ object.document.title_full}}
 {{ object.document.publication_type }}
+for category in {{ object.document.categories }}:
+    category.name
 {{ object.document.content_html|striptags }}
