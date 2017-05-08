@@ -4,10 +4,10 @@
 {% load highlight %}
 {% block content %}
     <div class="row">
-        <div class="col-md-2">
-            <div align="center"><h2>Zoeken</h2></div><br>
+        <div class="col-md-3">
+            <div align="center"><h2>Zoeken</h2></div>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
             <h2> </h2>
             <form class="form-horizontal" method="get" action=".">
                 <div class="input-group">
@@ -16,7 +16,7 @@
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                     </button></span>
                 </div>
-            </form>
+            </form><br>
         </div>
     </div>
 
@@ -26,7 +26,7 @@
 
         {% if query %}
             
-            <div class="col-md-2">
+            <div class="col-md-3">
             <!-- Begin faceting. -->
             {% include "search/facet.html" with facet=f.publication_type %}            
             {% include "search/facet.html" with facet=f.dossier %}            
@@ -38,7 +38,7 @@
 
             <!-- End faceting -->
             </div>
-            <div class="col-md-10">
+            <div class="col-md-9">
 
             {% for result in page_obj.object_list %}
                 <p>

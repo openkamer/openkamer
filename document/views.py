@@ -474,11 +474,10 @@ class DocumentSearchView(FacetedSearchView):
             return context
         
         base_url = "/search?q=" + query
-        facetlabels = {'publication_type':'Soort','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Status'}
+        facetlabels = {'publication_type':'Soort','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Status', 'receiver':'Vraag gesteld aan'}
         
         for facet in selected_facets:
             base_url += "&selected_facets=" + facet
-            print(facet)
                    
         try: 
             context['upper']

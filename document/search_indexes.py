@@ -60,7 +60,7 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
     receiver = indexes.CharField(model_attr='receiver', faceted=True)
     
     def prepare_receiver(self, obj):
-        return obj.receiver if not obj.kamerantwoord else obj.kamerantwoord.document.submitters
+        return obj.receiver
     
     def prepare_decision(self,obj):
         return "Onbeantwoord" if not obj.kamerantwoord else "Beantwoord"

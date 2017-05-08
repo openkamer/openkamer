@@ -46,14 +46,12 @@ class FacetedSearchForm(SearchForm):
 
 
             field, value = facet.split(":", 1)
-            print(value)
                                                       
                                                     
             if value:
                 if field=='date':
                     lower,upper = value.split("_TO_",1)
-                    string = u'%s:["%s" TO "%s"]' % (field, sqs.query.clean(lower), sqs.query.clean(upper))
-                    print(string)                    
+                    string = u'%s:["%s" TO "%s"]' % (field, sqs.query.clean(lower), sqs.query.clean(upper))                    
                     sqs = sqs.narrow(string)    
                 else:
                     sqs = sqs.narrow(u'%s:"%s"' % (field, sqs.query.clean(value)))
