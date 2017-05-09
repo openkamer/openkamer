@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Tue Apr 11 19:30:38 2017
 
@@ -25,19 +25,19 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
         return '' if not obj.document else obj.document.date_published.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_dossier(self,obj):
-        return '' if not obj.document.dossier else obj.document.dossier.dossier_id
+        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
         
     def prepare_decision(self,obj):
-        return '' if not obj.document.dossier else obj.document.dossier.decision
+        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.decision]
 
     def prepare_title(self, obj):
         return '' if not obj.document else obj.document.title_short
         
     def prepare_submitters(self, obj):
-        return '' if not obj.document else [n.person.fullname() for n in obj.document.submitters]
+        return '' if not obj.document else [n.person.fullname() if n.person else '' for n in obj.document.submitters]
     
     def prepare_parties(self, obj):
-        return '' if not obj.document else [n.party.name_short for n in obj.document.submitters]
+        return '' if not obj.document else [n.party.name_short if n.party else '' for n in obj.document.submitters]
     
     def get_model(self):
         return Kamerstuk
@@ -72,7 +72,7 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
         return '' if not obj.document else obj.document.date_published.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_dossier(self,obj):
-        return '' if not obj.document.dossier else obj.document.dossier.dossier_id
+        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
 
     def prepare_title(self, obj):
         return '' if not obj.document else obj.document.title_short
@@ -82,14 +82,14 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
             submitters = ''        
         else:
             if obj.kamerantwoord:
-                        submitters = [n.person.fullname() for n in obj.document.submitters|obj.kamerantwoord.document.submitters]
+                        submitters = [n.person.fullname() if n.person else '' for n in obj.document.submitters|obj.kamerantwoord.document.submitters]
             else:
-                        submitters = [n.person.fullname() for n in obj.document.submitters]
+                        submitters = [n.person.fullname() if n.person else '' for n in obj.document.submitters]
         
         return submitters
     
     def prepare_parties(self, obj):
-        return '' if not obj.document else [n.party.name_short for n in obj.document.submitters]  
+        return '' if not obj.document else [n.party.name_short if n.party else '' for n in obj.document.submitters]  
     
     def get_model(self):
         return Kamervraag
