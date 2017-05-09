@@ -2,6 +2,7 @@
 
 {% extends "website/base.html" %}
 {% load highlight %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-3">
@@ -72,13 +73,35 @@
                 <p>No results found.</p>
             {% endfor %}
 
-            {% if page_obj.has_previous or page_obj.has_next %}
-                <div>
-                    {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page={{ page_obj.previous_page_number }}">{% endif %}&laquo; Previous{% if page_obj.has_previous %}</a>{% endif %}
-                    |
-                    {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page={{ page_obj.next_page_number }}">{% endif %}Next &raquo;{% if page_obj.has_next %}</a>{% endif %}
-                </div>
+            {% if is_paginated %}
+            <div class="pagination">
+              <ul class="pagination">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a href="{{ base_url}}&page={{ page_obj.previous_page_number }}">
+                {% else %}
+                <li class="page-item disabled"><a href="#">
+                {% endif %}
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+                </a></li>
+                {% for p in pages %}
+                <li class="page-item {% if p == page_obj.number %}active{% endif %}"><a href="{{ base_url}}&page={{ p }}">{{ p }}</a></li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item"><a href="{{ base_url}}&page={{ page_obj.next_page_number }}">
+                {% else %}
+                <li class="page-item disabled"><a href="#">
+                {% endif %}
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+                </a></li>
+              </ul>
+            </div>
             {% endif %}
+
+
+
+            
             </div>
         {% else %}
             {# Show some example queries to run, maybe query syntax, something else? #}
