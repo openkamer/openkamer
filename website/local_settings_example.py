@@ -55,6 +55,7 @@ CRON_CLASSES = [
     # 'website.cron.UpdateKamervragen',
     # 'oktwitter.cron.UpdateTwitterLists',
     # 'stats.cron.UpdateStatsData',
+    # 'website.cron.UpdateSearchIndex',
 ]
 
 # OPENKAMER
