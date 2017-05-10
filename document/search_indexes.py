@@ -25,10 +25,13 @@ class KamerstukIndex(indexes.SearchIndex, indexes.Indexable):
         return '' if not obj.document else obj.document.date_published.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_dossier(self,obj):
-        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
+        return '' if not obj.document else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
         
     def prepare_decision(self,obj):
-        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.decision]
+        return '' if not obj.document else ['' if not obj.document.dossier else obj.document.dossier.get_status_display() ]
+        
+        
+        
 
     def prepare_title(self, obj):
         return '' if not obj.document else obj.document.title_short
@@ -72,7 +75,7 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
         return '' if not obj.document else obj.document.date_published.strftime('%Y-%m-%dT%H:%M:%SZ')
 
     def prepare_dossier(self,obj):
-        return '' if not obj.document.dossier else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
+        return '' if not obj.document else ['' if not obj.document.dossier else obj.document.dossier.dossier_id]
 
     def prepare_title(self, obj):
         return '' if not obj.document else obj.document.title_short
