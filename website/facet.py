@@ -57,3 +57,7 @@ class FacetedSearchForm(SearchForm):
                     sqs = sqs.narrow(u'%s:"%s"' % (field, sqs.query.clean(value)))
 
         return sqs
+        
+    def no_query_found(self):
+        
+        return self.searchqueryset.all()
