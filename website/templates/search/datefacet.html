@@ -1,4 +1,5 @@
 {% load openkamer %}
+{% if f.date.list_of_facetitems|length > 0 %}
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" type="text/css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
@@ -15,9 +16,9 @@
 
                     {% if facets.fields.date %}
 
-                        <!--{% for d in facets.fields.date%}
+                        {# {% for d in facets.fields.date%}
                             <dd><a href="{{ request.get_full_path }}&amp;selected_facets=date_updated_start:{{ d.0|urlencode }}">{{ d.0 }}</a> ({{ d.1 }})</dd>
-                        {% endfor %}-->
+                        {% endfor %} #}
                         
 
 Van:                
@@ -93,3 +94,4 @@ datepickerElement.datepicker()
                     {% endif %}
 
             </div>
+{% endif %}

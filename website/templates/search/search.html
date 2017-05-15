@@ -47,7 +47,7 @@
             </div>
 
             <div class="col-md-3 visible-md visible-lg">
-            <!-- Begin faceting. -->
+            <!-- Begin faceting.-->
             {% include "search/facet.html" with resp="T" facet=f.publication_type %}            
             {% include "search/facet.html" with resp="T" facet=f.dossier %}            
             {% include "search/facet.html" with resp="T" facet=f.decision %}            
@@ -56,6 +56,7 @@
             {% include "search/facet.html" with resp="T" facet=f.receiver %}    
             {% include "search/datefacet.html" %}                  
             <!-- End faceting -->
+
             </div>
             
             <div class="col-md-9">
@@ -63,7 +64,9 @@
             {% for result in page_obj.object_list %}
                 <p>
                     {% if result.model_name == "kamerstuk" %}<a href={% url result.model_name result.object.id_main result.object.id_sub %}>{{result.title}}</a> <a class="text-muted" href={% url 'dossier-timeline' result.object.id_main %}>(Dossier {{result.object.id_main}})</a><br> 
-                    {% else %}<a href={% url result.model_name result.object.vraagnummer %}>{{result.title}}</a><br> 
+                    {% elif result.model_name == "kamervraag" %}<a href={% url result.model_name result.object.vraagnummer %}>{{result.title}}</a><br> 
+                    {% elif result.model_name == "person" %}<a href={% url result.model_name result.object.slug %}>{{result.forename}}{% if result.surname_prefix %} {{ result.surname_prefix}}{% endif %} {{result.surname}}</a><br>
+                    {% else %}
                     {% endif %}
                     {% highlight result.text with query html_tag "b" %} 
                     
@@ -107,4 +110,5 @@
             </div>
 
     </div>
+
 {% endblock %}

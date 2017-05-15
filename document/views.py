@@ -12,6 +12,7 @@ from django.views.generic.base import RedirectView
 from haystack.query import SearchQuerySet
 from haystack.generic_views import FacetedSearchView 
 from website.facet import FacetedSearchForm
+from person.models import Person
 
 
 from dal import autocomplete
@@ -459,7 +460,7 @@ class DocumentSearchView(FacetedSearchView):
     
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset(**kwargs)
-        queryset = queryset.models(Kamervraag,Kamerstuk)
+        queryset = queryset.models(Kamervraag,Kamerstuk,Person)
         for facet in self.facet_fields:
             queryset = queryset.facet(facet, mincount=1)
         return queryset
@@ -547,6 +548,6 @@ class DocumentSearchView(FacetedSearchView):
                 pages = [x for x in range(page_no - 5, page_no + 6)]
     
             context.update({'pages': pages})
-            
+        print(context.get('object_list'))   
         return context
         
