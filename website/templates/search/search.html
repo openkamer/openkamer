@@ -65,7 +65,7 @@
                     {% if result.model_name == "kamerstuk" %}<a href={% url result.model_name result.object.id_main result.object.id_sub %}>{{result.title}}</a> <a class="text-muted" href={% url 'dossier-timeline' result.object.id_main %}>(Dossier {{result.object.id_main}})</a><br> 
                     {% else %}<a href={% url result.model_name result.object.vraagnummer %}>{{result.title}}</a><br> 
                     {% endif %}
-                    {% highlight result.text with query %} 
+                    {% highlight result.text with query html_tag "b" %} 
                     
                     
                 </p>
