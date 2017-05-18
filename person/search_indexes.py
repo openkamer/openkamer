@@ -14,7 +14,7 @@ class PersonIndex(indexes.SearchIndex, indexes.Indexable):
     forename = indexes.CharField(model_attr='forename')
     surname_prefix = indexes.CharField(model_attr='surname_prefix')
     surname = indexes.CharField(model_attr='surname')
-    text = indexes.CharField(use_template=True,document=True)
+    text = indexes.CharField(use_template=True,document=True, boost=1.5)
     publication_type = indexes.CharField(faceted=True)
    
     slug = indexes.CharField(model_attr='slug')
