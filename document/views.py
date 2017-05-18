@@ -548,6 +548,13 @@ class DocumentSearchView(FacetedSearchView):
                 pages = [x for x in range(page_no - 5, page_no + 6)]
     
             context.update({'pages': pages})
-        print(context.get('object_list'))   
+        
+
+        count=self.queryset.count()
+        if count==1:
+            context['count']="1 resultaat"
+        elif count >1:
+            context['count']=str(count) + " resultaten"
+        
         return context
         
