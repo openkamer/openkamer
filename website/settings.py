@@ -140,7 +140,8 @@ BOOTSTRAP3 = {
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr/default5'
+        'URL': 'http://127.0.0.1:8983/solr/default5',
+        'TIMEOUT': 3 * 60,
         # ...or for multicore...
         # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
