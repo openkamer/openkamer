@@ -1,4 +1,4 @@
-## Server setup
+## Server setup (Ubuntu 16.04)
 
 ### Basics
 
@@ -120,3 +120,48 @@ Enable on startup,
 ```
 $ sudo systemctl enable uwsgi_openkamer
 ```
+
+### Search (Solr)
+
+Install Solr by following these instructions: https://cwiki.apache.org/confluence/display/solr/Taking+Solr+to+Production
+
+```bash
+$ sudo systemctl start solr
+$ sudo systemctl status solr
+```
+
+Create core,
+```bash
+$ /opt/solr-6.5.1/bin/solr create -c default5
+```
+
+Create symbolic links of the config files,
+```bash
+$ ln -s openkamer/website/templates/search_configuration/solrconfig.xml /home/solr/data/default5/conf/solrconfig.xml
+$ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /home/solr/data/default5/conf/stemdict_nl.txt
+```
+
+Build schema.xml
+```bash
+$ python manage.py build_solr_schema --filename=openkamer/website/templates/search_configuration/schema.xml
+$ curl 'http://localhost:8983/solr/admin/cores?action=RELOAD&core=default5&wt=json&indent=true'
+```
+
+Move schema.xml to solr config dir,
+```bash
+$ sudo su - solr
+$ cp openkamer/website/templates/search_configuration/schema.xml /home/solr/data/default5/conf/schema.xml
+```
+
+Create search index,
+```
+$ python manage.py rebuild_index
+```
+
+Enable on startup,
+
+```bash
+$ sudo systemctl enable solr
+```
+
+Logs can be found in `/home/solr/logs`.
