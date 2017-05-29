@@ -138,19 +138,13 @@ $ /opt/solr-6.5.1/bin/solr create -c default5
 Create symbolic links of the config files,
 ```bash
 $ ln -s openkamer/website/templates/search_configuration/solrconfig.xml /home/solr/data/default5/conf/solrconfig.xml
+$ ln -s openkamer/website/templates/search_configuration/schema.xml /home/solr/data/default5/conf/schema.xml
 $ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /home/solr/data/default5/conf/stemdict_nl.txt
 ```
 
-Build schema.xml
+Reload core,
 ```bash
-$ python manage.py build_solr_schema --filename=openkamer/website/templates/search_configuration/schema.xml
 $ curl 'http://localhost:8983/solr/admin/cores?action=RELOAD&core=default5&wt=json&indent=true'
-```
-
-Move schema.xml to solr config dir,
-```bash
-$ sudo su - solr
-$ cp openkamer/website/templates/search_configuration/schema.xml /home/solr/data/default5/conf/schema.xml
 ```
 
 Create search index,
