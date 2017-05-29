@@ -137,9 +137,9 @@ $ /opt/solr-6.5.1/bin/solr create -c default5
 
 Create symbolic links of the config files,
 ```bash
-$ ln -s openkamer/website/templates/search_configuration/solrconfig.xml /home/solr/data/default5/conf/solrconfig.xml
-$ ln -s openkamer/website/templates/search_configuration/schema.xml /home/solr/data/default5/conf/schema.xml
-$ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /home/solr/data/default5/conf/stemdict_nl.txt
+$ ln -s openkamer/website/templates/search_configuration/solrconfig.xml /var/solr/data/default5/conf/solrconfig.xml
+$ ln -s openkamer/website/templates/search_configuration/schema.xml /var/solr/data/default5/conf/schema.xml
+$ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /var/solr/data/default5/conf/stemdict_nl.txt
 ```
 
 Reload core,
@@ -158,4 +158,4 @@ Enable on startup,
 $ sudo systemctl enable solr
 ```
 
-Logs can be found in `/home/solr/logs`.
+Logs can be found in `/var/solr/data/default5/conf/logs`.
