@@ -9,6 +9,12 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
+from haystack.query import SearchQuerySet
+from haystack.generic_views import FacetedSearchView 
+from website.facet import FacetedSearchForm
+from person.models import Person
+
+
 from dal import autocomplete
 
 from person.models import Person
@@ -33,6 +39,7 @@ from document import settings
 
 # TODO: remove dependency on website
 from website.create import create_or_update_dossier
+from website.facet import Facet, FacetItem
 
 logger = logging.getLogger(__name__)
 
@@ -431,3 +438,123 @@ class KamervraagView(TemplateView):
             raise Http404
         context['kamervraag'] = kamervragen[0]
         return context
+
+
+class DocumentSearchView(FacetedSearchView):
+    facet_fields = ['publication_type', 'submitters','parties','dossier','decision', 'date','receiver']
+    form_class = FacetedSearchForm
+    template_name = 'search/search.html'
+    load_all= False
+    
+    def parse_Solr_timestamp(self,string):
+        date={}
+        date['string'] = string
+        date['year'] = int(string[0:4])
+        date['month'] = int(string[5:7])
+        date['day'] = int(string[8:10])
+        return date
+    
+    def create_Solr_timestamp(self,date):
+        return date.strftime('%Y-%m-%dT00:00:00Z')
+        
+    
+    def get_queryset(self, **kwargs):
+        queryset = super().get_queryset(**kwargs)
+        queryset = queryset.models(Kamervraag,Kamerstuk,Person)
+        for facet in self.facet_fields:
+            queryset = queryset.facet(facet, mincount=1)
+        return queryset
+        
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        selected_facets = self.request.GET.getlist('selected_facets')
+
+        try:
+            query = context['query'].replace(" ","+")
+        except:
+            return context
+        
+        base_url = "/search?q=" + query
+        facetlabels = {'publication_type':'Soort','submitters':'Indieners','parties':'Partij','dossier':'Dossier','decision':'Status', 'receiver':'Vraag gesteld aan'}
+        
+        for facet in selected_facets:
+            base_url += "&selected_facets=" + facet
+                   
+        try: 
+            context['upper']
+        except:
+            context['upper']=self.parse_Solr_timestamp(self.create_Solr_timestamp(datetime.date.today()))
+        
+        try: 
+            context['lower']
+        except:
+            context['lower']=self.parse_Solr_timestamp(self.create_Solr_timestamp(Document.objects.all().order_by('date_published')[0].date_published))
+        context['today']=self.create_Solr_timestamp(datetime.date.today())
+        context['2weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(14))
+        context['4weeks']=self.create_Solr_timestamp(datetime.date.today()-datetime.timedelta(28))
+
+        try:
+            context['facets']['fields']
+        except:
+            return context       
+            
+        f = {}  
+        for facet in context['facets']['fields']:
+            try:
+                f[facet]=Facet(facet, label=facetlabels[facet])
+            except:
+                f[facet]=Facet(facet) 
+            
+            d={}
+            for item in context['facets']['fields'][facet]:
+                i = FacetItem(item[0], item[1], base_url=base_url)                
+                i.facet = f[facet]                
+                f[facet].list_of_facetitems.append(i)
+                d[item[0]]=i
+            f[facet].d=d
+                
+        
+        for selected_facet in selected_facets:
+            facet=selected_facet.split(':')[0]
+            item=":".join(selected_facet.split(':')[1:])
+            if not facet == 'date':            
+                f[facet].d[item].is_selected=True
+            else:
+                lower, upper = item.split('_TO_',1)
+                context['lower']=self.parse_Solr_timestamp(lower)
+                context['upper']=self.parse_Solr_timestamp(upper)
+                context['url_without_date']=base_url.replace("&selected_facets=" +selected_facet,"")
+
+        try:
+            context['url_without_date']
+        except:
+            context['url_without_date'] = base_url
+        
+        context['f']=f  
+        context['selected_facets']=selected_facets 
+        context['base_url']=base_url
+        
+        if context.get('is_paginated', True):
+            paginator = context.get('paginator')
+            num_pages = paginator.num_pages
+            current_page = context.get('page_obj')
+            page_no = current_page.number
+    
+            if num_pages <= 11 or page_no <= 6:  
+                pages = [x for x in range(1, min(num_pages + 1, 12))]
+            elif page_no > num_pages - 6:  
+                pages = [x for x in range(num_pages - 10, num_pages + 1)]
+            else:  
+                pages = [x for x in range(page_no - 5, page_no + 6)]
+    
+            context.update({'pages': pages})
+        
+
+        count=self.queryset.count()
+        if count==1:
+            context['count']="1 resultaat"
+        elif count >1:
+            context['count']=str(count) + " resultaten"
+        
+        return context
+        

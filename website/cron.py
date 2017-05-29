@@ -33,6 +33,7 @@ import openkamer.kamervraag
 
 from website import settings
 import website.create
+from haystack.management.commands import update_index
 
 
 logger = logging.getLogger(__name__)
@@ -394,3 +395,18 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             logger.error(traceback.format_exc())
             raise
         logger.info('END')
+        
+class UpdateSearchIndex(CronJobBase):
+    RUN_AT_TIMES = ['06:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateSearchIndex'
+
+    def do(self):
+        logger.info('BEGIN')
+        try:
+            update_index.Command().handle()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
+

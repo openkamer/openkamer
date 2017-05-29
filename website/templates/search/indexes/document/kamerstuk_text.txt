@@ -1,0 +1,6 @@
+{{ object.document.title_full}}
+{{ object.document.publication_type }}
+{% for category in object.document.categories.all %}
+    {{ category.name }}
+{% endfor %}
+{{ object.document.content_html|striptags }}

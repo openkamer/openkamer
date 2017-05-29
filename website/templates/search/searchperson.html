@@ -1,0 +1,35 @@
+
+
+{% extends "website/base.html" %}
+
+{% block content %}
+    <h2>Zoek Persoon</h2>
+
+    <form method="get" action=".">
+
+            {{ form }}   <input type="submit" value="Search">
+
+        {% if query %}
+            <h3>Resultaten</h3>
+
+            {% for result in page_obj.object_list %}
+                <p>
+                    <a href="{% url 'person' result.slug %}">{{ result.forename}} {% if result.surname_prefix %}{{ result.surname_prefix}} {% endif %}{{ result.surname}}</a>
+                  
+                </p>
+            {% empty %}
+                <p>Niemand gevonden.</p>
+            {% endfor %}
+
+            {% if page_obj.has_previous or page_obj.has_next %}
+                <div>
+                    {% if page_obj.has_previous %}<a href="?q={{ query }}&amp;page_obj={{ page_obj.previous_page_obj_number }}">{% endif %}&laquo; Previous{% if page_obj.has_previous %}</a>{% endif %}
+                    |
+                    {% if page_obj.has_next %}<a href="?q={{ query }}&amp;page_obj={{ page_obj.next_page_obj_number }}">{% endif %}Next &raquo;{% if page_obj.has_next %}</a>{% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            {# Show some example queries to run, maybe query syntax, something else? #}
+        {% endif %}
+    </form>
+{% endblock %}

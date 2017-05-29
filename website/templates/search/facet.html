@@ -1,0 +1,53 @@
+{% load openkamer %}
+{% if facet.list_of_facetitems|length > 0 %}
+<div class="panel panel-default" >
+  <div class="panel-heading">
+    <dt>{{facet.label}}</dt>
+  </div>
+  <div class="panel-body">
+    <table class="table table-facet table-bordered f11">
+        <tbody>  
+{% for i in facet.list_of_facetitems|slice:":5" %}            
+     {% if i.is_selected %}
+    <tr>
+        <td><a href="{{i.url}}" title="Verwijder {{facet.label}} = {{i.value}}"><b>{{i.value}}</b></a></td>
+        <td ><a href="{{i.url}}" title="Verwijder {{facet.label}} = {{i.value}}"><span class="badge">{{i.count}}</span></a></td>                
+    </tr>
+        
+     {% else %}
+    <tr>
+        <td><a href="{{i.url}}" title="Selecteer {{facet.label}} = {{i.value}}">{{i.value}}</a></td>
+        <td><a href="{{i.url}}" title="Selecteer {{facet.label}} = {{i.value}}"><span class="badge badge-outline badge-muted">{{i.count}}</span></a></td>                
+    </tr>
+        
+     {% endif %}
+{% endfor %}
+           </tbody>
+        </table>
+
+{% if facet.list_of_facetitems|length > 5 %}
+
+    <div class="panel" id="parent{{facet}}{{resp}}">
+    <a href="#collapse{{facet}}{{resp}}" data-toggle="collapse" data-parent="parent{{facet}}{{resp}}">Meer...<span class="caret"></span></a>
+    <div id="collapse{{facet}}{{resp}}" class="panel-collapse collapse" >
+    <table class="table table-facet table-bordered f11">
+            <tbody>
+
+        {% for i in facet.list_of_facetitems|slice:"5:20" %}     
+    <tr>
+    <td><a title="Selecteer {{facet.label}} = {{i.value}}" href="{{i.url}}">{{ i.value }}</a></td>
+    <td><span class="badge badge-outline badge-muted">{{ i.count }}</span></td>                                    
+
+    </tr>    
+    {% endfor %}
+           </tbody>
+        </table>
+</div>
+</div>
+  
+{% endif %}
+</div>
+</div>
+
+{% endif %}
+

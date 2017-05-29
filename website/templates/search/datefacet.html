@@ -1,0 +1,93 @@
+{% load openkamer %}
+{% if f.date.list_of_facetitems|length > 0 %}
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.min.css" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/locales/bootstrap-datepicker.nl.min.js" type="text/javascript"></script>
+
+
+<div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <dt>Datum</dt>
+  </div>
+  <div class="panel-body">                
+
+
+                    {% if facets.fields.date %}
+                      
+
+Van:                
+
+     <div id="date-input-container" class="input-group input-group-sm date">
+      
+      <input type="text" class="form-control">
+      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    </div>
+  
+
+
+Tot:
+  
+    <div id="date-input-container2" class="input-group input-group-sm date">
+      
+      <input type="text" class="form-control">
+      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    </div><br>
+  
+
+<ul class="list-group">
+<li class="list-group-item"><dd><a href="{{ url_without_date }}">Reset</a></dd>
+<dd><a href="{{ url_without_date }}&selected_facets=date:{{ 2weeks }}_TO_{{ today }}">2 weken</a></dd>
+<dd><a href="{{ url_without_date }}&selected_facets=date:{{ 4weeks }}_TO_{{ today }}">4 weken</a></dd>
+</li></ul>
+</div>
+</div>
+<!--<a href="{{ base_url }}&amp;selected_facets=date:2016-01-16T00:00:00Z_TO_2017-01-16T00:00:00Z">insert testvalues</a>-->
+
+<script type="text/javascript">
+var datepickerElement = $("#date-input-container.input-group.date");
+datepickerElement.datepicker({
+    format: "dd/mm/yyyy",
+    startView: 1,
+    language: "nl",
+    autoclose: true,
+    todayHighlight: true
+})
+
+datepickerElement.datepicker('update', new Date({{ lower.year }}, {{ lower.month }}-1, {{ lower.day }}));
+<!--datepickerElement.datepicker('update', new Date(2014,10,01));-->
+
+datepickerElement.datepicker()
+    .on('hide', function(e) {
+        var url =  '{{ url_without_date }}' +"&selected_facets=date:" + e.date.getFullYear() + "-" + ("0"+(e.date.getMonth()+1)).slice(-2) + "-" + ("0" + e.date.getDate()).slice(-2) + "T00:00:00Z_TO_"+ '{{ upper.string }}';
+        window.location.href = url;
+    });
+</script>
+
+<script type="text/javascript">
+var datepickerElement = $("#date-input-container2.input-group.date");
+datepickerElement.datepicker({
+    format: "dd/mm/yyyy",
+    startView: 1,
+    language: "nl",
+    autoclose: true,
+    todayHighlight: true
+})
+
+datepickerElement.datepicker('update', new Date({{ upper.year }}, {{ upper.month }}-1, {{ upper.day }}));
+<!--datepickerElement.datepicker('update', new Date(2014,10,01));-->
+
+datepickerElement.datepicker()
+    .on('hide', function(e) {
+        var url =  '{{ url_without_date }}' +"&selected_facets=date:" + '{{ lower.string }}' + "_TO_"+ e.date.getFullYear() + "-" + ("0"+(e.date.getMonth()+1)).slice(-2) + "-" + ("0" + e.date.getDate()).slice(-2) + "T00:00:00Z";
+        window.location.href = url;
+    });
+</script>
+                    {% else %}
+                        <p>No date facets.</p>
+                        <a href="{{ url_without_date }}">Reset</a>
+                    {% endif %}
+
+            </div>
+{% endif %}

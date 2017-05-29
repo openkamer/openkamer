@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 from person.views import PersonView
+from person.views import PersonSearchView
 from person.views import PersonsView
 from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
@@ -28,6 +29,7 @@ from document.views import PersonDocumentsView
 from document.views import VotingView
 from document.views import VotingsView
 from document.views import VotingsCheckView
+from document.views import DocumentSearchView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
@@ -128,6 +130,13 @@ urlpatterns = [
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
+    
+
+    url(r'^personen/search/',PersonSearchView.as_view(), name="search-person"),
+    url(r'^search/', DocumentSearchView.as_view(), name="search"),
+
+
+
 ]
 
 if settings.DEBUG:
