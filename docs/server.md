@@ -139,7 +139,7 @@ Create symbolic links of the config files,
 ```bash
 $ ln -s openkamer/website/templates/search_configuration/solrconfig.xml /var/solr/data/default5/conf/solrconfig.xml
 $ ln -s openkamer/website/templates/search_configuration/schema.xml /var/solr/data/default5/conf/schema.xml
-$ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /var/solr/data/default5/conf/stemdict_nl.txt
+$ ln -s openkamer/website/templates/search_configuration/stemdict_nl.txt /var/solr/data/default5/conf/lang/stemdict_nl.txt
 ```
 
 Reload core,
