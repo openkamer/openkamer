@@ -33,7 +33,7 @@ import openkamer.kamervraag
 
 from website import settings
 import website.create
-from haystack.management.commands import update_index
+
 
 
 logger = logging.getLogger(__name__)
@@ -404,7 +404,7 @@ class UpdateSearchIndex(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            update_index.Command().handle()
+            management.call_command('update_index', remove=True)        
         except Exception as error:
             logger.exception(error)
             raise
