@@ -467,11 +467,12 @@ class DocumentSearchView(FacetedSearchView):
         kwargs = {
             'hl.tag.pre': '<strong class="highlighted">',
             'hl.tag.post': '</strong>',
-            'hl.snippets':2,
+            'hl.snippets':1,
             'hl.fl':'text',
             'hl.method':'unified',
             'hl.fragsize':100,
             'hl.defaultSummary':'true',
+            'hl.maxAnalyzedChars':1000000
             
         }
         queryset = queryset.highlight(**kwargs)

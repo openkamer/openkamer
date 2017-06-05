@@ -71,7 +71,7 @@
                     {% else %}
                     {% endif %}
                     {% for hl in result.highlighted.text %}
-                        {% autoescape off %}{{hl|slice:":600"}}{% endautoescape %} ... {% endfor %}
+                        {% autoescape off %}{{hl}}{% endautoescape %} ... {% endfor %}
 
                     
                     
