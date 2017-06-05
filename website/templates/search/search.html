@@ -70,7 +70,9 @@
                     {% elif result.model_name == "person" %}<a href="{% url result.model_name result.object.slug %}>{{result.forename}}{% if result.surname_prefix %} {{ result.surname_prefix}}{% endif %} {{result.surname}}</a><br>
                     {% else %}
                     {% endif %}
-                    {% highlight result.text with query html_tag "b" %} 
+                    {% for hl in result.highlighted.text %}
+                        {% autoescape off %}{{hl|slice:":600"}}{% endautoescape %} ... {% endfor %}
+
                     
                     
                 </p>

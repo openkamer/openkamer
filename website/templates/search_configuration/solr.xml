@@ -88,8 +88,8 @@
     <!--
     Not required if the default search field (<str name="df">text</str>) is defined for
     /select request handler in sorlconfig.xml
-    -->
-    <defaultSearchField>{{ content_field_name }}</defaultSearchField>
+    
+    <defaultSearchField>{{ content_field_name }}</defaultSearchField>-->
 
     <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
     <solrQueryParser defaultOperator="{{ default_operator }}"/>

@@ -124,8 +124,8 @@
     <!--
     Not required if the default search field (<str name="df">text</str>) is defined for
     /select request handler in sorlconfig.xml
-    -->
-    <defaultSearchField>text</defaultSearchField>
+    
+    <defaultSearchField>text</defaultSearchField>-->
 
     <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
     <solrQueryParser defaultOperator="AND"/>

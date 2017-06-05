@@ -463,6 +463,18 @@ class DocumentSearchView(FacetedSearchView):
         queryset = queryset.models(Kamervraag,Kamerstuk,Person)
         for facet in self.facet_fields:
             queryset = queryset.facet(facet, mincount=1)
+            
+        kwargs = {
+            'hl.tag.pre': '<strong class="highlighted">',
+            'hl.tag.post': '</strong>',
+            'hl.snippets':2,
+            'hl.fl':'text',
+            'hl.method':'unified',
+            'hl.fragsize':100,
+            'hl.defaultSummary':'true',
+            
+        }
+        queryset = queryset.highlight(**kwargs)
         return queryset
         
     def get_context_data(self,**kwargs):
