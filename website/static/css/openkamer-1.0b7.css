@@ -166,28 +166,24 @@ h6.date {
     border-color: #b3b3b3;
 }
 
-.table-facet{
-  table-layout:fixed;
-  width: 100%
-border-collapse: collapse;
-border:none;
-margin-bottom: 0;
+.table-facet {
+    table-layout:fixed;
+    width: 100%
+    border-collapse: collapse;
+    border: none;
+    margin-bottom: 0;
 }
 
 .table-facet td:first-child {
-   
-white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.table-facet td:last-child{
+.table-facet td:last-child {
     white-space: nowrap;
     width:25%;
     text-align:center;
 }
-.table-facet > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+.table-facet > thead > tr > th {
 	padding: 0px;
-}
-.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
-	border: 0px;
 }
