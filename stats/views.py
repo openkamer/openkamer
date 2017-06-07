@@ -7,9 +7,6 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
-import plotly
-from plotly.graph_objs import Scatter, Layout, Bar, Margin
-
 from person.models import Person
 
 from parliament.models import ParliamentMember
@@ -86,6 +83,9 @@ class KamervraagFootnotesView(TemplateView):
     template_name = "stats/kamervraag_footnote_sources.html"
 
     def get_context_data(self, **kwargs):
+        import plotly.offline
+        from plotly.graph_objs import Scatter, Layout, Bar, Margin
+
         context = super().get_context_data(**kwargs)
         domains = self.get_domains()
         x = []
@@ -154,6 +154,9 @@ class KamervraagFootnotesView(TemplateView):
 
 
 def get_example_plot_html(number_of_points=30):
+    import plotly.offline
+    from plotly.graph_objs import Scatter, Layout, Bar, Margin
+
     data_x = []
     data_y = []
     for i in range(0, number_of_points):
