@@ -147,8 +147,9 @@ def link_kamervragen_and_antwoorden():
         if kamervragen:
             kamervraag = kamervragen[0]
             try:
-                kamervraag.kamerantwoord = kamerantwoord
-                kamervraag.save()
+                with transaction.atomic():
+                    kamervraag.kamerantwoord = kamerantwoord
+                    kamervraag.save()
             except IntegrityError as error:
                 logger.error('kamervraag: ' + str(kamervraag.id))
                 logger.error('kamerantwoord: ' + str(kamerantwoord.id))
