@@ -140,13 +140,19 @@ def get_receiver_from_title(title_full):
 @transaction.atomic
 def link_kamervragen_and_antwoorden():
     logger.info('BEGIN')
+    from django.db.utils import IntegrityError
     kamerantwoorden = Kamerantwoord.objects.all()
     for kamerantwoord in kamerantwoorden:
         kamervragen = Kamervraag.objects.filter(vraagnummer=kamerantwoord.vraagnummer)
         if kamervragen:
             kamervraag = kamervragen[0]
-            kamervraag.kamerantwoord = kamerantwoord
-            kamervraag.save()
+            try:
+                kamervraag.kamerantwoord = kamerantwoord
+                kamervraag.save()
+            except IntegrityError as error:
+                logger.error('kamervraag: ' + str(kamervraag))
+                logger.error('kamerantwoord: ' + str(kamerantwoord.id))
+                logger.exception(error)
     logger.info('END')
 
 
