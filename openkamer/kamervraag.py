@@ -150,7 +150,7 @@ def link_kamervragen_and_antwoorden():
                 kamervraag.kamerantwoord = kamerantwoord
                 kamervraag.save()
             except IntegrityError as error:
-                logger.error('kamervraag: ' + str(kamervraag))
+                logger.error('kamervraag: ' + str(kamervraag.id))
                 logger.error('kamerantwoord: ' + str(kamerantwoord.id))
                 logger.exception(error)
     logger.info('END')
