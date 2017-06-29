@@ -34,8 +34,6 @@ import openkamer.kamervraag
 from website import settings
 import website.create
 
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -395,13 +393,14 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             logger.error(traceback.format_exc())
             raise
         logger.info('END')
-        
-class UpdateSearchIndex(CronJobBase):
+
+
+class UpdateSearchIndex(LockJob):
     RUN_AT_TIMES = ['06:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateSearchIndex'
 
-    def do(self):
+    def do_imp(self):
         logger.info('BEGIN')
         try:
             management.call_command('update_index', remove=True)        
