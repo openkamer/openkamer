@@ -1,4 +1,6 @@
 from haystack.forms import SearchForm
+
+
 class Facet(object):
     def __init__(self,field,label=None):
         self.field = field
@@ -7,7 +9,8 @@ class Facet(object):
         
     def __str__(self):
         return self.field
-        
+
+
 class FacetItem(object):
     def __init__(self,value,count,base_url='',is_selected=False):
         self.value = value
@@ -31,7 +34,8 @@ class FacetItem(object):
     
     def __str__(self):
         return self.value, self.count
-        
+
+
 class FacetedSearchForm(SearchForm):
     def __init__(self, *args, **kwargs):
         self.selected_facets = kwargs.pop("selected_facets", [])
@@ -44,10 +48,8 @@ class FacetedSearchForm(SearchForm):
             if ":" not in facet:
                 continue
 
-
             field, value = facet.split(":", 1)
-                                                      
-                                                    
+
             if value:
                 if field=='date':
                     lower,upper = value.split("_TO_",1)
