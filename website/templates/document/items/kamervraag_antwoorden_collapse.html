@@ -22,7 +22,7 @@
                 <p><small><strong>{{ vraag.text }}</strong></small></p>
                 {% if vraag.antwoord %}
                   <div class="vertical-spacer-5"></div>
-                  <p><small>{{ vraag.antwoord.text }}</small></p>
+                  <p><small>{{ vraag.antwoord.text|linebreaks }}</small></p>
                 {% endif %}
               </li>
             {% endfor %}

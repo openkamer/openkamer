@@ -87,7 +87,7 @@
         {% if vraag.antwoord %}
           <br/>
           <br/>
-          {{ vraag.antwoord.text }}
+          {{ vraag.antwoord.text|linebreaks }}
         {% endif %}
       </li>
     {% endfor %}

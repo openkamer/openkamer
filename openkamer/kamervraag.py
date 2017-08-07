@@ -216,10 +216,10 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
         vraag_numbers = vraag_numbers.replace('en', ',').replace(' ', '').split(',')
         for paragraph in element.iter('p'):
             if paragraph.text is None or paragraph.text == '':
-                logger.warning('empty vraag text found for antwoord ' + str(kamerantwoord.document.document_url) + 'antwoord nr: ' + str(counter))
+                logger.warning('empty vraag text found for antwoord ' + str(kamerantwoord.document.document_url) + ' antwoord nr: ' + str(counter))
             else:
-                answer_text += paragraph.text_content() + '\n'
-        answer_text = re.sub('\s{2,}', ' ', answer_text).strip()
+                answer_text += re.sub('\s{2,}', ' ', paragraph.text_content()).strip()
+                answer_text += '\n'
         counter = 0
         see_answer_nr = None
         for number in vraag_numbers:
