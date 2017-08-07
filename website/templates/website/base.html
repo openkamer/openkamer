@@ -76,7 +76,7 @@
 
           <li class="hidden-sm"><a href="{% url 'votings' %}">Stemmingen</a></li>
 
-          <li><a href="{% url 'stats' %}">Statistieken</a></li>
+          <li class="hidden-sm"><a href="{% url 'stats' %}">Statistieken</a></li>
 
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Overig <span class="caret"></span></a>
@@ -86,19 +86,18 @@
               <li><a href="{% url 'government-current' %}">Kabinet</a></li>
               <li><a href="{% url 'parliament-members' %}">Kamerleden</a></li>
               <li><a href="{% url 'parties' %}">Partijen</a></li>
+              <li class="visible-sm"><a href="{% url 'stats' %}">Statistieken</a></li>
               <li class="visible-sm"><a href="{% url 'votings' %}">Stemmingen</a></li>
             </ul>
           </li>
         </ul>    
         
         <ul class="nav navbar-nav navbar-right">
-        
-        
-    
-            <form class="navbar-form" role="search" method="get" action="/search">
+
+            <form class="navbar-form visible-lg" role="search" method="get" action="/search">
                 <div class="input-group">
                     <input type="search" name="q" id="id_q" class="form-control">
-                    <div class="input-group-btn">                    
+                    <div class="input-group-btn">
                     <button type="submit"  class="btn btn-primary">   
 
                     <i class="glyphicon glyphicon-search"></i>
@@ -107,8 +106,10 @@
                     </div>
                 </div>
 
-                
             </form>
+
+            <li><a href="{% url 'search' %}" type="button" class="btn btn-default navbar-btn hidden-lg"><span class="glyphicon glyphicon-search"></span></a></li>
+
         </ul>
 
       </div>
