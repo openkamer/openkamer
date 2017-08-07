@@ -70,7 +70,7 @@ def create_kamervraag(document_number, overheidnl_document_id, skip_if_exists=Fa
     if skip_if_exists and Kamervraag.objects.filter(document__document_id=document_number).exists():
         return None, ''
     document, vraagnummer, overheidnl_antwoord_id = create_kamervraag_document(document_number, overheidnl_document_id)
-    Kamervraag.objects.filter(document=document).delete()
+    Kamervraag.objects.filter(vraagnummer=vraagnummer).delete()
     kamervraag = Kamervraag.objects.create(
         document=document,
         vraagnummer=vraagnummer,
@@ -88,7 +88,7 @@ def create_kamerantwoord(document_number, overheidnl_document_id, skip_if_exists
     if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=document_number).exists():
         return None
     document, vraagnummer, overheidnl_antwoord_id = create_kamervraag_document(document_number, overheidnl_document_id)
-    Kamerantwoord.objects.filter(document=document).delete()
+    Kamerantwoord.objects.filter(vraagnummer=vraagnummer).delete()
     kamerantwoord = Kamerantwoord.objects.create(document=document, vraagnummer=vraagnummer)
     create_antwoorden_from_antwoord_html(kamerantwoord)
     return kamerantwoord
