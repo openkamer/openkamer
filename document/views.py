@@ -38,7 +38,7 @@ from document import settings
 
 
 # TODO: remove dependency on website
-from website.create import create_or_update_dossier
+from openkamer.dossier import create_or_update_dossier
 from website.facet import Facet, FacetItem
 
 logger = logging.getLogger(__name__)

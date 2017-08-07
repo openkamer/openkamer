@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 
-import website.create
+import openkamer.parliament
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        website.create.create_parliament_members()
+        openkamer.parliament.create_parliament_members()

@@ -27,12 +27,13 @@ from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 from person.models import Person
 
-import stats.models
 
+import openkamer.besluitenlijst
+import openkamer.dossier
 import openkamer.kamervraag
+import openkamer.parliament
 
 from website import settings
-import website.create
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ class UpdateParliamentAndGovernment(CronJobBase):
     def do(self):
         logger.info('BEGIN')
         try:
-            website.create.create_parliament_and_government()
+            openkamer.parliament.create_parliament_and_government()
         except Exception as error:
             logger.exception(error)
             raise
@@ -121,7 +122,7 @@ class UpdateActiveDossiers(LockJob):
     def do_imp(self):
         # TODO: also update dossiers that have closed since last update
         logger.info('update active dossiers cronjob')
-        failed_dossiers = website.create.create_wetsvoorstellen_active()
+        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_active()
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
 
@@ -133,7 +134,7 @@ class UpdateInactiveDossiers(LockJob):
 
     def do_imp(self):
         logger.info('update inactive dossiers cronjob')
-        failed_dossiers = website.create.create_wetsvoorstellen_inactive()
+        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_inactive()
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
 
@@ -145,7 +146,7 @@ class UpdateBesluitenLijsten(LockJob):
 
     def do_imp(self):
         logger.info('update besluitenlijsten')
-        website.create.create_besluitenlijsten()
+        openkamer.besluitenlijst.create_besluitenlijsten()
 
 
 class UpdateKamervragen(LockJob):

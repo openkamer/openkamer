@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from document.models import Document
-import website.create
+import openkamer.dossier
 
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
         for document in documents:
             if not document.content_html:
                 continue
-            document.content_html = website.create.update_document_html_links(document.content_html)
+            document.content_html = openkamer.dossier.update_document_html_links(document.content_html)
             document.save()
             counter += 1
             print(counter)

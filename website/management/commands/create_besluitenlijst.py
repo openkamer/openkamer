@@ -3,7 +3,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from website.create import create_besluitenlijst
+from openkamer.besluitenlijst import create_besluitenlijst
 
 logger = logging.getLogger(__name__)
 

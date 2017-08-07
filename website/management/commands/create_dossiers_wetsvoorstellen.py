@@ -3,7 +3,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-import website.create
+import openkamer.dossier
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        failed_dossiers = website.create.create_wetsvoorstellen_all(options['skip-existing'])
+        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_all(options['skip-existing'])
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))

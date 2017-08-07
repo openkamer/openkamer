@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from website.create import create_government
+from openkamer.parliament import create_government
 
 
 class Command(BaseCommand):
