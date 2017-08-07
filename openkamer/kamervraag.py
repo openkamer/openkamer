@@ -4,6 +4,8 @@ import lxml
 
 from django.db import transaction
 
+import scraper.documents
+
 from document.models import Kamervraag
 from document.models import Kamerantwoord
 from document.models import Antwoord
@@ -13,8 +15,8 @@ from document.models import FootNote
 
 from document.models import Document
 
-import website.create
-import scraper.documents
+import openkamer.dossier
+import openkamer.kamerstuk
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +107,7 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
     if documents:
         logger.warning('document with id: ' + document_id + ' already exists, recreate document.')
 
-    content_html = website.create.update_document_html_links(content_html)
+    content_html = openkamer.kamerstuk.update_document_html_links(content_html)
 
     document = Document.objects.create(
         dossier=None,
@@ -118,12 +120,12 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
         source_url=document_html_url,
         content_html=content_html,
     )
-    category_list = website.create.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
+    category_list = openkamer.dossier.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
     document.categories.add(*category_list)
 
     submitters = metadata['submitter'].split('|')
     for submitter in submitters:
-        website.create.create_submitter(document, submitter, date_published)
+        openkamer.kamerstuk.create_submitter(document, submitter, date_published)
 
     logger.info('END')
     return document, metadata['vraagnummer']

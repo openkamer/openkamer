@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from website.create import create_or_update_dossier
+from openkamer.dossier import create_or_update_dossier
 
 
 class Command(BaseCommand):

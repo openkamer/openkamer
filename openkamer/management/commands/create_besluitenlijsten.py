@@ -1,9 +1,10 @@
 import traceback
 import logging
 
+
 from django.core.management.base import BaseCommand
 
-import website.create
+from openkamer.besluitenlijst import create_besluitenlijsten
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +18,13 @@ class Command(BaseCommand):
             action='store_true',
             dest='skip-existing',
             default=False,
-            help='Do not create dossiers that already exist.',
+            help='Do not create besluitenlijsten that already exist.',
         )
 
     def handle(self, *args, **options):
-        failed_dossiers = website.create.create_wetsvoorstellen_all(options['skip-existing'])
-        if failed_dossiers:
-            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+        try:
+            create_besluitenlijsten(skip_existing=options['skip-existing'])
+        except:
+            logger.error('while trying to create besluitenlijsten')
+            logger.error(traceback.format_exc())
+            raise
