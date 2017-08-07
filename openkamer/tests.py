@@ -271,7 +271,7 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        metadata = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
+        document, vraagnummer, overheidnl_antwoord_id = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
         # print(metadata)
 
     def test_get_receiver_from_title(self):
@@ -328,6 +328,14 @@ class TestKamervraag(TestCase):
          </div>""")
         kamervraag = Kamervraag.objects.create(document=document, vraagnummer='dummy')
         openkamer.kamervraag.create_vragen_from_kamervraag_html(kamervraag)
+
+    def test_create_kamervragen(self):
+        n_create = 4
+        kamervragen, kamerantwoorden = openkamer.kamervraag.create_kamervragen('2016', max_n=n_create, skip_if_exists=False)
+        for kamervraag in kamervragen:
+            self.assertTrue(kamervraag.kamerantwoord)
+        self.assertEqual(len(kamervragen), n_create)
+        self.assertEqual(len(kamerantwoorden), n_create)
 
 
 class TestKamerantwoord(TestCase):

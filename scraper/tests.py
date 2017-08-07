@@ -72,6 +72,19 @@ class TestParliamentMemberScraper(TestCase):
 #             self.assertNotEqual(member['date_ranges'], [])
 
 
+class TestKamervraagScraper(TestCase):
+    kamervraag_url = 'https://zoek.officielebekendmakingen.nl/kv-tk-2017Z06952'
+
+    def test_get_kamervraag_id_and_content(self):
+        kamervraag_html_url = self.kamervraag_url + '.html'
+        document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(kamervraag_html_url)
+        self.assertEqual(document_id, 'kv-tk-2017Z06952')
+        self.assertEqual(len(content_html), 5990)
+        self.assertEqual(title, 'Vragen van het lid Bosman (VVD) aan de Minister van Binnenlandse Zaken en Koninkrijksrelaties over het bericht «Ziekenhuis Curaçao bezorgt NL strop» (ingezonden 26 mei 2017).')
+        overheidnl_antwoord_id = scraper.documents.get_related_antwoord_id(self.kamervraag_url)
+        self.assertEqual(overheidnl_antwoord_id, 'ah-tk-20162017-2167')
+
+
 class TestVoortouwCommissieScraper(TestCase):
 
     def test_get_commissies(self):

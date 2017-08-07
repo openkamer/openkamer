@@ -10,8 +10,27 @@ import lxml.etree
 logger = logging.getLogger(__name__)
 
 
+def get_related_antwoord_id(kamervraag_url):
+    logger.info('get related antwoord id for url: ' + kamervraag_url)
+    page = requests.get(kamervraag_url, timeout=60)
+    tree = lxml.html.fromstring(page.content)
+    relations_titles = tree.xpath('//div[@id="main-column"]//h2[@class="divisiekop1"]')
+    overheidnl_antwoord_id = ''
+    for title_element in relations_titles:
+        if title_element.text_content() == "Relaties":
+            column_elements = title_element.getparent().xpath('//tr/td/p')
+            next_is_antwoord_url = False
+            for column_element in column_elements:
+                if next_is_antwoord_url:
+                    overheidnl_antwoord_id = column_element.text_content()
+                    next_is_antwoord_url = False
+                if column_element.text_content() == 'is beantwoord in':
+                    next_is_antwoord_url = True
+    return overheidnl_antwoord_id
+
+
 def get_kamervraag_document_id_and_content(url):
-    logger.info('get document id for url: ' + url)
+    logger.info('get kamervraag document id and content for url: ' + url)
     page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
@@ -79,6 +98,7 @@ def get_metadata(document_id):
         'OVERHEIDop.publicationName': 'publication_type',
         'DCTERMS.issued': 'date_published',
         'OVERHEIDop.datumIndiening': 'date_submitted',
+        'OVERHEIDop.datumOntvangst': 'date_received',
         'OVERHEID.organisationType': 'organisation_type',
         'OVERHEID.category': 'category',
         'DC.creator': 'publisher',

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from openkamer.kamervraag import create_kamervragen
+import openkamer.kamervraag
 
 from document.models import Kamervraag
 
@@ -14,5 +14,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         year = options['year'][0]
         max_n = options['max']
-        create_kamervragen(year, max_n, skip_if_exists=True)
-
+        openkamer.kamervraag.create_kamervragen(year, max_n, skip_if_exists=True)
+        openkamer.kamervraag.create_antwoorden(year, max_n, skip_if_exists=True)
+        openkamer.kamervraag.link_kamervragen_and_antwoorden()
