@@ -209,3 +209,8 @@ h6.date {
 .kamervraag-panel-title-col {
     padding: 0 10px 0 10px;
 }
+
+.inline-party-logo {
+    max-height: 18px;
+    max-width: 128px;
+}

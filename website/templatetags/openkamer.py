@@ -34,6 +34,15 @@ def get_submitter_ids(person):
 
 
 @register.assignment_tag
+def get_submitters_parties(submitters):
+    party_set = set()
+    for submitter in submitters:
+        if submitter.party:
+            party_set.add(submitter.party)
+    return party_set
+
+
+@register.assignment_tag
 def get_activities(person):
     submitter_ids = get_submitter_ids(person)
     documents = Document.objects.filter(submitter__in=submitter_ids)
