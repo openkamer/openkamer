@@ -137,7 +137,7 @@ class BesluitItem(object):
 class BesluitItemCase(object):
     def __init__(self, title):
         self.title = title
-        self.related_document_ids = self.get_related_document_ids(title)
+        self.related_document_ids = self.get_related_besluit_document_ids(title)
         self.decisions = []
         self.notes = []
         self.extra = ''
@@ -153,7 +153,7 @@ class BesluitItemCase(object):
         return str
 
     @staticmethod
-    def get_related_document_ids(text):
+    def get_related_besluit_document_ids(text):
         pattern = "[0-9]{5}-[0-9]{1,2}"
         document_ids = re.findall(pattern, text)
         return document_ids
