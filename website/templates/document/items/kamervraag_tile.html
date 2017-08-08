@@ -60,7 +60,7 @@
             <td colspan="2" align="center">
               {% get_submitters_parties kamervraag.document.submitters as parties %}
                 {% for party in parties %}
-                  <a href="{% url 'party' party.slug %}"><img class="inline-party-logo" src="{{ party.wikimedia_logo_url }}"></a>{% if not forloop.last %} | {% endif %}
+                  <a href="{% url 'party' party.slug %}"><img class="inline-party-logo" src="{{ party.wikimedia_logo_url }}"></a>
                 {% endfor %}
             </td>
           </tr>

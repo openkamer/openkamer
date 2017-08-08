@@ -213,4 +213,6 @@ h6.date {
 .inline-party-logo {
     max-height: 18px;
     max-width: 128px;
+    padding-left: 5px;
+    padding-right: 5px;
 }
