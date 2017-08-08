@@ -134,11 +134,7 @@ hr.hr-small {
   padding-bottom: 5px;
 }
 
-#panel-body-kamervraag {
-  padding: 10px 10px 5px 10px;
-}
-
-#panel-footer-kamervraag {
+.panel-footer-kamervraag {
   padding: 2px 7px 2px 7px;
 }
 
