@@ -79,9 +79,19 @@
 <hr class="hr-small"/>
 
 <div class="row">
+
   <div class="col-md-6">
     <h6>{% if n_results == 0 %}geen kamervragen{% elif n_results == 1 %}1 kamervraag{% else %}{{ n_results }} kamervragen{% endif %} gevonden</h6>
   </div>
+
+  <div class="col-md-6 visible-lg" align="right">
+    <h6>
+      <span class="legend-item"><i class="fa fa-check text-success" title="Beantwoord"></i> beantwoord</span>
+      <span class="legend-item"><i class="fa fa-spinner text-primary" title="Nog niet beantwoord"></i> onbeantwoord</span>
+      <span class="legend-item"><i class="fa fa-clock-o text-primary" title="Uitgesteld"></i> uitgesteld</span>
+    </h6>
+  </div>
+
 </div>
 
 

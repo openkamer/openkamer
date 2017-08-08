@@ -187,3 +187,7 @@ h6.date {
 .table-facet > thead > tr > th {
 	padding: 0px;
 }
+
+.legend-item {
+    margin: 0 5px 0 5px;
+}
