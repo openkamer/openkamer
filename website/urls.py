@@ -30,6 +30,8 @@ from document.views import VotingView
 from document.views import VotingsView
 from document.views import VotingsCheckView
 from document.views import DocumentSearchView
+from document.views import create_kamervraag_word_cloud
+
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
@@ -92,10 +94,12 @@ urlpatterns = [
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
     url(r'^kamerstuk/check/$', KamerstukCheckView.as_view(), name='kamerstuk-check'),
+
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 
     url(r'^kamervragen/$', KamervragenView.as_view(), name='kamervragen'),
     url(r'^kamervragen/tabel/(?P<year>\d{4})/$', KamervragenTableView.as_view(), name='kamervragen-table'),
+    url(r'^kamervraag/wordcloud/(?P<vraagnummer>.*)/$', create_kamervraag_word_cloud, name='kamervraag-word-cloud'),
     url(r'^kamervraag/(?P<vraagnummer>.*)/$', KamervraagView.as_view(), name='kamervraag'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),

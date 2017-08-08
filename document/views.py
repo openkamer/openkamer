@@ -1,19 +1,22 @@
 import datetime
 import logging
+import os
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.http import Http404
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
+from wordcloud import WordCloud
+
 from haystack.query import SearchQuerySet
 from haystack.generic_views import FacetedSearchView 
 from website.facet import FacetedSearchForm
 from person.models import Person
-
 
 from dal import autocomplete
 
@@ -35,6 +38,8 @@ from document.filters import DossierFilter
 from document.filters import KamervraagFilter
 from document.filters import VotingFilter
 from document import settings
+
+from django.conf import settings as django_settings
 
 
 # TODO: remove dependency on website
@@ -561,7 +566,6 @@ class DocumentSearchView(FacetedSearchView):
                 pages = [x for x in range(page_no - 5, page_no + 6)]
     
             context.update({'pages': pages})
-        
 
         count=self.queryset.count()
         if count==1:
@@ -570,4 +574,36 @@ class DocumentSearchView(FacetedSearchView):
             context['count']=str(count) + " resultaten"
         
         return context
-        
+
+
+def create_kamervraag_word_cloud(request, vraagnummer):
+    stopwords = {
+        'de', 'een', 'van', 'dat', 'in', 'het', 'en', 'of', 'zijn', 'met', 'is', 'te', 'op', 'ook', 'om',
+        'aan', 'uit', 'deze', 'voor', 'ik', 'al', 'die', 'er', 'tot', 'zo', 'naar', 'worden', 'door', 'mijn', 'niet',
+        'als', 'nog', 'per', 'zal', 'uw', 'zich', 'wordt', 'antwoord', 'hen', 'hun', 'na', 'vraag', 'bericht', 'zie',
+        'nee', 'ja', 'maar', 'geen', 'dit', 'eind', 'hoe', 'geldt', 'moet', 'reden', 'hebben', 'mening', 'waarom',
+        'eerdere', 'versie', 'alle', 'kunt', 'aangeven', 'bestaat', 'over', 'heeft', 'bij', 'dan', 'daarmee', 'geeft',
+        'was', 'binnen', 'kunnen', 'zoals', 'tijdens', 'gaat', 'zij', 'omdat', 'ben', 'maken', 'waar', 'wie', 'moeten',
+        'dus', 'welke', 'kan', 'zelf'
+    }
+    kamervraag = Kamervraag.objects.get(vraagnummer=vraagnummer)
+    text = ''
+    for vraag in kamervraag.vragen:
+        text += vraag.text
+    for antwoord in kamervraag.antwoorden:
+        text += antwoord.text
+    wordcloud = WordCloud(
+        width=1200, height=600,
+        stopwords=stopwords,
+        max_words=25,
+        # min_font_size=10, max_font_size=80,
+        prefer_horizontal=0.8,
+        # color_func=random_color_func,
+        # scale=10.0,
+        relative_scaling=0.7,
+        background_color='white'
+    ).generate_from_text(text)
+    image_filepath = os.path.join(django_settings.MEDIA_ROOT, 'cloud_' + kamervraag.vraagnummer + '.png')
+    wordcloud.to_file(image_filepath)
+    redirect_url = os.path.join(django_settings.MEDIA_URL, 'cloud_' + kamervraag.vraagnummer + '.png')
+    return HttpResponseRedirect(redirect_url)
