@@ -215,6 +215,7 @@ class Document(models.Model):
     title_full = models.CharField(max_length=3000)
     title_short = models.CharField(max_length=2000)
     publication_type = models.CharField(max_length=200, blank=True)
+    types = models.CharField(max_length=2000, blank=True)
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
@@ -329,6 +330,10 @@ class Kamervraag(models.Model):
         return Antwoord.objects.filter(kamerantwoord=self.kamerantwoord)
 
     @cached_property
+    def mededelingen(self):
+        return KamervraagMededeling.objects.filter(kamervraag=self)
+
+    @cached_property
     def duration(self):
         if not self.kamerantwoord:
             return (datetime.date.today() - self.document.date_published).days
@@ -392,6 +397,13 @@ class FootNote(models.Model):
 
     class Meta:
         ordering = ['nr']
+
+
+class KamervraagMededeling(models.Model):
+    document = models.ForeignKey(Document)
+    vraagnummer = models.CharField(max_length=200, db_index=True)
+    kamervraag = models.ForeignKey(Kamervraag, null=True, blank=True)
+    text = models.TextField()
 
 
 class Kamerstuk(models.Model):
