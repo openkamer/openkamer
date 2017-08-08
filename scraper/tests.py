@@ -81,8 +81,16 @@ class TestKamervraagScraper(TestCase):
         self.assertEqual(document_id, 'kv-tk-2017Z06952')
         self.assertEqual(len(content_html), 5990)
         self.assertEqual(title, 'Vragen van het lid Bosman (VVD) aan de Minister van Binnenlandse Zaken en Koninkrijksrelaties over het bericht «Ziekenhuis Curaçao bezorgt NL strop» (ingezonden 26 mei 2017).')
-        overheidnl_antwoord_id = scraper.documents.get_related_antwoord_id(self.kamervraag_url)
-        self.assertEqual(overheidnl_antwoord_id, 'ah-tk-20162017-2167')
+        overheidnl_document_ids = scraper.documents.get_related_document_ids(self.kamervraag_url)
+        self.assertEqual(len(overheidnl_document_ids), 1)
+        self.assertEqual(overheidnl_document_ids[0], 'ah-tk-20162017-2167')
+
+    def test_get_related_ids(self):
+        url = 'https://zoek.officielebekendmakingen.nl/kv-tk-2017Z07318'
+        related_document_ids = scraper.documents.get_related_document_ids(url)
+        self.assertEqual(len(related_document_ids), 2)
+        self.assertEqual(related_document_ids[0], 'ah-tk-20162017-2129')
+        self.assertEqual(related_document_ids[1], 'ah-tk-20162017-2338')
 
 
 class TestVoortouwCommissieScraper(TestCase):

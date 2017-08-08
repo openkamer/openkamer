@@ -271,7 +271,7 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        document, vraagnummer, overheidnl_antwoord_id = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
+        document, vraagnummer, related_document_ids = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
         # print(metadata)
 
     def test_get_receiver_from_title(self):
@@ -337,16 +337,26 @@ class TestKamervraag(TestCase):
         self.assertEqual(len(kamervragen), n_create)
         self.assertEqual(len(kamerantwoorden), n_create)
 
+    def test_postponed_answer(self):
+        overheid_id = 'kv-tk-2017Z07318'
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_id, overheid_id)
+        self.assertEqual(len(related_document_ids), 2)
+        kamerantwoord, mededelingen = openkamer.kamervraag.create_related_kamervraag_documents(kamervraag, related_document_ids)
+        self.assertTrue(kamerantwoord)
+        self.assertEqual(len(mededelingen), 1)
+        self.assertTrue(mededelingen[0].text)
+
 
 class TestKamerantwoord(TestCase):
 
     def test_combined_answers(self):
         document_number = '2016D07289'
         overheidnl_document_id = 'ah-tk-20152016-1580'
-        kamerantwoord = openkamer.kamervraag.create_kamerantwoord(document_number, overheidnl_document_id)
+        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(document_number, overheidnl_document_id)
         self.assertEqual(kamerantwoord.antwoord_set.count(), 4)
         antwoorden = kamerantwoord.antwoord_set.all()
         self.assertEqual(antwoorden[0].see_answer_nr, None)
         self.assertEqual(antwoorden[1].see_answer_nr, None)
         self.assertEqual(antwoorden[2].see_answer_nr, 2)
         self.assertEqual(antwoorden[3].see_answer_nr, None)
+
