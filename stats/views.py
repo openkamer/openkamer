@@ -86,7 +86,7 @@ class KamervraagFootnotesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         import plotly.offline
-        from plotly.graph_objs import Scatter, Layout, Bar, Margin
+        from plotly.graph_objs import Layout, Bar, Margin
 
         context = super().get_context_data(**kwargs)
         domains = self.get_domains()
@@ -155,21 +155,46 @@ class KamervraagFootnotesView(TemplateView):
         return domains_sorted
 
 
+class KamervraagStats(TemplateView):
+    template_name = "stats/kamervraag.html"
+
+    def get_context_data(self, **kwargs):
+        kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
+        kamervraag_dates = []
+        for kamervraag in kamervragen:
+            kamervraag_dates.append(kamervraag.document.date_published)
+        kamervraag_durations = []
+        for kamervraag in kamervragen:
+            kamervraag_durations.append(kamervraag.duration)
+        context = super().get_context_data(**kwargs)
+        context['page_stats_kamervraag'] = True
+        context['plot_kamervraag_vs_time_html'] = mark_safe(KamervraagVSTime.create_plot(kamervraag_dates))
+        context['plot_kamervraag_reply_times_html'] = mark_safe(KamervraagReplyTime.create_plot(kamervraag_durations))
+        context['plot_kamervraag_reply_times_contour_html'] = mark_safe(KamervraagReplyTimeContour.create_plot(kamervraag_dates, kamervraag_durations))
+        return context
+
+
 class KamervraagVSTime(TemplateView):
     template_name = "stats/kamervraag_vs_time.html"
 
     def get_context_data(self, **kwargs):
-        import plotly.offline
-        from plotly.graph_objs import Scatter, Layout, Histogram
 
         kamervragen = Kamervraag.objects.all().select_related('document')
         kamervraag_dates = []
         for kamervraag in kamervragen:
             kamervraag_dates.append(kamervraag.document.date_published)
 
-        plot_html = plotly.offline.plot(
+        plot_html = KamervraagVSTime.create_plot(kamervraag_dates)
+        context = super().get_context_data(**kwargs)
+        context['plot_html'] = mark_safe(plot_html)
+        return context
+
+    @staticmethod
+    def create_plot(kamervraag_dates):
+        import plotly.offline
+        from plotly.graph_objs import Layout, Histogram
+        return plotly.offline.plot(
             figure_or_data={
-                # "data": [Scatter(x=data_x, y=data_y)],
                 "data": [Histogram(
                     x=kamervraag_dates,
                     autobinx=False,
@@ -190,9 +215,6 @@ class KamervraagVSTime(TemplateView):
             include_plotlyjs=False,
             auto_open=False,
         )
-        context = super().get_context_data(**kwargs)
-        context['plot_html'] = mark_safe(plot_html)
-        return context
 
 
 class KamervraagReplyTime(TemplateView):
@@ -291,8 +313,8 @@ class KamervraagReplyTimeContour(TemplateView):
                     xaxis=dict(title='Kamervraag Ingediend [tijd]'),
                     yaxis=dict(title='Antwoordtijd [dagen]'),
                     autosize=False,
-                    width=1000,
-                    height=500,
+                    # width=1000,
+                    # height=500,
                 ),
             },
             show_link=False,
