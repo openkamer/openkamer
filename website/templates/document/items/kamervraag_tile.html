@@ -1,5 +1,6 @@
   <div class="col-md-6">
     <div class="panel panel-default" align="left">
+
       <div class="panel-heading">
         <div class="row">
           <div class="col-xs-9 col-sm-5" align="left">
@@ -21,40 +22,40 @@
         </div>
       </div>
 
-      <div id="panel-body-kamervraag" class="panel-body">
-        <div class="row">
-          <div class="col-sm-12" align="center">
-            <h5><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</a></h5>
-          </div>
-        </div>
+      <table class="table table-condensed">
+        <tbody>
 
-        <!--<div class="divider"></div>-->
+          <tr>
+            <td colspan="2">
+              <h5 align="center" class="kamervraag-panel-title-col"><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</span></a></h5>
+            </td>
+          </tr>
 
-        <div class="row">
-          <div class="col-sm-12">
-            <h6 class="small"><i class="fa fa-envelope text-primary kamervraag-panel-icon" title="Indiener(s)"></i>
+          <tr>
+            <th><h6 class="small"><i class="fa fa-envelope text-primary kamervraag-panel-icon" title="Indiener(s)"></i></h6></th>
+            <td>
+              <h6 class="small">
               {% with submitters=kamervraag.document.submitters %}
                 {% include "document/items/submitters_list.html" %}
               {% endwith %}
-            </h6>
+              </h6>
+            </td>
+          </tr>
+
+          <tr>
             {% if kamervraag.kamerantwoord %}
               {% with submitters=kamervraag.kamerantwoord.document.submitters %}
-                <h6 class="small"><i class="fa fa-reply text-primary kamervraag-panel-icon" title="Antwoord"></i> {% include "document/items/submitters_list.html" %}</h6>
+            <th><h6 class="small"><i class="fa fa-reply text-primary kamervraag-panel-icon" title="Antwoord"></i></h6></th>
+            <td><h6 class="small">{% include "document/items/submitters_list.html" %}</h6></td>
               {% endwith %}
             {% else %}
-              <h6 class="small"><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i> {{ kamervraag.receiver }}</h6>
+            <th><h6 class="small"><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i></h6></th>
+            <td><h6 class="small">{{ kamervraag.receiver }}</h6></td>
             {% endif %}
-          </div>
-        </div>
+          </tr>
 
-        <!--<div class="divider"></div>-->
-
-        <div class="row">
-          <div class="col-sm-12" align="center">
-            <h5> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
-          </div>
-        </div>
-      </div>
+        </tbody>
+      </table>
 
 
       {% include 'document/items/kamervraag_antwoorden_collapse.html' %}

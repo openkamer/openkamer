@@ -202,6 +202,10 @@ h6.date {
 }
 
 .kamervraag-panel-icon {
-    padding-right: 10px;
-    padding-left: 5px;
+    padding-right: 0px;
+    padding-left: 10px;
+}
+
+.kamervraag-panel-title-col {
+    padding: 0 10px 0 10px;
 }
