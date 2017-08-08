@@ -8,6 +8,7 @@ from document.models import CategoryDocument
 from document.models import Kamerstuk
 from document.models import Kamervraag
 from document.models import Kamerantwoord
+from document.models import KamervraagMededeling
 from document.models import Submitter
 from document.models import Vote
 from document.models import VoteParty
@@ -104,6 +105,7 @@ admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
 admin.site.register(Kamervraag, KamervraagAdmin)
 admin.site.register(Kamerantwoord, KamerantwoordAdmin)
+admin.site.register(KamervraagMededeling)
 
 admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 
