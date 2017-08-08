@@ -28,24 +28,34 @@
           </div>
         </div>
 
+        <!--<div class="divider"></div>-->
+
         <div class="row">
           <div class="col-sm-12">
-            <h6 class="small">Indiener{% if kamervraag.document.submitters|length > 1 %}s{% endif %}:
+            <h6 class="small"><i class="fa fa-envelope text-primary kamervraag-panel-icon" title="Indiener(s)"></i>
               {% with submitters=kamervraag.document.submitters %}
                 {% include "document/items/submitters_list.html" %}
               {% endwith %}
             </h6>
             {% if kamervraag.kamerantwoord %}
               {% with submitters=kamervraag.kamerantwoord.document.submitters %}
-                <h6 class="small">Antwoord: {% include "document/items/submitters_list.html" %}</h6>
+                <h6 class="small"><i class="fa fa-reply text-primary kamervraag-panel-icon" title="Antwoord"></i> {% include "document/items/submitters_list.html" %}</h6>
               {% endwith %}
             {% else %}
-            <h6 class="small">Ontvanger: {{ kamervraag.receiver }}</h6>
+              <h6 class="small"><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i> {{ kamervraag.receiver }}</h6>
             {% endif %}
-            <h6 class="small"><span class="hidden-xs">Onderwerpen:</span> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h6>
+          </div>
+        </div>
+
+        <!--<div class="divider"></div>-->
+
+        <div class="row">
+          <div class="col-sm-12" align="center">
+            <h5> {% with categories=kamervraag.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
           </div>
         </div>
       </div>
+
 
       {% include 'document/items/kamervraag_antwoorden_collapse.html' %}
 

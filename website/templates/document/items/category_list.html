@@ -1,1 +1,1 @@
-{% for category in categories %}{{ category.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+{% for category in categories %}<a href="/kamervragen/?categories={{ category.id }}"><span class="label label-default">{{ category.name }}</span></a> {% endfor %}
