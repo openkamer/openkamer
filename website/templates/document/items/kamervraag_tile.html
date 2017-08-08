@@ -2,13 +2,13 @@
     <div class="panel panel-default" align="left">
       <div class="panel-heading">
         <div class="row">
-          <div class="col-xs-10 col-sm-8" align="left">
+          <div class="col-xs-9 col-sm-5" align="left">
             <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
           </div>
-          <div class="hidden-xs col-sm-2" align="left">
+          <div class="hidden-xs col-sm-3" align="left">
             <h6 class="date {% if kamervraag.duration > 21 %}text-danger{% else %}text-success{% endif %}" title="{% if kamervraag.duration > 21 %}Kamervragen dienen binnen 3 weken beantwoord te worden.{% else %}Deze kamervragen is binnen de termijn van 3 weken beantwoord.{% endif %}">{{ kamervraag.duration }} dagen</h6>
           </div>
-          <div class="col-xs-2 col-sm-2" align="right">
+          <div class="col-xs-3 col-sm-4 pull-right" align="right">
             {% if kamervraag.kamerantwoord %}
               <i class="fa fa-check text-success" title="Beantwoord"></i>
             {% else %}
