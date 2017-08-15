@@ -39,7 +39,6 @@ def create_kamervragen(year, max_n=None, skip_if_exists=False):
         except Exception as error:
             logger.error('error for kamervraag id: ' + str(info['overheidnl_document_id']))
             logger.exception(error)
-            raise
         if max_n and counter >= max_n:
             return kamervragen, kamerantwoorden
         counter += 1
