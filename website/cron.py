@@ -149,10 +149,24 @@ class UpdateBesluitenLijsten(LockJob):
         openkamer.besluitenlijst.create_besluitenlijsten()
 
 
-class UpdateKamervragen(LockJob):
+class UpdateKamervragenRecent(LockJob):
     RUN_AT_TIMES = ['02:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateKamervragen'
+    code = 'website.cron.UpdateKamervragenRecent'
+
+    def do_imp(self):
+        logger.info('update kamervragen and kamerantwoorden')
+        years = ['2017', '2016']
+        for year in years:
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.link_kamervragen_and_antwoorden()
+
+
+class UpdateKamervragenAll(LockJob):
+    RUN_EVERY_MINS = 60 * 24 * 7  # 7 days
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'website.cron.UpdateKamervragenAll'
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
