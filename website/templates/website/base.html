@@ -124,30 +124,29 @@
   });
   </script>
 
-
   <div class="container">
-
-      {% block content %}Empty page{% endblock %}
-
+    {% block content %}Empty page{% endblock %}
   </div>
 
   <footer id="base-footer" class="footer">
     <hr/>
-    <div class="row" align="center">
-      <div class="col-sm-1 col-sm-offset-4">
-        <h6><a href="{% url 'about' %}">Colofon</a></h6>
-      </div>
-      <div class="col-sm-1">
-        <h6><a href="https://github.com/openkamer/openkamer" target="_blank">GitHub</a></h6>
-      </div>
-      <div class="col-sm-1">
-        <h6><a href="https://twitter.com/openkamer" target="_blank">Twitter</a></h6>
-      </div>
-      <div class="col-sm-1">
-        <h6><a href="{% url 'contact' %}">Contact</a></h6>
-      </div>
-      <div class="col-sm-1">
-        <h6>v{{ openkamer_version }}</h6>
+    <div class="container">
+      <div class="row" align="center">
+        <div class="col-sm-1 col-sm-offset-4">
+          <h6><a href="{% url 'about' %}">Colofon</a></h6>
+        </div>
+        <div class="col-sm-1">
+          <h6><a href="https://github.com/openkamer/openkamer" target="_blank">GitHub</a></h6>
+        </div>
+        <div class="col-sm-1">
+          <h6><a href="https://twitter.com/openkamer" target="_blank">Twitter</a></h6>
+        </div>
+        <div class="col-sm-1">
+          <h6><a href="{% url 'contact' %}">Contact</a></h6>
+        </div>
+        <div class="col-sm-1">
+          <h6>v{{ openkamer_version }}</h6>
+        </div>
       </div>
     </div>
   </footer>
