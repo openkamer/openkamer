@@ -78,19 +78,42 @@ def create_antwoorden(year, max_n=None, skip_if_exists=False):
     logger.info('END')
 
 
+def get_or_create_kamervraag(vraagnummer, document):
+    kamervragen = Kamervraag.objects.filter(vraagnummer=vraagnummer)
+    if kamervragen.count() == 1:
+        kamervraag = kamervragen[0]
+    else:
+        kamervragen.delete()
+        kamervraag = Kamervraag()
+    kamervraag.document = document
+    kamervraag.vraagnummer = vraagnummer
+    kamervraag.receiver = get_receiver_from_title(document.title_full)
+    kamervraag.save()
+    return kamervraag
+
+
+def get_or_create_kamerantwoord(vraagnummer, document):
+    kamerantwoorden = Kamerantwoord.objects.filter(vraagnummer=vraagnummer)
+    if kamerantwoorden.count() == 1:
+        kamerantwoord = kamerantwoorden[0]
+    else:
+        kamerantwoorden.delete()
+        kamerantwoord = Kamerantwoord()
+    kamerantwoord.document = document
+    kamerantwoord.vraagnummer = vraagnummer
+    kamerantwoord.save()
+    return kamerantwoord
+
+
 @transaction.atomic
 def create_kamervraag(document_number, overheidnl_document_id, skip_if_exists=False):
     if skip_if_exists and Kamervraag.objects.filter(document__document_id=document_number).exists():
         return None, []
     document, vraagnummer, related_document_ids = create_kamervraag_document(document_number, overheidnl_document_id)
-    Kamervraag.objects.filter(vraagnummer=vraagnummer).delete()
-    kamervraag = Kamervraag.objects.create(
-        document=document,
-        vraagnummer=vraagnummer,
-        receiver=get_receiver_from_title(document.title_full)
-    )
+    kamervraag = get_or_create_kamervraag(vraagnummer, document)
     create_vragen_from_kamervraag_html(kamervraag)
     footnotes = create_footnotes(kamervraag.document.content_html)
+    FootNote.objects.filter(document=document).delete()
     for footnote in footnotes:
         FootNote.objects.create(document=document, nr=footnote['nr'], text=footnote['text'], url=footnote['url'])
     return kamervraag, related_document_ids
@@ -102,13 +125,12 @@ def create_kamerantwoord(document_number, overheidnl_document_id, skip_if_exists
         return None
     document, vraagnummer, related_document_ids = create_kamervraag_document(document_number, overheidnl_document_id)
     if 'mededeling' in document.types.lower():
-        KamervraagMededeling.objects.filter(document__document_id=document.document_id).delete()
+        KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()
         mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
         create_kamervraag_mededeling_from_html(mededeling)
         kamerantwoord = None
     else:
-        Kamerantwoord.objects.filter(vraagnummer=vraagnummer).delete()
-        kamerantwoord = Kamerantwoord.objects.create(document=document, vraagnummer=vraagnummer)
+        kamerantwoord = get_or_create_kamerantwoord(vraagnummer, document)
         create_antwoorden_from_antwoord_html(kamerantwoord)
         mededeling = None
     return kamerantwoord, mededeling
