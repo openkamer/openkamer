@@ -1,7 +1,3 @@
-html, body {
-  overflow-x: hidden;
-}
-
 body {
   padding-top: 70px;
 }
@@ -96,7 +92,8 @@ hr.hr-small {
 }
 
 .well.well-filters {
-  padding: 0.4em 0.8em 0.8em 0.8em;
+  padding-top: 0.4em;
+  padding-bottom: 0.8em;
 }
 
 .col-kamerstukken {

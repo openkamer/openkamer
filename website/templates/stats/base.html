@@ -8,6 +8,7 @@
   <div class="container">
     <ul class="nav navbar-nav">
       <li {% if page_stats_votings_parties %} class="active" {% endif %}><a href="{% url 'stats-votings-party' %}">Stemgedrag Partijen</a></li>
+      <li {% if page_stats_kamervraag %} class="active" {% endif %}><a href="{% url 'stats-kamervraag' %}">Kamervragen</a></li>
       <li {% if page_stats_data %} class="active" {% endif %}><a href="{% url 'stats-data' %}">Open Kamer Data</a></li>
     </ul>
   </div>

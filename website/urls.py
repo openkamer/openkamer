@@ -41,6 +41,10 @@ from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
 from stats.views import KamervraagFootnotesView
 from stats.views import VotingsPerPartyView
+from stats.views import KamervraagStats
+from stats.views import KamervraagVSTime
+from stats.views import KamervraagReplyTime
+from stats.views import KamervraagReplyTimeContour
 
 from website.views import DatabaseDumpsView
 from website.views import PersonTimelineView
@@ -115,7 +119,11 @@ urlpatterns = [
     url(r'^stats/stemmingen/partijen/$', VotingsPerPartyView.as_view(), name='stats-votings-party'),
     url(r'^stats/exampleplots/$', PlotExampleView.as_view()),
     url(r'^stats/exampleplotjson/?', get_example_plot_html_json),
+    url(r'^stats/kamervraag/$', KamervraagStats.as_view(), name='stats-kamervraag'),
     url(r'^stats/kamervraag/voetnoot/bron/$', KamervraagFootnotesView.as_view(), name='stats-kamervraag-sources'),
+    url(r'^stats/kamervraag/vs/tijd/$', KamervraagVSTime.as_view(), name='stats-kamervraag-vs-time'),
+    url(r'^stats/kamervraag/antwoordtijd/$', KamervraagReplyTime.as_view(), name='stats-kamervraag-reply-time'),
+    url(r'^stats/kamervraag/antwoordtijd/contour/$', KamervraagReplyTimeContour.as_view(), name='stats-kamervraag-reply-time-contour'),
 
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
 
