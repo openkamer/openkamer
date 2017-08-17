@@ -238,6 +238,7 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY = 'KRTPM'
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION = 'KRTPMP'
+    KAMERVRAAG_REPLY_TIME_PER_POSITION = 'KRTPPO'
     PLOT_TYPES = (
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs Time'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
@@ -245,6 +246,7 @@ class Plot(models.Model):
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY, 'Kamervraag reply time per ministerie'),
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION, 'Kamervraag reply time per ministerie bewindspersoon'),
+        (KAMERVRAAG_REPLY_TIME_PER_POSITION, 'Kamervraag reply time per minister of staatssecretaris'),
     )
     type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
     html = models.TextField()
@@ -305,6 +307,7 @@ class Plot(models.Model):
         position_names = []
         ministry_durations = []
         position_durations = []
+        position_types = {}
 
         for ministry in ministries:
             ministry_person_ids = []
@@ -328,6 +331,10 @@ class Plot(models.Model):
                 if kamervraag_durations:
                     position_durations.append(kamervraag_durations)
                     position_names.append(ministry.name + ' (' + position.get_position_display() + ') (' + str(kamervragen.count()) + ')')
+                    if position.get_position_display() in position_types:
+                        position_types[position.get_position_display()] += kamervraag_durations
+                    else:
+                        position_types[position.get_position_display()] = kamervraag_durations
 
             submitters = Submitter.objects.filter(person__in=ministry_person_ids)
             submitter_ids = list(submitters.values_list('id', flat=True))
@@ -349,4 +356,13 @@ class Plot(models.Model):
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION)
         plot.html = kamervragen_reply_time_per_ministry(position_names, position_durations)
+        plot.save()
+
+        position_type_names = []
+        position_type_durations = []
+        for key in position_types:
+            position_type_names.append(key + ' (' + str(len(position_types[key])) + ')')
+            position_type_durations.append(position_types[key])
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_POSITION)
+        plot.html = kamervragen_reply_time_per_ministry(position_type_names, position_type_durations)
         plot.save()
