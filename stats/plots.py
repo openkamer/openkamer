@@ -201,7 +201,45 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
     )
 
     fig['layout'].update(xaxis=xaxis)
-    fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (Probability Distributie)")
+    fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (probability distributie)")
+    fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
+    # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
+    fig['layout'].update(height=700)
+    legend = dict(
+        x=0.01,
+        y=1,
+        bordercolor='#E2E2E2',
+        bgcolor='#FFFFFF',
+        borderwidth=2
+    )
+    fig['layout'].update(legend=legend)
+
+    return plot(
+        figure_or_data=fig,
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
+    fig = ff.create_distplot(
+        kamervraag_durations,
+        ministries,
+        # colors=colors,
+        bin_size=1,
+        show_curve=True,
+        show_hist=False,
+        show_rug=False
+    )
+
+    xaxis = XAxis(
+        range=[0, 50],
+    )
+
+    fig['layout'].update(xaxis=xaxis)
+    fig['layout'].update(title="Kamervraag Antwoordtijd per Ministerie tijdens Rutte-II (probability distributie)")
     fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
     # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
     fig['layout'].update(height=700)

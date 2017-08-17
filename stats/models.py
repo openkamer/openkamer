@@ -6,11 +6,13 @@ from django.db import transaction
 from person.models import Person
 
 from document.models import Kamervraag
+from document.models import Kamerantwoord
 from document.models import Vote
 from document.models import Voting
 from document.models import Submitter
 
 from government.models import Government
+from government.models import Ministry
 from parliament.models import PoliticalParty
 
 from stats import util
@@ -19,6 +21,7 @@ from stats.plots import kamervraag_vs_time_plot_html
 from stats.plots import kamervraag_reply_time_contour_plot_html
 from stats.plots import kamervraag_reply_time_histogram_plot_html
 from stats.plots import kamervragen_reply_time_per_party
+from stats.plots import kamervragen_reply_time_per_ministry
 
 
 logger = logging.getLogger(__name__)
@@ -233,11 +236,13 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
+    KAMERVRAAG_REPLY_TIME_PER_MINISTRY = 'KRTPM'
     PLOT_TYPES = (
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs Time'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
+        (KAMERVRAAG_REPLY_TIME_PER_MINISTRY, 'Kamervraag reply time per ministerie'),
     )
     type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
     html = models.TextField()
@@ -287,4 +292,31 @@ class Plot(models.Model):
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY)
         plot.html = kamervragen_reply_time_per_party(party_slugs, party_durations)
+        plot.save()
+
+        rutte_2 = Government.objects.filter(slug='kabinet-rutte-ii')[0]
+        ministries = rutte_2.ministries
+        ministry_names = []
+        ministry_durations = []
+        for ministry in ministries:
+            ministry_names.append(ministry.name)
+            ministry_person_ids = []
+            positions = ministry.positions()
+            for position in positions:
+                members = position.members
+                for member in members:
+                    ministry_person_ids.append(member.person.id)
+            submitters = Submitter.objects.filter(person__in=ministry_person_ids)
+            submitter_ids = list(submitters.values_list('id', flat=True))
+            antwoorden = Kamerantwoord.objects.filter(
+                document__submitter__in=submitter_ids,
+                document__date_published__gt=rutte_2.date_formed,
+            ).select_related('document').distinct()
+            kamervragen = Kamervraag.objects.filter(kamerantwoord__in=antwoorden)
+            kamervraag_durations = []
+            for kamervraag in kamervragen:
+                kamervraag_durations.append(kamervraag.duration)
+            ministry_durations.append(kamervraag_durations)
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY)
+        plot.html = kamervragen_reply_time_per_ministry(ministry_names, ministry_durations)
         plot.save()
