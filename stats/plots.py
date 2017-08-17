@@ -1,9 +1,11 @@
 import datetime
-from django.utils import timezone
-from plotly.offline import plot
-from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter
 
 import numpy as np
+
+from django.utils import timezone
+from plotly.offline import plot
+from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis
+import plotly.figure_factory as ff
 
 
 def movingaverage(values, window):
@@ -176,6 +178,46 @@ def kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_duratio
                 height=500,
             ),
         },
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def kamervragen_reply_time_per_party(parties, kamervraag_durations):
+    colors = ['#393E46', '#2BCDC1', '#F66095']
+    # colors = ['#393E46', '#2BCDC1']
+    fig = ff.create_distplot(
+        kamervraag_durations,
+        parties,
+        # colors=colors,
+        bin_size=1,
+        show_curve=True,
+        show_hist=False,
+        show_rug=False
+    )
+
+    xaxis = XAxis(
+        range=[0, 50],
+    )
+
+    fig['layout'].update(xaxis=xaxis)
+    fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (Probability Distributie)")
+    fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
+    # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
+    fig['layout'].update(height=700)
+    legend = dict(
+        x=0.01,
+        y=1,
+        bordercolor='#E2E2E2',
+        bgcolor='#FFFFFF',
+        borderwidth=2
+    )
+    fig['layout'].update(legend=legend)
+
+    return plot(
+        figure_or_data=fig,
         show_link=False,
         output_type='div',
         include_plotlyjs=False,

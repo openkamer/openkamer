@@ -8,6 +8,7 @@ from person.models import Person
 from document.models import Kamervraag
 from document.models import Vote
 from document.models import Voting
+from document.models import Submitter
 
 from government.models import Government
 from parliament.models import PoliticalParty
@@ -17,6 +18,7 @@ from stats import util
 from stats.plots import kamervraag_vs_time_plot_html
 from stats.plots import kamervraag_reply_time_contour_plot_html
 from stats.plots import kamervraag_reply_time_histogram_plot_html
+from stats.plots import kamervragen_reply_time_per_party
 
 
 logger = logging.getLogger(__name__)
@@ -230,10 +232,12 @@ class Plot(models.Model):
     KAMERVRAAG_VS_TIME = 'KVT'
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
+    KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
     PLOT_TYPES = (
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs Time'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
+        (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
     )
     type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
     html = models.TextField()
@@ -253,19 +257,37 @@ class Plot(models.Model):
     @staticmethod
     @transaction.atomic
     def create_kamervragen_plots():
-        kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
-        kamervraag_dates = []
-        for kamervraag in kamervragen:
-            kamervraag_dates.append(kamervraag.document.date_published)
-        kamervraag_durations = []
-        for kamervraag in kamervragen:
-            kamervraag_durations.append(kamervraag.duration)
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME)
-        plot.html = kamervraag_vs_time_plot_html(kamervraag_dates)
-        plot.save()
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_HIST)
-        plot.html = kamervraag_reply_time_histogram_plot_html(kamervraag_durations)
-        plot.save()
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST)
-        plot.html = kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_durations)
+        # kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
+        # kamervraag_dates = []
+        # for kamervraag in kamervragen:
+        #     kamervraag_dates.append(kamervraag.document.date_published)
+        # kamervraag_durations = []
+        # for kamervraag in kamervragen:
+        #     kamervraag_durations.append(kamervraag.duration)
+        # plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME)
+        # plot.html = kamervraag_vs_time_plot_html(kamervraag_dates)
+        # plot.save()
+        # plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_HIST)
+        # plot.html = kamervraag_reply_time_histogram_plot_html(kamervraag_durations)
+        # plot.save()
+        # plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST)
+        # plot.html = kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_durations)
+        # plot.save()
+
+        party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd']
+        party_durations = []
+        for party in party_slugs:
+            submitters = Submitter.objects.filter(party_slug=party)
+            submitter_ids = list(submitters.values_list('id', flat=True))
+            kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
+            # kamervraag_dates = []
+            # for kamervraag in kamervragen:
+            #     kamervraag_dates.append(kamervraag.document.date_published)
+            kamervraag_durations = []
+            for kamervraag in kamervragen:
+                kamervraag_durations.append(kamervraag.duration)
+            party_durations.append(kamervraag_durations)
+
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY)
+        plot.html = kamervragen_reply_time_per_party(party_slugs, party_durations)
         plot.save()
