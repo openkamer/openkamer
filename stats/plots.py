@@ -186,8 +186,6 @@ def kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_duratio
 
 
 def kamervragen_reply_time_per_party(parties, kamervraag_durations):
-    colors = ['#393E46', '#2BCDC1', '#F66095']
-    # colors = ['#393E46', '#2BCDC1']
     fig = ff.create_distplot(
         kamervraag_durations,
         parties,
