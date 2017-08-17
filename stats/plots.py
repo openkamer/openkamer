@@ -197,7 +197,7 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
     )
 
     xaxis = XAxis(
-        range=[0, 50],
+        range=[0, 70],
     )
 
     fig['layout'].update(xaxis=xaxis)
@@ -235,7 +235,7 @@ def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
     )
 
     xaxis = XAxis(
-        range=[0, 50],
+        range=[0, 70],
     )
 
     fig['layout'].update(xaxis=xaxis)
@@ -244,8 +244,8 @@ def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
     # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
     fig['layout'].update(height=700)
     legend = dict(
-        x=0.01,
-        y=1,
+        # x=0.01,
+        # y=1,
         bordercolor='#E2E2E2',
         bgcolor='#FFFFFF',
         borderwidth=2
