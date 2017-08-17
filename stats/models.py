@@ -341,7 +341,7 @@ class Plot(models.Model):
                 kamervraag_durations.append(kamervraag.duration)
             if kamervraag_durations:
                 ministry_durations.append(kamervraag_durations)
-                ministry_names.append(ministry.name + '(' + str(kamervragen.count()) + ')')
+                ministry_names.append(ministry.name + ' (' + str(kamervragen.count()) + ')')
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY)
         plot.html = kamervragen_reply_time_per_ministry(ministry_names, ministry_durations)
