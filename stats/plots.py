@@ -1,21 +1,94 @@
 import datetime
 from django.utils import timezone
 from plotly.offline import plot
-from plotly.graph_objs import Layout, Histogram, Histogram2d
+from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter
+
+import numpy as np
+
+
+def movingaverage(values, window):
+    weights = np.repeat([1.0], window)/window
+    sma = np.convolve(values, weights, 'full')
+    return sma
+
+
+def movingaverage_from_histogram(bin_values, bin_edges, window):
+    x = bin_edges[:-1]
+    y = bin_values
+    y_moving_avg = movingaverage(y, window)
+    return x, y_moving_avg
+
+
+def bin_datetimes(datetimes, range_years, bin_size_days):
+    bin_start = (timezone.now() - datetime.timedelta(days=range_years * 365)).timestamp() * 1000
+    bin_end = timezone.now().timestamp() * 1000
+    num_bins = (bin_end - bin_start) / (60 * 60 * 24 * bin_size_days * 1000)
+    timestamps = []
+    for date in datetimes:
+        timestamp = datetime.datetime.combine(date, datetime.datetime.min.time()).timestamp()
+        timestamps.append(timestamp * 1000)
+    bins = np.linspace(
+        start=bin_start,
+        stop=bin_end,
+        num=num_bins,
+        endpoint=True
+    )
+    bin_values, bin_edges = np.histogram(timestamps, bins, density=False)
+    return bin_values, bin_edges
+
+
+def polyfit(x, y, bin_size, deg):
+    z = np.polyfit(x, y, deg)
+    f = np.poly1d(z)
+    x_new = np.linspace(x[0], x[-1], bin_size)
+    y_new = f(x_new)
+
+    polyfit_data = Scatter(
+        x=x_new,
+        y=y_new,
+        mode='lines'
+    )
+    return polyfit_data
 
 
 def kamervraag_vs_time_plot_html(kamervraag_dates):
+    bin_values, bin_edges = bin_datetimes(kamervraag_dates, range_years=7, bin_size_days=7)
+    x, y_moving_avg = movingaverage_from_histogram(bin_values, bin_edges, window=8)
+
+    moving_average_scatter = Scatter(
+        x=x,
+        y=y_moving_avg,
+        mode='lines',
+        name='lopende trend',
+        marker=dict(
+            line=dict(
+                width=2,
+            )
+        ),
+    )
+
+    hist_data = Histogram(
+        x=kamervraag_dates,
+        autobinx=False,
+        xbins=dict(
+            start=(timezone.now() - datetime.timedelta(days=7 * 365)).timestamp() * 1000,
+            end=timezone.now().timestamp() * 1000,
+            size=60 * 60 * 24 * 7 * 1000
+        ),
+        marker=dict(
+            color='rgb(158,202,225)',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=0,
+            )
+        ),
+        name='vragen per week',
+        showlegend=False
+    )
     return plot(
+        # figure_or_data=fig,
         figure_or_data={
-            "data": [Histogram(
-                x=kamervraag_dates,
-                autobinx=False,
-                xbins=dict(
-                    start=(timezone.now() - datetime.timedelta(days=7 * 365)).timestamp() * 1000,
-                    end=timezone.now().timestamp() * 1000,
-                    size=60 * 60 * 24 * 7 * 1000
-                ),
-            )],
+            "data": [hist_data, moving_average_scatter],
             "layout": Layout(
                 title="Kamervragen per Week",
                 xaxis=dict(title='Tijd'),
