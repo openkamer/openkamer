@@ -280,6 +280,7 @@ class Plot(models.Model):
         plot.save()
 
         party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd']
+        party_labels = []
         party_durations = []
         for party in party_slugs:
             submitters = Submitter.objects.filter(party_slug=party)
@@ -288,10 +289,11 @@ class Plot(models.Model):
             kamervraag_durations = []
             for kamervraag in kamervragen:
                 kamervraag_durations.append(kamervraag.duration)
+            party_labels.append(party + ' (' + str(kamervragen.count()) + ')')
             party_durations.append(kamervraag_durations)
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY)
-        plot.html = kamervragen_reply_time_per_party(party_slugs, party_durations)
+        plot.html = kamervragen_reply_time_per_party(party_labels, party_durations)
         plot.save()
 
         rutte_2 = Government.objects.filter(slug='kabinet-rutte-ii')[0]
@@ -299,7 +301,6 @@ class Plot(models.Model):
         ministry_names = []
         ministry_durations = []
         for ministry in ministries:
-            ministry_names.append(ministry.name)
             ministry_person_ids = []
             positions = ministry.positions()
             for position in positions:
@@ -317,6 +318,7 @@ class Plot(models.Model):
             for kamervraag in kamervragen:
                 kamervraag_durations.append(kamervraag.duration)
             ministry_durations.append(kamervraag_durations)
+            ministry_names.append(ministry.name + ' (' + str(kamervragen.count()) + ')')
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY)
         plot.html = kamervragen_reply_time_per_ministry(ministry_names, ministry_durations)
         plot.save()
