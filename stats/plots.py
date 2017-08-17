@@ -83,7 +83,7 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
             )
         ),
         name='vragen per week',
-        showlegend=False
+        # showlegend=False
     )
     return plot(
         # figure_or_data=fig,
@@ -93,6 +93,13 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
                 title="Kamervragen per Week",
                 xaxis=dict(title='Tijd'),
                 yaxis=dict(title='Kamervragen per week'),
+                legend=dict(
+                    x=0.01,
+                    y=1,
+                    bordercolor='#E2E2E2',
+                    bgcolor='#FFFFFF',
+                    borderwidth=2
+                )
             )
         },
         show_link=False,
