@@ -5,6 +5,7 @@ from django.db import transaction
 
 from person.models import Person
 
+from document.models import Kamervraag
 from document.models import Vote
 from document.models import Voting
 
@@ -13,6 +14,11 @@ from parliament.models import PoliticalParty
 
 from stats import util
 
+from stats.plots import kamervraag_vs_time_plot_html
+from stats.plots import kamervraag_reply_time_contour_plot_html
+from stats.plots import kamervraag_reply_time_histogram_plot_html
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +26,7 @@ def update_all():
     logger.info('BEGIN')
     StatsVotingSubmitter.create()
     PartyVoteBehaviour.create_all()
+    Plot.create_all()
     logger.info('END')
 
 
@@ -217,3 +224,48 @@ class StatsVotingSubmitter(models.Model):
                     party=submitter.party
                 )
         logger.info('END')
+
+
+class Plot(models.Model):
+    KAMERVRAAG_VS_TIME = 'KVT'
+    KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
+    KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
+    PLOT_TYPES = (
+        (KAMERVRAAG_VS_TIME, 'Kamervraag vs Time'),
+        (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
+        (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
+    )
+    type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
+    html = models.TextField()
+    datetime_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-datetime_updated']
+
+
+    @staticmethod
+    @transaction.atomic
+    def create():
+        logger.info('BEGIN')
+        Plot.create_kamervragen_plots()
+        logger.info('END')
+
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_plots():
+        kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
+        kamervraag_dates = []
+        for kamervraag in kamervragen:
+            kamervraag_dates.append(kamervraag.document.date_published)
+        kamervraag_durations = []
+        for kamervraag in kamervragen:
+            kamervraag_durations.append(kamervraag.duration)
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME)
+        plot.html = kamervraag_vs_time_plot_html(kamervraag_dates)
+        plot.save()
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_HIST)
+        plot.html = kamervraag_reply_time_histogram_plot_html(kamervraag_durations)
+        plot.save()
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST)
+        plot.html = kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_durations)
+        plot.save()
