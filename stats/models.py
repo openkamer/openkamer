@@ -261,6 +261,8 @@ class Plot(models.Model):
     def create():
         logger.info('BEGIN')
         Plot.create_kamervragen_plots()
+        Plot.create_kamervragen_party_plots()
+        Plot.create_kamervragen_ministry_plots()
         logger.info('END')
 
     @staticmethod
@@ -283,23 +285,30 @@ class Plot(models.Model):
         plot.html = kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_durations)
         plot.save()
 
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_party_plots():
         party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd']
         party_labels = []
         party_durations = []
-        for party in party_slugs:
-            submitters = Submitter.objects.filter(party_slug=party)
+        for party_slug in party_slugs:
+            submitters = Submitter.objects.filter(party_slug=party_slug)
             submitter_ids = list(submitters.values_list('id', flat=True))
             kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
             kamervraag_durations = []
             for kamervraag in kamervragen:
                 kamervraag_durations.append(kamervraag.duration)
-            party_labels.append(party + ' (' + str(kamervragen.count()) + ')')
+            party = PoliticalParty.objects.get(slug=party_slug)
+            party_labels.append(party.name_short + ' (' + str(kamervragen.count()) + ')')
             party_durations.append(kamervraag_durations)
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY)
         plot.html = kamervragen_reply_time_per_party(party_labels, party_durations)
         plot.save()
 
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_ministry_plots():
         rutte_2 = Government.objects.filter(slug='kabinet-rutte-ii')[0]
         ministries = rutte_2.ministries
 
