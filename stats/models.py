@@ -24,6 +24,7 @@ from stats.plots import kamervraag_reply_time_histogram_plot_html
 from stats.plots import kamervragen_reply_time_per_party
 from stats.plots import kamervragen_reply_time_per_ministry
 from stats.plots import kamervragen_reply_time_per_year
+from stats.plots import kamervraag_vs_time_party_plot_html
 
 
 logger = logging.getLogger(__name__)
@@ -235,6 +236,7 @@ class StatsVotingSubmitter(models.Model):
 
 class Plot(models.Model):
     KAMERVRAAG_VS_TIME = 'KVT'
+    KAMERVRAAG_VS_TIME_PARTY = 'KVTP'
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
@@ -243,7 +245,8 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION = 'KRTPMP'
     KAMERVRAAG_REPLY_TIME_PER_POSITION = 'KRTPPO'
     PLOT_TYPES = (
-        (KAMERVRAAG_VS_TIME, 'Kamervraag vs Time'),
+        (KAMERVRAAG_VS_TIME, 'Kamervraag vs time'),
+        (KAMERVRAAG_VS_TIME_PARTY, 'Kamervraag vs time per party'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
@@ -256,6 +259,8 @@ class Plot(models.Model):
     html = models.TextField()
     datetime_updated = models.DateTimeField(auto_now=True)
 
+    party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd', 'sgp']
+
     class Meta:
         ordering = ['-datetime_updated']
 
@@ -264,8 +269,9 @@ class Plot(models.Model):
     def create():
         logger.info('BEGIN')
         start_year = None
-        # start_year = 2016
+        # start_year = 2014
         Plot.create_kamervragen_plots(start_year)
+        Plot.create_kamervragen_vs_time_party_plots(start_year)
         Plot.create_kamervragen_party_plots(start_year)
         Plot.create_kamervragen_ministry_plots(start_year)
         Plot.create_kamervragen_years_plots(start_year)
@@ -299,7 +305,7 @@ class Plot(models.Model):
     @transaction.atomic
     def create_kamervragen_party_plots(start_year=None):
         logger.info('BEGIN')
-        party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd']
+        party_slugs = Plot.party_slugs
         party_labels = []
         party_durations = []
         for party_slug in party_slugs:
@@ -307,7 +313,7 @@ class Plot(models.Model):
             submitter_ids = list(submitters.values_list('id', flat=True))
             kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
             if start_year:
-                kamervragen =  kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
+                kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
             kamervraag_durations = []
             for kamervraag in kamervragen:
                 kamervraag_durations.append(kamervraag.duration)
@@ -425,5 +431,30 @@ class Plot(models.Model):
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_YEAR)
         plot.html = kamervragen_reply_time_per_year(year_labels, year_durations)
+        plot.save()
+        logger.info('END')
+
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_vs_time_party_plots(start_year):
+        logger.info('BEGIN')
+        party_labels = []
+        party_kamervragen_dates = []
+
+        for party_slug in Plot.party_slugs:
+            submitters = Submitter.objects.filter(party_slug=party_slug)
+            submitter_ids = list(submitters.values_list('id', flat=True))
+            kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
+            if start_year:
+                kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
+            kamervraag_dates = []
+            for kamervraag in kamervragen:
+                kamervraag_dates.append(kamervraag.document.date_published)
+            party = PoliticalParty.objects.get(slug=party_slug)
+            party_labels.append(party.name_short)
+            party_kamervragen_dates.append(kamervraag_dates)
+
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_PARTY)
+        plot.html = kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates)
         plot.save()
         logger.info('END')

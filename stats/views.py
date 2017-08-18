@@ -165,6 +165,7 @@ class KamervraagStats(TemplateView):
         KamervraagStats.create_plots_if_needed()
         context['page_stats_kamervraag'] = True
         context['plot_kamervraag_vs_time_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_VS_TIME).html)
+        context['plot_kamervraag_vs_time_per_party_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_VS_TIME_PARTY).html)
         context['plot_kamervraag_reply_times_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_HIST).html)
         context['plot_kamervraag_reply_times_per_party_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY).html)
         context['plot_kamervraag_reply_times_per_year_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_YEAR).html)

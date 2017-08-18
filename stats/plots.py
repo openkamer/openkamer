@@ -14,10 +14,9 @@ COLOR_WARNING = '#f0ad4e'
 COLOR_DANGER = '#d9534f'
 
 
-
 def movingaverage(values, window):
     weights = np.repeat([1.0], window)/window
-    sma = np.convolve(values, weights, 'full')
+    sma = np.convolve(values, weights, 'valid')
     return sma
 
 
@@ -105,6 +104,51 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
                 legend=dict(
                     x=0.01,
                     y=1,
+                    bordercolor='#E2E2E2',
+                    bgcolor='#FFFFFF',
+                    borderwidth=2
+                )
+            )
+        },
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates):
+    data = []
+    for i in range(0, len(party_labels)-1):
+        bin_values, bin_edges = bin_datetimes(party_kamervragen_dates[i], range_years=7, bin_size_days=30)
+        x, y_moving_avg = movingaverage_from_histogram(bin_values, bin_edges, window=3)
+
+        x_new = []
+        for value in x:
+            date = datetime.datetime.fromtimestamp(value / 1000.0)
+            x_new.append(date)
+
+        moving_average_scatter = Scatter(
+            x=x_new,
+            y=y_moving_avg,
+            mode='lines',
+            name=party_labels[i],
+            line=dict(shape='spline'),
+        )
+        data.append(moving_average_scatter)
+
+    return plot(
+        # figure_or_data=fig,
+        figure_or_data={
+            "data": data,
+            "layout": Layout(
+                # title="Kamervragen per Week",
+                xaxis=dict(title='Tijd'),
+                yaxis=dict(title='Kamervragen per maand'),
+                margin=Margin(t=20),
+                legend=dict(
+                    # x=0.01,
+                    # y=1,
                     bordercolor='#E2E2E2',
                     bgcolor='#FFFFFF',
                     borderwidth=2
