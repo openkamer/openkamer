@@ -245,7 +245,7 @@ def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
     fig['layout'].update(xaxis=xaxis)
     # fig['layout'].update(title="Kamervraag Antwoordtijd per Ministerie tijdens Rutte-II (KDE probability distributie)")
     fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
-    fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
+    # fig['layout'].update(yaxis=dict(title=''))
     fig['layout'].update(height=700)
     fig['layout'].update(margin=Margin(t=20))
     legend = dict(
