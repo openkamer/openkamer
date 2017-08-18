@@ -206,8 +206,8 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
     # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
     fig['layout'].update(height=700)
     legend = dict(
-        x=0.01,
-        y=1,
+        # x=0.01,
+        # y=1,
         bordercolor='#E2E2E2',
         bgcolor='#FFFFFF',
         borderwidth=2
