@@ -70,8 +70,8 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
         mode='lines',
         name='lopende trend',
         line=dict(
-            color=COLOR_PRIMARY,
-            width=5,
+            color=COLOR_WARNING,
+            width=3,
         ),
     )
 
