@@ -7,6 +7,13 @@ from plotly.offline import plot
 from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis, Margin
 import plotly.figure_factory as ff
 
+COLOR_PRIMARY = '#4582ec'
+COLOR_INFO = '#5bc0de'
+COLOR_SUCCESS = '#3fad46'
+COLOR_WARNING = '#f0ad4e'
+COLOR_DANGER = '#d9534f'
+
+
 
 def movingaverage(values, window):
     weights = np.repeat([1.0], window)/window
@@ -62,10 +69,9 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
         y=y_moving_avg,
         mode='lines',
         name='lopende trend',
-        marker=dict(
-            line=dict(
-                width=2,
-            )
+        line=dict(
+            color=COLOR_PRIMARY,
+            width=5,
         ),
     )
 
@@ -78,10 +84,10 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
             size=60 * 60 * 24 * 7 * 1000
         ),
         marker=dict(
-            color='rgb(158,202,225)',
+            color=COLOR_INFO,
             line=dict(
-                color='rgb(8,48,107)',
-                width=0,
+                color=COLOR_PRIMARY,
+                width=1,
             )
         ),
         name='vragen per week',
@@ -123,6 +129,13 @@ def kamervraag_reply_time_histogram_plot_html(kamervraag_durations):
                     start=0,
                     end=100,
                     size=1
+                ),
+                marker=dict(
+                    color=COLOR_INFO,
+                    line=dict(
+                        color=COLOR_PRIMARY,
+                        width=2,
+                    )
                 ),
             )],
             "layout": Layout(
@@ -200,7 +213,7 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
     )
 
     xaxis = XAxis(
-        range=[0, 70],
+        range=[0, 60],
     )
 
     fig['layout'].update(xaxis=xaxis)
@@ -240,6 +253,45 @@ def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
 
     xaxis = XAxis(
         range=[0, 70],
+    )
+
+    fig['layout'].update(xaxis=xaxis)
+    # fig['layout'].update(title="Kamervraag Antwoordtijd per Ministerie tijdens Rutte-II (KDE probability distributie)")
+    fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
+    # fig['layout'].update(yaxis=dict(title=''))
+    fig['layout'].update(height=700)
+    fig['layout'].update(margin=Margin(t=20))
+    legend = dict(
+        # x=0.01,
+        # y=1,
+        bordercolor='#E2E2E2',
+        bgcolor='#FFFFFF',
+        borderwidth=2
+    )
+    fig['layout'].update(legend=legend)
+
+    return plot(
+        figure_or_data=fig,
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def kamervragen_reply_time_per_year(years, kamervraag_durations):
+    fig = ff.create_distplot(
+        kamervraag_durations,
+        years,
+        # colors=colors,
+        bin_size=1,
+        show_curve=True,
+        show_hist=False,
+        show_rug=False
+    )
+
+    xaxis = XAxis(
+        range=[0, 60],
     )
 
     fig['layout'].update(xaxis=xaxis)

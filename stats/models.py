@@ -23,6 +23,7 @@ from stats.plots import kamervraag_reply_time_contour_plot_html
 from stats.plots import kamervraag_reply_time_histogram_plot_html
 from stats.plots import kamervragen_reply_time_per_party
 from stats.plots import kamervragen_reply_time_per_ministry
+from stats.plots import kamervragen_reply_time_per_year
 
 
 logger = logging.getLogger(__name__)
@@ -237,6 +238,7 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
+    KAMERVRAAG_REPLY_TIME_PER_YEAR = 'KRTPY'
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY = 'KRTPM'
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION = 'KRTPMP'
     KAMERVRAAG_REPLY_TIME_PER_POSITION = 'KRTPPO'
@@ -245,6 +247,7 @@ class Plot(models.Model):
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
+        (KAMERVRAAG_REPLY_TIME_PER_YEAR, 'Kamervraag reply time per year'),
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY, 'Kamervraag reply time per ministerie'),
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION, 'Kamervraag reply time per ministerie bewindspersoon'),
         (KAMERVRAAG_REPLY_TIME_PER_POSITION, 'Kamervraag reply time per minister of staatssecretaris'),
@@ -258,14 +261,14 @@ class Plot(models.Model):
 
 
     @staticmethod
-    @transaction.atomic
     def create():
         logger.info('BEGIN')
         start_year = None
-        # start_year = 2017
+        # start_year = 2016
         Plot.create_kamervragen_plots(start_year)
         Plot.create_kamervragen_party_plots(start_year)
         Plot.create_kamervragen_ministry_plots(start_year)
+        Plot.create_kamervragen_years_plots(start_year)
         logger.info('END')
 
     @staticmethod
@@ -390,5 +393,37 @@ class Plot(models.Model):
             position_type_durations.append(position_types[key])
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_POSITION)
         plot.html = kamervragen_reply_time_per_ministry(position_type_names, position_type_durations)
+        plot.save()
+        logger.info('END')
+
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_years_plots(start_year):
+        logger.info('BEGIN')
+        years = []
+        year_labels = []
+        year_durations = []
+        if start_year is None:
+            start_year = 2011
+        end_year = datetime.date.today().year
+        year = start_year
+        while year <= end_year:
+            years.append(year)
+            year += 1
+
+        for year in years:
+            kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
+            kamervragen = kamervragen.filter(
+                document__date_published__gt=datetime.datetime(year=year, month=1, day=1),
+                document__date_published__lt=datetime.datetime(year=year+1, month=1, day=1),
+            )
+            kamervraag_durations = []
+            for kamervraag in kamervragen:
+                kamervraag_durations.append(kamervraag.duration)
+            year_durations.append(kamervraag_durations)
+            year_labels.append(str(year) + ' (' + str(len(kamervraag_durations)) + ')')
+
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_YEAR)
+        plot.html = kamervragen_reply_time_per_year(year_labels, year_durations)
         plot.save()
         logger.info('END')
