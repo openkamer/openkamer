@@ -4,7 +4,7 @@ import numpy as np
 
 from django.utils import timezone
 from plotly.offline import plot
-from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis
+from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis, Margin
 import plotly.figure_factory as ff
 
 
@@ -92,9 +92,10 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
         figure_or_data={
             "data": [hist_data, moving_average_scatter],
             "layout": Layout(
-                title="Kamervragen per Week",
+                # title="Kamervragen per Week",
                 xaxis=dict(title='Tijd'),
                 yaxis=dict(title='Kamervragen per week'),
+                margin=Margin(t=20),
                 legend=dict(
                     x=0.01,
                     y=1,
@@ -125,9 +126,10 @@ def kamervraag_reply_time_histogram_plot_html(kamervraag_durations):
                 ),
             )],
             "layout": Layout(
-                title="Dagen tot Antwoord",
+                # title="Dagen tot Antwoord",
                 xaxis=dict(title='Antwoordtijd [dagen]'),
                 yaxis=dict(title='Aantal Kamervragen'),
+                margin=Margin(t=20)
             ),
         },
         show_link=False,
@@ -170,12 +172,13 @@ def kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_duratio
             # "data": [Scatter(x=data_x, y=data_y)],
             "data": data,
             "layout": Layout(
-                title="Kamervraag Antwoordtijd vs Tijd",
+                # title="Kamervraag Antwoordtijd vs Tijd",
                 xaxis=dict(title='Kamervraag Ingediend [tijd]'),
                 yaxis=dict(title='Antwoordtijd [dagen]'),
                 autosize=False,
                 width=1000,
                 height=500,
+                margin=Margin(t=20)
             ),
         },
         show_link=False,
@@ -201,7 +204,7 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
     )
 
     fig['layout'].update(xaxis=xaxis)
-    fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (probability distributie)")
+    # fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (probability distributie)")
     fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
     # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
     fig['layout'].update(height=700)
@@ -213,6 +216,7 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
         borderwidth=2
     )
     fig['layout'].update(legend=legend)
+    fig['layout'].update(margin=Margin(t=20))
 
     return plot(
         figure_or_data=fig,
@@ -239,10 +243,11 @@ def kamervragen_reply_time_per_ministry(ministries, kamervraag_durations):
     )
 
     fig['layout'].update(xaxis=xaxis)
-    fig['layout'].update(title="Kamervraag Antwoordtijd per Ministerie tijdens Rutte-II (KDE probability distributie)")
+    # fig['layout'].update(title="Kamervraag Antwoordtijd per Ministerie tijdens Rutte-II (KDE probability distributie)")
     fig['layout'].update(xaxis=dict(title='Antwoordtijd [dagen]'))
-    # fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
+    fig['layout'].update(yaxis=dict(title='Kamervraag Ingediend [tijd]'))
     fig['layout'].update(height=700)
+    fig['layout'].update(margin=Margin(t=20))
     legend = dict(
         # x=0.01,
         # y=1,
