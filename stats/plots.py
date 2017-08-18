@@ -119,7 +119,7 @@ def kamervraag_vs_time_plot_html(kamervraag_dates):
 
 def kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates):
     data = []
-    for i in range(0, len(party_labels)-1):
+    for i in range(0, len(party_labels)):
         bin_values, bin_edges = bin_datetimes(party_kamervragen_dates[i], range_years=7, bin_size_days=30)
         x, y_moving_avg = movingaverage_from_histogram(bin_values, bin_edges, window=3)
 
