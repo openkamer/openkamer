@@ -27,7 +27,7 @@ def movingaverage_from_histogram(bin_values, bin_edges, window):
     return x, y_moving_avg
 
 
-def bin_datetimes(datetimes, range_years, bin_size_days):
+def bin_datetimes(datetimes, range_years, bin_size_days, weights=None):
     bin_start = (timezone.now() - datetime.timedelta(days=range_years * 365)).timestamp() * 1000
     bin_end = timezone.now().timestamp() * 1000
     num_bins = (bin_end - bin_start) / (60 * 60 * 24 * bin_size_days * 1000)
@@ -41,7 +41,7 @@ def bin_datetimes(datetimes, range_years, bin_size_days):
         num=num_bins,
         endpoint=True
     )
-    bin_values, bin_edges = np.histogram(timestamps, bins, density=False)
+    bin_values, bin_edges = np.histogram(timestamps, bins, density=False, weights=weights)
     return bin_values, bin_edges
 
 
@@ -146,6 +146,56 @@ def kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates):
                 xaxis=dict(title='Tijd'),
                 yaxis=dict(title='Kamervragen per maand'),
                 margin=Margin(t=20),
+                legend=dict(
+                    # x=0.01,
+                    # y=1,
+                    bordercolor='#E2E2E2',
+                    bgcolor='#FFFFFF',
+                    borderwidth=2
+                )
+            )
+        },
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def kamervraag_vs_time_party_seats_plot_html(party_labels, party_kamervragen_dates, party_seats):
+    data = []
+    for i in range(0, len(party_labels)):
+        weights = []
+        for seat in party_seats[i]:
+            weights.append(1/seat)
+        bin_values, bin_edges = bin_datetimes(party_kamervragen_dates[i], range_years=7, bin_size_days=30, weights=weights)
+
+        x, y_moving_avg = movingaverage_from_histogram(bin_values, bin_edges, window=3)
+
+        x_new = []
+        for value in x:
+            date = datetime.datetime.fromtimestamp(value / 1000.0)
+            x_new.append(date)
+
+
+        moving_average_scatter = Scatter(
+            x=x_new,
+            y=y_moving_avg,
+            mode='lines',
+            name=party_labels[i],
+            line=dict(shape='spline'),
+        )
+        data.append(moving_average_scatter)
+
+    return plot(
+        # figure_or_data=fig,
+        figure_or_data={
+            "data": data,
+            "layout": Layout(
+                # title="Kamervragen per Week",
+                # xaxis=dict(title='Tijd'),
+                yaxis=dict(title='Kamervragen per kamerzetel per maand', range=[0, 6]),
+                margin=Margin(t=20, b=20),
                 legend=dict(
                     # x=0.01,
                     # y=1,
@@ -355,6 +405,47 @@ def kamervragen_reply_time_per_year(years, kamervraag_durations):
 
     return plot(
         figure_or_data=fig,
+        show_link=False,
+        output_type='div',
+        include_plotlyjs=False,
+        auto_open=False,
+    )
+
+
+def party_seats_vs_time_plot_html(party_labels, dates, seats):
+    data = []
+    for i in range(0, len(party_labels)):
+        party_data = Scatter(
+            x=dates[i],
+            y=seats[i],
+            mode='lines',
+            name=party_labels[i],
+            # fill='tonexty',
+            line=dict(
+                shape='hv'
+            )
+            # line=dict(shape='spline'),
+        )
+        data.append(party_data)
+
+    return plot(
+        # figure_or_data=fig,
+        figure_or_data={
+            "data": data,
+            "layout": Layout(
+                # title="Kamervragen per Week",
+                xaxis=dict(title='Tijd'),
+                yaxis=dict(title='Zetels per partij'),
+                margin=Margin(t=20),
+                legend=dict(
+                    # x=0.01,
+                    # y=1,
+                    bordercolor='#E2E2E2',
+                    bgcolor='#FFFFFF',
+                    borderwidth=2
+                )
+            )
+        },
         show_link=False,
         output_type='div',
         include_plotlyjs=False,
