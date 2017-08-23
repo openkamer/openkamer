@@ -3,6 +3,7 @@ import logging
 
 from django.db import models
 from django.db import transaction
+from django.utils import timezone
 
 from person.models import Person
 
@@ -15,6 +16,8 @@ from document.models import Submitter
 from government.models import Government
 from government.models import Ministry
 from parliament.models import PoliticalParty
+from parliament.models import Parliament
+from parliament.models import ParliamentMember
 
 from stats import util
 
@@ -22,9 +25,11 @@ from stats.plots import kamervraag_vs_time_plot_html
 from stats.plots import kamervraag_reply_time_contour_plot_html
 from stats.plots import kamervraag_reply_time_histogram_plot_html
 from stats.plots import kamervragen_reply_time_per_party
+from stats.plots import kamervraag_vs_time_party_seats_plot_html
 from stats.plots import kamervragen_reply_time_per_ministry
 from stats.plots import kamervragen_reply_time_per_year
 from stats.plots import kamervraag_vs_time_party_plot_html
+from stats.plots import party_seats_vs_time_plot_html
 
 
 logger = logging.getLogger(__name__)
@@ -234,9 +239,62 @@ class StatsVotingSubmitter(models.Model):
         logger.info('END')
 
 
+class SeatsPerParty(models.Model):
+    date = models.DateField()
+    party = models.ForeignKey(PoliticalParty)
+    seats = models.IntegerField(default=0)
+    datetime_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.party.name + ': ' + str(self.seats) + ' seats at ' + str(self.date)
+
+    @staticmethod
+    def create_or_update_all(start_date):
+        parliament = Parliament.get_or_create_tweede_kamer()
+        end_date = datetime.date.today()
+        date = start_date
+        while date <= end_date:
+            SeatsPerParty.create_for_date(parliament, date)
+            date += datetime.timedelta(days=1)
+            print('next date: ' + str(date))
+
+    @staticmethod
+    @transaction.atomic
+    def create_for_date(parliament, date):
+        party_seats = {}
+        members = parliament.get_members_at_date(date)
+        for member in members:
+            party = member.political_party()
+            if not party:
+                logger.warning('no party found')
+                logger.warning('member.person: ' + str(member.person))
+                continue
+            if party in party_seats:
+                party_seats[party] += 1
+            else:
+                party_seats[party] = 1
+        for party in party_seats:
+            # print(party)
+            info = SeatsPerParty.objects.get_or_create(date=date, party=party, seats=party_seats[party])
+            # print(info)
+
+    @staticmethod
+    def seats_at_date(party, date):
+        infos = SeatsPerParty.objects.filter(date=date, party=party)
+        if infos and infos.count() == 1:
+            return infos[0].seats
+        else:
+            logger.warning('multiple entries for single date and party')
+            logger.warning('party: ' + str(party))
+            logger.warning('date: ' + str(date))
+            logger.warning('number of objects: ' + str(infos.count()))
+        return None
+
+
 class Plot(models.Model):
     KAMERVRAAG_VS_TIME = 'KVT'
     KAMERVRAAG_VS_TIME_PARTY = 'KVTP'
+    KAMERVRAAG_VS_TIME_PARTY_SEATS = 'KVTPS'
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
@@ -244,9 +302,11 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY = 'KRTPM'
     KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION = 'KRTPMP'
     KAMERVRAAG_REPLY_TIME_PER_POSITION = 'KRTPPO'
+    SEATS_PER_PARTY_VS_TIME = 'SPPVT'
     PLOT_TYPES = (
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs time'),
         (KAMERVRAAG_VS_TIME_PARTY, 'Kamervraag vs time per party'),
+        (KAMERVRAAG_VS_TIME_PARTY_SEATS, 'Kamervraag vs time per party seat'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
@@ -254,6 +314,7 @@ class Plot(models.Model):
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY, 'Kamervraag reply time per ministerie'),
         (KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION, 'Kamervraag reply time per ministerie bewindspersoon'),
         (KAMERVRAAG_REPLY_TIME_PER_POSITION, 'Kamervraag reply time per minister of staatssecretaris'),
+        (SEATS_PER_PARTY_VS_TIME, 'Seats per party vs time'),
     )
     type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
     html = models.TextField()
@@ -269,17 +330,19 @@ class Plot(models.Model):
     def create():
         logger.info('BEGIN')
         start_year = None
-        # start_year = 2014
-        Plot.create_kamervragen_plots(start_year)
+        # start_year = 2015
+        Plot.create_kamervragen_general_plots(start_year)
         Plot.create_kamervragen_vs_time_party_plots(start_year)
         Plot.create_kamervragen_party_plots(start_year)
         Plot.create_kamervragen_ministry_plots(start_year)
         Plot.create_kamervragen_years_plots(start_year)
+        Plot.create_kamervragen_vs_time_party_seats_plots(start_year)
+        Plot.create_party_seats_vs_time_plot(start_year)
         logger.info('END')
 
     @staticmethod
     @transaction.atomic
-    def create_kamervragen_plots(start_year=None):
+    def create_kamervragen_general_plots(start_year=None):
         logger.info('BEGIN')
         kamervragen = Kamervraag.objects.filter(kamerantwoord__isnull=False).select_related('document')
         if start_year:
@@ -456,5 +519,66 @@ class Plot(models.Model):
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_PARTY)
         plot.html = kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates)
+        plot.save()
+        logger.info('END')
+
+    @staticmethod
+    @transaction.atomic
+    def create_kamervragen_vs_time_party_seats_plots(start_year):
+        logger.info('BEGIN')
+        party_labels = []
+        party_kamervragen_dates = []
+        party_seats = []
+
+        for party_slug in Plot.party_slugs:
+            submitters = Submitter.objects.filter(party_slug=party_slug)
+            submitter_ids = list(submitters.values_list('id', flat=True))
+            kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
+            if start_year:
+                kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
+            kamervraag_dates = []
+            for kamervraag in kamervragen:
+                kamervraag_dates.append(kamervraag.document.date_published)
+            party = PoliticalParty.objects.get(slug=party_slug)
+            party_labels.append(party.name_short)
+            party_kamervragen_dates.append(kamervraag_dates)
+            seats = []
+            for date in kamervraag_dates:
+                seats.append(SeatsPerParty.seats_at_date(party, date))
+            party_seats.append(seats)
+
+        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_PARTY_SEATS)
+        plot.html = kamervraag_vs_time_party_seats_plot_html(party_labels, party_kamervragen_dates, party_seats)
+        plot.save()
+        logger.info('END')
+
+    @staticmethod
+    @transaction.atomic
+    def create_party_seats_vs_time_plot(start_year):
+        logger.info('BEGIN')
+        party_labels = []
+        dates = []
+        seats = []
+        data = {}
+        infos = SeatsPerParty.objects.all().order_by('party', 'date')
+        if start_year:
+            infos = infos.filter(date__gte=datetime.datetime(year=start_year, month=1, day=1))
+        for info in infos:
+            party_name = info.party.name_short
+            if party_name not in data:
+                data[party_name] = []
+            data[party_name].append([info.date, info.seats])
+        for party_name in data:
+            party_dates = []
+            party_seats = []
+            for date_seats in data[party_name]:
+                party_dates.append(date_seats[0])
+                party_seats.append(date_seats[1])
+            dates.append(party_dates)
+            seats.append(party_seats)
+            party_labels.append(party_name)
+        # print(data)
+        plot, created = Plot.objects.get_or_create(type=Plot.SEATS_PER_PARTY_VS_TIME)
+        plot.html = party_seats_vs_time_plot_html(party_labels, dates, seats)
         plot.save()
         logger.info('END')
