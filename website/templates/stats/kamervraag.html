@@ -28,13 +28,14 @@
 
 <hr/>
 
-<ul class="nav nav-tabs">
-  <li id="tab1" class="active"><a data-toggle="tab" href="#totaal">Totaal</a></li>
-  <li id="tab2"><a data-toggle="tab" href="#perzetel">Per zetel</a></li>
-</ul>
-
 <div id="tab-row" class="row">
   <div class="col-lg-12" align="center">
+
+    <ul class="nav nav-tabs">
+      <li id="tab1" class="active"><a data-toggle="tab" href="#totaal">Totaal</a></li>
+      <li id="tab2"><a data-toggle="tab" href="#perzetel">Per zetel</a></li>
+    </ul>
+
     <div class="tab-content">
 
       <div id="totaal" class="tab-pane active">
@@ -44,7 +45,7 @@
       </div>
 
       <div id="perzetel" class="tab-pane">
-        <h4>Kamervragen per kamerzetel per maand</h4>
+        <h4>Kamervragen per partijzetel per maand</h4>
         {{ plot_kamervraag_vs_time_per_party_seats_html }}
         <h5 class="text-info small">Klik op de legenda items om lijnen te verbergen. Dubbelklik om de rest te verbergen.</h5>
       </div>
