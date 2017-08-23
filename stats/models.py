@@ -21,15 +21,15 @@ from parliament.models import ParliamentMember
 
 from stats import util
 
-from stats.plots import kamervraag_vs_time_plot_html
-from stats.plots import kamervraag_reply_time_contour_plot_html
-from stats.plots import kamervraag_reply_time_histogram_plot_html
+from stats.plots import PlotKamervraagVsTime
+from stats.plots import PlotKamervraagVsTimePerParty
+from stats.plots import PlotKamervraagReplyTimeContour
+from stats.plots import PlotKamervraagReplyTimeHistogram
+from stats.plots import PlotKamervraagVsTimePerPartySeat
+from stats.plots import PlotPartySeatsVsTime
 from stats.plots import kamervragen_reply_time_per_party
-from stats.plots import kamervraag_vs_time_party_seats_plot_html
 from stats.plots import kamervragen_reply_time_per_ministry
 from stats.plots import kamervragen_reply_time_per_year
-from stats.plots import kamervraag_vs_time_party_plot_html
-from stats.plots import party_seats_vs_time_plot_html
 
 
 logger = logging.getLogger(__name__)
@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 
 def update_all():
     logger.info('BEGIN')
+    start_date = datetime.date(year=2010, month=1, day=1)
+    SeatsPerParty.create_or_update_all(start_date)
     StatsVotingSubmitter.create()
     PartyVoteBehaviour.create_all()
     Plot.create_all()
@@ -330,7 +332,7 @@ class Plot(models.Model):
     def create():
         logger.info('BEGIN')
         start_year = None
-        # start_year = 2015
+        # start_year = 2017
         Plot.create_kamervragen_general_plots(start_year)
         Plot.create_kamervragen_vs_time_party_plots(start_year)
         Plot.create_kamervragen_party_plots(start_year)
@@ -354,13 +356,13 @@ class Plot(models.Model):
         for kamervraag in kamervragen:
             kamervraag_durations.append(kamervraag.duration)
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME)
-        plot.html = kamervraag_vs_time_plot_html(kamervraag_dates)
+        plot.html = PlotKamervraagVsTime(kamervraag_dates).create_plot()
         plot.save()
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_HIST)
-        plot.html = kamervraag_reply_time_histogram_plot_html(kamervraag_durations)
+        plot.html = PlotKamervraagReplyTimeHistogram(kamervraag_durations).create_plot()
         plot.save()
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST)
-        plot.html = kamervraag_reply_time_contour_plot_html(kamervraag_dates, kamervraag_durations)
+        plot.html = PlotKamervraagReplyTimeContour(kamervraag_dates, kamervraag_durations).create_plot()
         plot.save()
         logger.info('END')
 
@@ -518,7 +520,7 @@ class Plot(models.Model):
             party_kamervragen_dates.append(kamervraag_dates)
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_PARTY)
-        plot.html = kamervraag_vs_time_party_plot_html(party_labels, party_kamervragen_dates)
+        plot.html = PlotKamervraagVsTimePerParty(party_labels, party_kamervragen_dates).create_plot()
         plot.save()
         logger.info('END')
 
@@ -548,7 +550,7 @@ class Plot(models.Model):
             party_seats.append(seats)
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_PARTY_SEATS)
-        plot.html = kamervraag_vs_time_party_seats_plot_html(party_labels, party_kamervragen_dates, party_seats)
+        plot.html = PlotKamervraagVsTimePerPartySeat(party_labels, party_kamervragen_dates, party_seats).create_plot()
         plot.save()
         logger.info('END')
 
@@ -579,6 +581,6 @@ class Plot(models.Model):
             party_labels.append(party_name)
         # print(data)
         plot, created = Plot.objects.get_or_create(type=Plot.SEATS_PER_PARTY_VS_TIME)
-        plot.html = party_seats_vs_time_plot_html(party_labels, dates, seats)
+        plot.html = PlotPartySeatsVsTime(party_labels, dates, seats).create_plot()
         plot.save()
         logger.info('END')
