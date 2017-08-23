@@ -189,7 +189,6 @@ class PlotKamervraagVsTimePerParty(Plot):
 
     def create_layout(self):
         return Layout(
-            xaxis=dict(title='Tijd'),
             yaxis=dict(title='Kamervragen per maand'),
             margin=Margin(t=20),
             legend=dict(
@@ -238,7 +237,7 @@ class PlotKamervraagVsTimePerPartySeat(Plot):
 
     def create_layout(self):
         return Layout(
-            yaxis=dict(title='Kamervragen per kamerzetel per maand', range=[0, 6]),
+            yaxis=dict(title='Kamervragen per partijzetel per maand', range=[0, 6]),
             margin=Margin(t=20, b=20),
             legend=dict(
                 # x=0.01,
