@@ -5,6 +5,7 @@ import numpy as np
 
 from django.utils import timezone
 from plotly.offline import plot
+from plotly import tools
 from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis, Margin
 import plotly.figure_factory as ff
 
@@ -147,7 +148,7 @@ class PlotKamervraagVsTime(Plot):
         return Layout(
             title=self.plot_title,
             xaxis=dict(title='Tijd'),
-            yaxis=dict(title='Kamervragen per week'),
+            yaxis=dict(title='Kamervragen [per week]'),
             margin=Margin(t=20),
             legend=dict(
                 x=0.01,
@@ -189,7 +190,7 @@ class PlotKamervraagVsTimePerParty(Plot):
 
     def create_layout(self):
         return Layout(
-            yaxis=dict(title='Kamervragen per maand'),
+            yaxis=dict(title='Kamervragen [per maand]'),
             margin=Margin(t=20, b=30),
             legend=dict(
                 # x=0.01,
@@ -237,8 +238,86 @@ class PlotKamervraagVsTimePerPartySeat(Plot):
 
     def create_layout(self):
         return Layout(
-            yaxis=dict(title='Kamervragen per partijzetel per maand', range=[0, 6]),
+            yaxis=dict(title='Kamervragen per partijzetel [per maand]', range=[0, 6]),
             margin=Margin(t=20, b=30),
+            legend=dict(
+                # x=0.01,
+                # y=1,
+                bordercolor='#E2E2E2',
+                bgcolor='#FFFFFF',
+                borderwidth=2
+            )
+        )
+
+
+class PlotKamervraagVsTimePerCategory(Plot):
+
+    def __init__(self, category_labels, category_kamervragen_dates, kamervraag_dates_all):
+        super().__init__()
+        self.category_labels = category_labels
+        self.category_kamervragen_dates = category_kamervragen_dates
+        self.kamervraag_dates_all = kamervraag_dates_all
+
+    def create_plot(self):
+        logger.info('BEGIN')
+        fig = self.create_data()
+        return Plot.create_plot_html_default(fig)
+
+    def create_data(self):
+        bin_size_days = int(365/6)
+        moving_avg_window = 2
+
+        bin_values_all, bin_edges = bin_datetimes(self.kamervraag_dates_all, range_years=7, bin_size_days=bin_size_days)
+        x_all, y_moving_avg_all = movingaverage_from_histogram(bin_values_all, bin_edges, window=moving_avg_window)
+        bin_all_average = sum(y_moving_avg_all) / len(y_moving_avg_all)
+
+        fig = tools.make_subplots(
+            rows=len(self.category_labels),
+            cols=1,
+            shared_xaxes=False,
+            subplot_titles=self.category_labels,
+            vertical_spacing=0.02
+        )
+
+        data = []
+        for i in range(0, len(self.category_labels)):
+            bin_values, bin_edges = bin_datetimes(self.category_kamervragen_dates[i], range_years=7, bin_size_days=bin_size_days)
+            bin_values_norm = []
+            for k in range(0, len(bin_values)):
+                bin_values_norm.append(bin_values[k]/bin_values_all[i])
+            x, y_moving_avg = movingaverage_from_histogram(bin_values_norm, bin_edges, window=moving_avg_window)
+
+            bin_average = sum(y_moving_avg)/len(y_moving_avg)
+            fraction_of_all_average = bin_average/bin_all_average
+
+            y_new = []
+            for j in range(0, len(y_moving_avg)):
+                y_new.append(y_moving_avg[j]/y_moving_avg_all[j] / fraction_of_all_average)
+
+            x_new = []
+            for value in x:
+                date = datetime.datetime.fromtimestamp(value / 1000.0)
+                x_new.append(date)
+
+            moving_average_scatter = Scatter(
+                x=x_new,
+                y=y_new,
+                mode='lines',
+                name=self.category_labels[i],
+                line=dict(shape='spline'),
+            )
+            data.append(moving_average_scatter)
+            fig.append_trace(moving_average_scatter, i+1, 1)
+            # fig['layout']['xaxis' + str(i+1)].update(title=self.category_labels[i])
+        # fig['layout'].update(**self.create_layout())
+        fig['layout'].update(height=len(self.category_labels)*300, showlegend=False)
+        return fig
+
+    def create_layout(self):
+        return Layout(
+            yaxis=dict(title='Kamervragen [per maand]'), #, range=[self.min_y*2, self.max_y/2]),
+            margin=Margin(t=20, b=30),
+            height=3000,
             legend=dict(
                 # x=0.01,
                 # y=1,
@@ -311,7 +390,7 @@ class PlotKamervraagReplyTimeContour(Plot):
     def create_layout(self):
         return Layout(
                 # title="Kamervraag Antwoordtijd vs Tijd",
-                xaxis=dict(title='Kamervraag Ingediend [tijd]'),
+                xaxis=dict(title='Kamervraag ingediend [tijd]'),
                 yaxis=dict(title='Antwoordtijd [dagen]'),
                 autosize=False,
                 width=1000,
@@ -369,9 +448,7 @@ def kamervragen_reply_time_per_party(parties, kamervraag_durations):
         show_rug=False
     )
 
-    xaxis = XAxis(
-        range=[0, 60],
-    )
+    xaxis = XAxis(range=[0, 60],)
 
     fig['layout'].update(xaxis=xaxis)
     # fig['layout'].update(title="Kamervraag Antwoordtijd per Partij (probability distributie)")
