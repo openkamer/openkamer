@@ -89,17 +89,18 @@ class UpdateParliamentAndGovernment(CronJobBase):
         logger.info('END')
 
 
-class UpdateSubmitters(CronJobBase):
+class UpdateSubmitters(LockJob):
     RUN_AT_TIMES = ['05:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateSubmitters'
 
     @transaction.atomic
-    def do(self):
+    def do_imp(self):
         logger.info('BEGIN')
         try:
             submitters = Submitter.objects.all()
             n_total = submitters.count()
+            logger.info('submitters: ' + str(n_total))
             counter = 0
             progress_percent = 0
             for submitter in submitters:

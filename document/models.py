@@ -268,6 +268,8 @@ class Submitter(models.Model):
         """ this non cached version is needed for cron jobs that gave cache errors when using the cached_property """
         if self.person.surname == '':
             return None
+        if not self.document:
+            return None
         members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
         if members.exists():
             return members[0].party
