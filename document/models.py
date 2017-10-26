@@ -68,7 +68,6 @@ class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
     title = models.CharField(max_length=2000, blank=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
-    is_active = models.BooleanField(default=True, db_index=True)
     url = models.URLField(blank=True)
     decision = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
@@ -128,13 +127,11 @@ class Dossier(models.Model):
             return Dossier.INGETROKKEN
         elif self.passed:
             return Dossier.AANGENOMEN
-        elif self.is_active:
-            return Dossier.IN_BEHANDELING
         elif self.voting and self.voting.result == Voting.VERWORPEN:
             return Dossier.VERWORPEN
         elif self.voting and self.voting.result == Voting.CONTROVERSIEEL:
             return Dossier.CONTROVERSIEEL
-        return Dossier.ONBEKEND
+        return Dossier.IN_BEHANDELING
 
     def get_title(self):
         kamerstukken = self.kamerstukken
@@ -176,10 +173,12 @@ class Dossier(models.Model):
                 return kamerstuk
         return None
 
-    @staticmethod
-    def is_active_id(dossier_id):
-        active_dossier_ids = Dossier.get_active_dossier_ids()
-        return dossier_id in active_dossier_ids
+    @cached_property
+    def is_active(self):
+        status_active = [Dossier.IN_BEHANDELING, Dossier.AANGEHOUDEN, Dossier.ONBEKEND]
+        if self.status in status_active:
+            return True
+        return False
 
     @staticmethod
     def get_lines_from_url(url):
@@ -187,26 +186,14 @@ class Dossier(models.Model):
         return response.content.decode('utf-8').splitlines()
 
     @classmethod
-    def get_active_dossier_ids(cls):
-        if hasattr(cls, 'active_dossier_ids'):
-            return cls.active_dossier_ids
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_aanhangig.txt')
-        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_aanhangig.txt')
-        cls.active_dossier_ids = []
+    def get_dossier_ids(cls):
+        if hasattr(cls, 'dossier_ids'):
+            return cls.dossier_ids
+        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids.txt')
+        cls.dossier_ids = []
         for line in lines:
-            cls.active_dossier_ids.append(line.strip())
-        return cls.active_dossier_ids
-
-    @classmethod
-    def get_inactive_dossier_ids(cls):
-        if hasattr(cls, 'inactive_dossier_ids'):
-            return cls.inactive_dossier_ids
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_initiatief_afgedaan.txt')
-        lines += Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids_regering_afgedaan.txt')
-        cls.inactive_dossier_ids = []
-        for line in lines:
-            cls.inactive_dossier_ids.append(line.strip())
-        return cls.inactive_dossier_ids
+            cls.dossier_ids.append(line.strip())
+        return cls.dossier_ids
 
 
 class Document(models.Model):

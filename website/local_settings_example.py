@@ -45,7 +45,6 @@ CRON_CLASSES = [
     'website.cron.BackupDaily',
     # 'website.cron.CreateCommitPartyCSV',
     # 'website.cron.CreateCommitParliamentMembersCSV',
-    # 'website.cron.CreateCommitWetsvoorstellenIDs',
     'website.cron.CleanUnusedPersons',
     # 'website.cron.UpdateSubmitters'
     # 'website.cron.UpdateParliamentAndGovernment',

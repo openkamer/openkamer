@@ -96,19 +96,6 @@ class TestSubmitter(TestCase):
             self.assertTrue(mem in expected_members)
 
 
-class TestDossier(TestCase):
-
-    def test_get_active_ids(self):
-        active_ids = Dossier.get_active_dossier_ids()
-        active_ids_cached = Dossier.get_active_dossier_ids()
-        self.assertEqual(len(active_ids), len(active_ids_cached))
-
-    def test_get_inactive_ids(self):
-        inactive_ids = Dossier.get_inactive_dossier_ids()
-        inactive_ids_cached = Dossier.get_inactive_dossier_ids()
-        self.assertEqual(len(inactive_ids), len(inactive_ids_cached))
-
-
 class TestVoting(TestCase):
     fixtures = ['person.json', 'parliament.json']
 

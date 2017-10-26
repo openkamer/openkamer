@@ -189,27 +189,6 @@ class TestGovernmentScraper(TestCase):
         self.assertEqual(parlement_id, expected_id)
 
 
-class TestWetsvoorstellenDossierScraper(TestCase):
-    max_results = 40
-
-    def test_get_initiatief_wetsvoorstellen_dossier_ids(self):
-        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results)
-        self.assertEqual(len(dossier_ids), self.max_results)
-        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_initiatief(max_results=self.max_results, filter_active=True)
-        self.assertEqual(len(dossier_ids), self.max_results)
-
-    def test_get_regering_wetsvoorstellen_dossier_ids(self):
-        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results)
-        self.assertEqual(len(dossier_ids), self.max_results)
-        dossier_ids = scraper.dossiers.get_dossier_ids_wetsvoorstellen_regering(max_results=self.max_results, filter_inactive=True)
-        self.assertEqual(len(dossier_ids), self.max_results)
-
-    def test_get_number_of_dossiers(self):
-        number_initiatief, number_regering = scraper.dossiers.get_number_of_wetsvoorstellen()
-        self.assertTrue(number_initiatief > 175)
-        self.assertTrue(number_regering > 1389)
-
-
 class TestVotingScraper(TestCase):
     dossier_nr_party_votes = 33885
     dossier_nr_individual_votes = 33506

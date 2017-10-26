@@ -12,6 +12,5 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def do(self):
-        wetsvoorstel_ids = Dossier.get_active_dossier_ids()
-        wetsvoorstel_ids += Dossier.get_inactive_dossier_ids()
+        wetsvoorstel_ids = Dossier.get_dossier_ids()
         Dossier.objects.exclude(dossier_id__in=wetsvoorstel_ids).delete()

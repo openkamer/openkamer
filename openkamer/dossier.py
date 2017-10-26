@@ -49,7 +49,6 @@ def create_or_update_dossier(dossier_id):
     decision = scraper.dossiers.get_dossier_decision(dossier_url)
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
-        is_active=Dossier.is_active_id(dossier_id),
         url=dossier_url,
         decision=decision
     )
@@ -130,26 +129,35 @@ def create_or_update_dossier(dossier_id):
     return dossier_new
 
 
+def get_inactive_dossier_ids():
+    return list(Dossier.objects.filter(status__in=[Dossier.VERWORPEN, Dossier.AANGENOMEN]).values_list('dossier_id', flat=True))
+
+
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    dossier_ids = Dossier.get_active_dossier_ids()
-    failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
+    dossier_ids = Dossier.get_dossier_ids()
+    dossier_ids_inactive = get_inactive_dossier_ids()
+    dossier_ids_active = []
+    for dossier_id in dossier_ids:
+        if dossier_id not in dossier_ids_inactive:
+            dossier_ids_active.append(dossier_id)
+    failed_dossiers = create_wetsvoorstellen(dossier_ids_active, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
 
 
 def create_wetsvoorstellen_inactive(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    dossier_ids = Dossier.get_inactive_dossier_ids()
-    failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
+    dossier_ids_inactive = get_inactive_dossier_ids()
+    failed_dossiers = create_wetsvoorstellen(dossier_ids_inactive, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
 
 
 def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    failed_dossiers = create_wetsvoorstellen_active(skip_existing=skip_existing, max_tries=max_tries)
-    failed_dossiers += create_wetsvoorstellen_inactive(skip_existing=skip_existing, max_tries=max_tries)
+    dossier_ids = Dossier.get_dossier_ids()
+    failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
 
