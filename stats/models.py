@@ -43,7 +43,7 @@ def update_all():
     SeatsPerParty.create_or_update_all(start_date)
     StatsVotingSubmitter.create()
     PartyVoteBehaviour.create_all()
-    Plot.create_all()
+    Plot.create()
     logger.info('END')
 
 
@@ -299,9 +299,7 @@ class Plot(models.Model):
     KAMERVRAAG_VS_TIME = 'KVT'
     KAMERVRAAG_VS_TIME_PARTY = 'KVTP'
     KAMERVRAAG_VS_TIME_PARTY_SEATS = 'KVTPS'
-    KAMERVRAAG_VS_TIME_CATEGORY_LARGE = 'KVTPCL'
-    KAMERVRAAG_VS_TIME_CATEGORY_MEDIUM = 'KVTPCM'
-    KAMERVRAAG_VS_TIME_CATEGORY_SMALL = 'KVTPCS'
+    KAMERVRAAG_VS_TIME_CATEGORY = 'KVTPCL'
     KAMERVRAAG_REPLY_TIME_HIST = 'KRTH'
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
@@ -314,9 +312,7 @@ class Plot(models.Model):
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs time'),
         (KAMERVRAAG_VS_TIME_PARTY, 'Kamervraag vs time per party'),
         (KAMERVRAAG_VS_TIME_PARTY_SEATS, 'Kamervraag vs time per party seat'),
-        (KAMERVRAAG_VS_TIME_CATEGORY_LARGE, 'Kamervraag vs time per large category'),
-        (KAMERVRAAG_VS_TIME_CATEGORY_MEDIUM, 'Kamervraag vs time per medium category'),
-        (KAMERVRAAG_VS_TIME_CATEGORY_SMALL, 'Kamervraag vs time per small category'),
+        (KAMERVRAAG_VS_TIME_CATEGORY, 'Kamervraag vs time per category'),
         (KAMERVRAAG_REPLY_TIME_HIST, 'Kamervraag reply time histogram'),
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
@@ -326,7 +322,7 @@ class Plot(models.Model):
         (KAMERVRAAG_REPLY_TIME_PER_POSITION, 'Kamervraag reply time per minister of staatssecretaris'),
         (SEATS_PER_PARTY_VS_TIME, 'Seats per party vs time'),
     )
-    type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
+    type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True)
     html = models.TextField()
     datetime_updated = models.DateTimeField(auto_now=True)
 
@@ -609,40 +605,68 @@ class Plot(models.Model):
         labels_small = []
         labels_medium = []
         labels_large = []
+        counts = []
         kamervragen_dates_small = []
         kamervragen_dates_medium = []
         kamervragen_dates_large = []
-        categories = CategoryDocument.objects.exclude(name='organisatie en beleid')
+        # categories = CategoryDocument.objects.exclude(name='organisatie en beleid')
+        categories = CategoryDocument.objects.all()
 
         for category in categories:
             kamervragen = Kamervraag.objects.filter(document__categories=category.id, kamerantwoord__isnull=False).select_related('document').distinct()
             if start_year:
                 kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
+            if kamervragen.count() < 100:
+                continue
             kamervraag_dates = []
             for kamervraag in kamervragen:
                 kamervraag_dates.append(kamervraag.document.date_published)
             print(category.name)
             print(kamervragen.count())
             label = category.name + ' (' + str(len(kamervraag_dates)) + ')'
-            if len(kamervraag_dates) > 1000:
-                kamervragen_dates_large.append(kamervraag_dates)
-                labels_large.append(label)
-            elif len(kamervraag_dates) > 400:
-                kamervragen_dates_medium.append(kamervraag_dates)
-                labels_medium.append(label)
-            elif len(kamervraag_dates) > 200:
-                kamervragen_dates_small.append(kamervraag_dates)
-                labels_small.append(label)
-            else:
-                continue
+            # if len(kamervraag_dates) > 1000:
+            kamervragen_dates_large.append(kamervraag_dates)
+            labels_large.append(label)
+            counts.append(len(kamervraag_dates))
+            # elif len(kamervraag_dates) > 400:
+            #     kamervragen_dates_medium.append(kamervraag_dates)
+            #     labels_medium.append(label)
+            # elif len(kamervraag_dates) > 200:
+            #     kamervragen_dates_small.append(kamervraag_dates)
+            #     labels_small.append(label)
+            # else:
+            #     continue
 
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_CATEGORY_SMALL)
-        plot.html = PlotKamervraagVsTimePerCategory(labels_small, kamervragen_dates_small, kamervraag_dates_all).create_plot()
-        plot.save()
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_CATEGORY_MEDIUM)
-        plot.html = PlotKamervraagVsTimePerCategory(labels_medium, kamervragen_dates_medium, kamervraag_dates_all).create_plot()
-        plot.save()
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_VS_TIME_CATEGORY_LARGE)
-        plot.html = PlotKamervraagVsTimePerCategory(labels_large, kamervragen_dates_large, kamervraag_dates_all).create_plot()
-        plot.save()
+        data_all = list(zip(counts, labels_large, categories, kamervragen_dates_large))
+        data_all.sort(key=lambda value: value[0])
+        data_all.reverse()
+        data_all = list(zip(*data_all))
+        counts_sorted = list(data_all[0])
+        labels_sorted = list(data_all[1])
+        categories_sorted = list(data_all[2])
+        dates_sorted = list(data_all[3])
+
+        plots_html, categories = PlotKamervraagVsTimePerCategory(labels_sorted, categories_sorted, dates_sorted, kamervraag_dates_all).create_plots()
+        plots_html, categories = PlotKamervraagVsTimePerCategory(labels_sorted, categories_sorted, dates_sorted, kamervraag_dates_all).create_plots()
+
+        PlotKamervraagOnderwerp.objects.all().delete()
+        for i in range(0, len(plots_html)):
+            plot, created = PlotKamervraagOnderwerp.objects.get_or_create(
+                type=Plot.KAMERVRAAG_VS_TIME_CATEGORY,
+                y_scale_type=PlotKamervraagOnderwerp.DIFFERENCE_FROM_MEAN_RELATIVE_ALL,
+                category=categories[i],
+            )
+            plot.html = plots_html[i]
+            plot.n_kamervragen = counts_sorted[i]
+            plot.save()
         logger.info('END')
+
+
+class PlotKamervraagOnderwerp(Plot):
+    DIFFERENCE_FROM_MEAN_RELATIVE_ALL = 'DFMRA'
+    Y_SCALE_TYPES = (
+        (DIFFERENCE_FROM_MEAN_RELATIVE_ALL, 'Difference from the mean number of kamervragen per category, relative to total kamervragen'),
+    )
+    y_scale_type = models.CharField(max_length=10, choices=Y_SCALE_TYPES, default=DIFFERENCE_FROM_MEAN_RELATIVE_ALL, db_index=True)
+    category = models.ForeignKey(CategoryDocument)
+    n_kamervragen = models.IntegerField(default=0)

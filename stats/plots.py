@@ -6,7 +6,7 @@ import numpy as np
 from django.utils import timezone
 from plotly.offline import plot
 from plotly import tools
-from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis, Margin
+from plotly.graph_objs import Layout, Bar, Histogram, Histogram2d, Scatter, XAxis, Margin
 import plotly.figure_factory as ff
 
 
@@ -250,81 +250,182 @@ class PlotKamervraagVsTimePerPartySeat(Plot):
         )
 
 
-class PlotKamervraagVsTimePerCategory(Plot):
+class PlotKamervraagVsTimePerCategory(object):
 
-    def __init__(self, category_labels, category_kamervragen_dates, kamervraag_dates_all):
+    def __init__(self, category_labels, categories, category_kamervragen_dates, kamervraag_dates_all):
         super().__init__()
         self.category_labels = category_labels
         self.category_kamervragen_dates = category_kamervragen_dates
         self.kamervraag_dates_all = kamervraag_dates_all
+        self.categories = categories
 
-    def create_plot(self):
+    def create_plots(self):
         logger.info('BEGIN')
-        fig = self.create_data()
-        return Plot.create_plot_html_default(fig)
+        data_set = self.create_data()
+        layout = self.create_layout()
+        plots = []
+        for i in range(0, len(data_set)):
+            layout['title'] = self.category_labels[i]
+            plot_config = Plot.create_plot_config([*data_set[i]], layout)
+            plots.append(Plot.create_plot_html_default(plot_config))
+        return plots, self.categories
 
-    def create_data(self):
-        bin_size_days = int(365/6)
+    def create_data_hist(self, kamervragen_dates, bin_values_all):
+        print('create_data_hist')
+        bin_size_days = 365/2
+        hist_data = Histogram(
+            x=kamervragen_dates,
+            autobinx=False,
+            xbins=dict(
+                start=(timezone.now() - datetime.timedelta(days=7 * 365)).timestamp() * 1000,
+                end=timezone.now().timestamp() * 1000,
+                size=60 * 60 * 24 * bin_size_days * 1000
+            ),
+            marker=dict(
+                color=COLOR_INFO,
+                line=dict(
+                    color=COLOR_PRIMARY,
+                    width=1,
+                )
+            ),
+            name='vragen per week',
+        )
+        return hist_data
+
+    def create_data_bar(self):
+        bin_size_days = int(365/12)
         moving_avg_window = 2
 
         bin_values_all, bin_edges = bin_datetimes(self.kamervraag_dates_all, range_years=7, bin_size_days=bin_size_days)
-        x_all, y_moving_avg_all = movingaverage_from_histogram(bin_values_all, bin_edges, window=moving_avg_window)
-        bin_all_average = sum(y_moving_avg_all) / len(y_moving_avg_all)
+        # x_all, y_moving_avg_all = movingaverage_from_histogram(bin_values_all, bin_edges, window=moving_avg_window)
+        bin_all_average = sum(bin_values_all) / len(bin_values_all)
 
-        fig = tools.make_subplots(
-            rows=len(self.category_labels),
-            cols=1,
-            shared_xaxes=False,
-            subplot_titles=self.category_labels,
-            vertical_spacing=0.02
-        )
-
-        data = []
+        data_list = []
         for i in range(0, len(self.category_labels)):
+            # histogram = self.create_data_hist(self.category_kamervragen_dates[i], bin_values_all)
+            # data_list.append(histogram)
+            # if i > 10:
+            #     return data_list
+            # continue
             bin_values, bin_edges = bin_datetimes(self.category_kamervragen_dates[i], range_years=7, bin_size_days=bin_size_days)
-            bin_values_norm = []
-            for k in range(0, len(bin_values)):
-                bin_values_norm.append(bin_values[k]/bin_values_all[i])
-            x, y_moving_avg = movingaverage_from_histogram(bin_values_norm, bin_edges, window=moving_avg_window)
+            # bin_values_norm = []
+            # for k in range(0, len(bin_values)):
+            #     if bin_values_all[k] == 0:
+            #         bin_value_relative = 0
+            #     else:
+            #         bin_value_relative = bin_values[k]/bin_values_all[k]
+            #     bin_values_norm.append(bin_value_relative)
+            # x, y_moving_avg = movingaverage_from_histogram(bin_values, bin_edges, window=moving_avg_window)
 
-            bin_average = sum(y_moving_avg)/len(y_moving_avg)
+            bin_average = sum(bin_values)/len(bin_values)
             fraction_of_all_average = bin_average/bin_all_average
 
             y_new = []
-            for j in range(0, len(y_moving_avg)):
-                y_new.append(y_moving_avg[j]/y_moving_avg_all[j] / fraction_of_all_average)
+            for j in range(0, len(bin_values)):
+                if bin_values_all[j] == 0:
+                    y_new.append(0)
+                else:
+                    y_new.append(bin_values[j]/bin_values_all[j] / fraction_of_all_average)
+
+            x_new = []
+            for value in bin_edges:
+                date = datetime.datetime.fromtimestamp(value / 1000.0)
+                x_new.append(date)
+
+            moving_average_scatter = Bar(
+                x=x_new,
+                y=y_new,
+                name=self.category_labels[i],
+            )
+            data_list.append(moving_average_scatter)
+        return data_list
+
+    def create_data(self):
+        bin_size_days = int(365/6)
+        moving_avg_window = 3
+
+        bin_values_all, bin_edges = bin_datetimes(self.kamervraag_dates_all, range_years=7, bin_size_days=bin_size_days)
+        max_y_all = max(bin_values_all)
+        min_y_all = min(bin_values_all)
+        # x_all, y_moving_avg_all = movingaverage_from_histogram(bin_values_all, bin_edges, window=moving_avg_window)
+        bin_all_average = sum(bin_values_all) / len(bin_values_all)
+        bin_values_norm_all = []
+        fractions_from_average = []
+        for k in range(0, len(bin_values_all)):
+            diff_from_average = bin_values_all[k] - bin_all_average
+            fraction_from_average = diff_from_average/bin_all_average
+            print(fraction_from_average)
+            fractions_from_average.append(fraction_from_average)
+
+        data_list = []
+        for i in range(0, len(self.category_labels)):
+            # histogram = self.create_data_hist(self.category_kamervragen_dates[i], bin_values_all)
+            # data_list.append(histogram)
+            # if i > 10:
+            #     return data_list
+            # continue
+            bin_values, bin_edges = bin_datetimes(self.category_kamervragen_dates[i], range_years=7, bin_size_days=bin_size_days)
+
+            max_y = max(bin_values)
+            min_y = min(bin_values)
+            bin_values_norm = []
+            for k in range(0, len(bin_values)):
+                bin_value_norm = (bin_values[k]-min_y) / (max_y-min_y)
+                bin_values_norm.append(bin_value_norm)
+
+            bin_avg = sum(bin_values_norm) / len(bin_values_norm)
+            bin_values_corrected = []
+            for k in range(0, len(bin_values_norm)):
+                bin_values_corrected.append(bin_values_norm[k] - (bin_avg*fractions_from_average[k]))
+                # bin_values_corrected.append(bin_values_norm[k])
+
+            max_y = max(bin_values_corrected)
+            min_y = min(bin_values_corrected)
+            bin_values_norm = []
+            for k in range(0, len(bin_values_corrected)):
+                bin_value_norm = (bin_values_corrected[k]-min_y) / (max_y-min_y)
+                bin_values_norm.append(bin_value_norm)
+
+            bin_average = sum(bin_values_norm) / len(bin_values_norm)
+            bin_values_norm2 = []
+            for k in range(0, len(bin_values_norm)):
+                bin_value_norm2 = bin_values_norm[k] - bin_average
+                bin_values_norm2.append(bin_value_norm2)
+
+            x, y_moving_avg = movingaverage_from_histogram(bin_values_norm2, bin_edges, window=moving_avg_window)
+            #
+            # bin_average = sum(y_moving_avg)/len(y_moving_avg)
+            # fraction_of_all_average = bin_average/bin_all_average
+            #
+            # y_new = []
+            # for j in range(0, len(y_moving_avg)):
+            #     if y_moving_avg_all[j] == 0:
+            #         y_new.append(0)
+            #     else:
+            #         y_new.append(y_moving_avg[j]/y_moving_avg_all[j] / fraction_of_all_average)
 
             x_new = []
             for value in x:
                 date = datetime.datetime.fromtimestamp(value / 1000.0)
                 x_new.append(date)
 
-            moving_average_scatter = Scatter(
+            corrected = Scatter(
                 x=x_new,
-                y=y_new,
+                y=y_moving_avg,
                 mode='lines',
                 name=self.category_labels[i],
                 line=dict(shape='spline'),
             )
-            data.append(moving_average_scatter)
-            fig.append_trace(moving_average_scatter, i+1, 1)
-            # fig['layout']['xaxis' + str(i+1)].update(title=self.category_labels[i])
-        # fig['layout'].update(**self.create_layout())
-        fig['layout'].update(height=len(self.category_labels)*300, showlegend=False)
-        return fig
+            data_list.append([corrected])
+        return data_list
 
     def create_layout(self):
         return Layout(
-            yaxis=dict(title='Kamervragen [per maand]'), #, range=[self.min_y*2, self.max_y/2]),
-            margin=Margin(t=20, b=30),
-            height=3000,
-            legend=dict(
-                # x=0.01,
-                # y=1,
-                bordercolor='#E2E2E2',
-                bgcolor='#FFFFFF',
-                borderwidth=2
-            )
+            # yaxis=dict(title='Kamervragen [per maand]'), #, range=[self.min_y*2, self.max_y/2]),
+            yaxis=dict(title='Kamervragen [per maand]', range=[0.5, "auto"]),
+            margin=Margin(t=40, b=30),
+            height=300,
+            showlegend=False
         )
 
 

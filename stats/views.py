@@ -34,7 +34,10 @@ import stats.util
 from stats.filters import PartyVotesFilter
 from stats.filters import PartyVoteBehaviour
 from stats.models import StatsVotingSubmitter
+
 from stats.models import Plot
+from stats.models import PlotKamervraagOnderwerp
+
 
 
 logger = logging.getLogger(__name__)
@@ -174,6 +177,7 @@ class KamervraagStats(TemplateView):
         context['plot_kamervraag_reply_times_per_position_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_POSITION).html)
         context['plot_kamervraag_reply_times_per_ministry_position_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION).html)
         context['plot_kamervraag_reply_times_contour_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST).html)
+        context['plots_kamervraag_vs_time_per_category'] = PlotKamervraagOnderwerp.objects.filter(type=Plot.KAMERVRAAG_VS_TIME_CATEGORY).order_by('-n_kamervragen')
         # context['plot_party_seats_vs_time_html'] = mark_safe(Plot.objects.get(type=Plot.SEATS_PER_PARTY_VS_TIME).html)
         return context
 
