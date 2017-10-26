@@ -41,7 +41,7 @@ def update_all():
     SeatsPerParty.create_or_update_all(start_date)
     StatsVotingSubmitter.create()
     PartyVoteBehaviour.create_all()
-    Plot.create_all()
+    Plot.create()
     logger.info('END')
 
 
