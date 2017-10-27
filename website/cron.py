@@ -76,7 +76,7 @@ class TestJob(LockJob):
 
 
 class UpdateParliamentAndGovernment(CronJobBase):
-    RUN_AT_TIMES = ['18:00']
+    RUN_AT_TIMES = ['20:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateParliamentAndGovernment'
 
@@ -88,6 +88,69 @@ class UpdateParliamentAndGovernment(CronJobBase):
             logger.exception(error)
             raise
         logger.info('END')
+
+
+class UpdateActiveDossiers(LockJob):
+    RUN_AT_TIMES = ['21:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateActiveDossiers'
+
+    def do_imp(self):
+        # TODO: also update dossiers that have closed since last update
+        logger.info('update active dossiers cronjob')
+        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_active()
+        if failed_dossiers:
+            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+
+
+class UpdateInactiveDossiers(LockJob):
+    RUN_EVERY_MINS = 60*24*3  # 3 days
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'website.cron.UpdateInactiveDossiers'
+
+    def do_imp(self):
+        logger.info('update inactive dossiers cronjob')
+        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_inactive()
+        if failed_dossiers:
+            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+
+
+class UpdateBesluitenLijsten(LockJob):
+    RUN_AT_TIMES = ['23:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateBesluitenLijsten'
+
+    def do_imp(self):
+        logger.info('update besluitenlijsten')
+        openkamer.besluitenlijst.create_besluitenlijsten()
+
+
+class UpdateKamervragenRecent(LockJob):
+    RUN_AT_TIMES = ['00:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateKamervragenRecent'
+
+    def do_imp(self):
+        logger.info('update kamervragen and kamerantwoorden')
+        years = ['2017', '2016']
+        for year in years:
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.link_kamervragen_and_antwoorden()
+
+
+class UpdateKamervragenAll(LockJob):
+    RUN_EVERY_MINS = 60 * 24 * 7  # 7 days
+    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    code = 'website.cron.UpdateKamervragenAll'
+
+    def do_imp(self):
+        logger.info('update kamervragen and kamerantwoorden')
+        years = ['2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010']
+        for year in years:
+            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
+            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
+            openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
 class UpdateSubmitters(LockJob):
@@ -123,71 +186,38 @@ class UpdateSubmitters(LockJob):
             submitter.update_submitter_party_slug()
 
 
-class UpdateActiveDossiers(LockJob):
-    RUN_AT_TIMES = ['19:00']
+class UpdateSearchIndex(LockJob):
+    RUN_AT_TIMES = ['06:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateActiveDossiers'
+    code = 'website.cron.UpdateSearchIndex'
 
     def do_imp(self):
-        # TODO: also update dossiers that have closed since last update
-        logger.info('update active dossiers cronjob')
-        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_active()
-        if failed_dossiers:
-            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+        logger.info('BEGIN')
+        try:
+            management.call_command('update_index', remove=True)
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
 
 
-class UpdateInactiveDossiers(LockJob):
-    RUN_EVERY_MINS = 60*24*3  # 3 days
-    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
-    code = 'website.cron.UpdateInactiveDossiers'
-
-    def do_imp(self):
-        logger.info('update inactive dossiers cronjob')
-        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_inactive()
-        if failed_dossiers:
-            logger.error('the following dossiers failed: ' + str(failed_dossiers))
-
-
-class UpdateBesluitenLijsten(LockJob):
-    RUN_AT_TIMES = ['02:00']
+class UpdateStatsData(LockJob):
+    RUN_AT_TIMES = ['07:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateBesluitenLijsten'
+    code = 'website.cron.UpdateStatsData'
 
     def do_imp(self):
-        logger.info('update besluitenlijsten')
-        openkamer.besluitenlijst.create_besluitenlijsten()
-
-
-class UpdateKamervragenRecent(LockJob):
-    RUN_AT_TIMES = ['02:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateKamervragenRecent'
-
-    def do_imp(self):
-        logger.info('update kamervragen and kamerantwoorden')
-        years = ['2017', '2016']
-        for year in years:
-            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
-            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
-            openkamer.kamervraag.link_kamervragen_and_antwoorden()
-
-
-class UpdateKamervragenAll(LockJob):
-    RUN_EVERY_MINS = 60 * 24 * 7  # 7 days
-    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
-    code = 'website.cron.UpdateKamervragenAll'
-
-    def do_imp(self):
-        logger.info('update kamervragen and kamerantwoorden')
-        years = ['2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010']
-        for year in years:
-            openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
-            openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
-            openkamer.kamervraag.link_kamervragen_and_antwoorden()
+        logger.info('BEGIN')
+        try:
+            stats.models.update_all()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
 
 
 class CleanUnusedPersons(CronJobBase):
-    RUN_AT_TIMES = ['04:00']
+    RUN_AT_TIMES = ['08:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.CleanUnusedPersons'
 
@@ -250,7 +280,6 @@ class BackupDaily(CronJobBase):
                 shutil.copyfileobj(f_in, f_out)
         os.remove(filepath)
         BackupDaily.remove_old_json_dumps(days_old=30)
-
 
     @staticmethod
     def remove_old_json_dumps(days_old):
@@ -342,35 +371,5 @@ class CreateCommitParliamentMembersCSV(CronJobBase):
             # origin.push()
         except:
             logger.error(traceback.format_exc())
-            raise
-        logger.info('END')
-
-
-class UpdateSearchIndex(LockJob):
-    RUN_AT_TIMES = ['06:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateSearchIndex'
-
-    def do_imp(self):
-        logger.info('BEGIN')
-        try:
-            management.call_command('update_index', remove=True)        
-        except Exception as error:
-            logger.exception(error)
-            raise
-        logger.info('END')
-
-
-class UpdateStatsData(LockJob):
-    RUN_AT_TIMES = ['06:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateStatsData'
-
-    def do_imp(self):
-        logger.info('BEGIN')
-        try:
-            stats.models.update_all()
-        except Exception as error:
-            logger.exception(error)
             raise
         logger.info('END')
