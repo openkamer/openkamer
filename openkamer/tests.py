@@ -13,13 +13,16 @@ from parliament.models import PartyMember
 from parliament.models import PoliticalParty
 
 from document.models import Document
+from document.models import Dossier
 from document.models import Kamervraag
+from document.models import Voting
 
 import openkamer.kamervraag
 import openkamer.dossier
 import openkamer.kamerstuk
 import openkamer.parliament
 import openkamer.besluitenlijst
+import openkamer.voting
 
 
 class TestCreatePerson(TestCase):
@@ -350,13 +353,9 @@ class TestKamervraag(TestCase):
         overheid_doc_id = 'kv-tk-2017Z07318'
         kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
         documents = Document.objects.all()
-        print(documents.count())
         self.assertEqual(documents.count(), 1)
-        print(documents[0].title_full)
         kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
         documents = Document.objects.all()
-        print(documents.count())
-        print(documents[0].title_full)
         self.assertEqual(documents.count(), 1)
 
 
@@ -372,3 +371,18 @@ class TestKamerantwoord(TestCase):
         self.assertEqual(antwoorden[2].see_answer_nr, 2)
         self.assertEqual(antwoorden[3].see_answer_nr, None)
 
+
+class TestVoting(TestCase):
+
+    def test_dossier_voting_controversieel(self):
+        dossier_id = '29282'
+        dossier = Dossier.objects.create(dossier_id=dossier_id)
+        openkamer.voting.create_votings(dossier_id)
+        votings = Voting.objects.all()
+        self.assertEqual(votings.count(), 66)
+        for voting in votings:
+            self.assertEqual(dossier.id, voting.dossier.id)
+            self.assertNotEqual(voting.source_url, '')
+        dossier.delete()
+        votings = Voting.objects.all()
+        self.assertEqual(votings.count(), 0)
