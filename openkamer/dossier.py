@@ -98,7 +98,7 @@ def create_or_update_dossier(dossier_id):
             'types': metadata['types'],
             'publisher': metadata['publisher'],
             'date_published': date_published,
-            'source_url': document_html_url,
+            'source_url': result['page_url'],
             'content_html': content_html,
         }
 
