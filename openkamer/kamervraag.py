@@ -1,6 +1,7 @@
 import logging
 import re
 import lxml
+import datetime
 
 from django.db import transaction
 
@@ -160,23 +161,23 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
     if metadata['receiver']:
         metadata['submitter'] = metadata['receiver']
 
-    documents = Document.objects.filter(document_id=document_id).delete()
-    if documents:
-        logger.warning('document with id: ' + document_id + ' already exists, recreate document.')
-
     content_html = openkamer.kamerstuk.update_document_html_links(content_html)
 
-    document = Document.objects.create(
-        dossier=None,
+    properties = {
+        'dossier': None,
+        'title_full': title,
+        'title_short': metadata['title_full'],
+        'publication_type': metadata['publication_type'],
+        'types': metadata['types'],
+        'publisher': metadata['publisher'],
+        'date_published': date_published,
+        'source_url': document_html_url,
+        'content_html': content_html,
+    }
+
+    document, created = Document.objects.update_or_create(
         document_id=document_id,
-        title_full=title,
-        title_short=metadata['title_full'],
-        publication_type=metadata['publication_type'],
-        types=metadata['types'],
-        publisher=metadata['publisher'],
-        date_published=date_published,
-        source_url=document_html_url,
-        content_html=content_html,
+        defaults=properties
     )
     category_list = openkamer.dossier.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
     document.categories.add(*category_list)

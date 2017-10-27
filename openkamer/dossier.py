@@ -88,25 +88,30 @@ def create_or_update_dossier(dossier_id):
             else:
                 dossier_for_document = dossier_new
 
-        documents = Document.objects.filter(document_id=document_id)
-        if documents.exists():
-            logger.warning('document with id: ' + document_id + ' already exists, skip creating document.')
-            continue
-
         content_html = update_document_html_links(content_html)
 
-        document = Document.objects.create(
-            dossier=dossier_for_document,
+        properties = {
+            'dossier': dossier_for_document,
+            'title_full': metadata['title_full'],
+            'title_short': metadata['title_short'],
+            'publication_type': metadata['publication_type'],
+            'types': metadata['types'],
+            'publisher': metadata['publisher'],
+            'date_published': date_published,
+            'source_url': document_html_url,
+            'content_html': content_html,
+        }
+
+        document, created = Document.objects.update_or_create(
             document_id=document_id,
-            title_full=metadata['title_full'],
-            title_short=metadata['title_short'],
-            publication_type=metadata['publication_type'],
-            publisher=metadata['publisher'],
-            date_published=date_published,
-            source_url=result['page_url'],
-            content_html=content_html,
+            defaults=properties
         )
-        category_list = get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
+
+        category_list = get_categories(
+            text=metadata['category'],
+            category_class=CategoryDocument,
+            sep_char='|'
+        )
         document.categories.add(*category_list)
 
         submitters = metadata['submitter'].split('|')

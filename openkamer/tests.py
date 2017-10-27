@@ -346,13 +346,25 @@ class TestKamervraag(TestCase):
         self.assertEqual(len(mededelingen), 1)
         self.assertTrue(mededelingen[0].text)
 
+    def test_update_or_create(self):
+        overheid_doc_id = 'kv-tk-2017Z07318'
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
+        documents = Document.objects.all()
+        print(documents.count())
+        self.assertEqual(documents.count(), 1)
+        print(documents[0].title_full)
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
+        documents = Document.objects.all()
+        print(documents.count())
+        print(documents[0].title_full)
+        self.assertEqual(documents.count(), 1)
+
 
 class TestKamerantwoord(TestCase):
 
     def test_combined_answers(self):
-        document_number = '2016D07289'
         overheidnl_document_id = 'ah-tk-20152016-1580'
-        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(document_number, overheidnl_document_id)
+        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(overheidnl_document_id, overheidnl_document_id)
         self.assertEqual(kamerantwoord.antwoord_set.count(), 4)
         antwoorden = kamerantwoord.antwoord_set.all()
         self.assertEqual(antwoorden[0].see_answer_nr, None)

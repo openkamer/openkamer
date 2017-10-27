@@ -198,7 +198,7 @@ class Dossier(models.Model):
 
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)
-    document_id = models.CharField(max_length=200, blank=True, db_index=True)
+    document_id = models.CharField(unique=True, max_length=200, blank=True, db_index=True)
     title_full = models.CharField(max_length=3000)
     title_short = models.CharField(max_length=2000)
     publication_type = models.CharField(max_length=200, blank=True)
