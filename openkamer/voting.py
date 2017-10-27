@@ -23,28 +23,53 @@ from document.models import Voting
 logger = logging.getLogger(__name__)
 
 
+def clean_voting_results(voting_results, dossier_id):
+    """ Removes votings for other dossiers and duplicate controversial dossier votings """
+    voting_results_cleaned = []
+    for voting_result in voting_results:
+        if str(voting_result.get_dossier_id()) != str(dossier_id):
+            # this should only happen for controversial voting result lists, example: https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2017P05310
+            logger.info('Voting for different dossier, remove voting')
+            continue
+        voting_results_cleaned.append(voting_result)
+    return voting_results_cleaned
+
+
 @transaction.atomic
 def create_votings(dossier_id):
     logger.info('BEGIN')
     logger.info('dossier id: ' + str(dossier_id))
     voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
-    logger.info('votings found: ' + str(len(voting_results)))
-    for voting_result in voting_results:
+
+    voting_results_cleaned = clean_voting_results(voting_results, dossier_id)
+
+    for voting_result in voting_results_cleaned:
         if not voting_result.get_result():
             logger.warning('no result found for voting, probaly not voted yet, voting date: ' + str(voting_result.date))
             continue
+
         document_id = voting_result.get_document_id_without_rijkswet()
         if not document_id:
             logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
             continue
+
         id_main = document_id.split('-')[0]
         dossiers = Dossier.objects.filter(dossier_id=id_main)
         if dossiers.count() != 1:
             logger.error('number of dossiers found: ' + str(dossiers.count()) + ', which is not 1, so we have to skip this voting')
             continue
+
         assert dossiers.count() == 1
         result = get_result_choice(voting_result.get_result())
-        voting_obj = Voting(dossier=dossiers[0], date=voting_result.date, result=result, is_dossier_voting=voting_result.is_dossier_voting())
+        voting_obj = Voting(
+            dossier=dossiers[0],
+            kamerstuk_raw_id=document_id,
+            result=result,
+            date=voting_result.date,
+            source_url=voting_result.url,
+            is_dossier_voting=voting_result.is_dossier_voting()
+        )
+
         if document_id and len(document_id.split('-')) == 2:
             id_sub = document_id.split('-')[1]
             kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
@@ -63,8 +88,10 @@ def create_votings(dossier_id):
             continue
         elif dossiers[0].voting:
             dossiers[0].voting.delete()
+
         voting_obj.is_individual = voting_result.is_individual()
         voting_obj.save()
+
         if voting_obj.is_individual:
             create_votes_individual(voting_obj, voting_result.votes)
         else:

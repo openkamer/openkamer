@@ -81,7 +81,7 @@ def create_besluitenlijst(url):
         for case in item.cases:
             BesluitItemCase.objects.create(
                 title=case.title,
-                besluit_item = besluit_item,
+                besluit_item=besluit_item,
                 decisions=case.create_str_list(case.decisions, BesluitItemCase.SEP_CHAR),
                 notes=case.create_str_list(case.notes, BesluitItemCase.SEP_CHAR),
                 related_commissions=case.create_str_list(case.volgcommissies, BesluitItemCase.SEP_CHAR),

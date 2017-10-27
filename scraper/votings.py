@@ -82,10 +82,11 @@ class VoteIndividual(Vote):
 
 
 class VotingResult(object):
-    def __init__(self, result_tree, date):
+    def __init__(self, result_tree, date, url):
         self.result_tree = result_tree
         self.date = date
         self.votes = self.create_votes_from_table()
+        self.url = url
 
     def get_property_elements(self):
         return self.result_tree.xpath('div[@class="search-result-properties"]/p')
@@ -129,6 +130,12 @@ class VotingResult(object):
 
     def get_document_id(self):
         return self.get_property_elements()[0].text
+
+    def get_dossier_id(self):
+        document_id = self.get_document_id()
+        if document_id is None:
+            return None
+        return document_id.split('-')[0]
 
     def get_document_id_without_rijkswet(self):
         document_id = self.get_document_id()
@@ -198,15 +205,20 @@ def get_votings_for_page(votings_page_url):
     :param votings_page_url: the url of the votings page, example: https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P10154
     :return: a list of VotingResult
     """
-    logger.info('url: ' + votings_page_url)
     page = requests.get(votings_page_url, timeout=60)
     tree = lxml.html.fromstring(page.content)
+
+    content_reader = tree.xpath('//div[@id="content-reader"]/p')
+    if len(content_reader) > 0 and content_reader[0].text is not None and 'tijdelijk niet beschikbaar' in content_reader[0].text:
+        logger.warning('Votings page temporarily not available: ' + votings_page_url)
+        return []
+
     date = tree.xpath('//p[@class="vote-info"]/span[@class="date"]')[0].text
     date = dateparser.parse(date).date()  # dateparser needed because of Dutch month names
     search_results = tree.xpath('//ul[@class="search-result-list reset"]/li')
 
     votings = []
     for search_result in search_results:
-        result = VotingResult(search_result, date)
+        result = VotingResult(search_result, date, votings_page_url)
         votings.append(result)
     return votings
