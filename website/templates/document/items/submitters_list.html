@@ -1,7 +1,22 @@
+
 {% for submitter in submitters %}
-  <a href="{% url 'person' submitter.person.slug %}">{{ submitter }}</a>
-  {% if submitter.government_members %}
-    ({% for member in submitter.government_members %}{{ member.position.get_position_display|lower }} {% if member.position.ministry %}{{ member.position.ministry }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %})
-  {% endif %}
-  {% if submitter.party %}(<a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>){% endif %}{% if not forloop.last %},{% endif %}
+<div class="card m-0 pb-2 pt-2 border-bottom-0 border-top-1 {% if forloop.first %}border-left-0{% endif %} {% if forloop.last %}border-right-0{% endif %}">
+  <div class="card-block py-0">
+    <span class="card-text font-sm">
+      <a href="{% url 'person' submitter.person.slug %}"
+        title="
+        {% if submitter.government_members %}
+          {% for member in submitter.government_members %}{{ member.position.get_position_display|lower }} {% if member.position.ministry %}{{ member.position.ministry }}{% endif %}{% endfor %}
+        {% endif %}">
+        {{ submitter }}
+      </a>
+    </span>
+
+    {% if submitter.party %}
+      <span class="card-text float-right font-sm font-weight-bold">
+        <a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>
+      </span>
+    {% endif %}
+  </div>
+</div>
 {% endfor %}

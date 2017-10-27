@@ -1,37 +1,51 @@
 {% load openkamer %}
 
-<div class="panel panel-default">
+{% get_dossier_status_color dossier as dossier_status_class %}
+{% get_dossier_status_icon dossier as dossier_status_icon %}
 
-  <div class="panel-heading panel-small">
+<div class="card card-accent-{{ dossier_status_class }}">
+
+  <div class="card-header pt-2 pb-2">
     <div class="row">
-      <div class="col-xs-5" align="left">
-        <h6 class="date">{{ dossier.last_date }}</h6>
+
+      <div class="col-md-7 col-lg-8">
+        <span class="float-left font-weight-bold">
+          <i class="fa fa-balance-scale d-none d-md-inline pr-2"></i>
+          <a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.short_title|capfirst }}</a>
+        </span>
       </div>
-      <div class="col-xs-2" align="center">
-        <h6 class="date">{{ dossier.dossier_id }}</h6>
+
+      <div class="col-md-5 col-lg-4 d-none d-md-block">
+        <span class="float-right">
+          <span class="font-sm pr-2">{{ dossier.dossier_id }}</span>
+          <span class="font-sm">{{ dossier.last_date }}</span>
+          <span class="fa {{ dossier_status_icon }} pl-2 text-{{ dossier_status_class }}" title="{{ dossier.get_status_display }}"></span>
+        </span>
       </div>
-      <div class="col-xs-5" align="right">
-        {% get_dossier_status_color dossier as dossier_status_class %}
-        {% get_dossier_status_icon dossier as dossier_status_icon %}
-        <i class="fa {{ dossier_status_icon }} text-{{ dossier_status_class }}" title="{{ dossier.get_status_display }}"></i>
-      </div>
+
     </div>
   </div>
 
-  <div class="panel-body panel-small">
-    <h6><a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.title }}</a></h6>
+  <div class="card-body pt-2 pb-2">
+    <span>
+      {{ dossier.title }}
+    </span>
   </div>
 
   {% if dossier.first_voorstel.document.submitters %}
-  <div class="panel-footer panel-small">
-      {% with submitters=dossier.first_voorstel.document.submitters %}
-        <h6 class="small">{% include "document/items/submitters_list.html" %}</h6>
-      {% endwith %}
+  <div class="card-group">
+    {% with submitters=dossier.first_voorstel.document.submitters %}
+      {% include "document/items/submitters_list.html" %}
+    {% endwith %}
   </div>
   {% endif %}
 
+  <div class="card-footer d-md-none pt-2 pb-2">
+    <span class="font-sm">{{ dossier.last_date }}</span>
+  </div>
+
   {% if dossier.voting %}
-  <div class="panel-footer panel-footer-timeline-vote-bar">
+  <div class="card-footer panel-footer-timeline-vote-bar border-top-0">
       {% with voting=dossier.voting %}
         {% include "document/items/voting_result_bar_small.html" %}
       {% endwith %}

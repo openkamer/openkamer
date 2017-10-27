@@ -194,7 +194,7 @@ def get_dossier_status_color(dossier):
     elif dossier.status == Dossier.CONTROVERSIEEL:
         return 'warning'
     elif dossier.status == Dossier.IN_BEHANDELING:
-        return 'info'
+        return 'primary'
     elif dossier.status == Dossier.ONBEKEND:
         return 'info'
     return 'info'
