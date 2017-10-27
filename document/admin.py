@@ -112,7 +112,7 @@ class VoteIndividualAdmin(admin.ModelAdmin):
 
 admin.site.register(CategoryDossier, CategoryAdmin)
 admin.site.register(CategoryDocument, CategoryAdmin)
-admin.site.register(DossierAdmin, Dossier)
+admin.site.register(Dossier, DossierAdmin)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
