@@ -14,12 +14,12 @@ from government.models import GovernmentMember
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_dossier_exists(dossier_id):
     return Dossier.objects.filter(dossier_id=dossier_id).exists()
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_current_party(person_id):
     members = PartyMember.objects.filter(person=person_id, left__isnull=True).select_related('party', 'person').order_by('-joined')
     if members.exists():
@@ -33,7 +33,7 @@ def get_submitter_ids(person):
     return submitter_ids
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_submitters_parties(submitters):
     party_set = set()
     for submitter in submitters:
@@ -42,7 +42,7 @@ def get_submitters_parties(submitters):
     return party_set
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_activities(person):
     submitter_ids = get_submitter_ids(person)
     documents = Document.objects.filter(submitter__in=submitter_ids)
@@ -63,35 +63,35 @@ def get_activities(person):
     return activities
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_kamervragen(person):
     submitter_ids = get_submitter_ids(person)
     kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids)
     return kamervragen
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_kamerstukken(person):
     submitter_ids = get_submitter_ids(person)
     kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids)
     return kamerstukken
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_moties(person):
     submitter_ids = get_submitter_ids(person)
     kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.MOTIE)
     return kamerstukken
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_amendementen(person):
     submitter_ids = get_submitter_ids(person)
     kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.AMENDEMENT)
     return kamerstukken
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_wetsvoorstellen(person):
     submitter_ids = get_submitter_ids(person)
     kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.WETSVOORSTEL)
@@ -100,7 +100,7 @@ def get_wetsvoorstellen(person):
     return dossiers
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_dossiers_results(dossiers):
     aangenomen = dossiers.filter(status=Dossier.AANGENOMEN)
     verworpen = dossiers.filter(status=Dossier.VERWORPEN)
@@ -109,7 +109,7 @@ def get_dossiers_results(dossiers):
     return results
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_kamerstukken_results(kamerstukken):
     aangenomen = kamerstukken.filter(voting__result=Voting.AANGENOMEN)
     verworpen = kamerstukken.filter(voting__result=Voting.VERWORPEN)
@@ -144,7 +144,7 @@ def creat_results(aangenomen, verworpen, in_behandeling):
     return results
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_kamerstuk_icon_name(kamerstuk):
     if kamerstuk.type == Kamerstuk.MOTIE:
         return 'fa-ticket'
@@ -161,7 +161,7 @@ def get_kamerstuk_icon_name(kamerstuk):
     return 'fa-file-text'
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_kamerstuk_timeline_bg_color(kamerstuk):
     voting = kamerstuk.voting
     if not voting:
@@ -179,7 +179,7 @@ def get_kamerstuk_timeline_bg_color(kamerstuk):
     return 'bg-info'
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_dossier_status_color(dossier):
     if not dossier:
         return 'info'
@@ -200,7 +200,7 @@ def get_dossier_status_color(dossier):
     return 'info'
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_dossier_status_icon(dossier):
     if not dossier:
         return 'fa-spinner'
@@ -221,7 +221,7 @@ def get_dossier_status_icon(dossier):
     return 'fa-spinner'
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_extra_category_button_class(category_slug, active_category_slug):
     if category_slug == active_category_slug:
         return 'active'
@@ -230,27 +230,27 @@ def get_extra_category_button_class(category_slug, active_category_slug):
     return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_submitters(person):
     return Submitter.objects.filter(person=person)
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_government_members_for_person(person):
     return GovernmentMember.objects.filter(person=person).order_by('-start_date')
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_parliament_members_for_person(person):
     return ParliamentMember.objects.filter(person=person).order_by('-joined')
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_party_members_for_person(person):
     return PartyMember.objects.filter(person=person)
 
 
-@register.assignment_tag
+@register.simple_tag
 def get_documents_for_person(person):
     submitters = Submitter.objects.filter(person=person)
     return Document.objects.filter(submitter__in=submitters)

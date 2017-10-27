@@ -109,7 +109,7 @@ $ python manage.py dumpdata --all --natural-foreign --indent 2 auth.User auth.Gr
 
 ### Debug toolbar
 
-Enable the django debug toolbar by uncommenting the django_toolbar related lines in `INSTALLED_APPS` and `MIDDLEWARE_CLASSES` in `website/settings.py`.
+Enable the django debug toolbar by uncommenting the django_toolbar related lines in `INSTALLED_APPS` and `MIDDLEWARE` in `website/settings.py`.
 
 ## CronJobs
 
