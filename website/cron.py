@@ -357,7 +357,7 @@ class UpdateSearchIndex(LockJob):
 class UpdateStatsData(LockJob):
     RUN_AT_TIMES = ['06:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'stats.cron.UpdateStatsData'
+    code = 'website.cron.UpdateStatsData'
 
     def do_imp(self):
         logger.info('BEGIN')

@@ -54,7 +54,7 @@ CRON_CLASSES = [
     # 'website.cron.UpdateKamervragenRecent',
     # 'website.cron.UpdateKamervragenAll',
     # 'oktwitter.cron.UpdateTwitterLists',
-    # 'stats.cron.UpdateStatsData',
+    # 'website.cron.UpdateStatsData',
     # 'website.cron.UpdateSearchIndex',
 ]
 
