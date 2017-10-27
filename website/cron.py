@@ -95,7 +95,6 @@ class UpdateSubmitters(LockJob):
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateSubmitters'
 
-    @transaction.atomic
     def do_imp(self):
         logger.info('BEGIN')
         try:
@@ -104,9 +103,12 @@ class UpdateSubmitters(LockJob):
             logger.info('submitters: ' + str(n_total))
             counter = 0
             progress_percent = 0
+            submitters_batch = []
             for submitter in submitters:
-                submitter.update_submitter_party_slug()
+                submitters_batch.append(submitter)
                 if counter/n_total*100 > (progress_percent+1) :
+                    self.update_batch(submitters_batch)
+                    submitters_batch = []
                     progress_percent = counter/n_total*100
                     logger.info(str(int(progress_percent)) + '%')
                 counter += 1
@@ -114,6 +116,11 @@ class UpdateSubmitters(LockJob):
             logger.exception(error)
             raise
         logger.info('END')
+
+    @transaction.atomic
+    def update_batch(self, submitters):
+        for submitter in submitters:
+            submitter.update_submitter_party_slug()
 
 
 class UpdateActiveDossiers(LockJob):
