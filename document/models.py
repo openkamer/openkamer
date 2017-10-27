@@ -151,6 +151,54 @@ class Dossier(models.Model):
         return title
 
     @cached_property
+    def short_title(self):
+        short_title = self.title
+        wet_split = short_title.split('(Wet')
+        if len(wet_split) > 1:
+            return 'Wet ' + wet_split[1].split(')')[0]
+        overeenkomst_split = short_title.split('Associatieovereenkomst')
+        if len(overeenkomst_split) > 1:
+            return 'Associatieovereenkomst ' + overeenkomst_split[1]
+        verdrag_split = short_title.split('Verdrag')
+        if len(verdrag_split) > 1:
+            short_title = 'Verdrag ' + verdrag_split[1]
+        verandering_split = short_title.split('verandering van de')
+        if len(verandering_split) > 1:
+            short_title = verandering_split[1]
+        wijziging_split = short_title.split('tot wijziging van de')
+        if len(wijziging_split) > 1:
+            short_title = wijziging_split[1]
+        wijziging_split = short_title.split('tot wijziging van')
+        if len(wijziging_split) > 1:
+            short_title = wijziging_split[1]
+        houdende_split = short_title.split('houdende')
+        if len(houdende_split) > 1:
+            short_title = houdende_split[1]
+        short_title = short_title.replace('Wijziging van onder meer de', '')
+        short_title = short_title.replace('Wijziging van de', '')
+        short_title = short_title.replace('Wijziging van het', '')
+        short_title = short_title.replace('Wijziging van', '')
+        short_title = short_title.split('naar aanleiding van')[0]
+        short_title = short_title.split('ter nadere')[0]
+        short_title = short_title.split('en nadere')[0]
+        short_title = short_title.split('teneinde')[0]
+        short_title = short_title.split('alsmede')[0]
+        short_title = short_title.split('in verband met')[0]
+        short_title = short_title.split('en enige andere wetten')[0]
+        short_title = short_title.split('en enkele andere wetten')[0]
+        short_title = short_title.split('met betrekking')[0]
+        short_title = short_title.split('betreffende')[0]
+        short_title = short_title.split('ter implementatie')[0]
+        short_title = short_title.split('ter aanvulling van')[0]
+        short_title = short_title.split('tot vaststelling')[0]
+        short_title = short_title.split('ter invoering')[0]
+        short_title = short_title.split('tot verbetering van')[0]
+        short_title = short_title.split('of daarmee')[0]
+        short_title = short_title.split('ten einde')[0]
+        short_title = short_title.split('inzake')[0]
+        return short_title.strip()
+
+    @cached_property
     def is_withdrawn(self):
         kamerstukken = self.kamerstukken
         if kamerstukken:
