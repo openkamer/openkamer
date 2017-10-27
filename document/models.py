@@ -523,10 +523,13 @@ class Voting(models.Model):
     )
     dossier = models.ForeignKey(Dossier)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
+    kamerstuk_raw_id = models.CharField(max_length=200, blank=True, default='')
     is_dossier_voting = models.BooleanField(default=False)
     is_individual = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
     date = models.DateField(auto_now=False, blank=True, db_index=True)
+    source_url = models.URLField(blank=True, default='')
+    date_updated = models.DateTimeField(auto_now=True)
 
     @cached_property
     def votes(self):
