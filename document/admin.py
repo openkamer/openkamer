@@ -90,6 +90,12 @@ class KamerantwoordAdmin(admin.ModelAdmin):
     )
 
 
+class KamervraagMededelingAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'document', 'vraagnummer', 'kamervraag',
+    )
+
+
 class SubmitterAdmin(admin.ModelAdmin):
     list_display = ('person', 'document')
 
@@ -118,7 +124,7 @@ admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
 admin.site.register(Kamervraag, KamervraagAdmin)
 admin.site.register(Kamerantwoord, KamerantwoordAdmin)
-admin.site.register(KamervraagMededeling)
+admin.site.register(KamervraagMededeling, KamervraagMededelingAdmin)
 
 admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 
