@@ -244,12 +244,12 @@ class CleanUnusedPersons(CronJobBase):
         logger.info('END')
 
 
-class BackupDaily(CronJobBase):
+class BackupDaily(LockJob):
     RUN_AT_TIMES = ['18:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.BackupDaily'
 
-    def do(self):
+    def do_imp(self):
         logger.info('run daily backup cronjob')
         management.call_command('dbbackup', '--clean')
         try:
