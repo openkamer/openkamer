@@ -16,6 +16,17 @@ from document.models import VoteIndividual
 from document.models import Voting
 
 
+class DossierAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'dossier_id',
+        'title',
+        'decision',
+        'status',
+        'date_updated',
+    )
+
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'id',
@@ -35,6 +46,7 @@ class DocumentAdmin(admin.ModelAdmin):
         'publisher',
         'document_url',
         'title_full',
+        'date_updated'
     )
 
 
@@ -48,6 +60,7 @@ class KamerstukAdmin(admin.ModelAdmin):
         'type_long',
         'document_date',
         'original_id',
+        'date_updated'
     )
 
     def document_date(self, obj):
@@ -99,7 +112,7 @@ class VoteIndividualAdmin(admin.ModelAdmin):
 
 admin.site.register(CategoryDossier, CategoryAdmin)
 admin.site.register(CategoryDocument, CategoryAdmin)
-admin.site.register(Dossier)
+admin.site.register(DossierAdmin, Dossier)
 admin.site.register(Document, DocumentAdmin)
 admin.site.register(Kamerstuk, KamerstukAdmin)
 admin.site.register(Submitter, SubmitterAdmin)
