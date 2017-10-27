@@ -27,11 +27,12 @@ from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 from person.models import Person
 
-
 import openkamer.besluitenlijst
 import openkamer.dossier
 import openkamer.kamervraag
 import openkamer.parliament
+
+import stats.models
 
 from website import settings
 
@@ -352,3 +353,17 @@ class UpdateSearchIndex(LockJob):
             raise
         logger.info('END')
 
+
+class UpdateStatsData(LockJob):
+    RUN_AT_TIMES = ['06:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'stats.cron.UpdateStatsData'
+
+    def do_imp(self):
+        logger.info('BEGIN')
+        try:
+            stats.models.update_all()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
