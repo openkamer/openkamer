@@ -10,7 +10,7 @@
 
 {% block content %}
 
-<div class="row pt-2">
+<div class="row pt-3">
   <!--<div class="col-sm-12">-->
     <!--<div class="card card-accent-primary" align="center">-->
       <!--<div class="card-body p-2" align="center">-->
@@ -24,7 +24,10 @@
   <div class="col-sm-12">
 
     <div class="card card-accent-success mb-2">
-      <div class="card-body p-2">
+      <div class="card-header p-2 text-center">
+        <span class="h4 text-primary">Wetsvoorstellen</span>
+      </div>
+      <div class="card-body p-3">
         <form action="" method="get">
 
           <div class="row">
@@ -119,8 +122,9 @@
       </div>
     </div>
   </div>
+
   {% for dossier in dossiers_voted %}
-  <div class="col-md-6">
+  <div class="col-12">
     {% include "document/items/dossier_tile.html" %}
   </div>
 

@@ -24,31 +24,46 @@
 <div class="row">
   <div class="col-lg-12">
 
-    <div align="center">
-      <h5>Wetsvoorstel {{ dossier.dossier_id }} - {{ dossier.first_voorstel.document.date_published }}</h5>
-    </div>
+    <div class="card card-accent-primary">
 
-    <div class="panel panel-default">
-      <div class="panel-heading panel-small" align="center">
+      <div class="card-header p-2">
+        <span class="float-left font-sm font-weight-bold">
+          {{ dossier.dossier_id }}
+        </span>
+        <span class="float-right font-sm font-weight-bold">
+          {{ dossier.last_date }}
+        </span>
+      </div>
+
+      <div class="card-header text-center bg-white py-2">
+        <span class="font-md font-weight-bold">
+          <a href="{% url 'dossier-timeline' dossier.dossier_id %}">
+            {{ dossier.short_title|capfirst }}
+          </a>
+        </span>
+      </div>
+
+      <div class="card-body py-2">
         {% if dossier.first_voorstel %}
-        <h5><a href="{% url 'kamerstuk' dossier.first_voorstel.id_main dossier.first_voorstel.id_sub %}">{{ dossier.title }}</a></h5>
+        <span class="">{{ dossier.title }}</span>
         {% else %}
-        <h5>{{ dossier.title }}</h5>
+          <span class="">{{ dossier.title }}</span>
         {% endif %}
       </div>
 
-      <div class="panel-body panel-small">
-        <h6>Indiener{% if dossier.first_voorstel.document.submitters|length > 1 %}s{% endif %}:
+      <div class="card-footer p-0">
+        <div class="card-group">
           {% with submitters=dossier.first_voorstel.document.submitters %}
             {% include "document/items/submitters_list.html" %}
           {% endwith %}
-        </h6>
+        </div>
       </div>
 
-      <div class="panel-footer panel-small">
-        <h6>Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></h6>
-        <h6 class="small">Bijgewerkt: {{ dossier.date_updated }}</h6>
+      <div class="card-body">
+        <div class="h6">Bron: <a href="{{ dossier.url }}">{{ dossier.url }}</a></div>
+        <div class="font-sm">Bijgewerkt: {{ dossier.date_updated }}</div>
       </div>
+
     </div>
 
   </div>
@@ -88,47 +103,55 @@
         </div>
       {% endif %}
 
-      <div class="panel panel-primary cd-timeline-content">
+      <div class="card {% if dossier_status_class %} card-accent-{{ dossier_status_class }}{% endif %} cd-timeline-content">
 
-        <div class="panel-heading panel-heading-timeline">
-          <div class="row" align="center">
-          {% if dossier.voting %}
-            <h2>Dit wetsvoorstel is {{ dossier.get_status_display }}</h2>
-          {% elif dossier.is_active %}
-            <h2>Dit wetsvoorstel is in behandeling.</h2>
-          {% else %}
-            <h2>Dit wetsvoorstel is niet meer in behandeling.</h2>
-          {% endif %}
-          </div>
+        <div class="card-header p-2">
+          <span class="h6">
+            {% if dossier.voting %}
+              Dit wetsvoorstel is {{ dossier.get_status_display }}
+            {% elif dossier.is_active %}
+              Dit wetsvoorstel is in behandeling.
+            {% else %}
+              Dit wetsvoorstel is niet meer in behandeling.
+            {% endif %}
+          </span>
         </div>
 
-        <div class="panel-body panel-body-timeline">
+        <div class="card-body p-2">
           {% if not dossier.voting and not dossier.is_active %}
+          <span class="h6">
             {% if dossier.is_withdrawn %}
-              <h2>Voorstel is ingetrokken.</h2>
+              Voorstel is ingetrokken.
             {% else %}
-              <h2>Er is niet over gestemd.</h2>
+              Er is niet over gestemd.
             {% endif %}
+          </span>
           {% endif %}
 
           {% if dossier.voting %}
-            <h6>Stemming van {{ dossier.voting.date }}</h6>
+          <span class="h6">
+            Stemming van {{ dossier.voting.date }}
+          </span>
           {% endif %}
 
           {% if dossier.decision %}
-            <h6>Besluit: {{ dossier.decision }}</h6>
+          <br/>
+          <span class="h6">
+            Besluit: {{ dossier.decision }}
           {% else %}
-            <h6>De huidige status is onbekend</h6>
+            De huidige status is onbekend
+          </span>
           {% endif %}
         </div>
 
         {% if dossier.voting %}
-        <div class="panel-footer panel-footer-timeline">
+        <div class="card-footer p-2">
           {% with voting=dossier.voting %}
             {% include "document/items/voting_result_list.html" %}
           {% endwith %}
         </div>
-        <div class="panel-footer panel-footer-timeline-vote-bar">
+
+        <div class="card-footer p-0">
           {% with voting=dossier.voting %}
             {% include "document/items/voting_result_bar.html" %}
           {% endwith %}
@@ -152,5 +175,20 @@
 </div>
 
 <script src="{% static 'js/timeline.js' %}"></script>
+
+{% endblock %}
+
+{% block sidebar %}
+
+    <!--<ul class="nav">-->
+    <!--<li class="nav-title">Kamerstukken</li>-->
+    <!--{% for kamerstuk in dossier.kamerstukken.reverse %}-->
+      <!--<li class="nav-item">-->
+        <!--<a class="nav-link font-sm" href="{% url 'parties' %}">-->
+          <!--<i class="fa fa-file"></i> {{ kamerstuk.type_short }}-->
+        <!--</a>-->
+      <!--</li>-->
+    <!--{% endfor %}-->
+    <!--</ul>-->
 
 {% endblock %}

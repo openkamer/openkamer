@@ -4,68 +4,6 @@
 
 {% block content %}
 
-<div class="row">
-  <div class="col-lg-12" align="center">
-
-    <h5>Kamerstuk {{ kamerstuk.id_full }}</h5>
-
-    <h4>
-    {% if kamerstuk %}
-      {{ kamerstuk.type_long }}
-    {% endif %}
-    {% if kamerstuk.voting %}
-      {% with kamerstuk.voting as voting %}
-      {% include "document/items/voting_result_small.html" %}
-      {% endwith %}
-    {% endif %}
-    </h4>
-
-    <h6>
-    Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.title }}</a>
-    </h6>
-
-  </div>
-</div>
-
-<hr/>
-
-<div class="row">
-  <div class="col-lg-8 col-lg-offset-2">
-    {% include "document/items/kamerstuk_info.html" %}
-  </div>
-</div>
-
-<hr/>
-
-{% if kamerstuk.voting and kamerstuk.voting.votes %}
-  {% with voting=kamerstuk.voting %}
-
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2" align="center">
-        {% include "document/items/voting_result_bar.html" %}
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2">
-      {% include "document/items/voting_result_list_large.html" %}
-    </div>
-  </div>
-
-  <hr/>
-
-  {% endwith %}
-{% endif %}
-
-
-<div class="row">
-  <div class="col-lg-8 col-lg-offset-2">
-  {% with document=kamerstuk.document %}
-    {{ document.content_html|safe }}
-  {% endwith %}
-  </div>
-</div>
-
-
+{% include 'document/kamerstuk/kamerstuk_card.html' %}
 
 {% endblock %}

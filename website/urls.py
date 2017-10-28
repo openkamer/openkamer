@@ -20,6 +20,7 @@ from document.views import DossierTimelineHorizontalView
 from document.views import AgendasView, AgendaView
 from document.views import DocumentView
 from document.views import KamerstukView
+from document.views import get_kamerstuk_html
 from document.views import KamerstukRedirectView
 from document.views import KamerstukCheckView
 from document.views import KamervragenView
@@ -95,6 +96,7 @@ urlpatterns = [
 
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
     url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
+    url(r'^kamerstuk/html/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', get_kamerstuk_html, name='kamerstuk-html'),
     url(r'^kamerstuk/check/$', KamerstukCheckView.as_view(), name='kamerstuk-check'),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 

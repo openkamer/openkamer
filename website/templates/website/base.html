@@ -182,10 +182,13 @@
       </li>
     </ul>
 
-
     <ul class="nav navbar-nav ml-auto">
 
     </ul>
+
+    <button class="navbar-toggler aside-menu-toggler" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
   </header>
 
@@ -222,8 +225,11 @@
             <a class="nav-link" href="{% url 'parties' %}"><i class="fa fa-group"></i> Partijen</a>
           </li>
 
+          {% block sidebar %}{% endblock %}
+
         </ul>
       </nav>
+
       <button class="sidebar-minimizer brand-minimizer" type="button"></button>
     </div>
 
@@ -235,6 +241,10 @@
       </div>
       <!-- /.conainer-fluid -->
     </main>
+
+    <aside class="aside-menu">
+      <div id="aside-container" class="container-fluid"></div>
+    </aside>
 
   </div>
 

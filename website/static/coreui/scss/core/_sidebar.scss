@@ -6,6 +6,7 @@
   color: $sidebar-color;
   background: $sidebar-bg;
   @include borders($sidebar-borders);
+  overlfow-y: scroll;
 
   .sidebar-close {
     position: absolute;

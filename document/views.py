@@ -1,5 +1,6 @@
 import datetime
 import logging
+import json
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
@@ -8,6 +9,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 from haystack.query import SearchQuerySet
 from haystack.generic_views import FacetedSearchView 
@@ -66,6 +69,17 @@ class KamerstukView(TemplateView):
             raise Http404
         context['kamerstuk'] = kamerstukken[0]
         return context
+
+
+def get_kamerstuk_html(request, dossier_id, sub_id):
+    kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
+    if not kamerstukken:
+        raise Http404
+    html = render_to_string('document/kamerstuk/kamerstuk_card.html', {
+        'kamerstuk': kamerstukken[0],
+    })
+    response = json.dumps({'html': html})
+    return HttpResponse(response, content_type='application/json')
 
 
 class KamerstukRedirectView(RedirectView):

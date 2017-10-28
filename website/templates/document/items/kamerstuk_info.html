@@ -1,20 +1,29 @@
-<H5>Gepubliceerd: {{ kamerstuk.document.date_published }}</H5>
-<h5>Indiener(s):
+<div class="card-header px-2 py-1">
+  <span class="float-left font-weight-bold">Gepubliceerd</span>
+  <span class="float-right font-weight-bold">{{ kamerstuk.document.date_published }}</span>
+</div>
+
+<div class="card-group">
   {% with submitters=kamerstuk.document.submitters %}
     {% include "document/items/submitters_list.html" %}
   {% endwith %}
-</h5>
-<h5>Onderwerpen: {% with categories=kamerstuk.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</h5>
-<h5>Bron: <a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.document.document_url }}</a></h5>
-<h5>ID: {{ kamerstuk.id_full }}</h5>
-{% if kamerstuk.original %}
-  <h5 class="text-warning">Origineel: <a href="{% url 'kamerstuk' kamerstuk.original.id_main kamerstuk.original.id_sub %}">{{ kamerstuk.original.id_full }}</a></h5>
-{% endif %}
+</div>
+
+<div class="card-body py-2 px-3">
+  <div class="h6">Onderwerpen: {% with categories=kamerstuk.document.categories.all %}{% include "document/items/category_list.html" %}{% endwith %}</div>
+  <div class="h6">Bron: <a href="{{ kamerstuk.document.document_url }}">{{ kamerstuk.document.document_url }}</a></div>
+  {% if kamerstuk.original %}
+    <div class="h6 text-warning">Origineel: <a href="{% url 'kamerstuk' kamerstuk.original.id_main kamerstuk.original.id_sub %}">{{ kamerstuk.original.id_full }}</a></div>
+  {% endif %}
+</div>
 
 {% if kamerstuk.modifications %}
-  <h5><font class="text-warning">Wijzigingen:</font>
-  {% for modification in kamerstuk.modifications %}
-    <a href="{% url 'kamerstuk' modification.id_main modification.id_sub %}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
-  {% endfor %}
-  </h5>
+<div class="card-footer py-1 px-3">
+  <span class="h6">
+    <font class="text-warning">Wijzigingen:</font>
+    {% for modification in kamerstuk.modifications %}
+      <a href="{% url 'kamerstuk' modification.id_main modification.id_sub %}">{{ modification.id_full }}</a>{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  </span>
+</div>
 {% endif %}

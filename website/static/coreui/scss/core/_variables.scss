@@ -43,10 +43,10 @@ $navbar-border: (
   bottom: (
     size:                             1px,
     style:                            solid,
-    color:                            $border-color
+    color:                            theme-color("primary") //$border-color
   )
 )  !default;
-$navbar-brand-width:                  170px !default;
+$navbar-brand-width:                  200px !default;
 $navbar-brand-bg:                     #fff !default;
 $navbar-brand-logo:                   url('../img/logo.png') !default;
 $navbar-brand-logo-size:              70px auto !default;
@@ -64,9 +64,9 @@ $navbar-brand-minimized-logo:         url('../img/logo-symbol.png') !default;
 $navbar-brand-minimized-logo-size:    24px !default;
 $navbar-brand-minimized-border:       $navbar-brand-border !default;
 
-$navbar-color:                        $gray-700 !default;
-$navbar-hover-color:                  $primary !default;
-$navbar-active-color:                 $primary !default;
+$navbar-color:                        theme-color("primary") !default;
+$navbar-hover-color:                  darken($primary, 30%) !default;
+$navbar-active-color:                 darken($primary, 30%) !default;
 $navbar-disabled-color:               $gray-300 !default;
 
 $navbar-toggler-icon:                 str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
@@ -81,7 +81,7 @@ $sidebar-minimized-height:            $sidebar-minimized-width !default;
 $sidebar-compact-width:               150px !default;
 $sidebar-compact-height:              $sidebar-compact-width !default;
 $sidebar-color:                       #fff !default;
-$sidebar-bg:                          darken($primary, 40%) !default;
+$sidebar-bg:                          darken($primary, 35%) !default;
 $sidebar-borders:                     none !default;
 $mobile-sidebar-width:                220px !default;
 
@@ -186,14 +186,14 @@ $breadcrumb-borders: (
 
 // Aside
 
-$aside-menu-width:                    250px !default;
+$aside-menu-width:                    40% !default;
 $aside-menu-color:                    $gray-800 !default;
-$aside-menu-bg:                       #fff !default;
+$aside-menu-bg:                       lighten($primary, 35%) !default;
 $aside-menu-borders: (
   left: (
-    size:                             1px,
+    size:                             3px,
     style:                            solid,
-    color:                            $border-color
+    color:                            theme-color("primary")
   )
 ) !default;
 

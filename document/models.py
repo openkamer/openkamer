@@ -156,6 +156,12 @@ class Dossier(models.Model):
         wet_split = short_title.split('(Wet')
         if len(wet_split) > 1:
             return 'Wet ' + wet_split[1].split(')')[0]
+        wet_split = short_title.split('(Verzamelwet')
+        if len(wet_split) > 1:
+            return 'Verzamelwet ' + wet_split[1].split(')')[0]
+        wet_split = short_title.split('(Tijdelijke wet')
+        if len(wet_split) > 1:
+            return 'Tijdelijke wet ' + wet_split[1].split(')')[0]
         overeenkomst_split = short_title.split('Associatieovereenkomst')
         if len(overeenkomst_split) > 1:
             return 'Associatieovereenkomst ' + overeenkomst_split[1]
@@ -171,7 +177,7 @@ class Dossier(models.Model):
         wijziging_split = short_title.split('tot wijziging van')
         if len(wijziging_split) > 1:
             short_title = wijziging_split[1]
-        houdende_split = short_title.split('houdende')
+        houdende_split = short_title.split(' houdende')
         if len(houdende_split) > 1:
             short_title = houdende_split[1]
         short_title = short_title.replace('Wijziging van onder meer de', '')

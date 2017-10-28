@@ -1,0 +1,59 @@
+<div class="card card-accent-primary mt-3">
+
+  <div class="card-header px-2 py-1">
+    <span class="float-right font-weight-bold">{{ kamerstuk.id_full }}</span>
+    <span class="float-left font-weight-bold">Kamerstuk</span>
+  </div>
+
+  <div class="card-header bg-white p-2 text-center">
+    <span class="h4">
+    {% if kamerstuk %}
+      {{ kamerstuk.type_long }}
+    {% endif %}
+    {% if kamerstuk.voting %}
+      {% with kamerstuk.voting as voting %}
+      {% include "document/items/voting_result_small.html" %}
+      {% endwith %}
+    {% endif %}
+    </span>
+
+  </div>
+  <div class="card-header bg-white px-3 py-2">
+    <span class="font-weight-bold">Dossier</span>
+    <br/>
+    <span class="h6">
+      <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">
+        {{ kamerstuk.document.title }}
+      </a>
+    </span>
+  </div>
+</div>
+
+<div class="card card-accent-primary">
+  {% include "document/items/kamerstuk_info.html" %}
+</div>
+
+{% if kamerstuk.voting and kamerstuk.voting.votes %}
+<div class="card card-accent-primary">
+  {% with voting=kamerstuk.voting %}
+  <div class="card-header p-0">
+    {% include "document/items/voting_result_bar.html" %}
+  </div>
+
+  <div class="card-body">
+    {% include "document/items/voting_result_list_large.html" %}
+  </div>
+  {% endwith %}
+</div>
+{% endif %}
+
+<div class="card card-accent-primary">
+  <div class="card-header text-center p-2">
+    <span class="font-weight-bold">Document</span>
+  </div>
+  <div class="card-body px-3">
+    {% with document=kamerstuk.document %}
+      {{ document.content_html|safe }}
+    {% endwith %}
+  </div>
+</div>

@@ -10,61 +10,81 @@
   <span style="font-size:24px;" class="fa {{ icon_name }}"></span>
 </div> <!-- cd-timeline-img -->
 
-<div class="panel panel-default cd-timeline-content">
+<div class="card card-accent-primary cd-timeline-content">
 
-  <div class="panel-heading panel-heading-timeline">
-    <div class="row">
+  <div class="card-header p-2">
 
-      <div class="col-xs-2">
       {% if kamerstuk.voting %}
+      <span class="pr-2">
         {% with voting=kamerstuk.voting %}
-        <h2>{% include "document/items/voting_result_small.html" %}</h2>
+        {% include "document/items/voting_result_small.html" %}
         {% endwith %}
+      </span>
       {% endif %}
-      </div>
 
-      <div class="col-xs-8" align="center">
-      {% if kamerstuk.type_short != kamerstuk.type_long %}
-        <h6>{{ kamerstuk.type_short|capfirst }}</h6>
-      {% else %}
-        <h6><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_long }}</a></h6>
-      {% endif %}
-      </div>
+      <span class="font-sm font-weight-bold">
+        <a id="kamerstuk-link-{{ kamerstuk.id }}" href="#">
+          {% if kamerstuk.type_short != kamerstuk.type_long %}
+            {{ kamerstuk.type_short|capfirst }}
+          {% else %}
+              {{ kamerstuk.type_long }}
+          {% endif %}
+        </a>
+      </span>
 
-      <div class="hidden-xs hidden-sm col-xs-2 kamertuk-id-timeline-container">
-        <a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.id_full }}</a>
-      </div>
+      <script>
+        $(function() {
+          $("#kamerstuk-link-{{ kamerstuk.id }}").bind('click', function() {
+            $.get(
+              "{% url 'kamerstuk-html' kamerstuk.id_main kamerstuk.id_sub  %}",
+              {
+              },
+              function(data) {
+                $("#aside-container").html(data.html);
+                $('body').removeClass('aside-menu-hidden');
+              },
+              "json"
+            );
+          });
+        });
+      </script>
 
-    </div>
+      <span class="font-sm float-right">
+        <span class="cd-date">
+          <span class="font-sm font-weight-bold">{{ kamerstuk.document.date_published|date:"j F Y" }}</span>
+        </span>
+      </span>
+
   </div>
 
   {% if kamerstuk.type_short != kamerstuk.type_long %}
-  <div class="panel-body panel-body-timeline" align="center">
-    <h6><a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.type_long }}</a></h6>
+  <div class="card-body p-2">
+    <a href="{% url 'kamerstuk' kamerstuk.id_main kamerstuk.id_sub %}">{{ kamerstuk.id_full }}</a>
+    <span class="font-sm">{{ kamerstuk.type_long }}</span>
   </div>
   {% endif %}
 
   {% if is_person_timeline %}
-  <div class="panel-footer panel-footer-timeline" align="left">
+  <div class="card-footer">
     <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title|truncatechars:200 }}</a></h6>
   </div>
   {% endif %}
 
-  <div class="panel-footer panel-footer-timeline">
+  <div class="card-footer p-0">
     {% with submitters=kamerstuk.document.submitters %}
     {% if submitters %}
-      <h6 class="small">
-        {% if submitters|length > 1 %}Indieners:{% else %}Indiener:{% endif %}
         {% include "document/items/submitters_list.html" %}
-      </h6>
     {% endif %}
     {% endwith %}
 
-    <h6 class="small">{% include "document/items/kamerstuk_modifications.html" %}</h6>
+  </div>
+
+  <div class="card-footer p-0 border-0">
+    <span class="small">{% include "document/items/kamerstuk_modifications.html" %}</span>
   </div>
 
   {% if kamerstuk.voting %}
-  <div class="panel-footer panel-footer-timeline-vote-bar">
+  <div class="card-footer p-0 border-0">
     {% with voting=kamerstuk.voting %}
     {% include "document/items/voting_result_bar_small.html" %}
     {% endwith %}
@@ -72,9 +92,9 @@
   {% endif %}
 
   {% if item.besluit_cases %}
-  <div class="panel-footer panel-footer-timeline">
+  <div class="card-body p-2">
     {% for case in item.besluit_cases %}
-      <p>
+      <span class="font-sm">
       {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
       <strong>Commissie besluit</strong> - {{ case.besluit_item.besluiten_lijst.date_published }} -
       besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
@@ -82,15 +102,14 @@
       {% for decision in case.decision_list %}
         {{ decision }}{% if not forloop.last %}<br/>{% endif %}
       {% endfor %}
-      </p>
+      </span>
     {% endfor %}
   </div>
   {% endif %}
 
-  <div class="visible-xs visible-sm panel-footer panel-footer-timeline">
-    <h6 class="small">{{ kamerstuk.document.date_published|date:"j F Y" }}</h6>
-  </div>
-  <span class="hidden-xs hidden-sm cd-date"><h2>{{ kamerstuk.document.date_published|date:"j F Y" }}</h2></span>
+  <!--<div class="visible-xs visible-sm panel-footer panel-footer-timeline">-->
+    <!--<h6 class="small">{{ kamerstuk.document.date_published|date:"j F Y" }}</h6>-->
+  <!--</div>-->
 
 </div> <!-- cd-timeline-content -->
 

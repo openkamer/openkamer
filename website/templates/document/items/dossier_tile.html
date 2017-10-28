@@ -6,30 +6,16 @@
 <div class="card card-accent-{{ dossier_status_class }}">
 
   <div class="card-header pt-2 pb-2">
-    <div class="row">
 
-      <div class="col-md-7 col-lg-8">
-        <span class="float-left font-weight-bold">
-          <i class="fa fa-balance-scale d-none d-md-inline pr-2"></i>
-          <a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.short_title|capfirst }}</a>
-        </span>
-      </div>
-
-      <div class="col-md-5 col-lg-4 d-none d-md-block">
-        <span class="float-right">
-          <span class="font-sm pr-2">{{ dossier.dossier_id }}</span>
-          <span class="font-sm">{{ dossier.last_date }}</span>
-          <span class="fa {{ dossier_status_icon }} pl-2 text-{{ dossier_status_class }}" title="{{ dossier.get_status_display }}"></span>
-        </span>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="card-body pt-2 pb-2">
-    <span>
-      {{ dossier.title }}
+    <span class="font-weight-bold">
+      <i class="fa fa-balance-scale d-none d-md-inline pr-2"></i>
+      <a href="{% url 'dossier-timeline' dossier.dossier_id %}">{{ dossier.short_title|capfirst }}</a>
     </span>
+
+    <span class="float-right d-none d-md-inline pl-2">
+      <i class="fa {{ dossier_status_icon }} text-{{ dossier_status_class }}" title="{{ dossier.get_status_display }}"></i>
+    </span>
+
   </div>
 
   {% if dossier.first_voorstel.document.submitters %}
@@ -40,8 +26,15 @@
   </div>
   {% endif %}
 
-  <div class="card-footer d-md-none pt-2 pb-2">
-    <span class="font-sm">{{ dossier.last_date }}</span>
+  <div class="card-body pt-2 pb-3">
+    <span class="font-sm">
+      {{ dossier.title }}
+    </span>
+  </div>
+
+  <div class="card-footer pt-2 pb-2">
+    <span class="font-sm">{{ dossier.dossier_id }}</span>
+    <span class="float-right font-sm font-weight-bold">{{ dossier.last_date }}</span>
   </div>
 
   {% if dossier.voting %}
