@@ -75,12 +75,12 @@ class TestJob(LockJob):
         logger.info('END')
 
 
-class UpdateParliamentAndGovernment(CronJobBase):
+class UpdateParliamentAndGovernment(LockJob):
     RUN_AT_TIMES = ['20:00']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateParliamentAndGovernment'
 
-    def do(self):
+    def do_imp(self):
         logger.info('BEGIN')
         try:
             openkamer.parliament.create_parliament_and_government()
