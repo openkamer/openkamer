@@ -142,6 +142,7 @@ def create_submitter(document, submitter, date):
         surname, surname_prefix = parse_surname_comma_surname_prefix(submitter)
     if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
         initials = ''
+
     person = Person.find_surname_initials(surname=surname, initials=initials)
     if surname == 'JAN JACOB VAN DIJK':  # 'Jan Jacob van Dijk' and ' Jasper van Dijk' have the same surname and initials, to solve this they have included the forename in the surname
         person = Person.objects.filter(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
@@ -149,6 +150,7 @@ def create_submitter(document, submitter, date):
         person = Person.objects.filter(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
     if surname == 'JAN DE VRIES':
         person = Person.objects.filter(forename='Jan', surname_prefix='de', surname='Vries', initials='J.M.')[0]
+
     if not person:
         active_persons = get_active_persons(date)
         persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(
@@ -167,8 +169,11 @@ def create_submitter(document, submitter, date):
     if not person:
         logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
         person = Person.objects.create(surname=surname, surname_prefix=surname_prefix, initials=initials)
+
     party_members = PartyMember.get_at_date(person, date)
     party_slug = ''
     if party_members:
         party_slug = party_members[0].party.slug
-    return Submitter.objects.create(person=person, document=document, party_slug=party_slug)
+
+    submitter, created = Submitter.objects.get_or_create(person=person, document=document, party_slug=party_slug)
+    return submitter
