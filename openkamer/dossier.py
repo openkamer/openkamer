@@ -135,7 +135,9 @@ def create_or_update_dossier(dossier_id):
 
 
 def get_inactive_dossier_ids():
-    return list(Dossier.objects.filter(status__in=[Dossier.VERWORPEN, Dossier.AANGENOMEN]).values_list('dossier_id', flat=True))
+    return list(Dossier.objects.filter(status__in=[
+        Dossier.VERWORPEN, Dossier.AANGENOMEN, Dossier.INGETROKKEN, Dossier.CONTROVERSIEEL
+    ]).values_list('dossier_id', flat=True))
 
 
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
