@@ -169,7 +169,7 @@ class UpdateSubmitters(LockJob):
             submitters_batch = []
             for submitter in submitters:
                 submitters_batch.append(submitter)
-                if counter/n_total*100 > (progress_percent+1) :
+                if counter/n_total*100 > (progress_percent+1):
                     self.update_batch(submitters_batch)
                     submitters_batch = []
                     progress_percent = counter/n_total*100
