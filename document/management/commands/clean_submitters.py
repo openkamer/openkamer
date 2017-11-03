@@ -2,6 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.db import models
 
 from document.models import Document
 from document.models import Submitter
@@ -16,18 +17,15 @@ class Command(BaseCommand):
 
     # @transaction.atomic
     def do(self):
-        submitters = Submitter.objects.all()
-        documents = Document.objects.all()
-        counter = 1
-        n_docs = documents.count()
-        print(n_docs)
-        for document in documents:
-            print('document ' + str(counter) + '/' + str(n_docs))
-            doc_submitters = submitters.filter(document=document)
-            person_ids = []
-            for doc_sub in doc_submitters:
-                if doc_sub.person.id in person_ids:
-                    doc_sub.delete()
-                else:
-                    person_ids.append(doc_sub.person.id)
-            counter += 1
+        unique_fields = ['person', 'document']
+
+        duplicates = (Submitter.objects.values(*unique_fields)
+                      .order_by()
+                      .annotate(max_id=models.Max('id'),
+                                count_id=models.Count('id'))
+                      .filter(count_id__gt=1))
+
+        for duplicate in duplicates:
+            (Submitter.objects.filter(**{x: duplicate[x] for x in unique_fields})
+             .exclude(id=duplicate['max_id'])
+             .delete())
