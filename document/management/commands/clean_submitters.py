@@ -14,7 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.do()
 
-    @transaction.atomic
+    # @transaction.atomic
     def do(self):
         submitters = Submitter.objects.all()
         documents = Document.objects.all()
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         n_docs = documents.count()
         print(n_docs)
         for document in documents:
-            print('document ' +  str(counter) + '/' + str(n_docs))
+            print('document ' + str(counter) + '/' + str(n_docs))
             doc_submitters = submitters.filter(document=document)
             person_ids = []
             for doc_sub in doc_submitters:
