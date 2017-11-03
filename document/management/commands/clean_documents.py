@@ -35,18 +35,18 @@ class Command(BaseCommand):
     @staticmethod
     def remove_unrelated():
         deleted_ids = []
-        for document in Document.objects.all():
-            if Kamerstuk.objects.filter(document=document):
+        for document in Document.objects.only('id'):
+            if Kamerstuk.objects.filter(document__id=document.id):
                 continue
-            if Kamervraag.objects.filter(document=document):
+            if Kamervraag.objects.filter(document__id=document.id):
                 continue
-            if Kamerantwoord.objects.filter(document=document):
+            if Kamerantwoord.objects.filter(document__id=document.id):
                 continue
-            if Agenda.objects.filter(document=document):
+            if Agenda.objects.filter(document__id=document.id):
                 continue
             deleted_ids.append(document.id)
             document.delete()
-        print('deleted: ' + str(len(deleted_ids)))
+        print('no relation: ' + str(len(deleted_ids)))
 
     @staticmethod
     def remove_duplicates(unique_together_fields):
