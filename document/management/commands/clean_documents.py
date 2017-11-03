@@ -4,13 +4,17 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db import models
 
+from document.models import Agenda
 from document.models import Document
+from document.models import Kamerstuk
+from document.models import Kamervraag
+from document.models import Kamerantwoord
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    """Remove duplicate documents"""
+    """Remove duplicate documents and documents without relations"""
 
     def handle(self, *args, **options):
         self.do()
@@ -19,6 +23,7 @@ class Command(BaseCommand):
     def do(self):
         unique_together_fields = ['document_id']
         Command.remove_duplicates(unique_together_fields)
+        Command.remove_unrelated()
         # unique_together_fields = ['source_url']
         # Command.remove_duplicates(unique_together_fields)
         # unique_together_fields = ['title_short']
@@ -26,6 +31,22 @@ class Command(BaseCommand):
         # relations = Command.find_relations()
         # for relation in relations:
         #     print(relation)
+
+    @staticmethod
+    def remove_unrelated():
+        deleted_ids = []
+        for document in Document.objects.all():
+            if Kamerstuk.objects.filter(document=document):
+                continue
+            if Kamervraag.objects.filter(document=document):
+                continue
+            if Kamerantwoord.objects.filter(document=document):
+                continue
+            if Agenda.objects.filter(document=document):
+                continue
+            deleted_ids.append(document.id)
+            document.delete()
+        print('deleted: ' + str(len(deleted_ids)))
 
     @staticmethod
     def remove_duplicates(unique_together_fields):
