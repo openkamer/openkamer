@@ -94,6 +94,8 @@ class TestSubmitter(TestCase):
         self.assertEqual(len(members), len(expected_members))
         for mem in members:
             self.assertTrue(mem in expected_members)
+        document.delete()
+        submitter.delete()
 
 
 class TestVoting(TestCase):
