@@ -17,15 +17,15 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def do(self):
-        unique_fields = ['person', 'document']
+        unique_together_fields = ['person', 'document']
 
-        duplicates = (Submitter.objects.values(*unique_fields)
+        duplicates = (Submitter.objects.values(*unique_together_fields)
                       .order_by()
                       .annotate(max_id=models.Max('id'),
                                 count_id=models.Count('id'))
                       .filter(count_id__gt=1))
 
         for duplicate in duplicates:
-            (Submitter.objects.filter(**{x: duplicate[x] for x in unique_fields})
+            (Submitter.objects.filter(**{x: duplicate[x] for x in unique_together_fields})
              .exclude(id=duplicate['max_id'])
              .delete())
