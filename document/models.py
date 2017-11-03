@@ -236,6 +236,9 @@ class Submitter(models.Model):
     document = models.ForeignKey(Document)
     party_slug = models.CharField(max_length=500, blank=True, default='', db_index=True)
 
+    class Meta:
+        unique_together = ['person', 'document']
+
     def __str__(self):
         return self.person.fullname()
 
