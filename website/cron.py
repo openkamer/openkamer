@@ -267,6 +267,8 @@ class BackupDaily(LockJob):
                 'dumpdata',
                 '--all',
                 '--natural-foreign',
+                '--exclude', 'auth.permission'
+                '--exclude', 'contenttypes'
                 'person',
                 'parliament',
                 'government',
