@@ -121,7 +121,9 @@ class GovernmentPosition(models.Model):
 
     @cached_property
     def member_latest(self):
-        return self.members_latest[0]
+        if self.members_latest:
+            return self.members_latest[0]
+        return None
 
     @cached_property
     def members_latest(self):
