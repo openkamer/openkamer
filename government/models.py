@@ -39,13 +39,13 @@ class Government(models.Model):
         return None
 
     @cached_property
-    def deputy_prime_minister(self):
+    def deputy_prime_ministers(self):
         deputies = GovernmentPosition.objects.filter(
             position=GovernmentPosition.DEPUTY_PRIME_MINISTER,
             government=self
         )
         if deputies.exists():
-            return deputies[0].member_latest
+            return deputies[0].members_latest
         return None
 
     @cached_property
@@ -121,13 +121,17 @@ class GovernmentPosition(models.Model):
 
     @cached_property
     def member_latest(self):
+        return self.members_latest[0]
+
+    @cached_property
+    def members_latest(self):
         current = GovernmentMember.objects.filter(position=self, end_date__isnull=True)
         if current:
-            return current[0]
+            return current
         else:
             at_end = GovernmentMember.objects.filter(position=self, end_date__gte=self.government.date_dissolved).order_by('-end_date')
         if at_end:
-            return at_end[0]
+            return at_end
         return None
 
     @cached_property
