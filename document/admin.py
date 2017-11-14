@@ -97,7 +97,7 @@ class KamervraagMededelingAdmin(admin.ModelAdmin):
 
 
 class SubmitterAdmin(admin.ModelAdmin):
-    list_display = ('person', 'document')
+    list_display = ('id', 'person', 'party_slug', 'document_id')
 
 
 class VotingAdmin(admin.ModelAdmin):
