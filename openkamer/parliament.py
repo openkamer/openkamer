@@ -57,8 +57,8 @@ def create_governments():
     # Balkenende IV : Q1719725
     # Rutte I : Q168828
     # Rutte II : Q1638648
-    # Rutte III : ?
-    government_ids = ['Q1473297', 'Q1638648', 'Q168828', 'Q1719725']
+    # Rutte III : Q42293409
+    government_ids = ['Q42293409', 'Q1638648', 'Q168828', 'Q1719725', 'Q1473297']
     for wikidata_id in government_ids:
         create_government(wikidata_id)
 
@@ -82,6 +82,7 @@ def create_government_members(government, max_members=None):
     members_created = []
     members = scraper.government.get_government_members(government.wikidata_id, max_members=max_members)
     for member in members:
+        logger.info(member['name'] + ' ' + member['position'])
         ministry = create_ministry(government, member)
         position = create_government_position(government, member, ministry)
         person = get_or_create_person(member['wikidata_id'], member['name'], add_initials=True)
