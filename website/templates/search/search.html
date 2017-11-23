@@ -71,10 +71,8 @@
                     {% else %}
                     {% endif %}
                     {% for hl in result.highlighted.text %}
-                        {% autoescape off %}{{hl}}{% endautoescape %} ... {% endfor %}
-
-                    
-                    
+                        {% autoescape off %}{{hl}}{% endautoescape %} ...
+                    {% endfor %}
                 </p>
             {% empty %}
                 <p>No results found.</p>

@@ -16,8 +16,9 @@ from document.models import Dossier
 from document.models import Kamerstuk
 
 from openkamer.agenda import create_agenda
-from openkamer.kamerstuk import update_document_html_links
-from openkamer.kamerstuk import create_submitter
+from openkamer.document import update_document_html_links
+from openkamer.document import create_submitter
+from openkamer.document import get_categories
 from openkamer.kamerstuk import create_kamerstuk
 from openkamer.voting import create_votings
 
@@ -185,15 +186,3 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
             logger.error(error)
     logger.info('END')
     return failed_dossiers
-
-
-@transaction.atomic
-def get_categories(text, category_class=CategoryDocument, sep_char='|'):
-    category_list = text.split(sep_char)
-    categories = []
-    for category_name in category_list:
-        name = category_name.lower().strip()
-        if name:
-            category, created = category_class.objects.get_or_create(name=name)
-            categories.append(category)
-    return categories

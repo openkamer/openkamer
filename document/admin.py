@@ -48,12 +48,14 @@ class DocumentAdmin(admin.ModelAdmin):
         'title_full',
         'date_updated'
     )
+    list_filter = ('publication_type',)
 
 
 class KamerstukAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'id_main',
+        'id_main_extra',
         'id_sub',
         'type',
         'type_short',
@@ -62,6 +64,7 @@ class KamerstukAdmin(admin.ModelAdmin):
         'original_id',
         'date_updated'
     )
+    list_filter = ('type',)
 
     def document_date(self, obj):
         return obj.document.date_published

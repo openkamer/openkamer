@@ -17,11 +17,12 @@ from document.models import Dossier
 from document.models import Kamervraag
 from document.models import Voting
 
-import openkamer.kamervraag
+import openkamer.besluitenlijst
+import openkamer.document
 import openkamer.dossier
 import openkamer.kamerstuk
+import openkamer.kamervraag
 import openkamer.parliament
-import openkamer.besluitenlijst
 import openkamer.voting
 
 
@@ -81,40 +82,40 @@ class TestCreatePerson(TestCase):
         parliament = Parliament.get_or_create_tweede_kamer()
         ParliamentMember.objects.create(person=p1, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.kamerstuk.create_submitter(document, 'L. van Tongeren', date)
+        submitter = openkamer.document.create_submitter(document, 'L. van Tongeren', date)
         self.assertEqual(submitter.person.initials, 'L.')
-        submitter = openkamer.kamerstuk.create_submitter(document, 'Tongeren C.S.', date)
+        submitter = openkamer.document.create_submitter(document, 'Tongeren C.S.', date)
         self.assertEqual(submitter.person.initials, '')
-        submitter = openkamer.kamerstuk.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertEqual(submitter.person, p1)
         p5 = Person.objects.create(forename='', surname='Dijsselbloem', initials='')
-        submitter = openkamer.kamerstuk.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertEqual(submitter.person, p1)
         p2 = Person.objects.create(forename='Pieter', surname='Dijsselbloem', initials='P.')
         ParliamentMember.objects.create(person=p2, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
-        submitter = openkamer.kamerstuk.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertNotEqual(submitter.person, p1)
         self.assertNotEqual(submitter.person, p2)
         p3 = Person.objects.create(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')
         p4 = Person.objects.create(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')
-        submitter = openkamer.kamerstuk.create_submitter(document, 'JAN JACOB VAN DIJK', date)
+        submitter = openkamer.document.create_submitter(document, 'JAN JACOB VAN DIJK', date)
         self.assertEqual(submitter.person, p3)
-        submitter = openkamer.kamerstuk.create_submitter(document, 'JASPER VAN DIJK', date)
+        submitter = openkamer.document.create_submitter(document, 'JASPER VAN DIJK', date)
         self.assertEqual(submitter.person, p4)
 
     def test_submitter_empty(self):
         p1 = Person.objects.create(forename='', surname='', initials='')
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.kamerstuk.create_submitter(document, '', datetime.date.today())
+        submitter = openkamer.document.create_submitter(document, '', datetime.date.today())
         self.assertEqual(submitter.person, p1)
 
     def test_submitter_surname_only(self):
         p1 = Person.objects.create(forename='', surname='van Raak', initials='')
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.kamerstuk.create_submitter(document, 'VAN RAAK', datetime.date.today())
+        submitter = openkamer.document.create_submitter(document, 'VAN RAAK', datetime.date.today())
         self.assertEqual(submitter.person, p1)
         p2 = Person.objects.create(forename='', surname_prefix='van der', surname='Ham', initials='')
-        submitter = openkamer.kamerstuk.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
+        submitter = openkamer.document.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
         self.assertEqual(submitter.person, p2)
 
 
@@ -274,7 +275,7 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        document, vraagnummer, related_document_ids = openkamer.kamervraag.create_kamervraag_document(infos[0]['document_number'], infos[0]['overheidnl_document_id'])
+        document, vraagnummer, related_document_ids = openkamer.kamervraag.create_kamervraag_document(infos[0]['overheidnl_document_id'])
         # print(metadata)
 
     def test_get_receiver_from_title(self):
@@ -342,7 +343,7 @@ class TestKamervraag(TestCase):
 
     def test_postponed_answer(self):
         overheid_id = 'kv-tk-2017Z07318'
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_id, overheid_id)
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_id)
         self.assertEqual(len(related_document_ids), 2)
         kamerantwoord, mededelingen = openkamer.kamervraag.create_related_kamervraag_documents(kamervraag, related_document_ids)
         self.assertTrue(kamerantwoord)
@@ -351,10 +352,10 @@ class TestKamervraag(TestCase):
 
     def test_update_or_create(self):
         overheid_doc_id = 'kv-tk-2017Z07318'
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id)
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id, overheid_doc_id)
+        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id)
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
 
@@ -363,7 +364,7 @@ class TestKamerantwoord(TestCase):
 
     def test_combined_answers(self):
         overheidnl_document_id = 'ah-tk-20152016-1580'
-        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(overheidnl_document_id, overheidnl_document_id)
+        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(overheidnl_document_id)
         self.assertEqual(kamerantwoord.antwoord_set.count(), 4)
         antwoorden = kamerantwoord.antwoord_set.all()
         self.assertEqual(antwoorden[0].see_answer_nr, None)

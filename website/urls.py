@@ -11,6 +11,7 @@ from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import PartyAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
+from document.views import DocumentSearchView
 from document.views import DossiersCheckView
 from document.views import DossiersView
 from document.views import DossiersTableView
@@ -29,7 +30,7 @@ from document.views import PersonDocumentsView
 from document.views import VotingView
 from document.views import VotingsView
 from document.views import VotingsCheckView
-from document.views import DocumentSearchView
+from document.views import VerslagenAlgemeenOverlegView
 from government.views import GovernmentsView
 from government.views import GovernmentView
 from government.views import GovernmentCurrentView
@@ -101,6 +102,8 @@ urlpatterns = [
     url(r'^kamervragen/$', KamervragenView.as_view(), name='kamervragen'),
     url(r'^kamervragen/tabel/(?P<year>\d{4})/$', KamervragenTableView.as_view(), name='kamervragen-table'),
     url(r'^kamervraag/(?P<vraagnummer>.*)/$', KamervraagView.as_view(), name='kamervraag'),
+
+    url(r'^commissie/verslagen/$', VerslagenAlgemeenOverlegView.as_view(), name='verslagen-algemeen-overleg'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
 

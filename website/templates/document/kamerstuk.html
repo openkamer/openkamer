@@ -20,9 +20,11 @@
     {% endif %}
     </h4>
 
+    {% if kamerstuk.document.dossier %}
     <h6>
     Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.title }}</a>
     </h6>
+    {% endif %}
 
   </div>
 </div>

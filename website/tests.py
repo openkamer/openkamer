@@ -23,6 +23,7 @@ from document.models import Kamerstuk
 from document.models import Voting
 
 import openkamer.besluitenlijst
+import openkamer.document
 import openkamer.dossier
 import openkamer.kamerstuk
 
@@ -345,7 +346,7 @@ class TestDocumentLinks(TestCase):
     def test_update_document_html_links(self):
         url = 'https://zoek.officielebekendmakingen.nl/kst-33771-8.html'
         document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
-        openkamer.dossier.update_document_html_links(content_html)
+        openkamer.document.update_document_html_links(content_html)
 
     def test_create_new_url(self):
         url = 'kst-33569-1.html'
@@ -362,8 +363,8 @@ class TestDocumentLinks(TestCase):
         self.check_url(url, url_expected)
 
     def check_url(self, url, url_expected):
-        new_url = openkamer.kamerstuk.create_new_url(url)
+        new_url = openkamer.document.create_new_url(url)
         self.assertEqual(new_url, url_expected)
         url = new_url
-        new_url = openkamer.kamerstuk.create_new_url(url)
+        new_url = openkamer.document.create_new_url(url)
         self.assertEqual(new_url, url)

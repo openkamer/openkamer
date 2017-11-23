@@ -12,7 +12,7 @@ class Command(BaseCommand):
         for document in documents:
             if not document.content_html:
                 continue
-            document.content_html = openkamer.dossier.update_document_html_links(document.content_html)
+            document.content_html = openkamer.document.update_document_html_links(document.content_html)
             document.save()
             counter += 1
             print(counter)

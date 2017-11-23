@@ -406,12 +406,15 @@ class Kamerstuk(models.Model):
     NOTA = 'Nota'
     BRIEF = 'Brief'
     UNKNOWN = 'Onbekend'
+    VERSLAG_AO = 'VerslagAlgemeenOverleg'
     TYPE_CHOICES = (
         (MOTIE, MOTIE), (AMENDEMENT, AMENDEMENT), (WETSVOORSTEL, WETSVOORSTEL),
-        (VERSLAG, VERSLAG), (NOTA, NOTA), (BRIEF, BRIEF), (UNKNOWN, UNKNOWN)
+        (VERSLAG, VERSLAG), (NOTA, NOTA), (BRIEF, BRIEF),  (VERSLAG_AO, 'Verslag van een algemeen overleg'),
+        (UNKNOWN, UNKNOWN)
     )
     document = models.ForeignKey(Document)
     id_main = models.CharField(max_length=40, blank=True, db_index=True)
+    id_main_extra = models.CharField(max_length=40, blank=True, db_index=True)
     id_sub = models.CharField(max_length=40, blank=True, db_index=True)
     type_short = models.CharField(max_length=400, blank=True)
     type_long = models.CharField(max_length=2000, blank=True)
@@ -443,6 +446,8 @@ class Kamerstuk(models.Model):
             return Kamerstuk.AMENDEMENT
         elif self.voorstelwet:
             return Kamerstuk.WETSVOORSTEL
+        elif 'verslag van een algemeen overleg' in self.type_long.lower():
+            return Kamerstuk.VERSLAG_AO
         elif 'verslag' in self.type_short.lower():
             return Kamerstuk.VERSLAG
         elif 'brief' in self.type_short.lower():

@@ -17,6 +17,7 @@ from document.models import FootNote
 
 from document.models import Document
 
+import openkamer.document
 import openkamer.dossier
 import openkamer.kamerstuk
 
@@ -31,7 +32,7 @@ def create_kamervragen(year, max_n=None, skip_if_exists=False):
     kamerantwoorden = []
     for info in infos:
         try:
-            kamervraag, related_document_overheid_ids = create_kamervraag(info['document_number'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+            kamervraag, related_document_overheid_ids = create_kamervraag(info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
             if kamervraag is not None:
                 kamervragen.append(kamervraag)
                 kamerantwoord, mededelingen = create_related_kamervraag_documents(kamervraag, related_document_overheid_ids)
@@ -50,8 +51,8 @@ def create_kamervragen(year, max_n=None, skip_if_exists=False):
 def create_related_kamervraag_documents(kamervraag, overheid_document_ids):
     kamerantwoord = None
     mededelingen = []
-    for document_id in overheid_document_ids:
-        kamerantwoord, mededeling = create_kamerantwoord(document_id, document_id)
+    for overheid_document_id in overheid_document_ids:
+        kamerantwoord, mededeling = create_kamerantwoord(overheid_document_id)
         if kamerantwoord:
             kamervraag.kamerantwoord = kamerantwoord
             kamervraag.save()
@@ -69,7 +70,7 @@ def create_antwoorden(year, max_n=None, skip_if_exists=False):
     for info in infos:
         logger.info(info['overheidnl_document_id'])
         try:
-            create_kamerantwoord(info['overheidnl_document_id'], info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+            create_kamerantwoord(info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
         except Exception as error:
             logger.error('error for kamerantwoord id: ' + str(info['overheidnl_document_id']))
             logger.exception(error)
@@ -107,10 +108,10 @@ def get_or_create_kamerantwoord(vraagnummer, document):
 
 
 @transaction.atomic
-def create_kamervraag(document_number, overheidnl_document_id, skip_if_exists=False):
-    if skip_if_exists and Kamervraag.objects.filter(document__document_id=document_number).exists():
+def create_kamervraag(overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamervraag.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None, []
-    document, vraagnummer, related_document_ids = create_kamervraag_document(document_number, overheidnl_document_id)
+    document, vraagnummer, related_document_ids = create_kamervraag_document(overheidnl_document_id)
     kamervraag = get_or_create_kamervraag(vraagnummer, document)
     create_vragen_from_kamervraag_html(kamervraag)
     footnotes = create_footnotes(kamervraag.document.content_html)
@@ -121,10 +122,10 @@ def create_kamervraag(document_number, overheidnl_document_id, skip_if_exists=Fa
 
 
 @transaction.atomic
-def create_kamerantwoord(document_number, overheidnl_document_id, skip_if_exists=False):
-    if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=document_number).exists():
+def create_kamerantwoord(overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None
-    document, vraagnummer, related_document_ids = create_kamervraag_document(document_number, overheidnl_document_id)
+    document, vraagnummer, related_document_ids = create_kamervraag_document(overheidnl_document_id)
     if 'mededeling' in document.types.lower():
         KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()
         mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
@@ -138,14 +139,14 @@ def create_kamerantwoord(document_number, overheidnl_document_id, skip_if_exists
 
 
 @transaction.atomic
-def create_kamervraag_document(document_number, overheidnl_document_id):
+def create_kamervraag_document(overheidnl_document_id):
     logger.info('BEGIN')
     document_url = 'https://zoek.officielebekendmakingen.nl/' + str(overheidnl_document_id)
     document_html_url = document_url + '.html'
     logger.info(document_html_url)
     document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(document_html_url)
     metadata = scraper.documents.get_metadata(overheidnl_document_id)
-    document_id = document_number
+    document_id = overheidnl_document_id
 
     if metadata['date_published']:
         date_published = metadata['date_published']
@@ -161,7 +162,7 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
     if metadata['receiver']:
         metadata['submitter'] = metadata['receiver']
 
-    content_html = openkamer.kamerstuk.update_document_html_links(content_html)
+    content_html = openkamer.document.update_document_html_links(content_html)
 
     properties = {
         'dossier': None,
@@ -179,12 +180,12 @@ def create_kamervraag_document(document_number, overheidnl_document_id):
         document_id=document_id,
         defaults=properties
     )
-    category_list = openkamer.dossier.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
+    category_list = openkamer.document.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
     document.categories.add(*category_list)
 
     submitters = metadata['submitter'].split('|')
     for submitter in submitters:
-        openkamer.kamerstuk.create_submitter(document, submitter, date_published)
+        openkamer.document.create_submitter(document, submitter, date_published)
 
     related_document_ids = scraper.documents.get_related_document_ids(document_url)
     logger.info('END')
