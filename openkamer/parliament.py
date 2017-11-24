@@ -48,7 +48,7 @@ def create_parliament_and_government():
     set_party_votes_derived_info()
     set_individual_votes_derived_info()
     Person.update_persons_all(language='nl')
-    stats.models.update_all()
+    # stats.models.update_all()
 
 
 @transaction.atomic
