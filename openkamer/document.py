@@ -57,8 +57,13 @@ def create_document(overheidnl_document_id, dossier_id=None):
 
     content_html = update_document_html_links(content_html)
 
+    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+    dossier = None
+    if dossiers.exists():
+        dossier = dossiers[0]
+
     properties = {
-        'dossier': None,
+        'dossier': dossier,
         'title_full': metadata['title_full'],
         'title_short': metadata['title_short'],
         'publication_type': metadata['publication_type'],
