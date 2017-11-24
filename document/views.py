@@ -265,20 +265,6 @@ class AgendaView(TemplateView):
         return context
 
 
-class AddDossierView(TemplateView):
-    template_name = 'document/dossier.html'
-
-    def get(self, request, **kwargs):
-        super().get(request=request, **kwargs)
-        dossiers = Dossier.objects.filter(dossier_id=self.kwargs['dossier_id'])
-        if dossiers.exists():
-            dossier = dossiers[0]
-        else:
-            dossier = create_or_update_dossier(self.kwargs['dossier_id'])
-        return redirect(reverse('dossier-timeline', args=(dossier.dossier_id,)))
-        # return HttpResponseRedirect()
-
-
 class VotingView(TemplateView):
     template_name = 'document/voting.html'
 

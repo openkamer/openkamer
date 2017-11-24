@@ -15,7 +15,7 @@ from document.views import DocumentSearchView
 from document.views import DossiersCheckView
 from document.views import DossiersView
 from document.views import DossiersTableView
-from document.views import DossierView, AddDossierView
+from document.views import DossierView
 from document.views import DossierTimelineView
 from document.views import DossierTimelineHorizontalView
 from document.views import AgendasView, AgendaView
@@ -89,7 +89,6 @@ urlpatterns = [
     url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
     url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>\d+)/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),
     url(r'^dossier/timeline/horizontal/json/?', get_dossier_timeline_json),
-    url(r'^dossier/add/(?P<dossier_id>\d+)/$', AddDossierView.as_view()),
 
     url(r'^agendas/$', AgendasView.as_view()),
     url(r'^agenda/(?P<agenda_id>.*)/$', AgendaView.as_view()),
