@@ -31,6 +31,7 @@ import openkamer.besluitenlijst
 import openkamer.dossier
 import openkamer.kamervraag
 import openkamer.parliament
+import openkamer.verslagao
 
 import stats.models
 
@@ -123,6 +124,19 @@ class UpdateBesluitenLijsten(LockJob):
     def do_imp(self):
         logger.info('update besluitenlijsten')
         openkamer.besluitenlijst.create_besluitenlijsten()
+
+
+class UpdateVerslagenAlgemeenOverleg(LockJob):
+    RUN_AT_TIMES = ['23:30']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateVerslagenAlgemeenOverleg'
+
+    def do_imp(self):
+        logger.info('update verslagen algemeen overleg')
+        skip_if_exists = datetime.date.today().day % 7 == 0
+        years = ['2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008']
+        for year in years:
+            openkamer.verslagao.create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=skip_if_exists)
 
 
 class UpdateKamervragenRecent(LockJob):

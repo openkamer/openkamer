@@ -51,6 +51,7 @@ CRON_CLASSES = [
     # 'website.cron.UpdateActiveDossiers',
     # 'website.cron.UpdateInactiveDossiers',
     # 'website.cron.UpdateBesluitenLijsten',
+    # 'website.cron.UpdateVerslagenAlgemeenOverleg',
     # 'website.cron.UpdateKamervragenRecent',
     # 'website.cron.UpdateKamervragenAll',
     # 'oktwitter.cron.UpdateTwitterLists',
