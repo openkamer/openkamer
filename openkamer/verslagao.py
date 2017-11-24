@@ -21,13 +21,13 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
             dossier_id = str(info['dossier_id'])
             dossier_id_extra = str(info['dossier_extra_id'])
             create_verslag(
-                overheidnl_document_id=info['overheidnl_document_id'],
+                overheidnl_document_id=info['document_url'].replace('https://zoek.officielebekendmakingen.nl/', ''),
                 dossier_id=dossier_id,
                 dossier_id_extra=dossier_id_extra,
                 kamerstuk_nr=info['kamerstuk_nr'],
                 skip_if_exists=skip_if_exists)
         except Exception as error:
-            logger.error('error for kamervraag id: ' + str(info['overheidnl_document_id']))
+            logger.error('error for kamervraag id: ' + str(info['document_url']))
             logger.exception(error)
         if max_n and counter >= max_n:
             return
@@ -65,17 +65,14 @@ def get_verlag_algemeen_overleg_infos(year):
     verslagen_info = []
     for line in lines:
         colums = line.split(',')
-        if colums[6] == '':  # no document url
+        if colums[4] == '':  # no document url
             continue
         info = {
             'date_published': colums[0],
-            'begin': colums[1],
-            'end': colums[2],
-            'dossier_id': colums[3],
-            'dossier_extra_id': colums[4],
-            'kamerstuk_nr': colums[5],
-            'overheidnl_document_id': colums[6].replace('https://zoek.officielebekendmakingen.nl/', ''),
-            'document_url': colums[6],
+            'dossier_id': colums[1],
+            'dossier_extra_id': colums[2],
+            'kamerstuk_nr': colums[3],
+            'document_url': colums[4],
         }
         verslagen_info.append(info)
     return verslagen_info
