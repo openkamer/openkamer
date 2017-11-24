@@ -42,6 +42,8 @@ def create_document(overheidnl_document_id, dossier_id=None):
         date_published = metadata['date_submitted']
     elif metadata['date_received']:
         date_published = metadata['date_received']
+    elif metadata['date_meeting']:
+        date_published = metadata['date_meeting']
     else:
         date_published = None
 
@@ -121,7 +123,6 @@ def create_new_url(url):
                 url = '/' + url
             new_url = 'https://zoek.officielebekendmakingen.nl' + url
     return new_url
-
 
 
 @transaction.atomic

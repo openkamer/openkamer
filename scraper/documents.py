@@ -100,6 +100,7 @@ def get_metadata(document_id):
         'DCTERMS.issued': 'date_published',
         'OVERHEIDop.datumIndiening': 'date_submitted',
         'OVERHEIDop.datumOntvangst': 'date_received',
+        'OVERHEIDop.datumVergadering': 'date_meeting',
         'OVERHEID.organisationType': 'organisation_type',
         'OVERHEID.category': 'category',
         'DC.creator': 'publisher',
