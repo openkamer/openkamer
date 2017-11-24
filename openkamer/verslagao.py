@@ -7,7 +7,7 @@ from django.db import transaction
 from document.models import Dossier
 from document.models import Kamerstuk
 
-from .document import create_document
+from openkamer.document import create_document
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,8 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
                 dossier_id=dossier_id,
                 dossier_id_extra=dossier_id_extra,
                 kamerstuk_nr=info['kamerstuk_nr'],
-                skip_if_exists=skip_if_exists)
+                skip_if_exists=skip_if_exists
+            )
         except Exception as error:
             logger.error('error for kamervraag id: ' + str(info['document_url']))
             logger.exception(error)
@@ -55,7 +56,11 @@ def create_verslag(overheidnl_document_id, dossier_id, dossier_id_extra, kamerst
 
 
 def get_verslag_document_title(title):
-    return re.sub(r'(Verslag van een algemeen overleg, gehouden.*? \d{4}, over )', '', title)
+    return upperfirst(re.sub(r'(Verslag van een algemeen overleg, gehouden.*? \d{4}, over )', '', title))
+
+
+def upperfirst(x):
+    return x[0].upper() + x[1:]
 
 
 def get_verlag_algemeen_overleg_infos(year):

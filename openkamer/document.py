@@ -47,6 +47,9 @@ def create_document(overheidnl_document_id, dossier_id=None):
     else:
         date_published = None
 
+    if 'officiële publicatie' in metadata['title_short']:
+        metadata['title_short'] = metadata['title_full']
+
     if 'submitter' not in metadata:
         metadata['submitter'] = 'undefined'
     if metadata['receiver']:
@@ -56,7 +59,7 @@ def create_document(overheidnl_document_id, dossier_id=None):
 
     properties = {
         'dossier': None,
-        'title_full': title,
+        'title_full': metadata['title_full'],
         'title_short': metadata['title_short'],
         'publication_type': metadata['publication_type'],
         'types': metadata['types'],
