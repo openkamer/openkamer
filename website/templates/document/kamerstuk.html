@@ -9,21 +9,16 @@
 
     <h5>Kamerstuk {{ kamerstuk.id_full }}</h5>
 
-    <h4>
     {% if kamerstuk %}
-      {{ kamerstuk.type_long }}
+      <h4>{{ kamerstuk.type_long }}</h4>
     {% endif %}
-    {% if kamerstuk.voting %}
-      {% with kamerstuk.voting as voting %}
-      {% include "document/items/voting_result_small.html" %}
-      {% endwith %}
-    {% endif %}
-    </h4>
 
     {% if kamerstuk.document.dossier %}
     <h6>
-    Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.title }}</a>
+      Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.title }}</a>
     </h6>
+    {% else %}
+    <h5>{{ kamerstuk.document.title_short }}</h5>
     {% endif %}
 
   </div>
