@@ -8,7 +8,7 @@ install:
 script:
 - python create_local_settings.py
 - python manage.py migrate
-- coverage run manage.py test
+- travis_wait 20 coverage run manage.py test
 notifications:
   email: false
 after_success:
