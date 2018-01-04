@@ -134,7 +134,7 @@ class UpdateVerslagenAlgemeenOverleg(LockJob):
     def do_imp(self):
         logger.info('update verslagen algemeen overleg')
         skip_if_exists = datetime.date.today().day % 7 == 0
-        years = ['2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008']
+        years = ['2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009', '2008']
         for year in years:
             openkamer.verslagao.create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=skip_if_exists)
 
@@ -146,7 +146,7 @@ class UpdateKamervragenRecent(LockJob):
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
-        years = ['2017', '2016']
+        years = ['2018', '2017']
         for year in years:
             openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
             openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
@@ -160,7 +160,7 @@ class UpdateKamervragenAll(LockJob):
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
-        years = ['2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010']
+        years = ['2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010']
         for year in years:
             openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
             openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
