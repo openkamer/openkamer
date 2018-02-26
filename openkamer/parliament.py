@@ -82,6 +82,9 @@ def create_government_members(government, max_members=None):
     members_created = []
     members = scraper.government.get_government_members(government.wikidata_id, max_members=max_members)
     for member in members:
+        if 'position' not in member:
+            logger.error('no position found for government member: ' + member['name'] + ' with wikidata id: ' + member['wikidata_id'])
+            continue
         logger.info(member['name'] + ' ' + member['position'])
         ministry = create_ministry(government, member)
         position = create_government_position(government, member, ministry)
