@@ -184,7 +184,7 @@ class PoliticalParty(models.Model):
         parliament_members = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today()).select_related('person')
         pm_ids = []
         for member in parliament_members:
-            if member.party.id == self.id:
+            if member.party and member.party.id == self.id:
                 pm_ids.append(member.id)
         return ParliamentMember.objects.filter(id__in=pm_ids)
 
