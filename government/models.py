@@ -130,10 +130,10 @@ class GovernmentPosition(models.Model):
         current = GovernmentMember.objects.filter(position=self, end_date__isnull=True)
         if current:
             return current
-        else:
+        elif self.government.date_dissolved is not None:
             at_end = GovernmentMember.objects.filter(position=self, end_date__gte=self.government.date_dissolved).order_by('-end_date')
-        if at_end:
-            return at_end
+            if at_end:
+                return at_end
         return None
 
     @cached_property
