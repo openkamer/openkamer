@@ -7,6 +7,7 @@ class Command(BaseCommand):
     # Balkenende IV : Q1719725
     # Rutte I : Q168828
     # Rutte II : Q1638648
+    # Rutte III : Q42293409
 
     def add_arguments(self, parser):
         parser.add_argument('wikidata_id', nargs='+', type=str)
