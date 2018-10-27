@@ -5,7 +5,8 @@ from django.db import transaction
 
 from wikidata import wikidata
 
-import scraper.votings
+import tkapi
+from tkapi.util import queries
 
 from person.util import parse_name_surname_initials
 
@@ -39,74 +40,64 @@ def clean_voting_results(voting_results, dossier_id):
 def create_votings(dossier_id):
     logger.info('BEGIN')
     logger.info('dossier id: ' + str(dossier_id))
-    voting_results = scraper.votings.get_votings_for_dossier(dossier_id)
-
-    voting_results_cleaned = clean_voting_results(voting_results, dossier_id)
-
-    for voting_result in voting_results_cleaned:
-        if not voting_result.get_result():
-            logger.warning('no result found for voting, probaly not voted yet, voting date: ' + str(voting_result.date))
-            continue
-
-        document_id = voting_result.get_document_id_without_rijkswet()
-        if not document_id:
-            logger.error('Voting has no document id. This is probably a modification of an existing document and does not (yet?) have a document id.')
-            continue
-
-        id_main = document_id.split('-')[0]
-        dossiers = Dossier.objects.filter(dossier_id=id_main)
-        if dossiers.count() != 1:
-            logger.error('number of dossiers found: ' + str(dossiers.count()) + ', which is not 1, so we have to skip this voting')
-            continue
-
-        assert dossiers.count() == 1
-        result = get_result_choice(voting_result.get_result())
-        voting_obj = Voting(
-            dossier=dossiers[0],
-            kamerstuk_raw_id=document_id,
-            result=result,
-            date=voting_result.date,
-            source_url=voting_result.url,
-            is_dossier_voting=voting_result.is_dossier_voting()
-        )
-
-        if document_id and len(document_id.split('-')) == 2:
-            id_sub = document_id.split('-')[1]
-            kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
-            if kamerstukken.exists():
-                kamerstuk = kamerstukken[0]
-                voting_obj.kamerstuk = kamerstuk
-                if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
-                    logger.info('newer voting for this kamerstuk already exits, skip this voting')
-                    continue
-                elif kamerstuk.voting:
-                    kamerstuk.voting.delete()
-            else:
-                logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
-        elif dossiers[0].voting and dossiers[0].voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
-            logger.info('newer voting for this dossier already exits, skip this voting')
-            continue
-        elif dossiers[0].voting:
-            dossiers[0].voting.delete()
-
-        voting_obj.is_individual = voting_result.is_individual()
-        voting_obj.save()
-
-        if voting_obj.is_individual:
-            create_votes_individual(voting_obj, voting_result.votes)
-        else:
-            create_votes_party(voting_obj, voting_result.votes)
+    besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
+    for besluit in besluiten:
+        create_votings_dossier_besluit(besluit, dossier_id)
     logger.info('END')
 
 
 @transaction.atomic
-def create_votes_party(voting, votes):
+def create_votings_dossier_besluit(besluit, dossier_id):
+    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+    assert dossiers.count() == 1
+    dossier = dossiers[0]
+    result = get_result_choice(besluit.slottekst)
+    zaak = besluit.zaak
+
+    document_id = ''
+    if zaak.volgnummer:
+        document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
+
+    is_dossier_voting = zaak.soort in ['Wetgeving', 'Initiatiefwetgeving']
+    logger.info(document_id + ' | dossier voting: ' + str(is_dossier_voting))
+    voting_obj = Voting(
+        dossier=dossier,
+        kamerstuk_raw_id=document_id,
+        result=result,
+        date=besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
+        source_url='',
+        is_dossier_voting=is_dossier_voting
+    )
+
+    kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=zaak.volgnummer)
+    if kamerstukken.exists():
+        kamerstuk = kamerstukken[0]
+        voting_obj.kamerstuk = kamerstuk
+        if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
+            logger.info('newer voting for this kamerstuk already exits, skip this voting')
+            return
+        elif kamerstuk.voting:
+            kamerstuk.voting.delete()
+    elif not is_dossier_voting:
+        logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
+
+    voting_obj.is_individual = (besluit.soort == 'Hoofdelijk')
+    voting_obj.save()
+
+    if voting_obj.is_individual:
+        create_votes_individual(voting_obj, besluit.stemmingen)
+    else:
+        create_votes_party(voting_obj, besluit.stemmingen)
+
+
+@transaction.atomic
+def create_votes_party(voting, stemmingen):
     logger.info('BEGIN')
-    for vote in votes:
-        party = PoliticalParty.find_party(vote.party_name)
+    for stemming in stemmingen:
+        party = PoliticalParty.find_party(stemming.fractie.naam)
         if not party:
-            wikidata_id = wikidata.search_political_party_id(vote.party_name, language='nl')
-            name = vote.party_name
+            wikidata_id = wikidata.search_political_party_id(stemming.fractie.naam, language='nl')
+            name = stemming.fractie.naam
             if wikidata_id:
                 item = wikidata.WikidataItem(wikidata_id)
                 name = item.get_label('nl')
@@ -115,51 +106,65 @@ def create_votes_party(voting, votes):
                 assert False
             party = PoliticalParty.objects.create(
                 name=name,
-                name_short=vote.party_name,
+                name_short=stemming.fractie.naam,
                 wikidata_id=wikidata_id
             )
             party.update_info(language='nl')
-        if not vote.decision:
-            logger.warning('vote has no decision, vote.details: ' + str(vote.details))
+        if not stemming.soort:
+            logger.warning('vote has no decision, vote.details: ' + str(stemming.soort))
         VoteParty.objects.create(
             voting=voting,
             party=party,
-            party_name=vote.party_name,
-            number_of_seats=vote.number_of_seats,
-            decision=get_decision(vote.decision),
-            details=vote.details,
-            is_mistake=vote.is_mistake
+            party_name=stemming.fractie.naam,
+            number_of_seats=stemming.fractie_size,
+            decision=get_decision(stemming.soort),
+            details='',
+            is_mistake=stemming.vergissing if stemming.vergissing is not None else False
         )
     logger.info('END')
 
 
 @transaction.atomic
-def create_votes_individual(voting, votes):
+def create_votes_individual(voting, stemmingen):
     logger.info('BEGIN')
-    for vote in votes:
-        initials, surname, surname_prefix = parse_name_surname_initials(vote.parliament_member)
+    for stemming in stemmingen:
+        persoon = stemming.persoon
+
+        if persoon:
+            initials = persoon.initialen
+            surname = persoon.achternaam
+            forname = persoon.roepnaam
+        else:
+            logger.error('Persoon not found for stemming: ' + stemming.id)
+            surname_initials = stemming.json['AnnotatieActorNaam']
+            forname = ''
+            initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
+
         parliament_member = ParliamentMember.find(surname=surname, initials=initials)
         if not parliament_member:
-            logger.error('parliament member not found for vote: ' + str(vote))
+            logger.error('parliament member not found for vote: ' + str(stemming))
             logger.error('creating vote with empty parliament member')
             if voting.kamerstuk:
                 logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
             else:
                 logger.error('voting.kamerstuk does not exist')
+
+        person_name = ' '.join([forname, surname, initials]).strip()
         VoteIndividual.objects.create(
             voting=voting,
-            person_name=vote.parliament_member,
+            person_name=person_name,
             parliament_member=parliament_member,
-            number_of_seats=vote.number_of_seats,
-            decision=get_decision(vote.decision),
-            details=vote.details,
-            is_mistake=vote.is_mistake
+            number_of_seats=1,
+            decision=get_decision(stemming.soort),
+            details='',
+            is_mistake=stemming.vergissing if stemming.vergissing is not None else False
         )
     logger.info('END')
 
 
 def get_result_choice(result_string):
     result_string = result_string.lower()
+    result_string.replace('.', '')
     if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
         return Voting.AANGENOMEN
     elif 'verworpen' in result_string:
@@ -175,11 +180,11 @@ def get_result_choice(result_string):
 
 
 def get_decision(decision_string):
-    if scraper.votings.Vote.FOR == decision_string:
+    if 'Voor' == decision_string:
         return Vote.FOR
-    elif scraper.votings.Vote.AGAINST == decision_string:
+    elif 'Tegen' == decision_string:
         return Vote.AGAINST
-    elif scraper.votings.Vote.NOVOTE == decision_string:
+    elif 'Niet deelgenomen' == decision_string:
         return Vote.NONE
     logger.error('no decision detected, returning Vote.NONE')
     return Vote.NONE

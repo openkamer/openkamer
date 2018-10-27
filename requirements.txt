@@ -20,4 +20,5 @@ python-twitter==3.3
 requests==2.18.4
 scipy==1.0.0
 unidecode==0.04.21
+tkapi==0.6.1
 django-debug-toolbar

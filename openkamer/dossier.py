@@ -1,10 +1,14 @@
 import datetime
 import logging
 import time
+import multiprocessing as mp
 
-from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
+from requests.exceptions import ConnectionError, ConnectTimeout
 
 from django.db import transaction
+
+from tkapi import Api
+from tkapi.zaak import Zaak
 
 import scraper.documents
 import scraper.dossiers
@@ -47,92 +51,128 @@ def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
     Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier_url = scraper.dossiers.search_dossier_url(dossier_id)
-    decision = scraper.dossiers.get_dossier_decision(dossier_url)
+    last_besluit = get_besluit_last(dossier_id)
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
         url=dossier_url,
-        decision=decision
+        decision=last_besluit.slottekst.replace('.', '')
     )
+    create_dossier_documents(dossier_new, dossier_id)
+    create_votings(dossier_id)
+    dossier_new.set_derived_fields()
+    logger.info('END - dossier id: ' + str(dossier_id))
+    return dossier_new
+
+
+class DocumentDataPolitiekNL(object):
+
+    def __init__(self, search_result, document_id, title, metadata, content_html):
+        self.search_result = search_result
+        self.document_id = document_id
+        self.title = title
+        self.metadata = metadata
+        self.content_html = content_html
+
+
+def get_document_data_mp(search_result, outputs):
+    # skip eerste kamer documents, first focus on the tweede kamer
+    # TODO: handle eerste kamer documents
+    if 'eerste kamer' in search_result['publisher'].lower():
+        logger.info('skipping Eerste Kamer document')
+        return
+    # skip documents of some types and/or sources, no models implemented yet
+    # TODO: handle all document types
+    if 'Staatscourant' in search_result['type']:
+        logger.info('Staatscourant, skip for now')
+        return
+
+    if 'Agenda' in search_result['type']:
+        logger.info('Agenda, skip for now')
+        return
+
+    document_id, content_html, title = scraper.documents.get_document_id_and_content(search_result['page_url'])
+    if not document_id:
+        logger.error('No document id found for url: ' + search_result['page_url'] + ' - will not create document')
+        return
+
+    metadata = scraper.documents.get_metadata(document_id)
+    document_data = DocumentDataPolitiekNL(
+        search_result=search_result,
+        document_id=document_id,
+        title=title,
+        metadata=metadata,
+        content_html=content_html
+    )
+    outputs.append(document_data)
+
+
+@transaction.atomic
+def create_dossier_documents(dossier, dossier_id):
+    manager = mp.Manager()
+    outputs = manager.list()
+    processes = []
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
-    for result in search_results:
-        # skip eerste kamer documents, first focus on the tweede kamer
-        # TODO: handle eerste kamer documents
-        if 'eerste kamer' in result['publisher'].lower():
-            logger.info('skipping Eerste Kamer document')
-            continue
-        # skip documents of some types and/or sources, no models implemented yet
-        # TODO: handle all document types
-        if 'Staatscourant' in result['type']:
-            logger.info('Staatscourant, skip for now')
-            continue
+    for search_result in search_results:
+        process = mp.Process(target=get_document_data_mp, args=(search_result, outputs))
+        processes.append(process)
+        process.start()
+    for process in processes:
+        process.join()
 
-        document_id, content_html, title = scraper.documents.get_document_id_and_content(result['page_url'])
-        if not document_id:
-            logger.error('No document id found for url: ' + result['page_url'] + ' - will not create document')
-            continue
-
-        metadata = scraper.documents.get_metadata(document_id)
-
-        if metadata['date_published']:
-            date_published = metadata['date_published']
+    for data in outputs:
+        if data.metadata['date_published']:
+            date_published = data.metadata['date_published']
         else:
-            date_published = result['date_published']
+            date_published = data.search_result['date_published']
 
-        if 'submitter' not in metadata:
-            metadata['submitter'] = 'undefined'
+        if 'submitter' not in data.metadata:
+            data.metadata['submitter'] = 'undefined'
 
-        if 'dossier_id' in metadata:
-            main_dossier_id = metadata['dossier_id'].split(';')[0].strip()
+        dossier_for_document = dossier
+        if 'dossier_id' in data.metadata:
+            main_dossier_id = data.metadata['dossier_id'].split(';')[0].strip()
             main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
             if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
                 dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
-            else:
-                dossier_for_document = dossier_new
-
-        content_html = update_document_html_links(content_html)
+                data.content_html = update_document_html_links(data.content_html)
 
         properties = {
             'dossier': dossier_for_document,
-            'title_full': metadata['title_full'],
-            'title_short': metadata['title_short'],
-            'publication_type': metadata['publication_type'],
-            'types': metadata['types'],
-            'publisher': metadata['publisher'],
+            'title_full': data.metadata['title_full'],
+            'title_short': data.metadata['title_short'],
+            'publication_type': data.metadata['publication_type'],
+            'types': data.metadata['types'],
+            'publisher': data.metadata['publisher'],
             'date_published': date_published,
-            'source_url': result['page_url'],
-            'content_html': content_html,
+            'source_url': data.search_result['page_url'],
+            'content_html': data.content_html,
         }
-
         document, created = Document.objects.update_or_create(
-            document_id=document_id,
+            document_id=data.document_id,
             defaults=properties
         )
 
         category_list = get_categories(
-            text=metadata['category'],
+            text=data.metadata['category'],
             category_class=CategoryDocument,
             sep_char='|'
         )
         document.categories.add(*category_list)
 
-        submitters = metadata['submitter'].split('|')
+        submitters = data.metadata['submitter'].split('|')
         for submitter in submitters:
             create_submitter(document, submitter, date_published)
 
-        if metadata['is_kamerstuk']:
-            is_attachement = "Bijlage" in result['type']
-            if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=metadata['id_sub']).exists():
-                create_kamerstuk(document, dossier_for_document.dossier_id, title, metadata, is_attachement)
-                category_list = get_categories(text=metadata['category'], category_class=CategoryDossier, sep_char='|')
+        if data.metadata['is_kamerstuk']:
+            is_attachement = "Bijlage" in data.search_result['type']
+            if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.metadata['id_sub']).exists():
+                create_kamerstuk(document, dossier_for_document.dossier_id, data.title, data.metadata, is_attachement)
+                category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
                 dossier_for_document.categories.add(*category_list)
 
-        if metadata['is_agenda']:
-            create_agenda(document, metadata)
-
-    create_votings(dossier_id)
-    dossier_new.set_derived_fields()
-    logger.info('END - dossier id: ' + str(dossier_id))
-    return dossier_new
+        # TODO BR: enable
+        # if metadata['is_agenda']:
+        #     create_agenda(document, metadata)
 
 
 def get_inactive_dossier_ids():
@@ -186,3 +226,28 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
             logger.error(error)
     logger.info('END')
     return failed_dossiers
+
+
+def get_besluit_last(dossier_id):
+    zaak = get_dossier_main_zaak(dossier_id)
+    last_besluit = None
+    for besluit in zaak.besluiten:
+        print(besluit.soort, besluit.slottekst, besluit.agendapunt.activiteit.begin)
+        if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
+            last_besluit = besluit
+    print(last_besluit.soort, last_besluit.slottekst, last_besluit.agendapunt.activiteit.begin)
+    return last_besluit
+
+
+def get_dossier_main_zaak(dossier_id):
+    # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi make that possible
+    filter = Zaak.create_filter()
+    filter.filter_kamerstukdossier(vetnummer=dossier_id)
+    filter.filter_soort('Wetgeving')
+    zaken = Api().get_zaken(filter=filter)
+    if not zaken:
+        filter = Zaak.create_filter()
+        filter.filter_kamerstukdossier(vetnummer=dossier_id)
+        filter.filter_soort('Initiatiefwetgeving')
+        zaken = Api().get_zaken(filter=filter)
+    return zaken[0]
