@@ -43,8 +43,6 @@ CRON_LOCK_DIR = '/tmp'
 CRON_CLASSES = [
     # 'website.cron.TestJob',
     'website.cron.BackupDaily',
-    # 'website.cron.CreateCommitPartyCSV',
-    # 'website.cron.CreateCommitParliamentMembersCSV',
     'website.cron.CleanUnusedPersons',
     # 'website.cron.UpdateSubmitters'
     # 'website.cron.UpdateParliamentAndGovernment',

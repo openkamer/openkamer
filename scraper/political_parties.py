@@ -31,10 +31,3 @@ def search_parties():
         parties.append(party)
     logger.info('END')
     return parties
-
-
-def create_parties_csv(parties, filepath):
-    with open(filepath, 'w') as fileout:
-        fileout.write('name,name_short\n')
-        for party in parties:
-            fileout.write(party['name'] + ',' + party['name_short'] + '\n')

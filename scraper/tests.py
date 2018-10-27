@@ -33,25 +33,6 @@ class TestPoliticalPartyScraper(TestCase):
             self.assertTrue(party['name'])
             self.assertTrue(party['name_short'])
 
-    def test_create_party_csv(self):
-        filepath = './data/tmp/parties.csv'
-        try:
-            parties = scraper.political_parties.search_parties()
-            scraper.political_parties.create_parties_csv(parties, filepath)
-        finally:
-            os.remove(filepath)
-
-
-class TestParliamentMemberScraper(TestCase):
-
-    def test_scrape_parliament_members(self):
-        members = scraper.parliament_members.search_members()
-        filepath = './data/tmp/members.csv'
-        try:
-            scraper.parliament_members.create_members_csv(members, filepath)
-        finally:
-            os.remove(filepath)
-
 
 class TestKamervraagScraper(TestCase):
     kamervraag_url = 'https://zoek.officielebekendmakingen.nl/kv-tk-2017Z06952'
