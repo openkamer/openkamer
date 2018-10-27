@@ -193,6 +193,7 @@ def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     for dossier_id in dossier_ids:
         if dossier_id not in dossier_ids_inactive:
             dossier_ids_active.append(dossier_id)
+    dossier_ids_active.reverse()
     failed_dossiers = create_wetsvoorstellen(dossier_ids_active, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
