@@ -1,6 +1,4 @@
 # openkamer
-[![Build Status](https://travis-ci.org/openkamer/openkamer.svg?branch=master)](https://travis-ci.org/openkamer/openkamer) [![Coverage Status](https://coveralls.io/repos/github/openkamer/openkamer/badge.svg?branch=master)](https://coveralls.io/github/openkamer/openkamer?branch=master)
-
 Openkamer gives insight into the Dutch parliament by gathering, organizing and visualizing parliamentary data.
 
 Openkamer gathers (scrapes) parliamentary data from several external sources, creates relations, and visualizes this data in a web application.
