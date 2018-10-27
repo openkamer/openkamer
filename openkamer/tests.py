@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.test import TestCase
 
 import tkapi
+from tkapi.util import queries
 from tkapi.besluit import Besluit
 
 from person.models import Person
@@ -387,35 +388,40 @@ class TestVoting(TestCase):
     def test_voting_party_vote(self):
         dossier_id = 33885
         Dossier.objects.create(dossier_id=dossier_id)
-        openkamer.voting.create_votings(dossier_id)
+        besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
+        max_votings = 2
+        voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
+        for besluit in besluiten:
+            voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
+        voting_factory.create_votings(dossier_id)
 
     def test_voting_individual_vote(self):
         dossier_id = 33506
         Dossier.objects.create(dossier_id=dossier_id)
-        openkamer.voting.create_votings(dossier_id)
+        voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
+        voting_factory.create_votings(dossier_id)
 
-    def test_dossier_voting_controversieel(self):
-        dossier_id = 29282
-        dossier = Dossier.objects.create(dossier_id=dossier_id)
-        openkamer.voting.create_votings(dossier_id)
-        votings = Voting.objects.all()
-        self.assertEqual(votings.count(), 66)
-        for voting in votings:
-            self.assertEqual(dossier.id, voting.dossier.id)
-            self.assertNotEqual(voting.source_url, '')
-        dossier.delete()
-        votings = Voting.objects.all()
-        self.assertEqual(votings.count(), 0)
+    # def test_dossier_voting_controversieel(self):
+    #     dossier_id = 29282
+    #     dossier = Dossier.objects.create(dossier_id=dossier_id)
+    #     besluit = self.get_besluit_kamerstuk(dossier_id, 337)
+    #     voting_factory = openkamer.voting.VotingFactory()
+    #     voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
+    #     votings = Voting.objects.all()
+    #     self.assertEqual(votings.count(), 27)
+    #     for voting in votings:
+    #         self.assertEqual(dossier.id, voting.dossier.id)
+    #     dossier.delete()
+    #     votings = Voting.objects.all()
+    #     self.assertEqual(votings.count(), 0)
 
     def test_get_voting_not_voted(self):
         dossier_id = 33542
+        ondernummer = 39
         Dossier.objects.create(dossier_id=dossier_id)
-        filter = Besluit.create_filter()
-        filter.filter_kamerstuk(vetnummer=dossier_id, ondernummer=39)
-        besluiten = tkapi.Api().get_besluiten(filter=filter)
-        self.assertEqual(1, len(besluiten))
-        besluit = besluiten[0]
-        openkamer.voting.create_votings_dossier_besluit(besluit, dossier_id)
+        besluit = self.get_besluit_kamerstuk(dossier_id=dossier_id, ondernummer=ondernummer)
+        voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
+        voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
         votings = Voting.objects.all()
         did_check = False
         for voting in votings:
@@ -424,3 +430,11 @@ class TestVoting(TestCase):
                     self.assertEqual(vote.decision, Vote.NONE)
                     did_check = True
         self.assertTrue(did_check)
+
+    def get_besluit_kamerstuk(self, dossier_id, ondernummer):
+        filter = Besluit.create_filter()
+        filter.filter_kamerstuk(vetnummer=dossier_id, ondernummer=ondernummer)
+        besluiten = tkapi.Api().get_besluiten(filter=filter)
+        self.assertEqual(1, len(besluiten))
+        besluit = besluiten[0]
+        return besluit

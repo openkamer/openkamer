@@ -24,7 +24,7 @@ from openkamer.document import update_document_html_links
 from openkamer.document import create_submitter
 from openkamer.document import get_categories
 from openkamer.kamerstuk import create_kamerstuk
-from openkamer.voting import create_votings
+from openkamer.voting import VotingFactory
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +52,17 @@ def create_or_update_dossier(dossier_id):
     Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier_url = scraper.dossiers.search_dossier_url(dossier_id)
     last_besluit = get_besluit_last(dossier_id)
+    decision = 'Onbekend'
+    if last_besluit:
+        decision = last_besluit.slottekst.replace('.', '')
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
         url=dossier_url,
-        decision=last_besluit.slottekst.replace('.', '')
+        decision=decision
     )
     create_dossier_documents(dossier_new, dossier_id)
-    create_votings(dossier_id)
+    voting_factory = VotingFactory()
+    voting_factory.create_votings(dossier_id)
     dossier_new.set_derived_fields()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
@@ -229,17 +233,20 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
 
 
 def get_besluit_last(dossier_id):
-    zaak = get_dossier_main_zaak(dossier_id)
+    zaak = get_zaak_dossier_main(dossier_id)
+    if zaak is None:
+        return None
     last_besluit = None
     for besluit in zaak.besluiten:
         print(besluit.soort, besluit.slottekst, besluit.agendapunt.activiteit.begin)
         if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
             last_besluit = besluit
-    print(last_besluit.soort, last_besluit.slottekst, last_besluit.agendapunt.activiteit.begin)
+    # if last_besluit:
+    #     print(last_besluit.soort, last_besluit.slottekst, last_besluit.agendapunt.activiteit.begin)
     return last_besluit
 
 
-def get_dossier_main_zaak(dossier_id):
+def get_zaak_dossier_main(dossier_id):
     # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi make that possible
     filter = Zaak.create_filter()
     filter.filter_kamerstukdossier(vetnummer=dossier_id)
@@ -250,4 +257,6 @@ def get_dossier_main_zaak(dossier_id):
         filter.filter_kamerstukdossier(vetnummer=dossier_id)
         filter.filter_soort('Initiatiefwetgeving')
         zaken = Api().get_zaken(filter=filter)
-    return zaken[0]
+    if zaken:
+        return zaken[0]
+    return None

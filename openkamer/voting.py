@@ -36,155 +36,161 @@ def clean_voting_results(voting_results, dossier_id):
     return voting_results_cleaned
 
 
-@transaction.atomic
-def create_votings(dossier_id):
-    logger.info('BEGIN')
-    logger.info('dossier id: ' + str(dossier_id))
-    besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
-    for besluit in besluiten:
-        create_votings_dossier_besluit(besluit, dossier_id)
-    logger.info('END')
+class VotingFactory(object):
 
+    def __init__(self, do_create_missing_party=True):
+        self.vote_factory = VoteFactory(do_create_missing_party=do_create_missing_party)
 
-@transaction.atomic
-def create_votings_dossier_besluit(besluit, dossier_id):
-    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    assert dossiers.count() == 1
-    dossier = dossiers[0]
-    result = get_result_choice(besluit.slottekst)
-    zaak = besluit.zaak
+    @transaction.atomic
+    def create_votings(self, dossier_id):
+        logger.info('BEGIN')
+        logger.info('dossier id: ' + str(dossier_id))
+        besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
+        for besluit in besluiten:
+            self.create_votings_dossier_besluit(besluit, dossier_id)
+        logger.info('END')
 
-    document_id = ''
-    if zaak.volgnummer:
-        document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
+    @transaction.atomic
+    def create_votings_dossier_besluit(self, besluit, dossier_id):
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        assert dossiers.count() == 1
+        dossier = dossiers[0]
+        result = self.get_result_choice(besluit.slottekst)
+        zaak = besluit.zaak
 
-    is_dossier_voting = zaak.soort in ['Wetgeving', 'Initiatiefwetgeving']
-    logger.info(document_id + ' | dossier voting: ' + str(is_dossier_voting))
-    voting_obj = Voting(
-        dossier=dossier,
-        kamerstuk_raw_id=document_id,
-        result=result,
-        date=besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
-        source_url='',
-        is_dossier_voting=is_dossier_voting
-    )
+        document_id = ''
+        if zaak.volgnummer:
+            document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
 
-    kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=zaak.volgnummer)
-    if kamerstukken.exists():
-        kamerstuk = kamerstukken[0]
-        voting_obj.kamerstuk = kamerstuk
-        if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
-            logger.info('newer voting for this kamerstuk already exits, skip this voting')
-            return
-        elif kamerstuk.voting:
-            kamerstuk.voting.delete()
-    elif not is_dossier_voting:
-        logger.error('Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
-
-    voting_obj.is_individual = (besluit.soort == 'Hoofdelijk')
-    voting_obj.save()
-
-    if voting_obj.is_individual:
-        create_votes_individual(voting_obj, besluit.stemmingen)
-    else:
-        create_votes_party(voting_obj, besluit.stemmingen)
-
-
-@transaction.atomic
-def create_votes_party(voting, stemmingen):
-    logger.info('BEGIN')
-    for stemming in stemmingen:
-        party = PoliticalParty.find_party(stemming.fractie.naam)
-        if not party:
-            wikidata_id = wikidata.search_political_party_id(stemming.fractie.naam, language='nl')
-            name = stemming.fractie.naam
-            if wikidata_id:
-                item = wikidata.WikidataItem(wikidata_id)
-                name = item.get_label('nl')
-            if not name:
-                logger.error('vote party has no name')
-                assert False
-            party = PoliticalParty.objects.create(
-                name=name,
-                name_short=stemming.fractie.naam,
-                wikidata_id=wikidata_id
-            )
-            party.update_info(language='nl')
-        if not stemming.soort:
-            logger.warning('vote has no decision, vote.details: ' + str(stemming.soort))
-        VoteParty.objects.create(
-            voting=voting,
-            party=party,
-            party_name=stemming.fractie.naam,
-            number_of_seats=stemming.fractie_size,
-            decision=get_decision(stemming.soort),
-            details='',
-            is_mistake=stemming.vergissing if stemming.vergissing is not None else False
+        is_dossier_voting = zaak.soort in ['Wetgeving', 'Initiatiefwetgeving']
+        logger.info(document_id + ' | dossier voting: ' + str(is_dossier_voting))
+        voting_obj = Voting(
+            dossier=dossier,
+            kamerstuk_raw_id=document_id,
+            result=result,
+            date=besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
+            source_url='',
+            is_dossier_voting=is_dossier_voting
         )
-    logger.info('END')
 
+        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=zaak.volgnummer)
+        if kamerstukken.exists():
+            kamerstuk = kamerstukken[0]
+            voting_obj.kamerstuk = kamerstuk
+            if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
+                logger.info('newer voting for this kamerstuk already exits, skip this voting')
+                return
+            elif kamerstuk.voting:
+                kamerstuk.voting.delete()
+        elif not is_dossier_voting:
+            logger.error(
+                'Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
 
-@transaction.atomic
-def create_votes_individual(voting, stemmingen):
-    logger.info('BEGIN')
-    for stemming in stemmingen:
-        persoon = stemming.persoon
+        voting_obj.is_individual = (besluit.soort == 'Hoofdelijk')
+        voting_obj.save()
 
-        if persoon:
-            initials = persoon.initialen
-            surname = persoon.achternaam
-            forname = persoon.roepnaam
+        if voting_obj.is_individual:
+            self.vote_factory.create_votes_individual(voting_obj, besluit.stemmingen)
         else:
-            logger.error('Persoon not found for stemming: ' + stemming.id)
-            surname_initials = stemming.json['AnnotatieActorNaam']
-            forname = ''
-            initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
+            self.vote_factory.create_votes_party(voting_obj, besluit.stemmingen)
 
-        parliament_member = ParliamentMember.find(surname=surname, initials=initials)
-        if not parliament_member:
-            logger.error('parliament member not found for vote: ' + str(stemming))
-            logger.error('creating vote with empty parliament member')
-            if voting.kamerstuk:
-                logger.error('on kamerstuk: ' + str(voting.kamerstuk) + ', in dossier: ' + str(voting.kamerstuk.document.dossier) + ', for name: ' + surname + ' ' + initials)
-            else:
-                logger.error('voting.kamerstuk does not exist')
+    @staticmethod
+    def get_result_choice(result_string):
+        result_string = result_string.lower()
+        result_string.replace('.', '')
+        if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
+            return Voting.AANGENOMEN
+        elif 'verworpen' in result_string:
+            return Voting.VERWORPEN
+        elif 'ingetrokken' in result_string:
+            return Voting.INGETROKKEN
+        elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
+            return Voting.AANGEHOUDEN
+        elif 'controversieel verklaard' in result_string:
+            return Voting.CONTROVERSIEEL
+        logger.error('could not interpret the voting result: ' + result_string)
+        return Voting.ONBEKEND
 
-        person_name = ' '.join([forname, surname, initials]).strip()
-        VoteIndividual.objects.create(
-            voting=voting,
-            person_name=person_name,
-            parliament_member=parliament_member,
-            number_of_seats=1,
-            decision=get_decision(stemming.soort),
-            details='',
-            is_mistake=stemming.vergissing if stemming.vergissing is not None else False
+
+class VoteFactory(object):
+
+    def __init__(self, do_create_missing_party=True):
+        self.do_create_missing_party = do_create_missing_party
+
+    @transaction.atomic
+    def create_votes_party(self, voting, stemmingen):
+        logger.info('BEGIN')
+        for stemming in stemmingen:
+            fractie_name = stemming.json['AnnotatieActorPartij']
+            party = PoliticalParty.find_party(fractie_name)
+            if not party and self.do_create_missing_party:
+                party = self.create_missing_party(stemming)
+            if not stemming.soort:
+                logger.warning('vote has no decision, vote.details: ' + str(stemming.soort))
+            VoteParty.objects.create(
+                voting=voting,
+                party=party,
+                party_name=fractie_name,
+                number_of_seats=stemming.fractie_size,
+                decision=self.get_decision(stemming.soort),
+                details='',
+                is_mistake=stemming.vergissing if stemming.vergissing is not None else False
+            )
+        logger.info('END')
+
+    def create_missing_party(self, stemming):
+        wikidata_id = wikidata.search_political_party_id(stemming.fractie.name, language='nl')
+        party = PoliticalParty.objects.create(
+            name=stemming.fractie.name,
+            name_short=stemming.fractie.afkorting,
+            wikidata_id=wikidata_id
         )
-    logger.info('END')
+        party.update_info(language='nl')
+        return party
 
+    @transaction.atomic
+    def create_votes_individual(self, voting, stemmingen):
+        logger.info('BEGIN')
+        for stemming in stemmingen:
+            persoon = stemming.persoon
 
-def get_result_choice(result_string):
-    result_string = result_string.lower()
-    result_string.replace('.', '')
-    if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
-        return Voting.AANGENOMEN
-    elif 'verworpen' in result_string:
-        return Voting.VERWORPEN
-    elif 'ingetrokken' in result_string:
-        return Voting.INGETROKKEN
-    elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
-        return Voting.AANGEHOUDEN
-    elif 'controversieel verklaard' in result_string:
-        return Voting.CONTROVERSIEEL
-    logger.error('could not interpret the voting result: ' + result_string)
-    return Voting.ONBEKEND
+            if persoon:
+                initials = persoon.initialen
+                surname = persoon.achternaam
+                forname = persoon.roepnaam
+            else:
+                logger.error('Persoon not found for stemming: ' + stemming.id)
+                surname_initials = stemming.json['AnnotatieActorNaam']
+                forname = ''
+                initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
 
+            parliament_member = ParliamentMember.find(surname=surname, initials=initials)
+            if not parliament_member:
+                logger.error('parliament member not found for vote: ' + str(stemming.id))
+                logger.error('creating vote with empty parliament member')
 
-def get_decision(decision_string):
-    if 'Voor' == decision_string:
-        return Vote.FOR
-    elif 'Tegen' == decision_string:
-        return Vote.AGAINST
-    elif 'Niet deelgenomen' == decision_string:
+            person_name = ' '.join([forname, surname, initials]).strip()
+            VoteIndividual.objects.create(
+                voting=voting,
+                person_name=person_name,
+                parliament_member=parliament_member,
+                number_of_seats=1,
+                decision=self.get_decision(stemming.soort),
+                details='',
+                is_mistake=stemming.vergissing if stemming.vergissing is not None else False
+            )
+        logger.info('END')
+
+    @staticmethod
+    def get_decision(decision_string):
+        if 'Voor' == decision_string:
+            return Vote.FOR
+        elif 'Tegen' == decision_string:
+            return Vote.AGAINST
+        elif 'Niet deelgenomen' == decision_string:
+            return Vote.NONE
+        logger.error('no decision detected, returning Vote.NONE')
         return Vote.NONE
-    logger.error('no decision detected, returning Vote.NONE')
-    return Vote.NONE
+
+
+
