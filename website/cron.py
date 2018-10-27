@@ -136,7 +136,7 @@ class UpdateKamervragenRecent(LockJob):
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
-        years = ['2018', '2017']
+        years = ['2018']
         for year in years:
             openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
             openkamer.kamervraag.create_antwoorden(year, skip_if_exists=True)
