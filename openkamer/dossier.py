@@ -113,15 +113,13 @@ def get_document_data_mp(search_result, outputs):
 @transaction.atomic
 def create_dossier_documents(dossier, dossier_id):
     manager = mp.Manager()
+    pool = mp.Pool(processes=4)
     outputs = manager.list()
-    processes = []
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
     for search_result in search_results:
-        process = mp.Process(target=get_document_data_mp, args=(search_result, outputs))
-        processes.append(process)
-        process.start()
-    for process in processes:
-        process.join()
+        pool.apply_async(get_document_data_mp, args=(search_result, outputs))
+    pool.close()
+    pool.join()
 
     for data in outputs:
         if data.metadata['date_published']:
