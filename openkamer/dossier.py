@@ -112,10 +112,11 @@ def get_document_data_mp(search_result, outputs):
 
 @transaction.atomic
 def create_dossier_documents(dossier, dossier_id):
-    manager = mp.Manager()
-    pool = mp.Pool(processes=4)
-    outputs = manager.list()
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
+
+    pool = mp.Pool(processes=4)
+    manager = mp.Manager()
+    outputs = manager.list()
     for search_result in search_results:
         pool.apply_async(get_document_data_mp, args=(search_result, outputs))
     pool.close()
@@ -131,13 +132,13 @@ def create_dossier_documents(dossier, dossier_id):
             data.metadata['submitter'] = 'undefined'
 
         dossier_for_document = dossier
-        if 'dossier_id' in data.metadata:
-            main_dossier_id = data.metadata['dossier_id'].split(';')[0].strip()
-            main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
-            if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
-                dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
-                data.content_html = update_document_html_links(data.content_html)
+        # if 'dossier_id' in data.metadata:
+        #     main_dossier_id = data.metadata['dossier_id'].split(';')[0].strip()
+        #     main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
+        #     if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
+        #         dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
 
+        data.content_html = update_document_html_links(data.content_html)
         properties = {
             'dossier': dossier_for_document,
             'title_full': data.metadata['title_full'],
