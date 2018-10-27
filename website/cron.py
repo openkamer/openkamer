@@ -116,16 +116,6 @@ class UpdateInactiveDossiers(LockJob):
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
 
 
-class UpdateBesluitenLijsten(LockJob):
-    RUN_AT_TIMES = ['23:00']
-    schedule = Schedule(run_at_times=RUN_AT_TIMES)
-    code = 'website.cron.UpdateBesluitenLijsten'
-
-    def do_imp(self):
-        logger.info('update besluitenlijsten')
-        openkamer.besluitenlijst.create_besluitenlijsten()
-
-
 class UpdateVerslagenAlgemeenOverleg(LockJob):
     RUN_AT_TIMES = ['23:30']
     schedule = Schedule(run_at_times=RUN_AT_TIMES)

@@ -29,5 +29,4 @@ class Command(BaseCommand):
         failed_dossiers = openkamer.dossier.create_wetsvoorstellen_all(options['skip-existing'])
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
-            openkamer.besluitenlijst.create_besluitenlijsten(skip_existing=options['skip-existing'])
         stats.models.update_all()

@@ -16,5 +16,3 @@ class Command(BaseCommand):
         openkamer.dossier.create_or_update_dossier('33885')
         openkamer.dossier.create_or_update_dossier('34344')
         openkamer.dossier.create_or_update_dossier('33506')
-
-        openkamer.besluitenlijst.create_besluitenlijsten(max_results_per_commission=20)

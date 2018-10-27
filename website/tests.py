@@ -97,7 +97,6 @@ class TestWebsite(TestCase):
     def setUpTestData(cls):
         openkamer.dossier.create_dossier_retry_on_error(33885)
         openkamer.dossier.create_dossier_retry_on_error(33506)
-        openkamer.besluitenlijst.create_besluitenlijsten(max_commissions=3, max_results_per_commission=5)
         cls.client = Client()
 
     def test_homepage(self):

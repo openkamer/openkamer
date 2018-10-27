@@ -23,11 +23,6 @@ class TestDossierScraper(TestCase):
         dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
         self.assertEqual(dossier_url, 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/detail?id=2013Z16228&dossier=33711')
 
-    def test_get_dossier_decision(self):
-        dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
-        decision = scraper.dossiers.get_dossier_decision(dossier_url)
-        self.assertEqual(decision, 'Wetsvoorstel zonder stemming aangenomen.')
-
 
 class TestPoliticalPartyScraper(TestCase):
 
@@ -77,18 +72,6 @@ class TestKamervraagScraper(TestCase):
         self.assertEqual(len(related_document_ids), 2)
         self.assertEqual(related_document_ids[0], 'ah-tk-20162017-2129')
         self.assertEqual(related_document_ids[1], 'ah-tk-20162017-2338')
-
-
-class TestVoortouwCommissieScraper(TestCase):
-
-    def test_get_commissies(self):
-        commissions = scraper.besluitenlijst.get_voortouwcommissies_besluiten_urls()
-        self.assertTrue(len(commissions) >= 37)
-
-    def test_get_besluitenlijst_urls(self):
-        overview_url = 'https://www.tweedekamer.nl/kamerstukken/besluitenlijsten?qry=%2A&fld_tk_categorie=Kamerstukken&srt=date%3Adesc%3Adate&clusterName=Besluitenlijsten&Type=Kamerstukken&fld_prl_kamerstuk=Besluitenlijsten&nocache=&fld_prl_voortouwcommissie=Vaste+commissie+voor+binnenlandse+zaken'
-        urls = scraper.besluitenlijst.get_besluitenlijsten_urls(overview_url, max_results=10)
-        self.assertEqual(len(urls), 10)
 
 
 class TestBesluitenlijstScraper(TestCase):

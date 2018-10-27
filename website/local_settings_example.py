@@ -50,7 +50,6 @@ CRON_CLASSES = [
     # 'website.cron.UpdateParliamentAndGovernment',
     # 'website.cron.UpdateActiveDossiers',
     # 'website.cron.UpdateInactiveDossiers',
-    # 'website.cron.UpdateBesluitenLijsten',
     # 'website.cron.UpdateVerslagenAlgemeenOverleg',
     # 'website.cron.UpdateKamervragenRecent',
     # 'website.cron.UpdateKamervragenAll',
