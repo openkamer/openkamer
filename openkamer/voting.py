@@ -139,9 +139,9 @@ class VoteFactory(object):
         logger.info('END')
 
     def create_missing_party(self, stemming):
-        wikidata_id = wikidata.search_political_party_id(stemming.fractie.name, language='nl')
+        wikidata_id = wikidata.search_political_party_id(stemming.fractie.naam, language='nl')
         party = PoliticalParty.objects.create(
-            name=stemming.fractie.name,
+            name=stemming.fractie.naam,
             name_short=stemming.fractie.afkorting,
             wikidata_id=wikidata_id
         )
