@@ -84,6 +84,9 @@ class TestNamePrefix(TestCase):
         name = 'van derHam'
         prefix, pos = Person.find_prefix(name)
         self.assertEqual(prefix, 'van')
+        name = 'von Martels'
+        prefix, pos = Person.find_prefix(name)
+        self.assertEqual(prefix, 'von')
 
     def test_parse_surname_surname_prefix(self):
         surname_expected = 'Ham'

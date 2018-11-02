@@ -18,6 +18,7 @@ NAME_PREFIXES = [
     'van \'t',
     'in het',
     'van',
+    'von',
     'de',
     'het',
     '\'t',

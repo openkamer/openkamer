@@ -1,6 +1,6 @@
 import re
 from person.models import Person
-from person.models import NAME_PREFIXES
+
 
 def parse_name_surname_initials(name):
     name = remove_forename(name)
