@@ -7,6 +7,7 @@ from json.decoder import JSONDecodeError
 
 from django.db import transaction
 
+import wikidata.government
 from wikidata import wikidata
 import tkapi
 from tkapi.fractie import Fractie
@@ -66,7 +67,7 @@ def create_governments():
 
 @transaction.atomic
 def create_government(wikidata_id, max_members=None):
-    gov_info = scraper.government.get_government(wikidata_id)
+    gov_info = wikidata.government.get_government(wikidata_id)
     Government.objects.filter(wikidata_id=wikidata_id).delete()
     government = Government.objects.create(
         name=gov_info['name'],
@@ -81,7 +82,7 @@ def create_government(wikidata_id, max_members=None):
 @transaction.atomic
 def create_government_members(government, max_members=None):
     members_created = []
-    members = scraper.government.get_government_members(government.wikidata_id, max_members=max_members)
+    members = wikidata.government.get_government_members(government.wikidata_id, max_members=max_members)
     for member in members:
         if 'position' not in member:
             logger.error('no position found for government member: ' + member['name'] + ' with wikidata id: ' + member['wikidata_id'])

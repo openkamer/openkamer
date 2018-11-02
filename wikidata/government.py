@@ -1,18 +1,5 @@
-import json
-import logging
-
+from scraper.government import logger
 from wikidata import wikidata
-
-logger = logging.getLogger(__name__)
-
-
-def get_government(government_wikidata_id):
-    item = wikidata.WikidataItem(government_wikidata_id)
-    return {
-        'name': item.get_label(language='nl'),
-        'start_date': item.get_start_time(),
-        'end_date': item.get_end_time(),
-    }
 
 
 def get_government_members(government_wikidata_id, max_members=None):
@@ -63,3 +50,12 @@ def get_government_members(government_wikidata_id, max_members=None):
             break
     logger.info('END')
     return members
+
+
+def get_government(government_wikidata_id):
+    item = wikidata.WikidataItem(government_wikidata_id)
+    return {
+        'name': item.get_label(language='nl'),
+        'start_date': item.get_start_time(),
+        'end_date': item.get_end_time(),
+    }

@@ -134,3 +134,23 @@ class TestPersonProperties(TestCase):
         wikidata_id = 'Q560780'
         item = wikidata.WikidataItem(wikidata_id)
         self.assertEqual(item.get_twitter_username(), 'diederiksamsom')
+
+
+class TestGovernmentScraper(TestCase):
+    rutte_2_wikidata_id = 'Q1638648'
+
+    def test(self):
+        government = wikidata.government.get_government(self.rutte_2_wikidata_id)
+        self.assertEqual(government['name'], 'Kabinet-Rutte II')
+        self.assertEqual(government['start_date'], datetime.date(2012, 11, 5))
+
+    def test_get_members(self):
+        members = wikidata.government.get_government_members(self.rutte_2_wikidata_id)
+        self.assertGreater(len(members), 10)
+
+    def test_get_parlement_and_politiek_id(self):
+        person_wikidata_id = 'Q32681'
+        expected_id = 'vg09llk9rzrp'
+        item = wikidata.WikidataItem(person_wikidata_id)
+        parlement_id = item.get_parlement_and_politiek_id()
+        self.assertEqual(parlement_id, expected_id)

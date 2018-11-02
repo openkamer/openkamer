@@ -5,6 +5,7 @@ import re
 
 from django.test import TestCase
 
+import wikidata.government
 from wikidata import wikidata
 
 import scraper.besluitenlijst
@@ -107,26 +108,6 @@ class TestPersonInfoScraper(TestCase):
         initials_expected = 'T.H.P.'
         initials = scraper.persons.get_initials(parlement_and_politiek_id)
         self.assertEqual(initials, initials_expected)
-
-
-class TestGovernmentScraper(TestCase):
-    rutte_2_wikidata_id = 'Q1638648'
-
-    def test(self):
-        government = scraper.government.get_government(self.rutte_2_wikidata_id)
-        self.assertEqual(government['name'], 'Kabinet-Rutte II')
-        self.assertEqual(government['start_date'], datetime.date(2012, 11, 5))
-
-    def test_get_members(self):
-        members = scraper.government.get_government_members(self.rutte_2_wikidata_id)
-        self.assertGreater(len(members), 10)
-
-    def test_get_parlement_and_politiek_id(self):
-        person_wikidata_id = 'Q32681'
-        expected_id = 'vg09llk9rzrp'
-        item = wikidata.WikidataItem(person_wikidata_id)
-        parlement_id = item.get_parlement_and_politiek_id()
-        self.assertEqual(parlement_id, expected_id)
 
 
 class TestDocumentScraper(TestCase):
