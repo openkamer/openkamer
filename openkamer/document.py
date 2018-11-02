@@ -155,8 +155,7 @@ def create_submitter(document, submitter, date):
 
     if not person:
         active_persons = get_active_persons(date)
-        persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(
-            forename='')
+        persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(forename='')
         if persons_similar.count() == 1:
             person = persons_similar[0]
     if not person:

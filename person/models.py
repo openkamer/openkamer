@@ -6,6 +6,8 @@ from django.utils.text import slugify
 
 from wikidata import wikidata
 
+import scraper.persons
+
 logger = logging.getLogger(__name__)
 
 
@@ -149,6 +151,8 @@ class Person(models.Model):
             self.wikimedia_image_name = image_filename
             self.wikimedia_image_url = wikidata.WikidataItem.get_wikimedia_image_url(self.wikimedia_image_name)
         self.parlement_and_politiek_id = wikidata_item.get_parlement_and_politiek_id()
+        if self.parlement_and_politiek_id:
+            self.initials = scraper.persons.get_initials(self.parlement_and_politiek_id)
         self.twitter_username = wikidata_item.get_twitter_username()
 
     def wikidata_url(self):

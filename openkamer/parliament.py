@@ -260,30 +260,37 @@ def set_party_votes_derived_info():
 
 @transaction.atomic
 def get_or_create_person(wikidata_id, fullname='', wikidata_item=None, add_initials=False):
-    persons = Person.objects.filter(wikidata_id=wikidata_id)
     if not wikidata_item:
         wikidata_item = wikidata.WikidataItem(wikidata_id)
-    if persons.exists():
+    persons = Person.objects.filter(wikidata_id=wikidata_id)
+    if persons.count() > 1:
+        logger.warning('more than one person with same wikidata_id found, wikidata id: ' + str(wikidata_id))
+    if persons.count() == 1:
         person = persons[0]
     else:
-        if not fullname:
-            fullname = wikidata_item.get_label(language='nl')
-        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
-        person = Person.objects.create(
-            forename=forename,
-            surname=surname,
-            surname_prefix=surname_prefix,
-            wikidata_id=wikidata_id
-        )
-        person.update_info(language='nl', wikidata_item=wikidata_item)
-        person.save()
-        if add_initials and person.parlement_and_politiek_id:
-            person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
-            person.save()
-        assert person.wikidata_id == wikidata_id
+        person = create_person(wikidata_id, fullname, wikidata_item, add_initials)
     party_members = PartyMember.objects.filter(person=person)
     if not party_members.exists():
         create_party_members_for_person(person)
+    return person
+
+
+def create_person(wikidata_id, fullname, wikidata_item, add_initials):
+    if not fullname:
+        fullname = wikidata_item.get_label(language='nl')
+    forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+    person = Person.objects.create(
+        forename=forename,
+        surname=surname,
+        surname_prefix=surname_prefix,
+        wikidata_id=wikidata_id
+    )
+    person.update_info(language='nl', wikidata_item=wikidata_item)
+    person.save()
+    if add_initials and person.parlement_and_politiek_id:
+        person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
+        person.save()
+    assert person.wikidata_id == wikidata_id
     return person
 
 

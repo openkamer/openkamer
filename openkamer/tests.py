@@ -163,7 +163,7 @@ class TestCreateParliament(TestCase):
 
 class TestCreateParliamentMember(TestCase):
 
-    def test_create_parliament_member_from_wikidata_martin(self):
+    def test_create_martin(self):
         person_wikidata_id = 'Q2801440'  # Martin van Rooijen
         parliament = Parliament.get_or_create_tweede_kamer()
         members = openkamer.parliament.create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
@@ -171,7 +171,24 @@ class TestCreateParliamentMember(TestCase):
         party_expected = PoliticalParty.find_party('50plus')
         self.assertEqual(members[0].party, party_expected)
 
-    def test_create_parliament_member_from_wikidata_kuzu(self):
+    def test_create_paul(self):
+        person_wikidata_id = 'Q18169519'  # Paul Smeulders
+        Person.objects.create(
+            forename='Paul',
+            surname='Smeulders',
+            wikidata_id=person_wikidata_id
+        )
+        parliament = Parliament.get_or_create_tweede_kamer()
+        members = openkamer.parliament.create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
+        self.assertEqual(len(members), 1)
+        member = members[0]
+        party_expected = PoliticalParty.find_party('GroenLinks')
+        self.assertEqual(member.party, party_expected)
+        self.assertEqual(member.person.initials, '')
+        member.person.update_info()
+        self.assertEqual(member.person.initials, 'P.H.M.')
+
+    def test_create_kuzu(self):
         person_wikidata_id = 'Q616635'  # Tunahan Kuzu
         parliament = Parliament.get_or_create_tweede_kamer()
         members = openkamer.parliament.create_parliament_member_from_wikidata_id(parliament, person_wikidata_id)
