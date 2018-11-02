@@ -151,16 +151,6 @@ class TestFindOriginalKamerstukId(TestCase):
         self.assertEqual(original_id, expected_result)
 
 
-class TestCreateParliament(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        openkamer.parliament.create_parties()
-
-    def test_create_parliament_from_wikidata(self):
-        openkamer.parliament.create_parliament_members(max_results=20)
-
-
 class TestCreateParliamentMember(TestCase):
 
     def test_create_martin(self):
@@ -202,6 +192,10 @@ class TestCreateParliamentMember(TestCase):
 
 
 class TestCreatePoliticalParty(TestCase):
+
+    def test_create_parties(self):
+        parties = openkamer.parliament.create_parties(active_only=True)
+        self.assertGreater(len(parties), 10)
 
     def test_create_socialist_party(self):
         party = openkamer.parliament.create_party('Socialistische Partij', 'SP')

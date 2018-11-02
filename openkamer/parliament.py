@@ -8,11 +8,12 @@ from json.decoder import JSONDecodeError
 from django.db import transaction
 
 from wikidata import wikidata
+import tkapi
+from tkapi.fractie import Fractie
 
 import scraper.government
 import scraper.parliament_members
 import scraper.persons
-import scraper.political_parties
 
 from person.models import Person
 
@@ -120,12 +121,20 @@ def create_goverment_member(government, member, person, position):
 
 
 @transaction.atomic
-def create_parties(update_votes=True):
-    parties = scraper.political_parties.search_parties()
-    for party_info in parties:
-        create_party(party_info['name'], party_info['name_short'])
+def create_parties(update_votes=True, active_only=False):
+    filter_fractie = None
+    if active_only:
+        filter_fractie = Fractie.create_filter()
+        filter_fractie.filter_actief()
+    api = tkapi.Api()
+    fracties = api.get_fracties(filter=filter_fractie)
+    parties = []
+    for fractie in fracties:
+        party = create_party(fractie.naam, fractie.afkorting)
+        parties.append(party)
     if update_votes:
         set_party_votes_derived_info()
+    return parties
 
 
 @transaction.atomic

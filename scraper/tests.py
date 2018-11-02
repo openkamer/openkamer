@@ -13,7 +13,6 @@ import scraper.dossiers
 import scraper.government
 import scraper.parliament_members
 import scraper.persons
-import scraper.political_parties
 
 
 class TestDossierScraper(TestCase):
@@ -22,16 +21,6 @@ class TestDossierScraper(TestCase):
     def test_scrape_dossier_url(self):
         dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
         self.assertEqual(dossier_url, 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/detail?id=2013Z16228&dossier=33711')
-
-
-class TestPoliticalPartyScraper(TestCase):
-
-    def test_scrape_parties(self):
-        parties = scraper.political_parties.search_parties()
-        self.assertTrue(len(parties) > 10)
-        for party in parties:
-            self.assertTrue(party['name'])
-            self.assertTrue(party['name_short'])
 
 
 class TestKamervraagScraper(TestCase):

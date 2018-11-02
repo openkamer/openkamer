@@ -13,18 +13,11 @@ from django.conf import settings
 from django_cron import CronJobBase, Schedule
 from django.db import transaction
 
-from git import Repo, Actor
-
-import scraper.dossiers
-import scraper.documents
-import scraper.political_parties
-import scraper.parliament_members
 
 from document.models import Submitter
 from government.models import GovernmentMember
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
-from parliament.models import PoliticalParty
 from person.models import Person
 
 import openkamer.besluitenlijst
