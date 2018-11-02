@@ -37,7 +37,7 @@ class DocumentData(object):
         self.title = title
         self.document_url = document_url
         self.document_html_url = document_url + '.html'
-        self.update_metatdata()
+        self.update_metadata()
 
     @property
     def date_published(self):
@@ -49,7 +49,7 @@ class DocumentData(object):
             return self.metadata['date_received']
         return None
 
-    def update_metatdata(self):
+    def update_metadata(self):
         if 'officiële publicatie' in self.metadata['title_short']:
             self.metadata['title_short'] = self.metadata['title_full']
         if 'submitter' not in self.metadata:
@@ -65,7 +65,6 @@ class DocumentFactory(object):
         KAMERVRAAG = 'Kamervraag'
 
     def __init__(self, document_type=None):
-        logger.info('DocumentFactory()')
         self.scraper = None
         if document_type == self.DocumentType.KAMERVRAAG:
             self.scraper = scraper.documents.get_kamervraag_document_id_and_content
@@ -102,9 +101,9 @@ class DocumentFactory(object):
             'content_html': document_data.content_html,
         }
 
-        document, related_document_ids = self.create_document_and_related(document_data, properties)
+        document = self.create_document_and_related(document_data, properties)
         logger.info('END')
-        return document, related_document_ids, metadata
+        return document, metadata
 
     def create_kamervraag_document(self, overheidnl_document_id):
         logger.info('BEGIN')
@@ -123,7 +122,8 @@ class DocumentFactory(object):
             'content_html': document_data.content_html,
         }
 
-        document, related_document_ids = self.create_document_and_related(document_data, properties)
+        document = self.create_document_and_related(document_data, properties)
+        related_document_ids = scraper.documents.get_kamervraag_antwoord_ids(document_data.document_url)
         logger.info('END')
         return document, related_document_ids, metadata['vraagnummer']
 
@@ -139,9 +139,7 @@ class DocumentFactory(object):
         submitters = document_data.metadata['submitter'].split('|')
         for submitter in submitters:
             SubmitterFactory.create_submitter(document, submitter, document_data.date_published)
-
-        related_document_ids = scraper.documents.get_related_document_ids(document_data.document_url)
-        return document, related_document_ids
+        return document
 
     @staticmethod
     def get_or_create_dossier(dossier_id):

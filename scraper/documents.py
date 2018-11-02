@@ -10,7 +10,7 @@ import lxml.etree
 logger = logging.getLogger(__name__)
 
 
-def get_related_document_ids(kamervraag_url):
+def get_kamervraag_antwoord_ids(kamervraag_url):
     logger.info('get related antwoord id for url: ' + kamervraag_url)
     page = requests.get(kamervraag_url, timeout=60)
     tree = lxml.html.fromstring(page.content)

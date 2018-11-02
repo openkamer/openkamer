@@ -41,7 +41,7 @@ def create_verslag(overheidnl_document_id, dossier_id, dossier_id_extra, kamerst
     if skip_if_exists and Kamerstuk.objects.filter(document__document_id=overheidnl_document_id).exists():
         return
     document_factory = DocumentFactory()
-    document, related_document_ids, metadata = document_factory.create_document(overheidnl_document_id, dossier_id=dossier_id)
+    document, metadata = document_factory.create_document(overheidnl_document_id, dossier_id=dossier_id)
     document.title_short = get_verslag_document_title(document.title_short)
     document.save()
     Kamerstuk.objects.filter(document=document).delete()
