@@ -20,6 +20,8 @@ class TestFindName(TestCase):
         cls.p5 = Person.objects.create(forename='Fatma', surname='Koşer Kaya', surname_prefix='', initials='F.')
         cls.p6 = Person.objects.create(forename='Jan Peter', surname='Balkenende', initials='')
         cls.p7 = Person.objects.create(forename='', surname='van Raak', initials='')
+        cls.p8 = Person.objects.create(forename='', surname='Grapperhaus', initials='F.B.J.')
+        cls.p9 = Person.objects.create(forename='Ferdinand', surname='Grapperhaus', initials='F.B.J.')
 
     def test_find_by_fullname(self):
         p_found = Person.find_by_fullname('Jan Peter Balkenende')
@@ -46,6 +48,10 @@ class TestFindName(TestCase):
         self.assertEqual(p_found, None)
         p_found = Person.find_surname_initials('Koşer Kaya', 'F.')
         self.assertEqual(p_found, self.p5)
+
+    def test_find_surname_multiple(self):
+        p_found = Person.find_surname_initials('Grapperhaus', 'F.B.J.')
+        self.assertEqual(p_found, self.p9)
 
 
 class TestNamePrefix(TestCase):

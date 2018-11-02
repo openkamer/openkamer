@@ -87,6 +87,8 @@ class Person(models.Model):
                 score += 1
             elif intials_letters and forename and intials_letters[0] == forename[0]:
                 score += 0.5
+            if person.initials and person.forename and person.surname:
+                score += 0.1
             if score >= 1.5 and score > best_score:
                 best_match = person
                 best_score = score
