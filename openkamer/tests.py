@@ -22,7 +22,8 @@ from document.models import Kamervraag
 from document.models import Voting, Vote
 
 import openkamer.besluitenlijst
-import openkamer.document
+from openkamer.document import DocumentFactory
+from openkamer.document import SubmitterFactory
 import openkamer.dossier
 import openkamer.kamerstuk
 import openkamer.kamervraag
@@ -86,40 +87,40 @@ class TestCreatePerson(TestCase):
         parliament = Parliament.get_or_create_tweede_kamer()
         ParliamentMember.objects.create(person=p1, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.document.create_submitter(document, 'L. van Tongeren', date)
+        submitter = SubmitterFactory.create_submitter(document, 'L. van Tongeren', date)
         self.assertEqual(submitter.person.initials, 'L.')
-        submitter = openkamer.document.create_submitter(document, 'Tongeren C.S.', date)
+        submitter = SubmitterFactory.create_submitter(document, 'Tongeren C.S.', date)
         self.assertEqual(submitter.person.initials, '')
-        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertEqual(submitter.person, p1)
         p5 = Person.objects.create(forename='', surname='Dijsselbloem', initials='')
-        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertEqual(submitter.person, p1)
         p2 = Person.objects.create(forename='Pieter', surname='Dijsselbloem', initials='P.')
         ParliamentMember.objects.create(person=p2, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
-        submitter = openkamer.document.create_submitter(document, 'DIJSSELBLOEM', date)
+        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
         self.assertNotEqual(submitter.person, p1)
         self.assertNotEqual(submitter.person, p2)
         p3 = Person.objects.create(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')
         p4 = Person.objects.create(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')
-        submitter = openkamer.document.create_submitter(document, 'JAN JACOB VAN DIJK', date)
+        submitter = SubmitterFactory.create_submitter(document, 'JAN JACOB VAN DIJK', date)
         self.assertEqual(submitter.person, p3)
-        submitter = openkamer.document.create_submitter(document, 'JASPER VAN DIJK', date)
+        submitter = SubmitterFactory.create_submitter(document, 'JASPER VAN DIJK', date)
         self.assertEqual(submitter.person, p4)
 
     def test_submitter_empty(self):
         p1 = Person.objects.create(forename='', surname='', initials='')
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.document.create_submitter(document, '', datetime.date.today())
+        submitter = SubmitterFactory.create_submitter(document, '', datetime.date.today())
         self.assertEqual(submitter.person, p1)
 
     def test_submitter_surname_only(self):
         p1 = Person.objects.create(forename='', surname='van Raak', initials='')
         document = Document.objects.create(date_published=datetime.date.today())
-        submitter = openkamer.document.create_submitter(document, 'VAN RAAK', datetime.date.today())
+        submitter = SubmitterFactory.create_submitter(document, 'VAN RAAK', datetime.date.today())
         self.assertEqual(submitter.person, p1)
         p2 = Person.objects.create(forename='', surname_prefix='van der', surname='Ham', initials='')
-        submitter = openkamer.document.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
+        submitter = SubmitterFactory.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
         self.assertEqual(submitter.person, p2)
 
 
@@ -290,7 +291,8 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        document, vraagnummer, related_document_ids = openkamer.kamervraag.create_kamervraag_document(infos[0]['overheidnl_document_id'])
+        document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+        document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(infos[0]['overheidnl_document_id'])
         # print(metadata)
 
     def test_get_receiver_from_title(self):

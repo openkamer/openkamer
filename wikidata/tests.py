@@ -3,6 +3,7 @@ from unittest import TestCase
 import datetime
 
 from wikidata import wikidata
+from wikidata import government as wikidata_government
 
 logger = logging.getLogger(__name__)
 
@@ -140,12 +141,12 @@ class TestGovernmentScraper(TestCase):
     rutte_2_wikidata_id = 'Q1638648'
 
     def test(self):
-        government = wikidata.government.get_government(self.rutte_2_wikidata_id)
+        government = wikidata_government.get_government(self.rutte_2_wikidata_id)
         self.assertEqual(government['name'], 'Kabinet-Rutte II')
         self.assertEqual(government['start_date'], datetime.date(2012, 11, 5))
 
     def test_get_members(self):
-        members = wikidata.government.get_government_members(self.rutte_2_wikidata_id)
+        members = wikidata_government.get_government_members(self.rutte_2_wikidata_id)
         self.assertGreater(len(members), 10)
 
     def test_get_parlement_and_politiek_id(self):

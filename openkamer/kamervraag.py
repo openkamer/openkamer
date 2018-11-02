@@ -1,25 +1,17 @@
 import logging
 import re
 import lxml
-import datetime
 
 from django.db import transaction
-
-import scraper.documents
 
 from document.models import Kamervraag
 from document.models import Kamerantwoord
 from document.models import KamervraagMededeling
 from document.models import Antwoord
 from document.models import Vraag
-from document.models import CategoryDocument
 from document.models import FootNote
 
-from document.models import Document
-
-import openkamer.document
-import openkamer.dossier
-import openkamer.kamerstuk
+from openkamer.document import DocumentFactory
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +103,8 @@ def get_or_create_kamerantwoord(vraagnummer, document):
 def create_kamervraag(overheidnl_document_id, skip_if_exists=False):
     if skip_if_exists and Kamervraag.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None, []
-    document, vraagnummer, related_document_ids = create_kamervraag_document(overheidnl_document_id)
+    document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+    document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheidnl_document_id)
     kamervraag = get_or_create_kamervraag(vraagnummer, document)
     create_vragen_from_kamervraag_html(kamervraag)
     footnotes = create_footnotes(kamervraag.document.content_html)
@@ -125,7 +118,8 @@ def create_kamervraag(overheidnl_document_id, skip_if_exists=False):
 def create_kamerantwoord(overheidnl_document_id, skip_if_exists=False):
     if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None
-    document, vraagnummer, related_document_ids = create_kamervraag_document(overheidnl_document_id)
+    document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+    document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheidnl_document_id)
     if 'mededeling' in document.types.lower():
         KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()
         mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
@@ -136,60 +130,6 @@ def create_kamerantwoord(overheidnl_document_id, skip_if_exists=False):
         create_antwoorden_from_antwoord_html(kamerantwoord)
         mededeling = None
     return kamerantwoord, mededeling
-
-
-@transaction.atomic
-def create_kamervraag_document(overheidnl_document_id):
-    logger.info('BEGIN')
-    document_url = 'https://zoek.officielebekendmakingen.nl/' + str(overheidnl_document_id)
-    document_html_url = document_url + '.html'
-    logger.info(document_html_url)
-    document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(document_html_url)
-    metadata = scraper.documents.get_metadata(overheidnl_document_id)
-    document_id = overheidnl_document_id
-
-    if metadata['date_published']:
-        date_published = metadata['date_published']
-    elif metadata['date_submitted']:
-        date_published = metadata['date_submitted']
-    elif metadata['date_received']:
-        date_published = metadata['date_received']
-    else:
-        date_published = None
-
-    if 'submitter' not in metadata:
-        metadata['submitter'] = 'undefined'
-    if metadata['receiver']:
-        metadata['submitter'] = metadata['receiver']
-
-    content_html = openkamer.document.update_document_html_links(content_html)
-
-    properties = {
-        'dossier': None,
-        'title_full': title,
-        'title_short': metadata['title_full'],
-        'publication_type': metadata['publication_type'],
-        'types': metadata['types'],
-        'publisher': metadata['publisher'],
-        'date_published': date_published,
-        'source_url': document_html_url,
-        'content_html': content_html,
-    }
-
-    document, created = Document.objects.update_or_create(
-        document_id=document_id,
-        defaults=properties
-    )
-    category_list = openkamer.document.get_categories(text=metadata['category'], category_class=CategoryDocument, sep_char='|')
-    document.categories.add(*category_list)
-
-    submitters = metadata['submitter'].split('|')
-    for submitter in submitters:
-        openkamer.document.create_submitter(document, submitter, date_published)
-
-    related_document_ids = scraper.documents.get_related_document_ids(document_url)
-    logger.info('END')
-    return document, metadata['vraagnummer'], related_document_ids
 
 
 def get_receiver_from_title(title_full):
@@ -245,7 +185,7 @@ def create_vragen_from_kamervraag_html(kamervraag):
         vraag_text = ''
         for paragraph in element.iter('p'):
             if paragraph.text is None or paragraph.text == '':
-                logger.warning('empty vraag text found for antwoord ' + str(kamervraag.document.document_url) + 'vraat nr: ' + str(counter))
+                logger.warning('empty vraag text found for antwoord ' + str(kamervraag.document.document_url) + 'vraag nr: ' + str(counter))
             else:
                 vraag_text += paragraph.text_content() + '\n'
         vraag_text = re.sub('\s{2,}', ' ', vraag_text).strip()

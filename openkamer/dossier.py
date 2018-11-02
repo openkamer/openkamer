@@ -13,15 +13,14 @@ from tkapi.zaak import Zaak
 import scraper.documents
 import scraper.dossiers
 
-from document.models import CategoryDocument
 from document.models import CategoryDossier
-from document.models import Document
 from document.models import Dossier
 from document.models import Kamerstuk
 
 from openkamer.agenda import create_agenda
 from openkamer.document import update_document_html_links
-from openkamer.document import create_submitter
+from openkamer.document import DocumentFactory
+from openkamer.document import DocumentData
 from openkamer.document import get_categories
 from openkamer.kamerstuk import create_kamerstuk
 from openkamer.voting import VotingFactory
@@ -76,6 +75,7 @@ class DocumentDataPolitiekNL(object):
         self.title = title
         self.metadata = metadata
         self.content_html = content_html
+        self.url = search_result['page_url']
 
 
 def get_document_data_mp(search_result, outputs):
@@ -124,47 +124,31 @@ def create_dossier_documents(dossier, dossier_id):
 
     for data in outputs:
         if data.metadata['date_published']:
-            date_published = data.metadata['date_published']
+            data.metadata['date_published'] = data.metadata['date_published']
         else:
-            date_published = data.search_result['date_published']
+            data.metadata['date_published'] = data.search_result['date_published']
 
         if 'submitter' not in data.metadata:
             data.metadata['submitter'] = 'undefined'
 
         dossier_for_document = dossier
-        # if 'dossier_id' in data.metadata:
-        #     main_dossier_id = data.metadata['dossier_id'].split(';')[0].strip()
-        #     main_dossier_id = main_dossier_id.split('-')[0]  # remove rijkswetdossier id, for example 34158-(R2048)
-        #     if main_dossier_id != '' and str(main_dossier_id) != str(dossier_id):
-        #         dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=main_dossier_id)
 
         data.content_html = update_document_html_links(data.content_html)
+        title = data.metadata['title_full']
         properties = {
             'dossier': dossier_for_document,
-            'title_full': data.metadata['title_full'],
+            'title_full': title,
             'title_short': data.metadata['title_short'],
             'publication_type': data.metadata['publication_type'],
             'types': data.metadata['types'],
             'publisher': data.metadata['publisher'],
-            'date_published': date_published,
-            'source_url': data.search_result['page_url'],
+            'date_published': data.metadata['date_published'],
+            'source_url': data.url,
             'content_html': data.content_html,
         }
-        document, created = Document.objects.update_or_create(
-            document_id=data.document_id,
-            defaults=properties
-        )
 
-        category_list = get_categories(
-            text=data.metadata['category'],
-            category_class=CategoryDocument,
-            sep_char='|'
-        )
-        document.categories.add(*category_list)
-
-        submitters = data.metadata['submitter'].split('|')
-        for submitter in submitters:
-            create_submitter(document, submitter, date_published)
+        document_data = DocumentData(data.document_id, data.metadata, data.content_html, title, data.url)
+        document, related_document_ids = DocumentFactory.create_document_and_related(document_data, properties)
 
         if data.metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in data.search_result['type']

@@ -7,7 +7,7 @@ from django.db import transaction
 from document.models import Dossier
 from document.models import Kamerstuk
 
-from openkamer.document import create_document
+from openkamer.document import DocumentFactory
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,8 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
 def create_verslag(overheidnl_document_id, dossier_id, dossier_id_extra, kamerstuk_nr, skip_if_exists=False):
     if skip_if_exists and Kamerstuk.objects.filter(document__document_id=overheidnl_document_id).exists():
         return
-    document, related_document_ids, metadata = create_document(overheidnl_document_id, dossier_id=dossier_id)
+    document_factory = DocumentFactory()
+    document, related_document_ids, metadata = document_factory.create_document(overheidnl_document_id, dossier_id=dossier_id)
     document.title_short = get_verslag_document_title(document.title_short)
     document.save()
     Kamerstuk.objects.filter(document=document).delete()
