@@ -148,7 +148,7 @@ def create_dossier_documents(dossier, dossier_id):
         }
 
         document_data = DocumentData(data.document_id, data.metadata, data.content_html, title, data.url)
-        document, related_document_ids = DocumentFactory.create_document_and_related(document_data, properties)
+        document = DocumentFactory.create_document_and_related(document_data, properties)
 
         if data.metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in data.search_result['type']
