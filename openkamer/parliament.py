@@ -12,7 +12,6 @@ from wikidata import wikidata
 import tkapi
 from tkapi.fractie import Fractie
 
-import scraper.government
 import scraper.parliament_members
 import scraper.persons
 

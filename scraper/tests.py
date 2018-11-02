@@ -5,13 +5,9 @@ import re
 
 from django.test import TestCase
 
-import wikidata.government
-from wikidata import wikidata
-
 import scraper.besluitenlijst
 import scraper.documents
 import scraper.dossiers
-import scraper.government
 import scraper.parliament_members
 import scraper.persons
 

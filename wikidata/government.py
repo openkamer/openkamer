@@ -1,5 +1,8 @@
-from scraper.government import logger
+import logging
+
 from wikidata import wikidata
+
+logger = logging.getLogger(__name__)
 
 
 def get_government_members(government_wikidata_id, max_members=None):
