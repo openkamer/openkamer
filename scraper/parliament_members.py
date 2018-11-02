@@ -6,16 +6,7 @@ import re
 import requests
 import lxml.html
 
-from wikidata import wikidata
-
 logger = logging.getLogger(__name__)
-
-
-def search_members_wikidata(all_members=False):
-    if all_members:
-        return wikidata.search_parliament_member_ids()
-    else:
-        return wikidata.search_parliament_member_ids_with_start_date()
 
 
 def search_members_check():
