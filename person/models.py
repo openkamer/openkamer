@@ -123,7 +123,7 @@ class Person(models.Model):
 
     @staticmethod
     def update_persons_all(language):
-        persons = Person.objects.all()
+        persons = Person.objects.all().order_by('surname')
         for person in persons:
             person.update_info(language=language)
             person.save()
