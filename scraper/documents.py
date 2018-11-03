@@ -90,7 +90,7 @@ def get_metadata(document_id):
     tree = lxml.etree.fromstring(page.content)
     attributes_transtable = {
         'DC.type': 'types',
-        'OVERHEIDop.dossiernummer': 'dossier_id',
+        'OVERHEIDop.dossiernummer': 'dossier_ids',
         'DC.title': 'title_full',
         'OVERHEIDop.documenttitel': 'title_short',
         'OVERHEIDop.indiener': 'submitter',

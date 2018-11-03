@@ -112,7 +112,7 @@ class TestDocumentScraper(TestCase):
         document_id = 'kst-34575-2'
         metadata = scraper.documents.get_metadata(document_id)
         self.assertEqual(metadata['publication_type'], 'Kamerstuk')
-        self.assertEqual(metadata['dossier_id'], '34575')
+        self.assertEqual(metadata['dossier_ids'], '34575')
         self.assertEqual(metadata['date_published'], '2016-10-13')
         self.assertEqual(metadata['title_short'], 'Voorstel van wet')
         self.assertEqual(metadata['title_full'], 'Wijziging van de Zorgverzekeringswet en de Wet op de zorgtoeslag in verband met enkele inhoudelijke en technische verbeteringen (Verzamelwet Zvw 2016); Voorstel van wet; Voorstel van wet')
@@ -125,7 +125,7 @@ class TestDocumentScraper(TestCase):
         document_id = 'kst-32203-2'
         metadata = scraper.documents.get_metadata(document_id)
         self.assertEqual(metadata['publication_type'], 'Kamerstuk')
-        self.assertEqual(metadata['dossier_id'], '32203')
+        self.assertEqual(metadata['dossier_ids'], '32203')
         self.assertEqual(metadata['date_published'], '2009-11-06')
         self.assertEqual(metadata['title_short'], 'officiële publicatie')
         self.assertEqual(metadata['title_full'], 'Voorstel van Wet van de leden Van der Ham, De Wit en Teeven tot wijziging van het Wetboek van Strafrecht in verband met het laten vervallen van het verbod op godslastering; Voorstel van wet')
@@ -133,6 +133,12 @@ class TestDocumentScraper(TestCase):
         self.assertEqual(metadata['publisher'], 'Tweede Kamer der Staten-Generaal')
         self.assertEqual(metadata['submitter'], 'Ham van der B.|Wit de J.M.A.M.|Teeven F.')
         self.assertEqual(metadata['publication_type'], 'Kamerstuk')
+
+    def test_document_metadata_kamerstuk_multiple_dossiers(self):
+        document_id = 'kst-33037-184'
+        metadata = scraper.documents.get_metadata(document_id)
+        self.assertEqual(metadata['publication_type'], 'Kamerstuk')
+        self.assertEqual(metadata['dossier_ids'], '33037;34532')
 
     def test_get_document_content_2016(self):
         url = 'https://zoek.officielebekendmakingen.nl/kst-34575-2.html'

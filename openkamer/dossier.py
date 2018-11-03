@@ -152,8 +152,9 @@ def create_dossier_documents(dossier, dossier_id):
 
         if data.metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in data.search_result['type']
+            dossier_id = data.metadata.get('dossier_ids', dossier_id).split(';')[0]
             if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.metadata['id_sub']).exists():
-                create_kamerstuk(document, dossier_for_document.dossier_id, data.title, data.metadata, is_attachement)
+                create_kamerstuk(document, dossier_id, data.title, data.metadata, is_attachement)
                 category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
                 dossier_for_document.categories.add(*category_list)
 

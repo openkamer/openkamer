@@ -413,9 +413,9 @@ class Kamerstuk(models.Model):
         (UNKNOWN, UNKNOWN)
     )
     document = models.ForeignKey(Document)
-    id_main = models.CharField(max_length=40, blank=True, db_index=True)
+    id_main = models.CharField(max_length=40, blank=True, db_index=True)  # dossier vetnummer/ID
     id_main_extra = models.CharField(max_length=40, blank=True, db_index=True)
-    id_sub = models.CharField(max_length=40, blank=True, db_index=True)
+    id_sub = models.CharField(max_length=40, blank=True, db_index=True)  # kamerstuk ondernummer
     type_short = models.CharField(max_length=400, blank=True)
     type_long = models.CharField(max_length=2000, blank=True)
     original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-22
