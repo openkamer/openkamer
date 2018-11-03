@@ -488,6 +488,8 @@ class Plot(models.Model):
                 document__date_published__gt=datetime.datetime(year=year, month=1, day=1),
                 document__date_published__lt=datetime.datetime(year=year+1, month=1, day=1),
             )
+            if not kamervragen.exists():
+                continue
             kamervraag_durations = []
             for kamervraag in kamervragen:
                 kamervraag_durations.append(kamervraag.duration)
