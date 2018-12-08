@@ -46,6 +46,7 @@ from stats.views import KamervraagStats
 from stats.views import KamervraagVSTime
 from stats.views import KamervraagReplyTime
 from stats.views import KamervraagReplyTimeContour
+import gift.views
 
 from website.views import DatabaseDumpsView
 from website.views import PersonTimelineView
@@ -113,8 +114,7 @@ urlpatterns = [
     url(r'^stemming/dossier/(?P<dossier_id>\d+)/$', VotingView.as_view(), name='voting-dossier'),
     url(r'^stemming/kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', VotingView.as_view(), name='voting-kamerstuk'),
 
-    url(r'^api/', include(website.api)),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^geschenken/$', gift.views.GiftsView.as_view(), name='gifts'),
 
     url(r'^stats/$', TemplateView.as_view(template_name='stats/index.html'), name='stats'),
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
@@ -138,14 +138,14 @@ urlpatterns = [
     url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
     url(r'^dossiers/check/$', DossiersCheckView.as_view(), name='dossiers-check'),
 
+    url(r'^api/', include(website.api)),
+    url(r'^admin/', include(admin.site.urls)),
+
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),
-    
 
     url(r'^personen/search/',PersonSearchView.as_view(), name="search-person"),
     url(r'^search/', DocumentSearchView.as_view(), name="search"),
-
-
 
 ]
 
