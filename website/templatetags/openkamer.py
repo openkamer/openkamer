@@ -11,6 +11,7 @@ from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 from government.models import GovernmentMember
 from gift.models import Gift
+from travel.models import Travel
 
 register = template.Library()
 
@@ -261,3 +262,9 @@ def get_documents_for_person(person):
 def get_gifts_for_person(person):
     gifts = Gift.objects.filter(person=person)
     return gifts
+
+
+@register.simple_tag
+def get_travels_for_person(person):
+    travels = Travel.objects.filter(person=person)
+    return travels

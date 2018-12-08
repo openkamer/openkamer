@@ -58,8 +58,8 @@ def find_gift_type(text):
         return Gift.BOEK
     if 'wijn' in text or 'champagne' in text:
         return Gift.WIJN
-    if 'kaart' in text or 'toegangsbewijzen' in text or 'concert' in text \
-        or 'tickets' in text or 'een uitnodiging' in text:
+    if 'kaart' in text or 'toegangsbewijzen' in text or 'toegangsbewijs' in text or 'concert' in text \
+        or 'ticket' in text or 'een uitnodiging' in text:
         return Gift.TOEGANGSKAART
     if 'bloem' in text:
         return Gift.BLOEMEN

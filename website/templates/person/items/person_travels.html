@@ -1,25 +1,25 @@
 {% load openkamer %}
 
-{% get_gifts_for_person person as gifts %}
+{% get_travels_for_person person as travels %}
 
 <div class="row">
   <div class="col-sm-12">
     <div class="panel panel-default">
 
       <div class="panel-heading">
-        <span class="h5">Geschenken ({{ gifts|length }})</span>
+        <span class="h5">Reizen ({{ travels|length }})</span>
       </div>
 
-      {% if gifts %}
+      {% if travels %}
       <ul class="list-group">
-      {% for gift in gifts|slice:":2" %}
-        <li class="list-group-item"><small>{{ gift.description }}</small></li>
+      {% for travel in travels|slice:":2" %}
+        <li class="list-group-item"><span class="h6">{{ travel.destination }}</span></li>
       {% endfor %}
       </ul>
 
       <div class="panel-footer">
         <span class="h5">
-          <a href="{% url 'gifts' %}?person={{ person.slug }}">Alle geschenken</a>
+          <a href="{% url 'travels' %}?person={{ person.slug }}">Alle reizen</a>
         </span>
       </div>
       {% endif %}
