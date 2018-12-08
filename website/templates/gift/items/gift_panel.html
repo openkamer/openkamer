@@ -16,8 +16,20 @@
   </div>
 
   <div class="panel-footer">
-    <span class="h5">{% if gift.value_euro %}€{{ gift.value_euro|floatformat:2 }}{% else %}onbekend{% endif %}</span>
-    <span class="pull-right">{{ gift.date }}</span>
+    <div class="row">
+      <div class="col-sm-4">
+        <span class="h6">{% if gift.get_type_display != 'Onbekend' %}{{ gift.get_type_display|lower }}{% endif %}</span>
+      </div>
+      <div class="col-sm-3 text-center">
+        <span class="h5">{% if gift.value_euro %}€{{ gift.value_euro|floatformat:2 }}{% endif %}</span>
+      </div>
+      <div class="col-sm-5 text-right">
+        <span><small>{{ gift.date }}</small></span>
+      </div>
+    </div>
+
+
+
   </div>
 
 </div>

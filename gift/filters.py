@@ -26,6 +26,10 @@ class GiftFilter(django_filters.FilterSet):
         method='gift_party_filter',
         label='',
     )
+    type = django_filters.ChoiceFilter(
+        choices=Gift.TYPE_CHOICES,
+        method='gift_type_filter',
+    )
 
     class Meta:
         model = Gift
@@ -40,3 +44,6 @@ class GiftFilter(django_filters.FilterSet):
 
     def gift_party_filter(self, queryset, name, value):
         return queryset.filter(person_position__party=value)
+
+    def gift_type_filter(self, queryset, name, value):
+        return queryset.filter(type=value)

@@ -27,11 +27,23 @@ class PersonPosition(models.Model):
 
 
 class Gift(models.Model):
+    BOEK = 'BOEK'
+    TOEGANGSKAART = 'KAAR'
+    WIJN = 'WIJN'
+    DINER = 'DINE'
+    BLOEMEN = 'BLOE'
+    PAKKET = 'PAKK'
+    ONBEKEND = 'ONB'
+    TYPE_CHOICES = (
+        (BOEK, 'Boek'), (TOEGANGSKAART, 'Toegangskaart'), (WIJN, 'Wijn'),
+        (BLOEMEN, 'Bloemen'), (PAKKET, 'Pakket'), (DINER, 'Diner'), (ONBEKEND, 'Onbekend')
+    )
     person = models.ForeignKey(Person)
     person_position = models.ForeignKey(PersonPosition)
     description = models.CharField(max_length=1000, default='', blank=True)
     date = models.DateField(null=True, blank=True)
     value_euro = models.FloatField(null=True, blank=True)
+    type = models.CharField(max_length=4, choices=TYPE_CHOICES, default=ONBEKEND, db_index=True)
 
     def save(self, *args, **kwargs):
         self.person_position, created = PersonPosition.objects.get_or_create(
