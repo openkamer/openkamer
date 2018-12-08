@@ -1,0 +1,33 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-xs-8">
+        <span class="h5">
+          <a href="{% url 'person' travel.person.slug %}">{{ travel.person.fullname }}</a>
+        </span>
+      </div>
+      <div class="col-xs-4 text-right">
+        {% if travel.person_position.party %}
+        <span class="h5">
+          <a href="{% url 'party' travel.person_position.party.slug %}">
+            {{ travel.person_position.party.name_short }}
+          </a>
+        </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <ul class="list-group">
+    <li class="list-group-item">
+      <p class="h5">{{ travel.destination }}</p>
+      <span>{{ travel.purpose }}</span>
+    </li>
+    <li class="list-group-item"><small>Betaald door: {{ travel.paid_by }}</small></li>
+    <li class="list-group-item text-right">
+      <small>{{ travel.date_begin|date:"j M Y" }} - {{ travel.date_end|date:"j M Y" }}</small>
+    </li>
+  </ul>
+
+</div>

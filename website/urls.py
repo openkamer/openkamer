@@ -47,6 +47,7 @@ from stats.views import KamervraagVSTime
 from stats.views import KamervraagReplyTime
 from stats.views import KamervraagReplyTimeContour
 import gift.views
+import travel.views
 
 from website.views import DatabaseDumpsView
 from website.views import PersonTimelineView
@@ -115,6 +116,7 @@ urlpatterns = [
     url(r'^stemming/kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', VotingView.as_view(), name='voting-kamerstuk'),
 
     url(r'^geschenken/$', gift.views.GiftsView.as_view(), name='gifts'),
+    url(r'^reizen/$', travel.views.TravelsView.as_view(), name='travels'),
 
     url(r'^stats/$', TemplateView.as_view(template_name='stats/index.html'), name='stats'),
     url(r'^stats/data/$', DataStatsView.as_view(), name='stats-data'),
