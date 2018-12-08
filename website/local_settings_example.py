@@ -54,6 +54,7 @@ CRON_CLASSES = [
     # 'oktwitter.cron.UpdateTwitterLists',
     # 'website.cron.UpdateStatsData',
     # 'website.cron.UpdateGifts',
+    # 'website.cron.UpdateTravels',
     # 'website.cron.UpdateSearchIndex',
 ]
 
