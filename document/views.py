@@ -4,16 +4,12 @@ import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.http import Http404
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
-from haystack.query import SearchQuerySet
-from haystack.generic_views import FacetedSearchView 
+from haystack.generic_views import FacetedSearchView
 from website.facet import FacetedSearchForm
-from person.models import Person
-
 
 from dal import autocomplete
 

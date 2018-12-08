@@ -252,11 +252,9 @@ class Submitter(models.Model):
 
     @cached_property
     def government_members(self):
-        """ :returns the government members of this person at the time the documented was published """
+        """ :returns the government members of this person at the time the document was published """
         date = self.document.date_published
-        gms = GovernmentMember.objects.filter(person=self.person, start_date__lte=date, end_date__gt=date) | GovernmentMember.objects.filter(person=self.person, start_date__lte=date, end_date=None)
-        gms = gms.order_by('-end_date')
-        return gms
+        return GovernmentMember.find_for_person(self.person, date)
 
     @cached_property
     def party(self):
@@ -269,9 +267,7 @@ class Submitter(models.Model):
 
     def get_party(self):
         """ this non cached version is needed for cron jobs that gave cache errors when using the cached_property """
-        if self.person.surname == '':
-            return None
-        if not self.document:
+        if self.person.surname == '' or not self.document:
             return None
         members = PartyMember.get_at_date(person=self.person, date=self.document.date_published)
         if members.exists():

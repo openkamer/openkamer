@@ -181,3 +181,10 @@ class GovernmentMember(models.Model):
     def active_at_date(date):
         return GovernmentMember.objects.filter(start_date__lte=date, end_date__gt=date) | \
                GovernmentMember.objects.filter(start_date__lte=date, end_date__isnull=True)
+
+    @staticmethod
+    def find_for_person(person, date):
+        gms = GovernmentMember.objects.filter(person=person, start_date__lte=date, end_date__gt=date) | \
+              GovernmentMember.objects.filter(person=person, start_date__lte=date, end_date=None)
+        gms = gms.order_by('-end_date')
+        return gms
