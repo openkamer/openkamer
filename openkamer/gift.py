@@ -18,15 +18,13 @@ def create_gifts(max_items=None):
     PersonPosition.objects.all().delete()
     gifts = Api.get_items(PersoonGeschenk, max_items=max_items)
     for gift in gifts:
-        print(gift.omschrijving, gift.datum)
         value = find_gift_value(gift.omschrijving)
-        # print('highest value: ', value)
         person = Person.find_surname_initials(gift.persoon.achternaam, gift.persoon.initialen)
         if person is None:
-            print('No person found for gift: {}'.format(gift.id))
+            logger.warning('No person found for gift: {}'.format(gift.id))
             continue
         if gift.datum is None:
-            print('No date found for gift: {}'.format(gift.id))
+            logger.warning('No date found for gift: {}'.format(gift.id))
             continue
         Gift.objects.create(
             person=person,
