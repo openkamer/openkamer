@@ -59,7 +59,7 @@ def create_or_update_dossier(dossier_id):
         url=dossier_url,
         decision=decision
     )
-    create_dossier_documents(dossier_new, dossier_id)
+    create_dossier_documents(dossier_id)
     voting_factory = VotingFactory()
     voting_factory.create_votings(dossier_id)
     dossier_new.set_derived_fields()
@@ -111,7 +111,7 @@ def get_document_data_mp(search_result, outputs):
 
 
 @transaction.atomic
-def create_dossier_documents(dossier, dossier_id):
+def create_dossier_documents(dossier_id):
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
 
     pool = mp.Pool(processes=4)
@@ -131,7 +131,9 @@ def create_dossier_documents(dossier, dossier_id):
         if 'submitter' not in data.metadata:
             data.metadata['submitter'] = 'undefined'
 
-        dossier_for_document = dossier
+        dossier_id = data.metadata.get('dossier_ids', dossier_id).split(';')[0]
+        dossier_ids_related = data.metadata.get('dossier_ids', '').replace(dossier_id, '')
+        dossier_for_document, created = Dossier.objects.get_or_create(dossier_id=dossier_id)
 
         data.content_html = update_document_html_links(data.content_html)
         title = data.metadata['title_full']
@@ -148,14 +150,19 @@ def create_dossier_documents(dossier, dossier_id):
         }
 
         document_data = DocumentData(data.document_id, data.metadata, data.content_html, title, data.url)
-        document = DocumentFactory.create_document_and_related(document_data, properties)
+        document = DocumentFactory.update_or_create_document_and_related(document_data, properties)
 
         if data.metadata['is_kamerstuk']:
             is_attachement = "Bijlage" in data.search_result['type']
-            dossier_id = data.metadata.get('dossier_ids', dossier_id).split(';')[0]
-            if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.metadata['id_sub']).exists():
-                create_kamerstuk(document, dossier_id, data.title, data.metadata, is_attachement)
-                category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
+            kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.metadata['id_sub'])
+            if kamerstukken.exists():
+                kamerstuk = kamerstukken[0]
+                kamerstuk.document = document
+                kamerstuk.dossier_ids_related = dossier_ids_related
+                kamerstuk.save()
+            else:
+                create_kamerstuk(document, dossier_id, dossier_ids_related, data.title, data.metadata, is_attachement)
+                category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier)
                 dossier_for_document.categories.add(*category_list)
 
         # TODO BR: enable

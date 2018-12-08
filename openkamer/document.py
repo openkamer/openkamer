@@ -101,7 +101,7 @@ class DocumentFactory(object):
             'content_html': document_data.content_html,
         }
 
-        document = self.create_document_and_related(document_data, properties)
+        document = self.update_or_create_document_and_related(document_data, properties)
         logger.info('END')
         return document, metadata
 
@@ -122,13 +122,13 @@ class DocumentFactory(object):
             'content_html': document_data.content_html,
         }
 
-        document = self.create_document_and_related(document_data, properties)
+        document = self.update_or_create_document_and_related(document_data, properties)
         related_document_ids = scraper.documents.get_kamervraag_antwoord_ids(document_data.document_url)
         logger.info('END')
         return document, related_document_ids, metadata['vraagnummer']
 
     @staticmethod
-    def create_document_and_related(document_data, properties):
+    def update_or_create_document_and_related(document_data, properties):
         document, created = Document.objects.update_or_create(
             document_id=document_data.document_id,
             defaults=properties

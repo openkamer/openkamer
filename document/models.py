@@ -421,6 +421,7 @@ class Kamerstuk(models.Model):
     original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-22
     date_updated = models.DateTimeField(auto_now=True)
     type = models.CharField(choices=TYPE_CHOICES, default=UNKNOWN, max_length=30, db_index=True)
+    dossier_ids_related = models.CharField(max_length=200, blank=True)
 
     class Meta:
         verbose_name_plural = 'Kamerstukken'

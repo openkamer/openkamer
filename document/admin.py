@@ -62,7 +62,8 @@ class KamerstukAdmin(admin.ModelAdmin):
         'type_long',
         'document_date',
         'original_id',
-        'date_updated'
+        'date_updated',
+        'dossier_ids_related'
     )
     list_filter = ('type',)
 
