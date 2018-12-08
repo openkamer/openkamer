@@ -29,6 +29,7 @@ import openkamer.kamerstuk
 import openkamer.kamervraag
 import openkamer.parliament
 import openkamer.voting
+import openkamer.gift
 
 
 class TestCreatePerson(TestCase):
@@ -451,3 +452,9 @@ class TestVoting(TestCase):
         self.assertEqual(1, len(besluiten))
         besluit = besluiten[0]
         return besluit
+
+
+class TestGifts(TestCase):
+
+    def test_create_gifts(self):
+        openkamer.gift.create_gifts(max_items=20)

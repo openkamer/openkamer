@@ -1,0 +1,73 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+{% load bootstrap3 %}
+{% load bootstrap_pagination %}
+
+{% block title %}Geschenken aan Kamerleden {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Geschenken aan Kamerleden</h3></div>
+  </div>
+</div>
+
+<div class="vertical-spacer-15"></div>
+
+{% include "gift/items/gift_filter.html" %}
+
+<hr class="hr-small"/>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="h5">
+      <span class="text-info">{{ n_results }}</span> geschenken gevonden
+      met een totaal bedrag van <span class="text-info">€{{ value_total_euro }}</span>.
+      Gemiddeld €{{ value_average_euro }} per geschenk.
+    </div>
+  </div>
+</div>
+
+<div class="vertical-spacer-15"></div>
+
+<div class="row">
+{% for gift in gifts %}
+  <div class="col-sm-4">
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <span class="h5">
+          <a href="{% url 'person' gift.person.slug %}">{{ gift.person.fullname }}</a>
+          {% if gift.person_position.party %}
+          <a href="{% url 'party' gift.person_position.party.slug %}" class="pull-right">
+            {{ gift.person_position.party.name_short }}
+          </a>
+        </span>
+        {% endif %}
+      </div>
+
+      <div class="panel-body">
+        {{ gift.description }}
+      </div>
+
+      <div class="panel-footer">
+        <span class="h5">{% if gift.value_euro %}€{{ gift.value_euro }}{% else %}onbekend{% endif %}</span>
+        <span class="pull-right">{{ gift.date }}</span>
+      </div>
+
+    </div>
+  </div>
+
+  {% if forloop.counter|divisibleby:3 %}
+    <div class="clearfix"></div>
+  {% endif %}
+
+{% endfor %}
+</div>
+
+<div class="row" align="center">{% bootstrap_paginate gifts range=10 show_prev_next="true" show_first_last="true" %}</div>
+
+
+{% endblock %}

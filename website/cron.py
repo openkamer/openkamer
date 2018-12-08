@@ -22,6 +22,7 @@ from person.models import Person
 
 import openkamer.besluitenlijst
 import openkamer.dossier
+import openkamer.gift
 import openkamer.kamervraag
 import openkamer.parliament
 import openkamer.verslagao
@@ -207,6 +208,21 @@ class UpdateStatsData(LockJob):
         logger.info('BEGIN')
         try:
             stats.models.update_all()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
+
+
+class UpdateGifts(LockJob):
+    RUN_AT_TIMES = ['12:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateGifts'
+
+    def do_imp(self):
+        logger.info('BEGIN')
+        try:
+            openkamer.gift.create_gifts()
         except Exception as error:
             logger.exception(error)
             raise

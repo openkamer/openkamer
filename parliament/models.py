@@ -59,9 +59,8 @@ class ParliamentMember(models.Model):
 
     @staticmethod
     def find_at_date(person, date):
-        members = ParliamentMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
-                  ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
-        return members
+        return ParliamentMember.objects.filter(person=person, joined__lte=date, left__gt=date) | \
+               ParliamentMember.objects.filter(person=person, joined__lte=date, left__isnull=True)
 
     @staticmethod
     def active_at_date(date):
