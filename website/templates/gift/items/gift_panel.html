@@ -1,0 +1,23 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+    <span class="h5">
+      <a href="{% url 'person' gift.person.slug %}">{{ gift.person.fullname }}</a>
+      {% if gift.person_position.party %}
+      <a href="{% url 'party' gift.person_position.party.slug %}" class="pull-right">
+        {{ gift.person_position.party.name_short }}
+      </a>
+    </span>
+    {% endif %}
+  </div>
+
+  <div class="panel-body">
+    {{ gift.description }}
+  </div>
+
+  <div class="panel-footer">
+    <span class="h5">{% if gift.value_euro %}€{{ gift.value_euro|floatformat:2 }}{% else %}onbekend{% endif %}</span>
+    <span class="pull-right">{{ gift.date }}</span>
+  </div>
+
+</div>

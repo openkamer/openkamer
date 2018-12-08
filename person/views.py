@@ -6,7 +6,6 @@ from haystack.query import SearchQuerySet
 from person.models import Person
 
 
-
 class PersonsView(TemplateView):
     template_name = 'person/persons.html'
 

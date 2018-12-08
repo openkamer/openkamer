@@ -8,7 +8,6 @@ from parliament.models import PoliticalParty
 from government.models import Government
 
 from stats.models import PartyVoteBehaviour
-from stats import util
 
 logger = logging.getLogger(__name__)
 

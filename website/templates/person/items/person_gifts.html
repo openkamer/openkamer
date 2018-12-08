@@ -1,0 +1,27 @@
+{% load openkamer %}
+
+{% get_gifts_for_person person as gifts %}
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <span class="h5">Geschenken ({{ gifts|length }})</span>
+      </div>
+
+      {% for gift in gifts|slice:":2" %}
+      <ul class="list-group">
+        <li class="list-group-item text-sm"><small>{{ gift.description }}</small></li>
+      </ul>
+      {% endfor %}
+
+      <div class="panel-footer">
+        <span class="h5">
+          <a href="{% url 'gifts' %}?person={{ person.slug }}">Alle geschenken</a>
+        </span>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -10,6 +10,7 @@ from document.models import Voting
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 from government.models import GovernmentMember
+from gift.models import Gift
 
 register = template.Library()
 
@@ -254,3 +255,9 @@ def get_party_members_for_person(person):
 def get_documents_for_person(person):
     submitters = Submitter.objects.filter(person=person)
     return Document.objects.filter(submitter__in=submitters)
+
+
+@register.simple_tag
+def get_gifts_for_person(person):
+    gifts = Gift.objects.filter(person=person)
+    return gifts
