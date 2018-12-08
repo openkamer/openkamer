@@ -115,7 +115,7 @@ def get_document_data_mp(search_result, outputs):
 def create_dossier_documents(dossier, dossier_id):
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
 
-    pool = ThreadPool()
+    pool = ThreadPool(processes=4)
     manager = mp.Manager()
     outputs = manager.list()
     for search_result in search_results:

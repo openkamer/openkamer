@@ -77,7 +77,9 @@ class VotingFactory(object):
         if kamerstukken.exists():
             kamerstuk = kamerstukken[0]
             voting_obj.kamerstuk = kamerstuk
-            if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:  # A voting can be postponed and later voted on, we do not save the postponed voting if there is a newer voting
+            # A voting can be postponed and later voted on
+            # we do not save the postponed voting if there is a newer voting
+            if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:
                 logger.info('newer voting for this kamerstuk already exits, skip this voting')
                 return
             elif kamerstuk.voting:
@@ -138,7 +140,8 @@ class VoteFactory(object):
             )
         logger.info('END')
 
-    def create_missing_party(self, stemming):
+    @staticmethod
+    def create_missing_party(stemming):
         wikidata_id = wikidata.search_political_party_id(stemming.fractie.naam, language='nl')
         party = PoliticalParty.objects.create(
             name=stemming.fractie.naam,
