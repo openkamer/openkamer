@@ -1,9 +1,8 @@
 import logging
 import datetime
 import re
-
 import requests
-import lxml
+
 import lxml.html
 import lxml.etree
 

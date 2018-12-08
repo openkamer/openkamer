@@ -114,7 +114,7 @@ def get_document_data_mp(search_result, outputs):
 def create_dossier_documents(dossier, dossier_id):
     search_results = scraper.documents.search_politieknl_dossier(dossier_id)
 
-    pool = mp.Pool(processes=4)
+    pool = mp.Pool()
     manager = mp.Manager()
     outputs = manager.list()
     for search_result in search_results:
@@ -223,7 +223,6 @@ def get_besluit_last(dossier_id):
         return None
     last_besluit = None
     for besluit in zaak.besluiten:
-        print(besluit.soort, besluit.slottekst, besluit.agendapunt.activiteit.begin)
         if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
             last_besluit = besluit
     # if last_besluit:

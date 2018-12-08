@@ -31,7 +31,7 @@ def get_initials(parlement_and_politiek_id):
     if not parlement_and_politiek_id:
         return ''
     url = 'https://www.parlement.com/id/' + parlement_and_politiek_id + '/'
-    page = requests.get(url)
+    page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
     title = tree.xpath("//title")[0].text
     name_parts = title.split(' ')  # this includes the title, if applicable, for example: Ir. J.R.V.A. (Jeroen) Dijsselbloem
