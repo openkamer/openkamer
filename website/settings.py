@@ -23,6 +23,7 @@ INSTALLED_APPS = (
     'document',
     'parliament',
     'government',
+    'gift',
     'person',
     # 'debug_toolbar',
     'bootstrap3',
@@ -248,6 +249,11 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'document': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'gift': {
             'handlers': ['file_debug', 'file_error', 'console'],
             'propagate': True,
             'level': 'DEBUG',
