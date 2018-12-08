@@ -33,10 +33,12 @@ class Gift(models.Model):
     DINER = 'DINE'
     BLOEMEN = 'BLOE'
     PAKKET = 'PAKK'
+    KLEDING = 'KLED'
     ONBEKEND = 'ONB'
     TYPE_CHOICES = (
         (BOEK, 'Boek'), (TOEGANGSKAART, 'Toegangskaart'), (WIJN, 'Wijn'),
-        (BLOEMEN, 'Bloemen'), (PAKKET, 'Pakket'), (DINER, 'Diner'), (ONBEKEND, 'Onbekend')
+        (BLOEMEN, 'Bloemen'), (PAKKET, 'Pakket'), (KLEDING, 'Kleding'), (DINER, 'Diner'),
+        (ONBEKEND, 'Onbekend')
     )
     person = models.ForeignKey(Person)
     person_position = models.ForeignKey(PersonPosition)

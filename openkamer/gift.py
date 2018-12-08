@@ -56,14 +56,17 @@ def find_gift_type(text):
     text = text.lower()
     if 'boek' in text:
         return Gift.BOEK
-    if 'wijn' in text:
+    if 'wijn' in text or 'champagne' in text:
         return Gift.WIJN
-    if 'kaart' in text:
+    if 'kaart' in text or 'toegangsbewijzen' in text or 'concert' in text \
+        or 'tickets' in text or 'een uitnodiging' in text:
         return Gift.TOEGANGSKAART
     if 'bloem' in text:
         return Gift.BLOEMEN
+    if 'sjaal' in text or 'stropdas' in text or 'sokken' in text:
+        return Gift.KLEDING
     if 'pakket' in text:
         return Gift.PAKKET
-    if 'lunch' in text or 'diner' in text:
+    if 'lunch' in text or 'diner' in text or 'ontbijt' in text:
         return Gift.DINER
     return Gift.ONBEKEND
