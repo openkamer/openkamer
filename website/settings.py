@@ -24,6 +24,7 @@ INSTALLED_APPS = (
     'parliament',
     'government',
     'gift',
+    'travel',
     'person',
     # 'debug_toolbar',
     'bootstrap3',

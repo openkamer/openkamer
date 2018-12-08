@@ -1,0 +1,47 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+{% load bootstrap3 %}
+{% load bootstrap_pagination %}
+
+{% block title %}Reizen van Kamerleden {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Reizen van Kamerleden</h3></div>
+  </div>
+</div>
+
+<div class="vertical-spacer-15"></div>
+
+{% include "travel/items/travel_filter.html" %}
+
+<hr class="hr-small"/>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="h5">
+      <span class="text-info">{{ n_results }}</span> reizen gevonden
+    </div>
+  </div>
+</div>
+
+<div class="vertical-spacer-15"></div>
+
+<div class="row">
+{% for travel in travels %}
+  <div class="col-sm-4">
+    {% include "travel/items/travel_panel.html" %}
+  </div>
+
+  {% if forloop.counter|divisibleby:3 %}
+    <div class="clearfix"></div>
+  {% endif %}
+{% endfor %}
+</div>
+
+<div class="row" align="center">{% bootstrap_paginate travels range=10 show_prev_next="true" show_first_last="true" %}</div>
+
+{% endblock %}

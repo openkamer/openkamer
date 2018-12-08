@@ -25,6 +25,7 @@ import openkamer.dossier
 import openkamer.gift
 import openkamer.kamervraag
 import openkamer.parliament
+import openkamer.travel
 import openkamer.verslagao
 
 import stats.models
@@ -223,6 +224,21 @@ class UpdateGifts(LockJob):
         logger.info('BEGIN')
         try:
             openkamer.gift.create_gifts()
+        except Exception as error:
+            logger.exception(error)
+            raise
+        logger.info('END')
+
+
+class UpdateTravels(LockJob):
+    RUN_AT_TIMES = ['14:00']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.UpdateTravels'
+
+    def do_imp(self):
+        logger.info('BEGIN')
+        try:
+            openkamer.travel.create_travels()
         except Exception as error:
             logger.exception(error)
             raise
