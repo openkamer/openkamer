@@ -1,4 +1,7 @@
+import datetime
+
 from rest_framework import serializers, viewsets
+from rest_framework.response import Response
 
 from person.models import Person
 from parliament.models import PoliticalParty
@@ -82,8 +85,17 @@ class KamervraagSerializer(serializers.ModelSerializer):
 
 class KamervraagViewSet(viewsets.ModelViewSet):
     allowed_methods = ('GET',)
-    queryset = Kamervraag.objects.filter(kamerantwoord__isnull=False)
+    queryset = Kamervraag.objects.all()
     serializer_class = KamervraagSerializer
+
+    def get_queryset(self):
+        if 'year' in self.request.query_params:
+            year = int(self.request.query_params['year'])
+            begin_date = datetime.date(year=year, month=1, day=1)
+            end_date = datetime.date(year=year + 1, month=1, day=1)
+            return Kamervraag.objects.filter(document__date_published__gt=begin_date).filter(document__date_published__lt=end_date)
+        else:
+            return Kamervraag.objects.all()
 
 
 class KamerantwoordViewSet(viewsets.ModelViewSet):
