@@ -224,6 +224,10 @@ class Document(models.Model):
             return self.source_url
         return 'https://zoek.officielebekendmakingen.nl/' + str(self.document_id) + '.html'
 
+    @cached_property
+    def foot_notes(self):
+        return self.footnote_set.all()
+
     def __str__(self):
         return self.title_short
 

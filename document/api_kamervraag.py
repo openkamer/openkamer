@@ -1,9 +1,10 @@
 from rest_framework import serializers, viewsets
 
-from document.models import Kamervraag, Kamerantwoord, Vraag, Antwoord
-from document.models import Document, Submitter
 from person.models import Person
 from parliament.models import PoliticalParty
+
+from document.models import Kamervraag, Kamerantwoord, Vraag, Antwoord
+from document.models import Document, Submitter, FootNote
 
 
 class KVPersonSerializer(serializers.ModelSerializer):
@@ -30,14 +31,21 @@ class KVSubmitterSerializer(serializers.ModelSerializer):
         fields = ('person', 'party')
 
 
+class KVFootNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FootNote
+        fields = ('nr', 'text', 'url')
+
+
 class KVDocumentSerializer(serializers.ModelSerializer):
     submitters = KVSubmitterSerializer(read_only=True, many=True)
+    foot_notes = KVFootNoteSerializer(read_only=True, many=True)
 
     class Meta:
         model = Document
         fields = (
             'title_full', 'title_short', 'date_published',
-            'source_url', 'submitters'
+            'source_url', 'submitters', 'foot_notes'
         )
 
 
@@ -50,7 +58,7 @@ class VraagSerializer(serializers.ModelSerializer):
 class AntwoordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Antwoord
-        fields = ('nr', 'text')
+        fields = ('nr', 'text', 'see_answer_nr')
 
 
 class KamerantwoordSerializer(serializers.ModelSerializer):
