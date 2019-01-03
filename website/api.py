@@ -9,7 +9,7 @@ from document.api import DocumentCategoryViewSet, DossierCategoryViewSet
 from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet, SubmitterViewSet
 from document.api import VotingViewSet, VotePartyViewSet, VoteIndividualViewSet
 
-from document.api_kamerstuk import KamervraagViewSet, KamerantwoordViewSet
+from document.api_kamervraag import KamervraagViewSet, KamerantwoordViewSet
 
 router = routers.DefaultRouter()
 
