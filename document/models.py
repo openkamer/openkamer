@@ -279,6 +279,10 @@ class Kamerantwoord(models.Model):
     document = models.ForeignKey(Document)
     vraagnummer = models.CharField(max_length=200, db_index=True)
 
+    @cached_property
+    def antwoorden(self):
+        return self.antwoord_set.all()
+
     @classmethod
     def get_antwoorden_info(cls, year):
         lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/antwoorden_' + str(year) + '.csv')
