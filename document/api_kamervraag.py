@@ -93,9 +93,14 @@ class KamervraagViewSet(viewsets.ModelViewSet):
             year = int(self.request.query_params['year'])
             begin_date = datetime.date(year=year, month=1, day=1)
             end_date = datetime.date(year=year + 1, month=1, day=1)
-            return Kamervraag.objects.filter(document__date_published__gt=begin_date).filter(document__date_published__lt=end_date)
+            kamervragen = Kamervraag.objects.filter(document__date_published__gt=begin_date).filter(document__date_published__lt=end_date)
         else:
-            return Kamervraag.objects.all()
+            kamervragen = Kamervraag.objects.all()
+        kamervragen = kamervragen.select_related('document')\
+            .prefetch_related('vraag_set')\
+            .prefetch_related('document__submitter_set')\
+            .prefetch_related('document__footnote_set')
+        return kamervragen
 
 
 class KamerantwoordViewSet(viewsets.ModelViewSet):
