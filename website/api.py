@@ -9,6 +9,8 @@ from document.api import DocumentCategoryViewSet, DossierCategoryViewSet
 from document.api import DocumentViewSet, KamerstukViewSet, DossierViewSet, SubmitterViewSet
 from document.api import VotingViewSet, VotePartyViewSet, VoteIndividualViewSet
 
+from document.api_kamerstuk import KamervraagViewSet, KamerantwoordViewSet
+
 router = routers.DefaultRouter()
 
 router.register(r'person', PersonViewSet)
@@ -32,6 +34,9 @@ router.register(r'dossier', DossierViewSet)
 router.register(r'voting', VotingViewSet)
 router.register(r'vote_party', VotePartyViewSet)
 router.register(r'vote_individual', VoteIndividualViewSet)
+
+router.register(r'kamervraag', KamervraagViewSet)
+router.register(r'kamerantwoord', KamerantwoordViewSet)
 
 urlpatterns = [
     url(r'', include(router.urls)),
