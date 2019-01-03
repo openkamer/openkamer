@@ -6,7 +6,7 @@ from person.models import Person
 from parliament.models import PoliticalParty
 
 
-class KSPersonSerializer(serializers.ModelSerializer):
+class KVPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = (
@@ -15,23 +15,23 @@ class KSPersonSerializer(serializers.ModelSerializer):
         )
 
 
-class KSPoliticalPartySerializer(serializers.ModelSerializer):
+class KVPoliticalPartySerializer(serializers.ModelSerializer):
     class Meta:
         model = PoliticalParty
         fields = ('name_short', 'name', 'wikidata_id', 'wikipedia_url')
 
 
-class KSSubmitterSerializer(serializers.ModelSerializer):
-    person = KSPersonSerializer(read_only=True)
-    party = KSPoliticalPartySerializer(read_only=True)
+class KVSubmitterSerializer(serializers.ModelSerializer):
+    person = KVPersonSerializer(read_only=True)
+    party = KVPoliticalPartySerializer(read_only=True)
 
     class Meta:
         model = Submitter
         fields = ('person', 'party')
 
 
-class KSDocumentSerializer(serializers.ModelSerializer):
-    submitters = KSSubmitterSerializer(read_only=True, many=True)
+class KVDocumentSerializer(serializers.ModelSerializer):
+    submitters = KVSubmitterSerializer(read_only=True, many=True)
 
     class Meta:
         model = Document
@@ -55,7 +55,7 @@ class AntwoordSerializer(serializers.ModelSerializer):
 
 class KamerantwoordSerializer(serializers.ModelSerializer):
     antwoorden = AntwoordSerializer(read_only=True, many=True)
-    document = KSDocumentSerializer(read_only=True)
+    document = KVDocumentSerializer(read_only=True)
 
     class Meta:
         model = Kamerantwoord
@@ -65,7 +65,7 @@ class KamerantwoordSerializer(serializers.ModelSerializer):
 class KamervraagSerializer(serializers.ModelSerializer):
     vragen = VraagSerializer(read_only=True, many=True)
     antwoorden = AntwoordSerializer(read_only=True, many=True)
-    document = KSDocumentSerializer(read_only=True)
+    document = KVDocumentSerializer(read_only=True)
 
     class Meta:
         model = Kamervraag
