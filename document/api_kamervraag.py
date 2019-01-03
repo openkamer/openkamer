@@ -1,7 +1,6 @@
 import datetime
 
 from rest_framework import serializers, viewsets
-from rest_framework.response import Response
 
 from person.models import Person
 from parliament.models import PoliticalParty
@@ -19,19 +18,12 @@ class KVPersonSerializer(serializers.ModelSerializer):
         )
 
 
-class KVPoliticalPartySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PoliticalParty
-        fields = ('name_short', 'name', 'wikidata_id', 'wikipedia_url')
-
-
 class KVSubmitterSerializer(serializers.ModelSerializer):
     person = KVPersonSerializer(read_only=True)
-    party = KVPoliticalPartySerializer(read_only=True)
 
     class Meta:
         model = Submitter
-        fields = ('person', 'party')
+        fields = ('person', 'party_slug')
 
 
 class KVFootNoteSerializer(serializers.ModelSerializer):
