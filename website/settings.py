@@ -27,7 +27,7 @@ INSTALLED_APPS = (
     'travel',
     'person',
     # 'debug_toolbar',
-    'bootstrap3',
+    'bootstrap4',
     'bootstrap_pagination',
     'dal',
     'dal_select2',
@@ -126,15 +126,6 @@ DATABASES = {
 # defined per machine.
 from website.local_settings import *
 
-
-##############
-# Bootstrap3 #
-##############
-
-BOOTSTRAP3 = {
-    'horizontal_label_class': 'col-md-2',
-    'horizontal_field_class': 'col-md-4',
-}
 
 ##########
 # Search #

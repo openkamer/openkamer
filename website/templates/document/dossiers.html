@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 
 {% block title %}Wetsvoorstellen - Tweede Kamer {{ block.super }}{% endblock %}
 
@@ -10,41 +10,41 @@
 
 {% block content %}
 
-<div class="row">
+<div class="row my-3">
   <div class="col-lg-12">
     <div align="center"><h3>Wetsvoorstellen</h3></div>
   </div>
 </div>
 
-<div class="row">
-  <div class="col-sm-12 well well-filters">
+<div class="card border-primary">
+  <div class="card-body">
 
-    <div class="row">
-      <form action="" method="get">
+    <form action="" method="get">
+      <div class="row">
 
         <div class="col-sm-4 col-lg-4">
-          <h6 class="text-primary">Titel</h6>
+          <h6 class="h6 text-info">Titel</h6>
           {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
         </div>
 
         <div class="col-sm-4 col-lg-4">
-          <h6 class="text-primary">Dossier nr.</h6>
+          <h6 class="text-info">Dossier nr.</h6>
           {% bootstrap_field filter.form.dossier_id bound_css_class='' show_label=False show_help=False %}
         </div>
 
         <div class="col-sm-4 col-lg-4">
-          <h6 class="text-primary">Status</h6>
+          <h6 class="text-info">Status</h6>
           {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
         </div>
 
         <div class="col-sm-6 col-lg-6">
-          <h6 class="text-primary">Betrokkenen</h6>
+          <h6 class="text-info">Betrokkenen</h6>
           {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
         </div>
 
         <div class="col-sm-6 col-lg-6">
-          <h6 class="text-primary">Indiener</h6>
+          <h6 class="text-info">Indiener</h6>
           {% bootstrap_field filter.form.wetsvoorstel_submitter bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
         </div>
@@ -75,19 +75,17 @@
           {% bootstrap_button content='Zoek' button_type='submit' %}
         </div>
 
-      </form>
-    </div>
+      </div>
+    </form>
 
   </div>
 </div>
 
-<hr class="hr-small"/>
+<hr class="my-3"/>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-12">
     <h6>{% if n_results == 0 %}geen wetsvoorstellen{% elif n_results == 1 %}1 wetsvoorstel{% else %}{{ n_results }} wetsvoorstellen{% endif %} gevonden</h6>
-  </div>
-  <div class="col-md-6" align="right">
   </div>
 </div>
 
@@ -95,14 +93,9 @@
 <div class="row">
   <h5>Recent behandeld</h5>
   {% for dossier in dossiers_voted %}
-  <div class="col-md-6">
+  <div class="col-12 mb-5">
     {% include "document/items/dossier_tile.html" %}
   </div>
-
-  {% if forloop.counter|divisibleby:2 %}
-  <div class="clearfix"></div>
-  {% endif %}
-
   {% endfor %}
 </div>
 <hr class="hr-small"/>
@@ -114,17 +107,17 @@
 
 <div class="row">
   {% for dossier in dossiers %}
-  <div class="col-md-6">
+  <div class="col-12 mb-4">
     {% include "document/items/dossier_tile.html" %}
   </div>
-
-  {% if forloop.counter|divisibleby:2 %}
-  <div class="clearfix"></div>
-  {% endif %}
 
   {% endfor %}
 </div>
 
-<div class="row" align="center">{% bootstrap_paginate dossiers range=10 show_prev_next="true" show_first_last="true" %}</div>
+<div class="row">
+  <div class="col">
+    {% bootstrap_paginate dossiers range=10 show_prev_next="true" show_first_last="true" %}
+  </div>
+</div>
 
 {% endblock %}

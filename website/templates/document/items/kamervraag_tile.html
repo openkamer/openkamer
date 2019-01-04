@@ -1,9 +1,9 @@
   {% load openkamer %}
 
-  <div class="col-md-6">
-    <div class="panel panel-default" align="left">
+  <div class="col-md-6 my-2">
+    <div class="card border-secondary" align="left">
 
-      <div class="panel-heading">
+      <div class="card-header">
         <div class="row">
           <div class="col-xs-9 col-sm-5" align="left">
             <h6 class="date">{{ kamervraag.document.date_published }}{% if kamervraag.kamerantwoord %} - {{ kamervraag.kamerantwoord.document.date_published }}{% endif %}</h6>
@@ -24,19 +24,21 @@
         </div>
       </div>
 
-      <table class="table table-condensed">
+      <table class="table mb-1">
         <tbody>
 
           <tr>
             <td colspan="2">
-              <h5 align="center" class="kamervraag-panel-title-col"><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</span></a></h5>
+              <h6 class="kamervraag-panel-title-col text-center">
+                <a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.document.title_short }}</a>
+              </h6>
             </td>
           </tr>
 
           <tr>
-            <th><h6 class="small"><i class="fa fa-envelope text-primary kamervraag-panel-icon" title="Indiener(s)"></i></h6></th>
+            <th><h6><i class="fa fa-envelope text-primary kamervraag-panel-icon" title="Indiener(s)"></i></h6></th>
             <td>
-              <h6 class="small">
+              <h6>
               {% with submitters=kamervraag.document.submitters %}
                 {% include "document/items/submitters_list.html" %}
               {% endwith %}
@@ -47,20 +49,22 @@
           <tr>
             {% if kamervraag.kamerantwoord %}
               {% with submitters=kamervraag.kamerantwoord.document.submitters %}
-            <th><h6 class="small"><i class="fa fa-reply text-primary kamervraag-panel-icon" title="Antwoord"></i></h6></th>
-            <td><h6 class="small">{% include "document/items/submitters_list.html" %}</h6></td>
+            <th><h6><i class="fa fa-reply text-primary kamervraag-panel-icon" title="Antwoord"></i></h6></th>
+            <td><h6>{% include "document/items/submitters_list.html" %}</h6></td>
               {% endwith %}
             {% else %}
-            <th><h6 class="small"><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i></h6></th>
-            <td><h6 class="small">{{ kamervraag.receiver }}</h6></td>
+            <th><h6><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i></h6></th>
+            <td><h6>{{ kamervraag.receiver }}</h6></td>
             {% endif %}
           </tr>
 
           <tr>
-            <td colspan="2" align="center">
+            <td colspan="2" class="text-center p-1">
               {% get_submitters_parties kamervraag.document.submitters as parties %}
                 {% for party in parties %}
-                  <a href="{% url 'party' party.slug %}"><img class="inline-party-logo" src="{{ party.wikimedia_logo_url }}"></a>
+                  <a href="{% url 'party' party.slug %}">
+                    <img class="inline-party-logo" src="{{ party.wikimedia_logo_url }}">
+                  </a>
                 {% endfor %}
             </td>
           </tr>
@@ -68,9 +72,9 @@
         </tbody>
       </table>
 
-
-
-      {% include 'document/items/kamervraag_antwoorden_collapse.html' %}
+      <div class="card-footer py-0">
+        {% include 'document/items/kamervraag_antwoorden_collapse.html' %}
+      </div>
 
     </div>
   </div>

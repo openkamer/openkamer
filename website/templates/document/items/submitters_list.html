@@ -1,7 +1,15 @@
+
 {% for submitter in submitters %}
   <a href="{% url 'person' submitter.person.slug %}">{{ submitter }}</a>
-  {% if submitter.government_members %}
-    ({% for member in submitter.government_members %}{{ member.position.get_position_display|lower }} {% if member.position.ministry %}{{ member.position.ministry }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %})
+
+  {% if submitter.party %} (<a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>){% endif %}{% spaceless %}
+  {% if not forloop.last %},{% endif %}{% endspaceless %}
+
+  {% if submitter.government_members %}-
+    {% for member in submitter.government_members %}
+      {{ member.position.get_position_display|lower }} {% if member.position.ministry %}{{ member.position.ministry }}{% endif %}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
   {% endif %}
-  {% if submitter.party %}(<a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>){% endif %}{% if not forloop.last %},{% endif %}
+
 {% endfor %}
+

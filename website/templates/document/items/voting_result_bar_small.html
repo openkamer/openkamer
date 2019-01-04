@@ -7,9 +7,9 @@
     <a href="{% url 'voting-kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}">
   {% endif %}
   <div class="progress progress-small">
-    <div class="progress-bar progress-bar-success" style="width: {{ voting.result_percent.for|unlocalize }}%" title="{{ voting.result_percent.for|floatformat:1 }} %"></div>
-    <div class="progress-bar progress-bar-danger" style="width: {{ voting.result_percent.against|unlocalize }}%" title="{{ voting.result_percent.against|floatformat:1 }} %"></div>
-    <div class="progress-bar progress-bar-warning" style="width: {{ voting.result_percent.no_vote|unlocalize }}%" title="{{ voting.entities_none_string }}"></div>
+    <div class="progress-bar bg-success" style="width: {{ voting.result_percent.for|unlocalize }}%" title="{{ voting.result_percent.for|floatformat:1 }} %"></div>
+    <div class="progress-bar bg-danger" style="width: {{ voting.result_percent.against|unlocalize }}%" title="{{ voting.result_percent.against|floatformat:1 }} %"></div>
+    <div class="progress-bar bg-warning" style="width: {{ voting.result_percent.no_vote|unlocalize }}%" title="{{ voting.entities_none_string }}"></div>
   </div>
 </a>
 {% endif %}
