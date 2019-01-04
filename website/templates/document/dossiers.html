@@ -16,108 +16,116 @@
   </div>
 </div>
 
-<div class="card border-primary">
-  <div class="card-body">
+<div class="row">
+  <div class="col-3">
+    <div class="card border-primary">
+      <div class="card-body">
 
-    <form action="" method="get">
-      <div class="row">
+        <form action="" method="get">
+          <div class="row">
 
-        <div class="col-sm-4 col-lg-4">
-          <h6 class="h6 text-info">Titel</h6>
-          {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
-        </div>
-
-        <div class="col-sm-4 col-lg-4">
-          <h6 class="text-info">Dossier nr.</h6>
-          {% bootstrap_field filter.form.dossier_id bound_css_class='' show_label=False show_help=False %}
-        </div>
-
-        <div class="col-sm-4 col-lg-4">
-          <h6 class="text-info">Status</h6>
-          {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
-        </div>
-
-        <div class="col-sm-6 col-lg-6">
-          <h6 class="text-info">Betrokkenen</h6>
-          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
-          {{ filter.form.media }}
-        </div>
-
-        <div class="col-sm-6 col-lg-6">
-          <h6 class="text-info">Indiener</h6>
-          {% bootstrap_field filter.form.wetsvoorstel_submitter bound_css_class='' show_label=False show_help=False %}
-          {{ filter.form.media }}
-        </div>
-
-        <div class="col-sm-12">
-          <a class="collapse-filter" data-toggle="collapse" href="#collapse-category-filter" aria-expanded="false" aria-controls="collapse-category-filter"><h6><i class="fa fa-chevron-right"></i> Onderwerpen</h6></a>
-          <div class="collapse" id="collapse-category-filter">
-            <div class="card card-block">
-              {% bootstrap_field filter.form.categories size='medium' field_class='category-filter-checkboxes text-primary' bound_css_class='' show_label=False show_help=False %}
+            <div class="col-sm-4 col-lg-12">
+              <h6 class="h6 text-info">Titel</h6>
+              {% bootstrap_field filter.form.title bound_css_class='' show_label=False show_help=False %}
             </div>
+
+            <div class="col-sm-4 col-lg-12">
+              <h6 class="text-info">Dossier nr.</h6>
+              {% bootstrap_field filter.form.dossier_id bound_css_class='' show_label=False show_help=False %}
+            </div>
+
+            <div class="col-sm-4 col-lg-12">
+              <h6 class="text-info">Status</h6>
+              {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
+            </div>
+
+            <div class="col-sm-6 col-lg-12">
+              <h6 class="text-info">Betrokkenen</h6>
+              {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+              {{ filter.form.media }}
+            </div>
+
+            <div class="col-sm-6 col-lg-12">
+              <h6 class="text-info">Indiener</h6>
+              {% bootstrap_field filter.form.wetsvoorstel_submitter bound_css_class='' show_label=False show_help=False %}
+              {{ filter.form.media }}
+            </div>
+
+            <div class="col-sm-12">
+              <a class="collapse-filter" data-toggle="collapse" href="#collapse-category-filter" aria-expanded="false" aria-controls="collapse-category-filter"><h6><i class="fa fa-chevron-right"></i> Onderwerpen</h6></a>
+              <div class="collapse" id="collapse-category-filter">
+                <div class="card card-block">
+                  {% bootstrap_field filter.form.categories size='medium' field_class='category-filter-checkboxes text-primary' bound_css_class='' show_label=False show_help=False %}
+                </div>
+              </div>
+              <script type="text/javascript">
+                $('.collapse').on('show.bs.collapse', function() {
+                  $(this).parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");
+                }).on('hide.bs.collapse', function() {
+                  $(this).parent().find(".fa-chevron-down").removeClass("fa-chevron-down").addClass("fa-chevron-right");
+                });
+
+                if ($(".checkbox input").is(":checked")) { // checked
+                  // console.log('at least one category is checked');
+                  $("#collapse-category-filter").addClass("in");
+                  $("#collapse-category-filter").parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");;
+                }
+              </script>
+            </div>
+
+            <div class="col-sm-12">
+              {% bootstrap_button content='Zoek' button_type='submit' %}
+            </div>
+
           </div>
-          <script type="text/javascript">
-            $('.collapse').on('show.bs.collapse', function() {
-              $(this).parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");
-            }).on('hide.bs.collapse', function() {
-              $(this).parent().find(".fa-chevron-down").removeClass("fa-chevron-down").addClass("fa-chevron-right");
-            });
-
-            if ($(".checkbox input").is(":checked")) { // checked
-              // console.log('at least one category is checked');
-              $("#collapse-category-filter").addClass("in");
-              $("#collapse-category-filter").parent().find(".fa-chevron-right").removeClass("fa-chevron-right").addClass("fa-chevron-down");;
-            }
-          </script>
-        </div>
-
-        <div class="col-sm-12">
-          {% bootstrap_button content='Zoek' button_type='submit' %}
-        </div>
+        </form>
 
       </div>
-    </form>
+    </div>
 
+  </div>
+  <div class="col-9">
+    <div class="row">
+      <div class="col-12">
+        <h6>{% if n_results == 0 %}geen wetsvoorstellen{% elif n_results == 1 %}1 wetsvoorstel{% else %}{{ n_results }} wetsvoorstellen{% endif %} gevonden</h6>
+      </div>
+    </div>
+
+    {% if dossiers_voted %}
+    <div class="row">
+      <h5>Recent behandeld</h5>
+      {% for dossier in dossiers_voted %}
+      <div class="col-12 mb-5">
+        {% include "document/items/dossier_tile.html" %}
+      </div>
+      {% endfor %}
+    </div>
+    <hr class="hr-small"/>
+    {% endif %}
+
+    <div class="row">
+      <h5>Alle</h5>
+    </div>
+
+    <div class="row">
+      {% for dossier in dossiers %}
+      <div class="col-12 mb-4">
+        {% include "document/items/dossier_tile.html" %}
+      </div>
+
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <div class="col">
+        {% bootstrap_paginate dossiers range=10 show_prev_next="true" show_first_last="true" %}
+      </div>
+    </div>
   </div>
 </div>
 
 <hr class="my-3"/>
 
-<div class="row">
-  <div class="col-12">
-    <h6>{% if n_results == 0 %}geen wetsvoorstellen{% elif n_results == 1 %}1 wetsvoorstel{% else %}{{ n_results }} wetsvoorstellen{% endif %} gevonden</h6>
-  </div>
-</div>
 
-{% if dossiers_voted %}
-<div class="row">
-  <h5>Recent behandeld</h5>
-  {% for dossier in dossiers_voted %}
-  <div class="col-12 mb-5">
-    {% include "document/items/dossier_tile.html" %}
-  </div>
-  {% endfor %}
-</div>
-<hr class="hr-small"/>
-{% endif %}
-
-<div class="row">
-  <h5>Alle</h5>
-</div>
-
-<div class="row">
-  {% for dossier in dossiers %}
-  <div class="col-12 mb-4">
-    {% include "document/items/dossier_tile.html" %}
-  </div>
-
-  {% endfor %}
-</div>
-
-<div class="row">
-  <div class="col">
-    {% bootstrap_paginate dossiers range=10 show_prev_next="true" show_first_last="true" %}
-  </div>
-</div>
 
 {% endblock %}
