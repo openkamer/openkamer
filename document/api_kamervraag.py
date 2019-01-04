@@ -13,17 +13,24 @@ class KVPersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
         fields = (
-            'fullname', 'forename', 'surname', 'initials', 'wikidata_id', 'wikipedia_url',
+            'url', 'fullname', 'forename', 'surname', 'initials', 'wikidata_id', 'wikipedia_url',
             'parlement_and_politiek_id'
         )
 
 
+class KVPoliticalPartySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PoliticalParty
+        fields = ('url', 'name_short', 'name', 'wikidata_id', 'wikipedia_url')
+
+
 class KVSubmitterSerializer(serializers.ModelSerializer):
     person = KVPersonSerializer(read_only=True)
+    party = KVPoliticalPartySerializer(read_only=True)
 
     class Meta:
         model = Submitter
-        fields = ('person', 'party_slug')
+        fields = ('person', 'party')
 
 
 class KVFootNoteSerializer(serializers.ModelSerializer):
