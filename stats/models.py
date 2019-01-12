@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 def update_all():
     logger.info('BEGIN')
     start_date = datetime.date(year=2010, month=1, day=1)
-    SeatsPerParty.create_or_update_all(start_date)
+    SeatsPerParty.create_all(start_date)
     StatsVotingSubmitter.create()
     PartyVoteBehaviour.create_all()
     Plot.create()
@@ -115,7 +115,7 @@ class PartyVoteBehaviour(models.Model):
     @staticmethod
     @transaction.atomic
     def create(party):
-        logger.info('BEGIN for party: ' + str(party))
+        logger.info('BEGIN for party:', party)
         governments = Government.objects.all()
         party_votes_per_gov = []
         for gov in governments:
@@ -125,7 +125,7 @@ class PartyVoteBehaviour(models.Model):
         for party_submitting in parties:
             PartyVoteBehaviour.create_for_submitting_party(party, party_submitting, party_votes_per_gov)
         PartyVoteBehaviour.create_for_submitting_party(party, None, party_votes_per_gov)
-        logger.info('END')
+        logger.info('END for party:', party)
         return stats
 
     @staticmethod
@@ -251,14 +251,15 @@ class SeatsPerParty(models.Model):
         return self.party.name + ': ' + str(self.seats) + ' seats at ' + str(self.date)
 
     @staticmethod
-    def create_or_update_all(start_date):
+    def create_all(start_date):
         parliament = Parliament.get_or_create_tweede_kamer()
+        SeatsPerParty.objects.all().delete()
         end_date = datetime.date.today()
         date = start_date
         while date <= end_date:
             SeatsPerParty.create_for_date(parliament, date)
             date += datetime.timedelta(days=1)
-            print('next date: ' + str(date))
+            logger.info('next date: ' + str(date))
 
     @staticmethod
     @transaction.atomic
@@ -266,19 +267,16 @@ class SeatsPerParty(models.Model):
         party_seats = {}
         members = parliament.get_members_at_date(date)
         for member in members:
-            party = member.political_party()
+            party = member.party
             if not party:
-                logger.warning('no party found')
-                logger.warning('member.person: ' + str(member.person))
+                logger.warning('no party found member.person: ' + str(member.person))
                 continue
             if party in party_seats:
                 party_seats[party] += 1
             else:
                 party_seats[party] = 1
         for party in party_seats:
-            # print(party)
-            info = SeatsPerParty.objects.get_or_create(date=date, party=party, seats=party_seats[party])
-            # print(info)
+            SeatsPerParty.objects.create(date=date, party=party, seats=party_seats[party])
 
     @staticmethod
     def seats_at_date(party, date):
