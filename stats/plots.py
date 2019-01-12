@@ -5,7 +5,8 @@ import numpy as np
 
 from django.utils import timezone
 from plotly.offline import plot
-from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter, XAxis, Margin
+from plotly.graph_objs import Layout, Histogram, Histogram2d, Scatter
+from plotly.graph_objs.layout import XAxis, Margin
 import plotly.figure_factory as ff
 
 
