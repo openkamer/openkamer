@@ -62,8 +62,8 @@
     $.get(
       "{% url 'get-person-timeline-html' %}",
       {
-        person_id : {{ person.id }},
-        year : 2017
+        person_id: {{ person.id }},
+        year: (new Date()).getFullYear()
       },
       function(data) {
         $("#cd-timeline").html(data.html);
