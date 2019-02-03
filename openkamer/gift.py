@@ -14,9 +14,11 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def create_gifts(max_items=None):
+    gifts = Api.get_items(PersoonGeschenk, max_items=max_items)
+    if len(gifts) < 1000:
+        logger.error('Only {} gifts found. This is unexpected. Skip re-creating gifts.'.format(len(gifts)))
     Gift.objects.all().delete()
     PersonPosition.objects.all().delete()
-    gifts = Api.get_items(PersoonGeschenk, max_items=max_items)
     for gift in gifts:
         value = find_gift_value(gift.omschrijving)
         gift_type = find_gift_type(gift.omschrijving)
