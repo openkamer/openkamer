@@ -115,7 +115,7 @@ class PartyVoteBehaviour(models.Model):
     @staticmethod
     @transaction.atomic
     def create(party):
-        logger.info('BEGIN for party:', party)
+        logger.info('BEGIN for party: {}'.format(party))
         governments = Government.objects.all()
         party_votes_per_gov = []
         for gov in governments:
@@ -125,7 +125,7 @@ class PartyVoteBehaviour(models.Model):
         for party_submitting in parties:
             PartyVoteBehaviour.create_for_submitting_party(party, party_submitting, party_votes_per_gov)
         PartyVoteBehaviour.create_for_submitting_party(party, None, party_votes_per_gov)
-        logger.info('END for party:', party)
+        logger.info('END for party: {}'.format(party))
         return stats
 
     @staticmethod
