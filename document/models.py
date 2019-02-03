@@ -68,7 +68,7 @@ class Dossier(models.Model):
     dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
     title = models.CharField(max_length=2000, blank=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
-    url = models.URLField(blank=True)
+    url = models.URLField(blank=True, max_length=1000)
     decision = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
     date_updated = models.DateTimeField(auto_now=True)
@@ -206,7 +206,7 @@ class Document(models.Model):
     categories = models.ManyToManyField(CategoryDocument, blank=True)
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
-    source_url = models.URLField()
+    source_url = models.URLField(max_length=1000)
     content_html = models.CharField(max_length=4000000, blank=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -540,7 +540,7 @@ class Voting(models.Model):
     is_individual = models.BooleanField(default=False)
     result = models.CharField(max_length=3, choices=CHOICES, db_index=True)
     date = models.DateField(auto_now=False, blank=True, db_index=True)
-    source_url = models.URLField(blank=True, default='')
+    source_url = models.URLField(blank=True, default='', max_length=1000)
     date_updated = models.DateTimeField(auto_now=True)
 
     @cached_property

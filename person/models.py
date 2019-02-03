@@ -38,9 +38,9 @@ class Person(models.Model):
     slug = models.SlugField(max_length=250, default='')
     birthdate = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
-    wikipedia_url = models.URLField(blank=True)
+    wikipedia_url = models.URLField(blank=True, max_length=1000)
     wikimedia_image_name = models.CharField(blank=True, max_length=300)
-    wikimedia_image_url = models.URLField(blank=True, max_length=600)
+    wikimedia_image_url = models.URLField(blank=True, max_length=1000)
     parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
     twitter_username = models.CharField(max_length=200, blank=True)
 

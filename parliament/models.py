@@ -139,9 +139,9 @@ class PoliticalParty(models.Model):
     founded = models.DateField(blank=True, null=True)
     dissolved = models.DateField(blank=True, null=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
-    wikimedia_logo_url = models.URLField(blank=True)
-    wikipedia_url = models.URLField(blank=True)
-    official_website_url = models.URLField(blank=True)
+    wikimedia_logo_url = models.URLField(blank=True, max_length=1000)
+    wikipedia_url = models.URLField(blank=True, max_length=1000)
+    official_website_url = models.URLField(blank=True, max_length=1000)
     slug = models.SlugField(max_length=250, default='', db_index=True)
     current_parliament_seats = models.IntegerField(default=0)
 
