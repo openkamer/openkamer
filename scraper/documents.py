@@ -13,18 +13,8 @@ def get_kamervraag_antwoord_ids(kamervraag_url):
     logger.info('get related antwoord id for url: ' + kamervraag_url)
     page = requests.get(kamervraag_url, timeout=60)
     tree = lxml.html.fromstring(page.content)
-    relations_titles = tree.xpath('//div[@id="main-column"]//h2[@class="divisiekop1"]')
-    overheidnl_document_ids = []
-    for title_element in relations_titles:
-        if title_element.text_content() == "Relaties":
-            column_elements = title_element.getparent().xpath('//tr/td/p')
-            next_is_antwoord_url = False
-            for column_element in column_elements:
-                if next_is_antwoord_url:
-                    overheidnl_document_ids.append(column_element.text_content())
-                    next_is_antwoord_url = False
-                if column_element.text_content() == 'is beantwoord in':
-                    next_is_antwoord_url = True
+    elements = tree.xpath('/html/head/meta[@name="OVERHEIDop.aanhangsel"]')
+    overheidnl_document_ids = [element.get('content') for element in elements]
     return overheidnl_document_ids
 
 
@@ -32,18 +22,14 @@ def get_kamervraag_document_id_and_content(url):
     logger.info('get kamervraag document id and content for url: ' + url)
     page = requests.get(url, timeout=60)
     tree = lxml.html.fromstring(page.content)
-    elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
-    if elements:
-        document_id = elements[0].get('href').split('/')[-1]
-    else:
-        elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
-        if not elements:
-            return None, '', ''
-        document_id = elements[0].get('content')
+    elements = tree.xpath('/html/head/meta[@name="DC.identifier"]')
+    if not elements:
+        return None, '', ''
+    document_id = elements[0].get('content')
     logger.info('document id: ' + document_id)
     content_html = ''
-    if tree.xpath('//div[@id="main-column"]'):
-        content_html = lxml.etree.tostring(tree.xpath('//div[@id="main-column"]')[0])
+    if tree.xpath('//main'):
+        content_html = lxml.etree.tostring(tree.xpath('//main')[0])
     titles = tree.xpath('//h1[@class="kamervraagomschrijving_kop no-toc"]')
     title = ''
     if titles:
