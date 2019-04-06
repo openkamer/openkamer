@@ -1,5 +1,5 @@
 requests==2.20.0
-django==1.11.16
+django==1.11.20
 dateparser==0.7.0
 django-autocomplete-light==3.2.10
 django-bootstrap-pagination==1.7.0
