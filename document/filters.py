@@ -50,6 +50,13 @@ class DossierFilter(django_filters.FilterSet):
         label='',
         widget=ModelSelect2SlugWidget(url='person-autocomplete')
     )
+    wetsvoorstel_submitter_party = django_filters.ModelChoiceFilter(
+        queryset=PoliticalParty.objects.all(),
+        to_field_name='slug',
+        method='wetsvoorstel_submitter_party_filter',
+        label='',
+        widget=ModelSelect2SlugWidget(url='party-autocomplete')
+    )
     status = django_filters.ChoiceFilter(
         choices=DOSSIER_STATUS_CHOICES,
         method='status_filter',
@@ -78,6 +85,15 @@ class DossierFilter(django_filters.FilterSet):
 
     def wetsvoorstel_submitter_filter(self, queryset, name, value):
         submitters = Submitter.objects.filter(person=value)
+        submitter_ids = list(submitters.values_list('id', flat=True))
+        kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.WETSVOORSTEL)
+        dossier_ids = list(kamerstukken.values_list('document__dossier_id', flat=True))
+        dossiers = queryset.filter(id__in=dossier_ids).distinct()
+        return dossiers
+
+    def wetsvoorstel_submitter_party_filter(self, queryset, name, value):
+        party = value
+        submitters = Submitter.objects.filter(party_slug=party.slug)
         submitter_ids = list(submitters.values_list('id', flat=True))
         kamerstukken = Kamerstuk.objects.filter(document__submitter__in=submitter_ids, type=Kamerstuk.WETSVOORSTEL)
         dossier_ids = list(kamerstukken.values_list('document__dossier_id', flat=True))

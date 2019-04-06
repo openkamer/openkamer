@@ -37,15 +37,21 @@
           {% bootstrap_field filter.form.status bound_css_class='' show_label=False show_help=False %}
         </div>
 
-        <div class="col-sm-6 col-lg-6">
-          <h6 class="text-primary">Betrokkenen</h6>
-          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+        <div class="col-sm-4 col-lg-4">
+          <h6 class="text-primary">Indiener (partij)</h6>
+          {% bootstrap_field filter.form.wetsvoorstel_submitter_party bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
         </div>
 
-        <div class="col-sm-6 col-lg-6">
-          <h6 class="text-primary">Indiener</h6>
+        <div class="col-sm-4 col-lg-4">
+          <h6 class="text-primary">Indiener (persoon)</h6>
           {% bootstrap_field filter.form.wetsvoorstel_submitter bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
+        <div class="col-sm-4 col-lg-4">
+          <h6 class="text-primary">Betrokkenen</h6>
+          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
           {{ filter.form.media }}
         </div>
 
