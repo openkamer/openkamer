@@ -178,6 +178,20 @@ class VotingFilter(django_filters.FilterSet):
     dossier_id = django_filters.CharFilter(method='dossier_id_filter', label='')
     title = django_filters.CharFilter(method='title_filter', label='')
     status = django_filters.ChoiceFilter(method='status_filter', choices=VOTING_RESULT_CHOICES)
+    submitter = django_filters.ModelChoiceFilter(
+        queryset=Person.objects.all(),
+        to_field_name='slug',
+        method='submitter_filter',
+        label='',
+        widget=ModelSelect2SlugWidget(url='person-autocomplete')
+    )
+    submitter_party = django_filters.ModelChoiceFilter(
+        queryset=PoliticalParty.objects.all(),
+        to_field_name='slug',
+        method='submitter_party_filter',
+        label='',
+        widget=ModelSelect2SlugWidget(url='party-autocomplete')
+    )
 
     class Meta:
         model = Voting
@@ -191,3 +205,12 @@ class VotingFilter(django_filters.FilterSet):
 
     def title_filter(self, queryset, name, value):
         return (queryset.filter(dossier__title__icontains=value) | queryset.filter(kamerstuk__type_long__icontains=value)).distinct()
+
+    def submitter_party_filter(self, queryset, name, value):
+        party = value
+        submitters = Submitter.objects.filter(party_slug=party.slug)
+        submitter_ids = list(submitters.values_list('id', flat=True))
+        return queryset.filter(kamerstuk__document__submitter__in=submitter_ids).distinct()
+
+    def submitter_filter(self, queryset, name, value):
+        return queryset.filter(kamerstuk__document__submitter__person=value).distinct()

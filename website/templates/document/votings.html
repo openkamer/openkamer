@@ -34,6 +34,18 @@
           {% bootstrap_field filter.form.result bound_css_class='' show_label=False show_help=False %}
         </div>
 
+        <div class="col-sm-4 col-lg-4">
+          <h6 class="text-primary">Indiener (partij)</h6>
+          {% bootstrap_field filter.form.submitter_party bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
+        <div class="col-sm-4 col-lg-4">
+          <h6 class="text-primary">Indiener (persoon)</h6>
+          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
         <div class="col-sm-12">
           {% bootstrap_button content='Zoek' button_type='submit' %}
         </div>
