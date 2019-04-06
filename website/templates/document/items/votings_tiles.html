@@ -1,52 +1,78 @@
 <div class="row">
   {% for voting in votings %}
-  <div class="col-sm-4 well well-small">
-    <div class="row">
-      <div class="col-xs-3">
-        <small>{{ voting.date|date:"Y-M-d" }}</small>
+  <div class="col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading panel-small">
+        <div class="row">
+          <div class="col-xs-4">
+            <h6 class="date">{{ voting.date|date:"Y-m-d" }}</h6>
+          </div>
+
+          <div class="col-xs-4" align="center">
+            {% if voting.is_dossier_voting %}
+              <span class="h6">Wetsvoorstel</span>
+            {% else %}
+              <span class="h6">{{ voting.kamerstuk.type_short }}</span>
+            {% endif %}
+          </div>
+
+          <div class="col-xs-4" align="right">
+            <small>{% include "document/items/voting_result_small.html" %}</small>
+          </div>
+        </div>
       </div>
 
-      <div class="col-xs-6" align="center">
-        <h5>{{ voting.kamerstuk.type_short }}</h5>
+      <div class="panel-body panel-small">
+        <div class="row" align="center">
+          <div class="col-sm-12">
+            <h6>
+            {% if voting.kamerstuk %}
+            <a href="{% url 'kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}">{{ voting.kamerstuk.type_long }}</a>
+            {% elif voting.is_dossier_voting %}
+            <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}">{{ voting.dossier.title }}</a>
+            {% else %}
+            <small class="text-danger">kamerstuk ontbreekt</small>
+            {% endif %}
+            </h6>
+          </div>
+        </div>
       </div>
 
-      <div class="col-xs-3" align="right">
-        {% include "document/items/voting_result_small.html" %}
+      <div class="panel-footer panel-small">
+        {% with voting=voting %}
+          {% include "document/items/voting_result_list.html" %}
+        {% endwith %}
       </div>
+
+      <div class="panel-footer panel-small">
+        <div class="row">
+          <div class="col-xs-8">
+            <h6 class="small">
+              {% if voting.kamerstuk %}
+              {% with submitters=voting.kamerstuk.document.submitters %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+              {% endif %}
+            </h6>
+          </div>
+
+          <div class="col-xs-4" align="right">
+            <span class="h6">
+              <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}">
+                {{ voting.dossier.dossier_id }}</a>{% if voting.kamerstuk %}-{{ voting.kamerstuk.id_sub }}{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer panel-footer-timeline-vote-bar">
+          {% include "document/items/voting_result_bar_small.html" %}
+      </div>
+
     </div>
-
-    <hr class="hr hr-small"/>
-
-    <div class="row" align="center">
-      <div class="col-sm-12">
-        {% if voting.kamerstuk %}
-        <a href="{% url 'kamerstuk' voting.kamerstuk.id_main voting.kamerstuk.id_sub %}"><small>{{ voting.kamerstuk.type_long }}</small></a>
-        {% elif voting.is_dossier_voting %}
-        <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}"><small>{{ voting.dossier.title }}</small></a>
-        {% else %}
-        <small class="text-danger">kamerstuk ontbreekt</small>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-sm-12 col-progress-bar">
-        {% include "document/items/voting_result_bar_small.html" %}
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-xs-4">
-      </div>
-
-      <div class="col-xs-4" align="center">
-      </div>
-
-      <div class="col-xs-4" align="right">
-        <a href="{% url 'dossier-timeline' voting.dossier.dossier_id %}"><small>{{ voting.dossier.dossier_id }}</small></a><small>.{{ voting.kamerstuk.id_sub }}</small>
-      </div>
-    </div>
-
   </div>
+  {% if forloop.counter|divisibleby:2 %}
+    <div class="clearfix"></div>
+  {% endif %}
   {% endfor %}
 </div>
