@@ -20,5 +20,5 @@ pysolr==3.6.0
 python-twitter==3.4.2
 scipy==1.1.0
 unidecode==1.0.22
-tkapi==0.6.1
+tkapi==0.8.0.dev1
 django-debug-toolbar

@@ -95,6 +95,7 @@ class TestWebsite(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        # TODO: improve performance of votings (tkapi)
         openkamer.dossier.create_dossier_retry_on_error(33885)
         openkamer.dossier.create_dossier_retry_on_error(33506)
         cls.client = Client()
@@ -341,11 +342,6 @@ class TestDocumentLinks(TestCase):
         Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='1')
         Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='2')
         Kamerstuk.objects.create(document=document, id_main=dosser_id, id_sub='3')
-
-    def test_update_document_html_links(self):
-        url = 'https://zoek.officielebekendmakingen.nl/kst-33771-8.html'
-        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
-        openkamer.document.update_document_html_links(content_html)
 
     def test_create_new_url(self):
         url = 'kst-33569-1.html'

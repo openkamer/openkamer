@@ -1,11 +1,9 @@
-import datetime
 import logging
 
 from django.db import transaction
 
 from wikidata import wikidata
 
-import tkapi
 from tkapi.util import queries
 
 from person.util import parse_name_surname_initials
@@ -45,7 +43,7 @@ class VotingFactory(object):
     def create_votings(self, dossier_id):
         logger.info('BEGIN')
         logger.info('dossier id: ' + str(dossier_id))
-        besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
+        besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id)
         for besluit in besluiten:
             self.create_votings_dossier_besluit(besluit, dossier_id)
         logger.info('END')
@@ -55,7 +53,7 @@ class VotingFactory(object):
         dossiers = Dossier.objects.filter(dossier_id=dossier_id)
         assert dossiers.count() == 1
         dossier = dossiers[0]
-        result = self.get_result_choice(besluit.slottekst)
+        result = self.get_result_choice(besluit.tekst)
         zaak = besluit.zaak
 
         document_id = ''
@@ -63,7 +61,7 @@ class VotingFactory(object):
             document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
 
         is_dossier_voting = zaak.soort in ['Wetgeving', 'Initiatiefwetgeving']
-        logger.info(document_id + ' | dossier voting: ' + str(is_dossier_voting))
+        logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
         voting_obj = Voting(
             dossier=dossier,
             kamerstuk_raw_id=document_id,
@@ -88,7 +86,7 @@ class VotingFactory(object):
             logger.error(
                 'Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
 
-        voting_obj.is_individual = (besluit.soort == 'Hoofdelijk')
+        voting_obj.is_individual = ('hoofdelijk' in besluit.tekst.lower())
         voting_obj.save()
 
         if voting_obj.is_individual:
@@ -123,7 +121,7 @@ class VoteFactory(object):
     def create_votes_party(self, voting, stemmingen):
         logger.info('BEGIN')
         for stemming in stemmingen:
-            fractie_name = stemming.json['AnnotatieActorPartij']
+            fractie_name = stemming.actor_fractie
             party = PoliticalParty.find_party(fractie_name)
             if not party and self.do_create_missing_party:
                 party = self.create_missing_party(stemming)
