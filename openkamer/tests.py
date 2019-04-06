@@ -3,7 +3,7 @@ import datetime
 from django.urls import reverse
 from django.test import TestCase
 
-import tkapi
+from tkapi import Api
 from tkapi.util import queries
 from tkapi.besluit import Besluit
 
@@ -292,7 +292,7 @@ class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
         infos = Kamervraag.get_kamervragen_info(2016)
-        document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+        document_factory = DocumentFactory()
         document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(infos[0]['overheidnl_document_id'])
         # print(metadata)
 
@@ -399,21 +399,24 @@ class TestVoting(TestCase):
     # no document id: 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2010P04136'
     # rijkswet: 'https://www.tweedekamer.nl/kamerstukken/stemmingsuitslagen/detail?id=2016P11874'
 
-    def test_voting_party_vote(self):
-        dossier_id = 33885
-        Dossier.objects.create(dossier_id=dossier_id)
-        besluiten = queries.get_dossier_besluiten_with_stemmingen(vetnummer=dossier_id)
-        max_votings = 2
-        voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
-        for besluit in besluiten:
-            voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
-        voting_factory.create_votings(dossier_id)
+    # TODO: improve performance and enable
+    # def test_voting_party_vote(self):
+    #     Api(verbose=True)
+    #     dossier_id = 33885
+    #     Dossier.objects.create(dossier_id=dossier_id)
+    #     besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id)
+    #     max_votings = 2
+    #     voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
+    #     for besluit in besluiten:
+    #         voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
+    #     voting_factory.create_votings(dossier_id)
 
-    def test_voting_individual_vote(self):
-        dossier_id = 33506
-        Dossier.objects.create(dossier_id=dossier_id)
-        voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
-        voting_factory.create_votings(dossier_id)
+    # TODO: improve performance and enable
+    # def test_voting_individual_vote(self):
+    #     dossier_id = 33506
+    #     Dossier.objects.create(dossier_id=dossier_id)
+    #     voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
+    #     voting_factory.create_votings(dossier_id)
 
     # def test_dossier_voting_controversieel(self):
     #     dossier_id = 29282
@@ -431,9 +434,9 @@ class TestVoting(TestCase):
 
     def test_get_voting_not_voted(self):
         dossier_id = 33542
-        ondernummer = 39
+        volgnummer = 39
         Dossier.objects.create(dossier_id=dossier_id)
-        besluit = self.get_besluit_kamerstuk(dossier_id=dossier_id, ondernummer=ondernummer)
+        besluit = self.get_besluit_kamerstuk(dossier_id=dossier_id, volgnummer=volgnummer)
         voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
         voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
         votings = Voting.objects.all()
@@ -445,10 +448,8 @@ class TestVoting(TestCase):
                     did_check = True
         self.assertTrue(did_check)
 
-    def get_besluit_kamerstuk(self, dossier_id, ondernummer):
-        filter = Besluit.create_filter()
-        filter.filter_kamerstuk(vetnummer=dossier_id, ondernummer=ondernummer)
-        besluiten = tkapi.Api().get_besluiten(filter=filter)
+    def get_besluit_kamerstuk(self, dossier_id, volgnummer):
+        besluiten = queries.get_kamerstuk_besluiten(nummer=dossier_id, volgnummer=volgnummer)
         self.assertEqual(1, len(besluiten))
         besluit = besluiten[0]
         return besluit

@@ -1,35 +1,20 @@
-import datetime
-import json
-import os
 import re
 
 from django.test import TestCase
 
 import scraper.besluitenlijst
 import scraper.documents
-import scraper.dossiers
 import scraper.parliament_members
 import scraper.persons
 
 
-class TestDossierScraper(TestCase):
-    dossier_id = '33711'
-
-    def test_scrape_dossier_url(self):
-        dossier_url = scraper.dossiers.search_dossier_url(self.dossier_id)
-        self.assertEqual(dossier_url, 'https://www.tweedekamer.nl/kamerstukken/wetsvoorstellen/detail?id=2013Z16228&dossier=33711')
-
-
 class TestKamervraagScraper(TestCase):
-    kamervraag_url = 'https://zoek.officielebekendmakingen.nl/kv-tk-2017Z06952'
 
     def test_get_kamervraag_id_and_content(self):
-        kamervraag_html_url = self.kamervraag_url + '.html'
-        document_id, content_html, title = scraper.documents.get_kamervraag_document_id_and_content(kamervraag_html_url)
-        self.assertEqual('kv-tk-2017Z06952', document_id)
-        self.assertEqual(5809, len(content_html))
-        self.assertEqual(title, 'Vragen van het lid Bosman (VVD) aan de Minister van Binnenlandse Zaken en Koninkrijksrelaties over het bericht «Ziekenhuis Curaçao bezorgt NL strop» (ingezonden 26 mei 2017).')
-        overheidnl_document_ids = scraper.documents.get_kamervraag_antwoord_ids(self.kamervraag_url)
+        document_id = 'kv-tk-2017Z06952'
+        metadata = scraper.documents.get_metadata(document_id)
+        kamervraag_html_url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
+        overheidnl_document_ids = scraper.documents.get_kamervraag_antwoord_ids(kamervraag_html_url)
         self.assertEqual(1, len(overheidnl_document_ids))
         self.assertEqual('ah-tk-20162017-2167', overheidnl_document_ids[0])
 
@@ -139,19 +124,3 @@ class TestDocumentScraper(TestCase):
         metadata = scraper.documents.get_metadata(document_id)
         self.assertEqual(metadata['publication_type'], 'Kamerstuk')
         self.assertEqual(metadata['dossier_ids'], '33037;34532')
-
-    def test_get_document_content_2016(self):
-        url = 'https://zoek.officielebekendmakingen.nl/kst-34575-2.html'
-        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
-        self.assertEqual(document_id, 'kst-34575-2')
-        self.assertEqual(title, 'voorstel van wet')
-
-    def test_get_document_content_2009(self):
-        url = 'https://zoek.officielebekendmakingen.nl/kst-32203-2.html'
-        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
-        self.assertEqual(document_id, 'kst-32203-2')
-        self.assertEqual(title, 'voorstel van wet')
-        url = 'https://zoek.officielebekendmakingen.nl/kst-31830-6.html'
-        document_id, content_html, title = scraper.documents.get_document_id_and_content(url)
-        self.assertEqual(document_id, 'kst-31830-6')
-        self.assertEqual(title, 'brief van de minister van financiën')

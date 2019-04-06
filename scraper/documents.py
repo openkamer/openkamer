@@ -1,6 +1,4 @@
 import logging
-import datetime
-import re
 import requests
 
 import lxml.html
@@ -18,58 +16,26 @@ def get_kamervraag_antwoord_ids(kamervraag_url):
     return overheidnl_document_ids
 
 
-def get_kamervraag_document_id_and_content(url):
-    logger.info('get kamervraag document id and content for url: ' + url)
-    page = requests.get(url, timeout=60)
-    tree = lxml.html.fromstring(page.content)
-    elements = tree.xpath('/html/head/meta[@name="DC.identifier"]')
-    if not elements:
-        return None, '', ''
-    document_id = elements[0].get('content')
-    logger.info('document id: ' + document_id)
-    content_html = ''
-    if tree.xpath('//main'):
-        content_html = lxml.etree.tostring(tree.xpath('//main')[0])
-    titles = tree.xpath('//h1[@class="kamervraagomschrijving_kop no-toc"]')
-    title = ''
-    if titles:
-        title = titles[0].text_content()
-        title = re.sub('\s{2,}', ' ', title).strip()
-    return document_id, content_html, title
-
-
-def get_document_id_and_content(url):
-    logger.info('get document id for url: ' + url)
-    page = requests.get(url, timeout=60)
-    tree = lxml.html.fromstring(page.content)
-    elements = tree.xpath('//ul/li/a[@id="technischeInfoHyperlink"]')
-    if elements:
-        document_id = elements[0].get('href').split('/')[-1]
-    else:
-        elements = tree.xpath('/html/head/meta[@name="dcterms.identifier"]')
-        if not elements:
-            return None, '', ''
-        document_id = elements[0].get('content')
-    logger.info('document id: ' + document_id)
+def get_html_content(document_id):
+    url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
+    response = requests.get(url, timeout=60)
+    tree = lxml.html.fromstring(response.content)
     elements = tree.xpath('//div[@class="stuk"]')
-    if elements:
-        content_html = lxml.etree.tostring(elements[0])
-    elif tree.xpath('//h2[@class="stuktitel"]'):
-        content_html = lxml.etree.tostring(tree.xpath('//h2[@class="stuktitel"]')[0].getparent())
-    else:
-        content_html = ''
-    titles = tree.xpath('//h2[@class="stuktitel"]')
-    titles += tree.xpath('//h1[@class="stuktitel"]')
-    title = ''
-    if titles:
-        text = titles[0].text_content()
-        title = re.sub("\w{2}\.\s\d+", '', text).strip().lower()  # remove 'nr. 6'
-    return document_id, content_html, title
+    if not elements:
+        elements = tree.xpath('//div[contains(@class, "stuk")]')
+    if not elements:
+        logger.error('no document content found for document url: ' + url)
+        elements = tree.xpath('//main[@class="global-main"]')
+    html_content = lxml.etree.tostring(elements[0])
+    # print('get_html_content', html_content)
+    return html_content
 
 
 def get_metadata(document_id):
     logger.info('get metadata url for document id: ' + str(document_id))
-    xml_url = 'https://zoek.officielebekendmakingen.nl/' + document_id + '/metadata.xml'
+    url = 'https://zoek.officielebekendmakingen.nl/{}'.format(document_id)
+    response = requests.get(url, timeout=60)  # get redirected urls (new document ids)
+    xml_url = response.url + '/metadata.xml'
     logger.info('get metadata url: ' + xml_url)
     page = requests.get(xml_url, timeout=60)
     tree = lxml.etree.fromstring(page.content)
@@ -83,6 +49,8 @@ def get_metadata(document_id):
         'OVERHEIDop.ondernummer': 'id_sub',
         'OVERHEIDop.publicationName': 'publication_type',
         'DCTERMS.issued': 'date_published',
+        'DCTERMS.available': 'date_available',
+        'OVERHEIDop.datumBrief': 'date_letter_sent',
         'OVERHEIDop.datumIndiening': 'date_submitted',
         'OVERHEIDop.datumOntvangst': 'date_received',
         'OVERHEIDop.datumVergadering': 'date_meeting',
@@ -92,11 +60,12 @@ def get_metadata(document_id):
         "OVERHEIDop.vergaderjaar": 'vergaderjaar',
         "OVERHEIDop.vraagnummer": 'vraagnummer',
         "OVERHEIDop.aanhangsel": 'aanhangsel',
+        "DC.identifier": 'overheidnl_document_id',
     }
 
     metadata = {}
     for key, name in attributes_transtable.items():
-        elements = tree.xpath('/metadata_gegevens/metadata[@name="' + key + '"]')
+        elements = tree.xpath('/metadata_gegevens/metadata[@name="{}"]'.format(key))
         if not elements:
             # logger.warning('' + key + ' was not found')
             metadata[name] = ''
@@ -134,53 +103,31 @@ def get_metadata(document_id):
     for element in elements:
         metadata['behandelde_dossiers'].append(element.get('content'))
 
+    logger.info('get metadata url for document id: ' + str(document_id) + ' - END')
     return metadata
 
 
 def search_politieknl_dossier(dossier_id):
-    dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/' + str(dossier_id)
-    page = requests.get(dossier_url, timeout=60)
-    tree = lxml.html.fromstring(page.content)
-    element = tree.xpath('//p[@class="info marge-onder"]/strong')
-    n_publications = int(element[0].text)
-    logger.info(str(n_publications) + ' results found')
-    element = tree.xpath('//dl[@class="zoek-resulaten-info"]//dd')
-    dossier_number = int(element[1].text)
-    assert element[1].getprevious().text == 'Dossiernummer:'
-    results = []
+    dossier_url = 'https://zoek.officielebekendmakingen.nl/resultaten'
+    document_ids = []
     pagnr = 1
-    while len(results) < n_publications:
+    max_pages = 10
+    while pagnr < max_pages:
         logger.info('reading page: ' + str(pagnr))
         params = {
-            '_page': pagnr,
-            'sorttype': 1,
-            'sortorder': 4,
+            'pagina': pagnr,
+            'q': '(dossiernummer="{}")'.format(dossier_id),
+            'pg': 100
         }
         pagnr += 1
-        # print('request url: ' + dossier_url)
-        page = requests.get(dossier_url, params, timeout=60)
-        tree = lxml.html.fromstring(page.content)
-
-        elements = tree.xpath('//div[@class="lijst"]/ul/li/a')
-        for element in elements:
-            title = element.text.strip().replace('\n', '')
-            title = re.sub(r'\(.+?\)', '', title).strip()
-            # print(title)
-            result_info = element.find('em').text
-            published_date = result_info.split('|')[0].strip()
-            published_date = datetime.datetime.strptime(published_date, '%d-%m-%Y').date()
-            # print(published_date)
-            page_url = 'https://zoek.officielebekendmakingen.nl' + element.get('href')
-            # print(page_url)
-            type = result_info.split('|')[1].strip()
-            publisher = result_info.split('|')[2].strip()
-
-            result = {
-                'title': title,
-                'type': type,
-                'publisher': publisher,
-                'date_published': published_date,
-                'page_url': page_url,
-            }
-            results.append(result)
-    return results
+        response = requests.get(dossier_url, params, timeout=60)
+        tree = lxml.html.fromstring(response.content)
+        li_elements = tree.xpath('//ol[@id="PublicatieList"]/li')
+        if not li_elements:
+            break
+        for list_element in li_elements:
+            document_link = list_element.xpath('div[@class="result-item"]/a')[0]
+            relative_url = document_link.get('href')
+            document_id = relative_url.replace('/', '').replace('.html', '')
+            document_ids.append(document_id)
+    return document_ids

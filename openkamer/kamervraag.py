@@ -103,7 +103,7 @@ def get_or_create_kamerantwoord(vraagnummer, document):
 def create_kamervraag(overheidnl_document_id, skip_if_exists=False):
     if skip_if_exists and Kamervraag.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None, []
-    document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+    document_factory = DocumentFactory()
     document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheidnl_document_id)
     kamervraag = get_or_create_kamervraag(vraagnummer, document)
     create_vragen_from_kamervraag_html(kamervraag)
@@ -118,7 +118,7 @@ def create_kamervraag(overheidnl_document_id, skip_if_exists=False):
 def create_kamerantwoord(overheidnl_document_id, skip_if_exists=False):
     if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id).exists():
         return None
-    document_factory = DocumentFactory(DocumentFactory.DocumentType.KAMERVRAAG)
+    document_factory = DocumentFactory()
     document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheidnl_document_id)
     if 'mededeling' in document.types.lower():
         KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()

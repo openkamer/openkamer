@@ -30,13 +30,12 @@ logger = logging.getLogger(__name__)
 
 class DocumentData(object):
 
-    def __init__(self, document_id, metadata, content_html, title, document_url):
+    def __init__(self, document_id, metadata, content_html, document_url):
         self.document_id = document_id
         self.metadata = metadata
         self.content_html = update_document_html_links(content_html)
-        self.title = title
+        self.title = metadata['title_full']
         self.document_url = document_url
-        self.document_html_url = document_url + '.html'
         self.update_metadata()
 
     @property
@@ -47,6 +46,10 @@ class DocumentData(object):
             return self.metadata['date_submitted']
         elif self.metadata['date_received']:
             return self.metadata['date_received']
+        elif self.metadata['date_available']:
+            return self.metadata['date_available']
+        elif self.metadata['date_letter_sent']:
+            return self.metadata['date_letter_sent']
         return None
 
     def update_metadata(self):
@@ -60,30 +63,16 @@ class DocumentData(object):
 
 class DocumentFactory(object):
 
-    class DocumentType(Enum):
-        KAMERSTUK = 'Kamerstuk'
-        KAMERVRAAG = 'Kamervraag'
-
-    def __init__(self, document_type=None):
-        self.scraper = None
-        if document_type == self.DocumentType.KAMERVRAAG:
-            self.scraper = scraper.documents.get_kamervraag_document_id_and_content
-        elif document_type == self.DocumentType.KAMERSTUK:
-            self.scraper = scraper.documents.get_document_id_and_content
-        elif document_type is None:
-            self.scraper = scraper.documents.get_document_id_and_content
-
-    def get_document(self, overheidnl_document_id):
-        document_url = 'https://zoek.officielebekendmakingen.nl/' + str(overheidnl_document_id)
-        document_html_url = document_url + '.html'
-        document_id, content_html, title = self.scraper(document_html_url)
+    def get_document_data(self, overheidnl_document_id):
+        document_url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(overheidnl_document_id)
         metadata = scraper.documents.get_metadata(overheidnl_document_id)
-        document_id = overheidnl_document_id
-        return DocumentData(document_id, metadata, content_html, title, document_url)
+        overheidnl_document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else overheidnl_document_id
+        content_html = scraper.documents.get_html_content(overheidnl_document_id)
+        return DocumentData(overheidnl_document_id, metadata, content_html, document_url)
 
     def create_document(self, overheidnl_document_id, dossier_id=None, dossier=None):
         logger.info('BEGIN')
-        document_data = self.get_document(overheidnl_document_id)
+        document_data = self.get_document_data(overheidnl_document_id)
         metadata = document_data.metadata
 
         if dossier is None:
@@ -97,7 +86,7 @@ class DocumentFactory(object):
             'types': metadata['types'],
             'publisher': metadata['publisher'],
             'date_published': document_data.date_published,
-            'source_url': document_data.document_html_url,
+            'source_url': document_data.document_url,
             'content_html': document_data.content_html,
         }
 
@@ -107,7 +96,7 @@ class DocumentFactory(object):
 
     def create_kamervraag_document(self, overheidnl_document_id):
         logger.info('BEGIN')
-        document_data = self.get_document(overheidnl_document_id)
+        document_data = self.get_document_data(overheidnl_document_id)
         metadata = document_data.metadata
 
         properties = {
@@ -118,7 +107,7 @@ class DocumentFactory(object):
             'types': metadata['types'],
             'publisher': metadata['publisher'],
             'date_published': document_data.date_published,
-            'source_url': document_data.document_html_url,
+            'source_url': document_data.document_url,
             'content_html': document_data.content_html,
         }
 
@@ -129,6 +118,10 @@ class DocumentFactory(object):
 
     @staticmethod
     def create_document_and_related(document_data, properties):
+
+        if not document_data.date_published:
+            logger.error('No published date for document: ' + str(document_data.document_id))
+
         document, created = Document.objects.update_or_create(
             document_id=document_data.document_id,
             defaults=properties
