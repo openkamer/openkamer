@@ -140,7 +140,6 @@ class CommissieView(TemplateView):
         return timeline_items
 
     def get_context_data(self, slug, **kwargs):
-        print(slug)
         commissie = Commissie.objects.get(slug=slug)
         timeline_items = self.get_timeline_items(commissie)
         context = super().get_context_data(**kwargs)

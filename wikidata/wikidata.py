@@ -83,7 +83,6 @@ def search_parliament_member_ids_with_start_date():
         'format': 'json',
     }
     response = request_wikidata(url, params)
-    print(response.content)
     response_json = response.json()
     member_ids = []
     for item in response_json['results']['bindings']:
