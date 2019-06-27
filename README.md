@@ -83,8 +83,6 @@ create search index
 $ python manage.py rebuild_index
 ```
 
-
-
 ## Development
 
 ### Testing

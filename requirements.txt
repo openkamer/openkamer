@@ -1,5 +1,5 @@
 requests==2.20.0
-django==1.11.20
+django==1.11.21
 dateparser==0.7.0
 django-autocomplete-light==3.2.10
 django-bootstrap-pagination==1.7.0
@@ -8,7 +8,7 @@ django-cron==0.5.1
 django-dbbackup==3.2.0
 django-filter==1.1.0
 django-haystack==2.8.1
-djangorestframework==3.9.0
+djangorestframework==3.9.1
 fasteners==0.14.1
 gitpython==2.1.11
 lxml==4.2.5
@@ -20,5 +20,5 @@ pysolr==3.6.0
 python-twitter==3.4.2
 scipy==1.1.0
 unidecode==1.0.22
-tkapi==0.8.0.dev1
+tkapi==0.8.0.dev2
 django-debug-toolbar
