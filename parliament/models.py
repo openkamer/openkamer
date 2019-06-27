@@ -256,3 +256,24 @@ class PartyMember(models.Model):
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'
+
+
+class Commissie(models.Model):
+    name = models.CharField(max_length=500)
+    name_short = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, default='', db_index=True)
+
+    def save(self, *args, **kwargs):
+        self.name_short = self.create_short_name(str(self.name))
+        self.slug = self.create_slug(self.name_short)
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def create_short_name(name):
+        name = name.replace('vaste commissie voor', '').strip()
+        name = name.replace('algemene commissie voor', '').strip()
+        return name
+
+    @staticmethod
+    def create_slug(name_short):
+        return slugify(name_short)
