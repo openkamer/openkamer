@@ -1,9 +1,12 @@
 import datetime
 
-from unidecode import unidecode
-
 from django.views.generic import TemplateView
 
+# TODO BR: move this dependency to website or openkamer layer
+from document.models import CommissieDocument
+from document.views import CommissieDocumentItem
+
+from parliament.models import Commissie
 from parliament.models import PartyMember
 from parliament.models import Parliament
 from parliament.models import ParliamentMember
@@ -123,3 +126,24 @@ class ParliamentMembersCheckView(TemplateView):
         })
         return members_per_month
 
+
+class CommissieView(TemplateView):
+    template_name = 'parliament/commissie.html'
+
+    @staticmethod
+    def get_timeline_items(commissie: Commissie):
+        documents = CommissieDocument.objects.filter(commissie=commissie)
+        timeline_items = []
+        for document in documents:
+            timeline_items.append(CommissieDocumentItem(document))
+        timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
+        return timeline_items
+
+    def get_context_data(self, slug, **kwargs):
+        print(slug)
+        commissie = Commissie.objects.get(slug=slug)
+        timeline_items = self.get_timeline_items(commissie)
+        context = super().get_context_data(**kwargs)
+        context['commissie'] = commissie
+        context['timeline_items'] = timeline_items
+        return context

@@ -231,6 +231,19 @@ class DossierTimelineHorizontalView(TemplateView):
         return context
 
 
+class CommissieDocumentItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_commissie.html'
+
+    @property
+    def date(self):
+        return self.obj.document.date_published
+
+
 class AgendasView(TemplateView):
     template_name = 'document/agendas.html'
 

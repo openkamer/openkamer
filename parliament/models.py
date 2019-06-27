@@ -277,3 +277,6 @@ class Commissie(models.Model):
     @staticmethod
     def create_slug(name_short):
         return slugify(name_short)
+
+    def __html__(self):
+        return self.name_short

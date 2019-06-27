@@ -38,6 +38,7 @@ from parliament.views import PartiesView, PartyView, PartyMembersCheckView
 from parliament.views import ParliamentMembersCurrentView
 from parliament.views import ParliamentMembersAtDateView
 from parliament.views import ParliamentMembersCheckView
+from parliament.views import CommissieView
 from stats.views import get_example_plot_html_json
 from stats.views import DataStatsView
 from stats.views import KamervraagFootnotesView
@@ -105,6 +106,8 @@ urlpatterns = [
     url(r'^kamervraag/(?P<vraagnummer>.*)/$', KamervraagView.as_view(), name='kamervraag'),
 
     url(r'^commissie/verslagen/$', VerslagenAlgemeenOverlegView.as_view(), name='verslagen-algemeen-overleg'),
+    # url(r'^commissies/$', CommissiesView.as_view(), name='commissies'),
+    url(r'^commissie/(?P<slug>[-\w]+)/$', CommissieView.as_view(), name='commissie'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
 
