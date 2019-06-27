@@ -2,6 +2,7 @@ import datetime
 import logging
 import re
 import urllib.parse
+import time
 
 import requests
 
@@ -9,6 +10,17 @@ logger = logging.getLogger(__name__)
 
 
 PARLIAMENT_MEMBER_DUTCH_ITEM_ID = 'Q18887908'
+REQUEST_TIMEOUT = 60
+
+
+def request_wikidata(url, params, **kwargs):
+    response = requests.get(url, params, timeout=REQUEST_TIMEOUT, **kwargs)
+    if response.status_code == 429:
+        backoff = int(response.headers.get('retry-after', REQUEST_TIMEOUT))
+        logger.info('too many requests for {}, waiting {} seconds before retry'.format(url, backoff))
+        time.sleep(backoff)
+        response = requests.get(url, params, timeout=REQUEST_TIMEOUT, **kwargs)
+    return response
 
 
 def search(search_str, language='en'):
@@ -70,7 +82,8 @@ def search_parliament_member_ids_with_start_date():
     ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
         'format': 'json',
     }
-    response = requests.get(url, params, timeout=60)
+    response = request_wikidata(url, params)
+    print(response.content)
     response_json = response.json()
     member_ids = []
     for item in response_json['results']['bindings']:
@@ -88,7 +101,7 @@ def search_parliament_member_ids():
     ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
         'format': 'json',
     }
-    response = requests.get(url, params, timeout=60)
+    response = request_wikidata(url, params)
     response_json = response.json()
     member_ids = []
     for item in response_json['results']['bindings']:
@@ -118,7 +131,7 @@ class WikidataItem(object):
             params['sites'] = sites
         if props:
             params['props'] = props
-        response = requests.get(url, params, timeout=60)
+        response = request_wikidata(url, params)
         reponse_json = response.json()
         item = reponse_json['entities'][id]
         return item
@@ -252,7 +265,7 @@ class WikidataItem(object):
             'iiurlwidth': str(image_width_px),
             'format': 'json',
         }
-        response = requests.get(url, params, timeout=60)
+        response = request_wikidata(url, params)
         response_json = response.json()
         pages = response_json['query']['pages']
         for page in pages.values():
