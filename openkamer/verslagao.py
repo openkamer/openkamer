@@ -1,6 +1,7 @@
 import logging
 import re
-import lxml
+import csv
+import requests
 
 from django.db import transaction
 
@@ -22,8 +23,9 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
         try:
             dossier_id = str(info['dossier_id'])
             dossier_id_extra = str(info['dossier_extra_id'])
-            name=info['commissie_name']
-            name_short = Commissie.create_short_name(info['commissie_name'])
+            name = info['commissie_name'].strip()
+            logger.info('commissie name: {}'.format(name))
+            name_short = Commissie.create_short_name(name)
             slug = Commissie.create_slug(name_short)
             commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
             commissie_document = create_verslag(
@@ -78,12 +80,13 @@ def upperfirst(x):
 
 
 def get_verlag_algemeen_overleg_infos(year):
-    lines = Dossier.get_lines_from_url(
-        'https://raw.githubusercontent.com/openkamer/ok-tk-data/master/verslagen/verslagen_algemeen_overleg_' + str(year) + '.csv')
-    lines.pop(0)  # remove table headers
+    url = 'https://raw.githubusercontent.com/openkamer/ok-tk-data/master/verslagen/verslagen_algemeen_overleg_{}.csv'.format(year)
+    response = requests.get(url, timeout=60)
+    rows = response.content.decode('utf-8').splitlines()
+    rows = csv.reader(rows)
+    next(rows, None)  # skip table headers
     verslagen_info = []
-    for line in lines:
-        colums = line.split(',')
+    for colums in rows:
         if colums[4] == '':  # no document url
             continue
         info = {
@@ -91,8 +94,9 @@ def get_verlag_algemeen_overleg_infos(year):
             'dossier_id': colums[1],
             'dossier_extra_id': colums[2],
             'kamerstuk_nr': colums[3],
-            'document_url': colums[4],
-            'commissie_name': colums[5],
+            'document_url': str(colums[4]),
+            'commissie_name': str(colums[5]),
         }
+        logger.info('verslag info: {}'.format(info))
         verslagen_info.append(info)
     return verslagen_info
