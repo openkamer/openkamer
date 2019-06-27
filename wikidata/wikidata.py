@@ -31,7 +31,7 @@ def search(search_str, language='en'):
         'search': search_str,
         'language': language,
     }
-    response = requests.get(search_url, params, timeout=60)
+    response = request_wikidata(search_url, params)
     return response.json()
 
 
