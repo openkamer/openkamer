@@ -4,7 +4,6 @@ from django.test import TestCase
 
 import scraper.besluitenlijst
 import scraper.documents
-import scraper.parliament_members
 import scraper.persons
 
 
