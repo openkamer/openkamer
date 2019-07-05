@@ -21,6 +21,7 @@ from document.models import Agenda
 from document.models import AgendaItem
 from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
+from document.models import CommissieDocument
 from document.models import Dossier
 from document.models import Kamervraag
 from document.models import Antwoord
@@ -228,6 +229,19 @@ class DossierTimelineHorizontalView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['dossier'] = Dossier.objects.get(dossier_id=dossier_id)
         return context
+
+
+class CommissieDocumentItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_commissie.html'
+
+    @property
+    def date(self):
+        return self.obj.document.date_published
 
 
 class AgendasView(TemplateView):
@@ -558,7 +572,7 @@ class VerslagenAlgemeenOverlegView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        verslagen_all = Kamerstuk.objects.filter(type=Kamerstuk.VERSLAG_AO)
+        verslagen_all = CommissieDocument.objects.all()
         paginator = Paginator(verslagen_all, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:

@@ -1,0 +1,39 @@
+{% extends "website/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}Commissie {{ commissie.name_short }} {{ block.super }}{% endblock %}
+
+{% block headcontent %}
+  <link rel="stylesheet" href="/static/css/timeline-1.1.css"> <!-- Resource style -->
+  <script src="/static/js/modernizr.min.js"></script> <!-- Modernizr -->
+{% endblock %}
+
+{% block content %}
+
+<div class="row" align="center">
+  <div class="col-md-12">
+    <h4>{{ commissie.name_short }}</h4>
+    <h5>{{ commissie.name }}</h5>
+  </div>
+</div>
+
+<hr/>
+
+<div class="row">
+
+<section id="cd-timeline" class="cd-container">
+
+  {% for item in timeline_items %}
+	<div class="cd-timeline-block">
+    {% include item.template_name %}
+	</div>
+  {% endfor %}
+
+</section>
+
+</div>
+
+<script src="{% static 'js/timeline.js' %}"></script>
+
+{% endblock %}

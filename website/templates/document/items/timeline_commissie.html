@@ -1,0 +1,43 @@
+{% load openkamer %}
+
+{% with commissie_document=item.obj %}
+
+<a class="anchor" id="{{ commissie_document.id }}"></a>
+
+
+<div class="cd-timeline-img text-center bg-info">
+  <span style="font-size:24px;" class="fa fa-file"></span>
+</div> <!-- cd-timeline-img -->
+
+<div class="panel panel-default cd-timeline-content">
+  <div class="panel-heading panel-heading-timeline">
+    <div class="row">
+
+      <div class="col-xs-12" align="center">
+        <h6>
+          <a href="{% url 'kamerstuk' commissie_document.kamerstuk.id_main commissie_document.kamerstuk.id_sub %}">
+            {{ commissie_document.document.title_short }}
+          </a>
+        </h6>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel-footer panel-footer-timeline">
+    {% with submitters=commissie_document.document.submitters %}
+    {% if submitters %}
+        <h6 class="small">
+          Indiener{% if commissie_document.document.submitters|length > 1 %}s{% endif %}:
+          {% include "document/items/submitters_list.html" %}
+        </h6>
+    {% endif %}
+    {% endwith %}
+    <h6 class="visible-xs visible-sm small">{{ commissie_document.document.date_published|date:"j F Y" }}</h6>
+  </div>
+
+  <span class="hidden-xs hidden-sm cd-date"><h2>{{ commissie_document.document.date_published|date:"j F Y" }}</h2></span>
+
+</div> <!-- cd-timeline-content -->
+
+{% endwith %}

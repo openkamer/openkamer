@@ -5,6 +5,7 @@ from document.models import Dossier
 from document.models import Document
 from document.models import CategoryDossier
 from document.models import CategoryDocument
+from document.models import CommissieDocument
 from document.models import Kamerstuk
 from document.models import Kamervraag
 from document.models import Kamerantwoord
@@ -119,6 +120,10 @@ class VoteIndividualAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
 
 
+class CommissieDocumentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'document', 'kamerstuk', 'commissie')
+
+
 admin.site.register(CategoryDossier, CategoryAdmin)
 admin.site.register(CategoryDocument, CategoryAdmin)
 admin.site.register(Dossier, DossierAdmin)
@@ -135,3 +140,5 @@ admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)
 admin.site.register(VoteIndividual, VoteIndividualAdmin)
 admin.site.register(Voting, VotingAdmin)
+
+admin.site.register(CommissieDocument, CommissieDocumentAdmin)

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from parliament.models import Parliament, ParliamentMember, PartyMember, PoliticalParty
+from parliament.models import Commissie
 
 
 class PoliticalPartyAdmin(admin.ModelAdmin):
@@ -29,7 +30,17 @@ class ParliamentMemberAdmin(admin.ModelAdmin):
     )
 
 
+class CommissieAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        'name_short',
+        'slug'
+    )
+
+
 admin.site.register(Parliament)
 admin.site.register(ParliamentMember, ParliamentMemberAdmin)
 admin.site.register(PartyMember)
 admin.site.register(PoliticalParty, PoliticalPartyAdmin)
+admin.site.register(Commissie, CommissieAdmin)

@@ -13,6 +13,7 @@ from person.util import parse_name_surname_initials
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
+from parliament.models import Commissie
 
 from government.models import GovernmentMember
 
@@ -757,3 +758,9 @@ class BesluitItemCase(models.Model):
             if kamerstukken:
                 related_stukken.append(kamerstukken[0])
         return related_stukken
+
+
+class CommissieDocument(models.Model):
+    document = models.ForeignKey(Document, null=False)
+    kamerstuk = models.ForeignKey(Kamerstuk, null=False)
+    commissie = models.ForeignKey(Commissie, null=False)

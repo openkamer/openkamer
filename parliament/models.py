@@ -54,7 +54,7 @@ class ParliamentMember(models.Model):
             members = ParliamentMember.objects.filter(person=person).order_by('-joined')
         if members.exists():
             return members[0]
-        logger.info('ParliamentMember not found for: ' + str(surname) + ' (' + initials + ')')
+        logger.info('ParliamentMember not found for: {} ({})'.format(surname, initials))
         return None
 
     @staticmethod
@@ -213,6 +213,8 @@ class PoliticalParty(models.Model):
         logger.info(self.name + ' - id: ' + str(self.wikidata_id))
         logo_filename = wikidata_item.get_logo_filename()
         self.founded = wikidata_item.get_inception()
+        if not self.name_short and wikidata_item.get_short_name():
+            self.name_short = wikidata_item.get_short_name()
         if logo_filename:
             self.wikimedia_logo_url = wikidata.WikidataItem.get_wikimedia_image_url(logo_filename)
         self.save()
@@ -256,3 +258,27 @@ class PartyMember(models.Model):
 
     def __str__(self):
         return str(self.person) + ' (' + str(self.party) + ')'
+
+
+class Commissie(models.Model):
+    name = models.CharField(max_length=500)
+    name_short = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, default='', db_index=True)
+
+    def save(self, *args, **kwargs):
+        self.name_short = self.create_short_name(str(self.name))
+        self.slug = self.create_slug(self.name_short)
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def create_short_name(name):
+        name = name.replace('vaste commissie voor', '').strip()
+        name = name.replace('algemene commissie voor', '').strip()
+        return name
+
+    @staticmethod
+    def create_slug(name_short):
+        return slugify(name_short)
+
+    def __html__(self):
+        return self.name_short

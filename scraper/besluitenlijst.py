@@ -1,4 +1,3 @@
-import datetime
 import logging
 import re
 from io import StringIO
@@ -9,7 +8,6 @@ import requests
 
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 
 logger = logging.getLogger(__name__)
