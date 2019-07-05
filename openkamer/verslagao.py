@@ -5,7 +5,6 @@ import requests
 
 from django.db import transaction
 
-from document.models import Dossier
 from document.models import Kamerstuk
 from document.models import CommissieDocument
 from parliament.models import Commissie

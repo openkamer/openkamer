@@ -121,7 +121,7 @@ class VoteFactory(object):
     def create_votes_party(self, voting, stemmingen):
         logger.info('BEGIN')
         for stemming in stemmingen:
-            fractie_name = stemming.actor_fractie
+            fractie_name = stemming.actor_fractie if stemming.actor_fractie else stemming.actor_naam
             party = PoliticalParty.find_party(fractie_name)
             if not party and self.do_create_missing_party:
                 party = self.create_missing_party(stemming)
@@ -140,10 +140,11 @@ class VoteFactory(object):
 
     @staticmethod
     def create_missing_party(stemming):
-        wikidata_id = wikidata.search_political_party_id(stemming.fractie.naam, language='nl')
+        party_name = stemming.actor_naam  # TODO: use fractie.naam (currently not available in TK API)
+        wikidata_id = wikidata.search_political_party_id(party_name, language='nl')
         party = PoliticalParty.objects.create(
-            name=stemming.fractie.naam,
-            name_short=stemming.fractie.afkorting,
+            name=party_name,
+            # name_short=stemming.fractie.afkorting, # TODO: use fractie.afkorting (currently not available in TK API)
             wikidata_id=wikidata_id
         )
         party.update_info(language='nl')

@@ -190,8 +190,11 @@ class TestWebsite(TestCase):
         for voting in votings:
             if voting.is_dossier_voting:
                 response = self.client.get(reverse('voting-dossier', args=(voting.dossier.dossier_id,)))
-            else:
+            elif voting.kamerstuk:
                 response = self.client.get(reverse('voting-kamerstuk', args=(voting.kamerstuk.id_main, voting.kamerstuk.id_sub,)))
+            else:
+                print('WARNING: no kamerstuk found for voting id: {}'.format(voting.id))
+                continue
             self.assertEqual(response.status_code, 200)
 
     def test_parties_overview(self):
@@ -201,8 +204,12 @@ class TestWebsite(TestCase):
     def test_party_view(self):
         parties = PoliticalParty.objects.all()
         for party in parties:
+            if not party.slug:
+                print('WARNING: Empty party found, skipping view')
+                continue
             response = self.client.get(reverse('party', args=(party.slug,)))
             self.assertEqual(response.status_code, 200)
+        self.assertGreaterEqual(len(parties), 60)
 
     def test_besluitenlijsten_view(self):
         response = self.client.get(reverse('besluitenlijsten'))

@@ -14,12 +14,13 @@ REQUEST_TIMEOUT = 60
 
 
 def request_wikidata(url, params, **kwargs):
-    response = requests.get(url, params, timeout=REQUEST_TIMEOUT, **kwargs)
+    headers = {'User-Agent': 'OpenKamer 1.0'}
+    response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
     if response.status_code == 429:
         backoff = int(response.headers.get('retry-after', REQUEST_TIMEOUT))
-        logger.info('too many requests for {}, waiting {} seconds before retry'.format(url, backoff))
+        logger.warning('too many requests for {}, waiting {} seconds before retry'.format(url, backoff))
         time.sleep(backoff)
-        response = requests.get(url, params, timeout=REQUEST_TIMEOUT, **kwargs)
+        response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
     return response
 
 
