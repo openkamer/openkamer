@@ -209,7 +209,7 @@ class TestWebsite(TestCase):
                 continue
             response = self.client.get(reverse('party', args=(party.slug,)))
             self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(parties), 60)
+        self.assertGreaterEqual(len(parties), 50)
 
     def test_besluitenlijsten_view(self):
         response = self.client.get(reverse('besluitenlijsten'))
