@@ -19,7 +19,7 @@ class PartiesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        parties = PoliticalParty.objects.all()
+        parties = PoliticalParty.objects.exclude(slug__exact='')
         parties = PoliticalParty.sort_by_current_seats(parties)
         context['parties'] = parties
         return context
