@@ -285,7 +285,7 @@ class SeatsPerParty(models.Model):
             return infos[0].seats
         else:
             logger.warning('{} entries for single date ({}) and party ({})'.format(infos.count(), date, party))
-        return None
+        return 0
 
 
 class Plot(models.Model):
