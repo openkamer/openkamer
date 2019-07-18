@@ -6,4 +6,4 @@ import openkamer.parliament
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        openkamer.parliament.create_parliament_members()
+        openkamer.parliament.create_parliament_members(update_votes=False)

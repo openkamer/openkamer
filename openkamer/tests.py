@@ -3,9 +3,7 @@ import datetime
 from django.urls import reverse
 from django.test import TestCase
 
-from tkapi import Api
 from tkapi.util import queries
-from tkapi.besluit import Besluit
 
 from person.models import Person
 
@@ -15,6 +13,7 @@ from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PartyMember
 from parliament.models import PoliticalParty
+from parliament.models import Commissie
 
 from document.models import Document
 from document.models import Dossier
@@ -30,6 +29,7 @@ import openkamer.kamervraag
 import openkamer.parliament
 import openkamer.voting
 import openkamer.gift
+import openkamer.verslagao
 
 
 class TestCreatePerson(TestCase):
@@ -459,3 +459,21 @@ class TestGifts(TestCase):
 
     def test_create_gifts(self):
         openkamer.gift.create_gifts(max_items=20)
+
+
+class TestVerslagAlgemeenOverleg(TestCase):
+
+    def test_create_verslag(self):
+        dossier_id = 26234
+        kamerstuk_nr = 225
+        overheidnl_document_id = 'kst-{}-{}'.format(dossier_id, kamerstuk_nr)
+        commissie = Commissie.objects.create(name='test commissie', name_short='tc', slug='tc')
+        verslag = openkamer.verslagao.create_verslag(
+            overheidnl_document_id=overheidnl_document_id,
+            dossier_id=dossier_id,
+            dossier_id_extra='',
+            kamerstuk_nr=kamerstuk_nr,
+            commissie=commissie
+        )
+
+

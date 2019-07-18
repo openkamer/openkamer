@@ -284,10 +284,7 @@ class SeatsPerParty(models.Model):
         if infos and infos.count() == 1:
             return infos[0].seats
         else:
-            logger.warning('multiple entries for single date and party')
-            logger.warning('party: ' + str(party))
-            logger.warning('date: ' + str(date))
-            logger.warning('number of objects: ' + str(infos.count()))
+            logger.warning('{} entries for single date ({}) and party ({})'.format(infos.count(), date, party))
         return None
 
 
