@@ -10,4 +10,4 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        openkamer.parliament.create_parliament_and_government()
+        openkamer.parliament.create_parliament_and_government(all_members=False)

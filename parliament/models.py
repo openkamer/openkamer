@@ -205,9 +205,11 @@ class PoliticalParty(models.Model):
         update the party with wikidata info
         :param language: the language to search for in wikidata
         """
+        logger.info('update party info for {}'.format(self.name))
         if not self.wikidata_id:
             self.wikidata_id = self.find_wikidata_id(language)
             if not self.wikidata_id:
+                logger.warn('no wikidata_id found for {}'.format(self.name))
                 return
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
         self.official_website_url = wikidata_item.get_official_website()

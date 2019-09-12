@@ -81,8 +81,16 @@ class TestFindPoliticalParty(TestCase):
         label = item.get_label(language='nl')
         self.assertEqual(label, 'Partij voor de Dieren')
 
+    def test_search_groenlinks(self):
+        wikidata_id = wikidata.search_political_party_id('GL', language='nl')
+        self.assertIsNotNone(wikidata_id)
+        self.assertGreaterEqual(wikidata_id, 'Q667680')
+        item = wikidata.WikidataItem(wikidata_id)
+        label = item.get_label(language='nl')
+        self.assertEqual(label, 'GroenLinks')
+
     def test_search_vvd(self):
-        wikidata_id = wikidata.search_political_party_id('VVD', language='nl')
+        wikidata_id = wikidata.search_political_party_id('VgetVD', language='nl')
         item = wikidata.WikidataItem(wikidata_id)
         label = item.get_label(language='nl')
         self.assertEqual(label, 'Volkspartij voor Vrijheid en Democratie')

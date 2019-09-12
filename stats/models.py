@@ -328,13 +328,16 @@ class Plot(models.Model):
         logger.info('BEGIN')
         start_year = None
         # start_year = 2017
-        Plot.create_kamervragen_general_plots(start_year)
-        Plot.create_kamervragen_vs_time_party_plots(start_year)
-        Plot.create_kamervragen_party_plots(start_year)
-        Plot.create_kamervragen_ministry_plots(start_year)
-        Plot.create_kamervragen_years_plots(start_year)
-        Plot.create_kamervragen_vs_time_party_seats_plots(start_year)
-        Plot.create_party_seats_vs_time_plot(start_year)
+        try:
+            Plot.create_kamervragen_general_plots(start_year)
+            Plot.create_kamervragen_vs_time_party_plots(start_year)
+            Plot.create_kamervragen_party_plots(start_year)
+            Plot.create_kamervragen_ministry_plots(start_year)
+            Plot.create_kamervragen_years_plots(start_year)
+            Plot.create_kamervragen_vs_time_party_seats_plots(start_year)
+            Plot.create_party_seats_vs_time_plot(start_year)
+        except Exception as error:
+            logger.exception('Failed to create stats plots')
         logger.info('END')
 
     @staticmethod

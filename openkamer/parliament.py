@@ -1,5 +1,6 @@
 import datetime
 import logging
+from typing import List
 
 from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 
@@ -36,13 +37,13 @@ logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
-def create_parliament_and_government():
+def create_parliament_and_government(all_members=False):
     PoliticalParty.objects.all().delete()
     PartyMember.objects.all().delete()
     ParliamentMember.objects.all().delete()
     create_parties(update_votes=False)
     create_governments()
-    create_parliament_members(update_votes=False)
+    create_parliament_members(update_votes=False, all_members=all_members)
     for party in PoliticalParty.objects.all():
         party.set_current_parliament_seats()
     set_party_votes_derived_info()
@@ -120,7 +121,7 @@ def create_goverment_member(government, member, person, position):
 
 
 @transaction.atomic
-def create_parties(update_votes=True, active_only=False):
+def create_parties(update_votes=True, active_only=False) -> List[PoliticalParty]:
     filter_fractie = None
     if active_only:
         filter_fractie = Fractie.create_filter()
