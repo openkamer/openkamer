@@ -12,6 +12,7 @@ from parliament.models import Parliament
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 from parliament import check
+from parliament.filters import ParliamentMemberFilter
 
 
 class PartiesView(TemplateView):
@@ -42,7 +43,11 @@ class ParliamentMembersView(TemplateView):
         context = super().get_context_data(**kwargs)
         tweedekamer = Parliament.get_or_create_tweede_kamer()
         members = tweedekamer.get_members_at_date(at_date)
-        context['members'] = members
+        member_filter = ParliamentMemberFilter(self.request.GET, queryset=members)
+        members_filtered = member_filter.qs
+        context['members'] = member_filter.qs
+        context['n_results'] = members_filtered.count()
+        context['filter'] = member_filter
         context['date'] = at_date
         return context
 

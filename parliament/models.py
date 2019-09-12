@@ -18,6 +18,8 @@ class Parliament(models.Model):
     name = models.CharField(max_length=200)
     wikidata_id = models.CharField(max_length=200, blank=True)
 
+    TWEEDE_KAMER_WIKIDATA_ID = 'Q233262'
+
     def __str__(self):
         return str(self.name)
 
@@ -36,7 +38,7 @@ class Parliament(models.Model):
         if parliaments.exists():
             return parliaments[0]
         else:
-            return Parliament.objects.create(name='Tweede Kamer', wikidata_id='Q233262')
+            return Parliament.objects.create(name='Tweede Kamer', wikidata_id=Parliament.TWEEDE_KAMER_WIKIDATA_ID)
 
 
 class ParliamentMember(models.Model):
@@ -125,7 +127,7 @@ class ParliamentMember(models.Model):
                     overlapping_members.append(member_a)
         return overlapping_members
 
-    def __str__(self):
+    def __html__(self):
         display_name = self.person.fullname()
         party = self.political_party()  # do not use the cached_property here because this might fail tests during creation phase
         if party:
