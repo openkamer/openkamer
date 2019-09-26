@@ -63,7 +63,6 @@ class DossierFilter(django_filters.FilterSet):
         # widget=forms.ChoiceField()
     )
     categories = django_filters.ModelMultipleChoiceFilter(
-        name='categories',
         queryset=CategoryDossier.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
     )

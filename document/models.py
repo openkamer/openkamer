@@ -188,7 +188,7 @@ class Dossier(models.Model):
 
 
 class Document(models.Model):
-    dossier = models.ForeignKey(Dossier, blank=True, null=True)
+    dossier = models.ForeignKey(Dossier, blank=True, null=True, on_delete=models.CASCADE)
     document_id = models.CharField(unique=True, max_length=200, blank=True, db_index=True)
     title_full = models.CharField(max_length=3000)
     title_short = models.CharField(max_length=2000)
@@ -227,8 +227,8 @@ class Document(models.Model):
 
 
 class Submitter(models.Model):
-    person = models.ForeignKey(Person)
-    document = models.ForeignKey(Document)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     party_slug = models.CharField(max_length=500, blank=True, default='', db_index=True)
 
     class Meta:
@@ -271,7 +271,7 @@ class Submitter(models.Model):
 
 
 class Kamerantwoord(models.Model):
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     vraagnummer = models.CharField(max_length=200, db_index=True)
 
     @cached_property
@@ -298,10 +298,10 @@ class Kamerantwoord(models.Model):
 
 
 class Kamervraag(models.Model):
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     vraagnummer = models.CharField(max_length=200, db_index=True)
     receiver = models.CharField(max_length=1000)
-    kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True)
+    kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-document__date_published']
@@ -347,7 +347,7 @@ class Kamervraag(models.Model):
 
 class Vraag(models.Model):
     nr = models.IntegerField(db_index=True)
-    kamervraag = models.ForeignKey(Kamervraag)
+    kamervraag = models.ForeignKey(Kamervraag, on_delete=models.CASCADE)
     text = models.CharField(max_length=50000)
 
     class Meta:
@@ -365,7 +365,7 @@ class Vraag(models.Model):
 
 class Antwoord(models.Model):
     nr = models.IntegerField(db_index=True)
-    kamerantwoord = models.ForeignKey(Kamerantwoord)
+    kamerantwoord = models.ForeignKey(Kamerantwoord, on_delete=models.CASCADE)
     text = models.CharField(max_length=50000)
     see_answer_nr = models.IntegerField(null=True, blank=False)
 
@@ -377,7 +377,7 @@ class Antwoord(models.Model):
 
 
 class FootNote(models.Model):
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     nr = models.IntegerField(db_index=True)
     text = models.CharField(max_length=10000, blank=True, default='')
     url = models.URLField(max_length=1000, blank=True, default='')
@@ -387,9 +387,9 @@ class FootNote(models.Model):
 
 
 class KamervraagMededeling(models.Model):
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     vraagnummer = models.CharField(max_length=200, db_index=True)
-    kamervraag = models.ForeignKey(Kamervraag, null=True, blank=True)
+    kamervraag = models.ForeignKey(Kamervraag, null=True, blank=True, on_delete=models.CASCADE)
     text = models.TextField()
 
 
@@ -407,7 +407,7 @@ class Kamerstuk(models.Model):
         (VERSLAG, VERSLAG), (NOTA, NOTA), (BRIEF, BRIEF),  (VERSLAG_AO, 'Verslag van een algemeen overleg'),
         (UNKNOWN, UNKNOWN)
     )
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     id_main = models.CharField(max_length=40, blank=True, db_index=True)  # dossier vetnummer/ID
     id_main_extra = models.CharField(max_length=40, blank=True, db_index=True)
     id_sub = models.CharField(max_length=40, blank=True, db_index=True)  # kamerstuk ondernummer
@@ -497,7 +497,7 @@ class Kamerstuk(models.Model):
 
 
 class Agenda(models.Model):
-    document = models.ForeignKey(Document)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
     agenda_id = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
@@ -505,8 +505,8 @@ class Agenda(models.Model):
 
 
 class AgendaItem(models.Model):
-    agenda = models.ForeignKey(Agenda)
-    dossier = models.ForeignKey(Dossier, null=True)
+    agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE)
+    dossier = models.ForeignKey(Dossier, null=True, on_delete=models.CASCADE)
     item_text = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
@@ -524,8 +524,8 @@ class Voting(models.Model):
         (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
         (AANGEHOUDEN, 'Aangehouden'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
-    dossier = models.ForeignKey(Dossier)
-    kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True)
+    dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE)
+    kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True, on_delete=models.CASCADE)
     kamerstuk_raw_id = models.CharField(max_length=200, blank=True, default='')
     is_dossier_voting = models.BooleanField(default=False)
     is_individual = models.BooleanField(default=False)
@@ -632,7 +632,7 @@ class Vote(models.Model):
         (FOR, 'For'), (AGAINST, 'Against'), (NONE, 'None')
     )
 
-    voting = models.ForeignKey(Voting)
+    voting = models.ForeignKey(Voting, on_delete=models.CASCADE)
     number_of_seats = models.IntegerField()
     decision = models.CharField(max_length=2, choices=CHOICES)
     details = models.CharField(max_length=200, blank=True, null=False, default='')
@@ -704,7 +704,7 @@ class BesluitenLijst(models.Model):
 
 class BesluitItem(models.Model):
     title = models.CharField(max_length=4000)
-    besluiten_lijst = models.ForeignKey(BesluitenLijst)
+    besluiten_lijst = models.ForeignKey(BesluitenLijst, on_delete=models.CASCADE)
 
     def cases(self):
         return BesluitItemCase.objects.filter(besluit_item=self)
@@ -712,7 +712,7 @@ class BesluitItem(models.Model):
 
 class BesluitItemCase(models.Model):
     title = models.CharField(max_length=2000)
-    besluit_item = models.ForeignKey(BesluitItem)
+    besluit_item = models.ForeignKey(BesluitItem, on_delete=models.CASCADE)
     decisions = models.CharField(max_length=7000)
     notes = models.CharField(max_length=5000)
     related_commissions = models.CharField(max_length=1000)
@@ -751,6 +751,6 @@ class BesluitItemCase(models.Model):
 
 
 class CommissieDocument(models.Model):
-    document = models.ForeignKey(Document, null=False)
-    kamerstuk = models.ForeignKey(Kamerstuk, null=False)
-    commissie = models.ForeignKey(Commissie, null=False)
+    document = models.ForeignKey(Document, null=False, on_delete=models.CASCADE)
+    kamerstuk = models.ForeignKey(Kamerstuk, null=False, on_delete=models.CASCADE)
+    commissie = models.ForeignKey(Commissie, null=False, on_delete=models.CASCADE)

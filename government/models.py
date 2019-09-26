@@ -82,7 +82,7 @@ class Government(models.Model):
 
 class Ministry(models.Model):
     name = models.CharField(max_length=200)
-    government = models.ForeignKey(Government)
+    government = models.ForeignKey(Government, on_delete=models.CASCADE)
 
     def positions(self):
         return GovernmentPosition.objects.filter(ministry=self).order_by('position')
@@ -112,8 +112,8 @@ class GovernmentPosition(models.Model):
         (DEPUTY_PRIME_MINISTER, 'Viceminister-president'),
     )
     position = models.CharField(max_length=3, choices=GOVERNMENT_POSITIONS, db_index=True)
-    ministry = models.ForeignKey(Ministry, blank=True, null=True)
-    government = models.ForeignKey(Government, blank=True, null=True)
+    ministry = models.ForeignKey(Ministry, blank=True, null=True, on_delete=models.CASCADE)
+    government = models.ForeignKey(Government, blank=True, null=True, on_delete=models.CASCADE)
     extra_info = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
@@ -165,8 +165,8 @@ class GovernmentPosition(models.Model):
 
 
 class GovernmentMember(models.Model):
-    person = models.ForeignKey(Person)
-    position = models.ForeignKey(GovernmentPosition)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    position = models.ForeignKey(GovernmentPosition, on_delete=models.CASCADE)
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
 

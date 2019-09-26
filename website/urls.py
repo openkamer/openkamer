@@ -142,7 +142,7 @@ urlpatterns = [
     url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
 
     url(r'^api/', include(website.api)),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     url(r'^google9b15c66ff83a61ed.html$', TemplateView.as_view(template_name="website/google9b15c66ff83a61ed.html")),
     url(r'^privacy/english/$', TemplateView.as_view(template_name="website/privacy_policy_english.html")),

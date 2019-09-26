@@ -42,8 +42,8 @@ class Parliament(models.Model):
 
 
 class ParliamentMember(models.Model):
-    person = models.ForeignKey(Person)
-    parliament = models.ForeignKey(Parliament)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    parliament = models.ForeignKey(Parliament, on_delete=models.CASCADE)
     joined = models.DateField(blank=True, null=True, db_index=True)
     left = models.DateField(blank=True, null=True, db_index=True)
 
@@ -209,7 +209,7 @@ class PoliticalParty(models.Model):
         if not self.wikidata_id:
             self.wikidata_id = self.find_wikidata_id(language)
             if not self.wikidata_id:
-                logger.warn('no wikidata_id found for {}'.format(self.name))
+                logger.warning('no wikidata_id found for {}'.format(self.name))
                 return
         wikidata_item = wikidata.WikidataItem(self.wikidata_id)
         self.official_website_url = wikidata_item.get_official_website()
@@ -248,8 +248,8 @@ class PoliticalParty(models.Model):
 
 
 class PartyMember(models.Model):
-    person = models.ForeignKey(Person, related_name='partymember')
-    party = models.ForeignKey(PoliticalParty)
+    person = models.ForeignKey(Person, related_name='partymember', on_delete=models.CASCADE)
+    party = models.ForeignKey(PoliticalParty, on_delete=models.CASCADE)
     joined = models.DateField(blank=True, null=True, db_index=True)
     left = models.DateField(blank=True, null=True, db_index=True)
 

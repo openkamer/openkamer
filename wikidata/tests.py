@@ -60,7 +60,7 @@ class TestPositionHeld(TestCase):
         self.assertEqual(len(positions), 6)
         item = wikidata.WikidataItem(self.wikidata_id_wa)
         positions = item.get_positions_held()
-        self.assertEqual(len(positions), 1)
+        self.assertEqual(len(positions), 2)
 
     def test_search_parliament_member(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
@@ -90,7 +90,7 @@ class TestFindPoliticalParty(TestCase):
         self.assertEqual(label, 'GroenLinks')
 
     def test_search_vvd(self):
-        wikidata_id = wikidata.search_political_party_id('VgetVD', language='nl')
+        wikidata_id = wikidata.search_political_party_id('VVD', language='nl')
         item = wikidata.WikidataItem(wikidata_id)
         label = item.get_label(language='nl')
         self.assertEqual(label, 'Volkspartij voor Vrijheid en Democratie')

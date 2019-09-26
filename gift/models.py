@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class PersonPosition(models.Model):
-    person = models.ForeignKey(Person)
-    party = models.ForeignKey(PoliticalParty, null=True, blank=True)
-    parliament_member = models.ForeignKey(ParliamentMember, null=True, blank=True)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    party = models.ForeignKey(PoliticalParty, null=True, blank=True, on_delete=models.CASCADE)
+    parliament_member = models.ForeignKey(ParliamentMember, null=True, blank=True, on_delete=models.CASCADE)
     date = models.DateField()
 
     class Meta:
@@ -40,8 +40,8 @@ class Gift(models.Model):
         (BLOEMEN, 'Bloemen'), (PAKKET, 'Pakket'), (KLEDING, 'Kleding'), (DINER, 'Diner'),
         (ONBEKEND, 'Onbekend')
     )
-    person = models.ForeignKey(Person)
-    person_position = models.ForeignKey(PersonPosition)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    person_position = models.ForeignKey(PersonPosition, on_delete=models.CASCADE)
     description = models.CharField(max_length=1000, default='', blank=True)
     date = models.DateField(null=True, blank=True)
     value_euro = models.FloatField(null=True, blank=True)

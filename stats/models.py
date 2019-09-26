@@ -52,9 +52,9 @@ class PartyVoteBehaviour(models.Model):
         (BILL, 'Wetsvoorstel'),
         (OTHER, 'Overig (Motie, Amendement)')
     )
-    party = models.ForeignKey(PoliticalParty)
-    submitter = models.ForeignKey(PoliticalParty, related_name='party_vote_behaviour_submitter', blank=True, null=True)
-    government = models.ForeignKey(Government)
+    party = models.ForeignKey(PoliticalParty, on_delete=models.CASCADE)
+    submitter = models.ForeignKey(PoliticalParty, related_name='party_vote_behaviour_submitter', blank=True, null=True, on_delete=models.CASCADE)
+    government = models.ForeignKey(Government, on_delete=models.CASCADE)
     voting_type = models.CharField(max_length=5, choices=VOTING_TYPE_CHOICES)
     votes_for = models.IntegerField()
     votes_against = models.IntegerField()
@@ -221,9 +221,9 @@ class PartyVoteBehaviour(models.Model):
 
 
 class StatsVotingSubmitter(models.Model):
-    voting = models.ForeignKey(Voting)
-    person = models.ForeignKey(Person)
-    party = models.ForeignKey(PoliticalParty, blank=True, null=True)
+    voting = models.ForeignKey(Voting, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    party = models.ForeignKey(PoliticalParty, blank=True, null=True, on_delete=models.CASCADE)
 
     @staticmethod
     @transaction.atomic
@@ -243,7 +243,7 @@ class StatsVotingSubmitter(models.Model):
 
 class SeatsPerParty(models.Model):
     date = models.DateField()
-    party = models.ForeignKey(PoliticalParty)
+    party = models.ForeignKey(PoliticalParty, on_delete=models.CASCADE)
     seats = models.IntegerField(default=0)
     datetime_updated = models.DateTimeField(auto_now=True)
 
