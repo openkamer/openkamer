@@ -186,16 +186,6 @@ class Dossier(models.Model):
         response = requests.get(url, timeout=60)
         return response.content.decode('utf-8').splitlines()
 
-    @classmethod
-    def get_dossier_ids(cls):
-        if hasattr(cls, 'dossier_ids'):
-            return cls.dossier_ids
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/wetsvoorstellen/wetsvoorstellen_dossier_ids.txt')
-        cls.dossier_ids = []
-        for line in lines:
-            cls.dossier_ids.append(line.strip())
-        return cls.dossier_ids
-
 
 class Document(models.Model):
     dossier = models.ForeignKey(Dossier, blank=True, null=True)

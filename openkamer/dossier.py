@@ -13,6 +13,7 @@ from tkapi.activiteit import ActiviteitStatus
 
 import scraper.documents
 
+from document.create import get_dossier_ids
 from document.models import CategoryDossier
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -177,7 +178,7 @@ def get_inactive_dossier_ids():
 
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    dossier_ids = Dossier.get_dossier_ids()
+    dossier_ids = get_dossier_ids()
     dossier_ids_inactive = get_inactive_dossier_ids()
     dossier_ids_active = []
     for dossier_id in dossier_ids:
@@ -201,7 +202,7 @@ def create_wetsvoorstellen_inactive(skip_existing=False, max_tries=3):
 
 def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    dossier_ids = Dossier.get_dossier_ids()
+    dossier_ids = get_dossier_ids()
     dossier_ids.reverse()
     failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')

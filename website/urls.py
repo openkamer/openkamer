@@ -12,7 +12,6 @@ from document.views import PersonAutocomplete
 from document.views import PartyAutocomplete
 from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DocumentSearchView
-from document.views import DossiersCheckView
 from document.views import DossiersView
 from document.views import DossiersTableView
 from document.views import DossierView
@@ -141,7 +140,6 @@ urlpatterns = [
     url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
     url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
     url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
-    url(r'^dossiers/check/$', DossiersCheckView.as_view(), name='dossiers-check'),
 
     url(r'^api/', include(website.api)),
     url(r'^admin/', include(admin.site.urls)),

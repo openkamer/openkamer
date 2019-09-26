@@ -2,6 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from document.create import get_dossier_ids
 from document.models import Dossier
 
 logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        dossier_ids = Dossier.get_dossier_ids()
+        dossier_ids = get_dossier_ids()
         if len(dossier_ids) < 1500:
             logger.error('Less than 1500 dossiers found, something wrong, abort!')
             return

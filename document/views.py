@@ -337,16 +337,6 @@ class BesluitenLijstView(TemplateView):
         return context
 
 
-class DossiersCheckView(TemplateView):
-    template_name = 'document/dossiers_check.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        wetsvoorstel_ids = Dossier.get_dossier_ids()
-        context['dossiers_no_wetsvoorstel'] = Dossier.objects.exclude(dossier_id__in=wetsvoorstel_ids)
-        return context
-
-
 class VotingsCheckView(TemplateView):
     template_name = 'document/votings_check.html'
 
