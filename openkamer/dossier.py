@@ -9,6 +9,7 @@ from django.db import transaction
 
 from tkapi import Api
 from tkapi.zaak import Zaak
+from tkapi.activiteit import ActiviteitStatus
 
 import scraper.documents
 
@@ -183,6 +184,7 @@ def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
         if dossier_id not in dossier_ids_inactive:
             dossier_ids_active.append(dossier_id)
     dossier_ids_active.reverse()
+    logger.info('dossiers active: {}'.format(dossier_ids_active))
     failed_dossiers = create_wetsvoorstellen(dossier_ids_active, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
@@ -218,8 +220,7 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
             create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=max_tries)
         except Exception as error:
             failed_dossiers.append(dossier_id)
-            logger.error('error for dossier id: ' + str(dossier_id))
-            logger.error(error)
+            logger.exception('error for dossier id: ' + str(dossier_id))
     logger.info('END')
     return failed_dossiers
 
@@ -230,6 +231,9 @@ def get_besluit_last(dossier_id):
         return None
     last_besluit = None
     for besluit in zaak.besluiten:
+        if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
+            # TODO: create dossier agendapunt with planned activiteit
+            continue
         if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
             last_besluit = besluit
     # if last_besluit:
