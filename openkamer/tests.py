@@ -455,6 +455,29 @@ class TestVoting(TestCase):
         return besluit
 
 
+class TestDossierBesluit(TestCase):
+    DOSSIER_ID = 34792
+
+    def test_get_dossier_zaken(self):
+        zaken = openkamer.dossier.get_zaken_dossier_main(dossier_id=self.DOSSIER_ID)
+        self.assertEqual(1, len(zaken))
+
+    def test_get_dossier_besluiten(self):
+        besluiten = openkamer.dossier.get_besluiten_dossier_main(dossier_id=self.DOSSIER_ID)
+        # print('{} besluiten found'.format(len(besluiten)))
+        # for index, besluit in enumerate(besluiten):
+        #     print('{} | {} | {} besluit stemmingen'.format(index, besluit.tekst, len(besluit.stemmingen)))
+        self.assertEqual(7, len(besluiten))
+
+    def test_get_last_besluit(self):
+        besluit = openkamer.dossier.get_besluit_last(dossier_id=self.DOSSIER_ID)
+        self.assertEqual(0, len(besluit.stemmingen))
+
+    def test_get_last_besluit_with_voting(self):
+        besluit = openkamer.dossier.get_besluit_last_with_voting(dossier_id=self.DOSSIER_ID)
+        self.assertEqual(13, len(besluit.stemmingen))
+
+
 class TestGifts(TestCase):
 
     def test_create_gifts(self):

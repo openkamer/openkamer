@@ -2,7 +2,6 @@ import datetime
 import logging
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
 from django.http import Http404
 from django.urls import reverse
 from django.views.generic import TemplateView
@@ -24,10 +23,8 @@ from document.models import Document, Kamerstuk
 from document.models import CommissieDocument
 from document.models import Dossier
 from document.models import Kamervraag
-from document.models import Antwoord
 from document.models import Submitter
 from document.models import Voting
-from document.models import VoteParty
 from document.filters import DossierFilter
 from document.filters import KamervraagFilter
 from document.filters import VotingFilter
@@ -35,7 +32,6 @@ from document import settings
 
 
 # TODO: remove dependency on website
-from openkamer.dossier import create_or_update_dossier
 from website.facet import Facet, FacetItem
 
 logger = logging.getLogger(__name__)

@@ -1,14 +1,17 @@
 import logging
-import time
 import multiprocessing as mp
 from multiprocessing.pool import ThreadPool
+import time
+from typing import List
 
 from requests.exceptions import ConnectionError, ConnectTimeout
 
 from django.db import transaction
 
 from tkapi import Api
+from tkapi.besluit import Besluit
 from tkapi.zaak import Zaak
+from tkapi.zaak import ZaakSoort
 from tkapi.activiteit import ActiviteitStatus
 
 import scraper.documents
@@ -18,7 +21,6 @@ from document.models import CategoryDossier
 from document.models import Dossier
 from document.models import Kamerstuk
 
-from openkamer.agenda import create_agenda
 from openkamer.document import update_document_html_links
 from openkamer.document import DocumentFactory
 from openkamer.document import DocumentData
@@ -49,9 +51,16 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 @transaction.atomic
 def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
-    Dossier.objects.filter(dossier_id=dossier_id).delete()
+    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+    logger.info('dossiers: {}'.format(len(dossiers)))
+    dossiers[0].delete()
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
-    last_besluit = get_besluit_last(dossier_id)
+
+    # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example
+    last_besluit = get_besluit_last_with_voting(dossier_id)
+    if not last_besluit:
+        last_besluit = get_besluit_last(dossier_id)
+
     decision = 'Onbekend'
     if last_besluit:
         decision = last_besluit.tekst.replace('.', '')
@@ -226,33 +235,41 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
     return failed_dossiers
 
 
-def get_besluit_last(dossier_id):
-    zaak = get_zaak_dossier_main(dossier_id)
-    if zaak is None:
-        return None
+def get_besluiten_dossier_main(dossier_id) -> List[Besluit]:
+    zaken = get_zaken_dossier_main(dossier_id)
+    besluiten = []
+    for zaak in zaken:
+        besluiten += zaak.besluiten
+    return besluiten
+
+
+def get_besluit_last(dossier_id, filter_has_votings=False) -> Besluit:
+    besluiten = get_besluiten_dossier_main(dossier_id=dossier_id)
     last_besluit = None
-    for besluit in zaak.besluiten:
+    for besluit in besluiten:
+        if filter_has_votings and not besluit.stemmingen:
+            continue
         if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
             # TODO: create dossier agendapunt with planned activiteit
             continue
         if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
             last_besluit = besluit
-    # if last_besluit:
-    #     print(last_besluit.soort, last_besluit.slottekst, last_besluit.agendapunt.activiteit.begin)
     return last_besluit
 
 
-def get_zaak_dossier_main(dossier_id):
-    # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi make that possible
+def get_besluit_last_with_voting(dossier_id) -> Besluit:
+    return get_besluit_last(dossier_id=dossier_id, filter_has_votings=True)
+
+
+def get_zaken_dossier_main(dossier_id) -> List[Zaak]:
+    # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi makes it possible
     filter = Zaak.create_filter()
     filter.filter_kamerstukdossier(nummer=dossier_id)
-    filter.filter_soort('Wetgeving')
+    filter.filter_soort(ZaakSoort.WETGEVING)
     zaken = Api().get_zaken(filter=filter)
     if not zaken:
         filter = Zaak.create_filter()
         filter.filter_kamerstukdossier(nummer=dossier_id)
-        filter.filter_soort('Initiatiefwetgeving')
+        filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING)
         zaken = Api().get_zaken(filter=filter)
-    if zaken:
-        return zaken[0]
-    return None
+    return zaken
