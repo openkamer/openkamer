@@ -1,7 +1,5 @@
 import logging
 
-from orderedset import OrderedSet
-
 from tkapi import Api
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
@@ -26,4 +24,4 @@ def get_dossier_ids():
             continue
         logger.info('dossier id: {}'.format(dossier_id))
         dossier_ids.add(dossier_id)
-    return OrderedSet(sorted(dossier_ids))
+    return sorted(list(dossier_ids))

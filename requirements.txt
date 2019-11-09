@@ -1,6 +1,6 @@
 requests==2.20.0
-django==2.2.5
-dateparser==0.7.1
+django==2.2.7
+dateparser==0.7.2
 django-autocomplete-light==3.4.1
 django-bootstrap-pagination==1.7.1
 django-bootstrap3==11.1.0
@@ -14,12 +14,11 @@ gitpython==2.1.11
 lxml==4.4.1
 pillow==6.2.0
 plotly==4.1.1
-psycopg2-binary==2.8.3
-pysolr==3.6.0
+psycopg2-binary==2.8.4
+pysolr==3.8.1
 python-twitter==3.4.2
 scipy==1.3.1
 unidecode==1.1.1
-tkapi==0.8.0
+tkapi==0.8.1
 pdfminer.six==20170720
-orderedset
 django-debug-toolbar
