@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 @transaction.atomic
 def create_travels(max_items=None):
     travels = Api.get_items(PersoonReis, max_items=max_items)
+    logger.info('{} travels found.'.format(len(travels)))
     if len(travels) < 1000:
-        logger.error('Only {} gifts found. This is unexpected. Skip re-creating gifts.'.format(len(travels)))
+        logger.error('Only {} travels found. This is unexpected. Skip re-creating travels.'.format(len(travels)))
     Travel.objects.all().delete()
     TravelPersonPosition.objects.all().delete()
     for travel in travels:
