@@ -377,6 +377,14 @@ class TestKamervraag(TestCase):
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
 
+    def test_get_kamervragen_info(self):
+        year = 2016
+        month = 1
+        begin_datetime = datetime.datetime(year=year, month=month, day=1)
+        end_datetime = datetime.datetime(year=year + 1, month=month, day=1)
+        infos = openkamer.kamervraag.get_tk_kamervragen(begin_datetime, end_datetime)
+        self.assertEqual(len(infos), 2624)
+
 
 class TestKamerantwoord(TestCase):
 

@@ -15,5 +15,4 @@ class Command(BaseCommand):
         year = options['year'][0]
         max_n = options['max']
         openkamer.kamervraag.create_kamervragen(year, max_n, skip_if_exists=True)
-        openkamer.kamervraag.create_antwoorden(year, max_n, skip_if_exists=True)
-        openkamer.kamervraag.link_kamervragen_and_antwoorden()
+        # openkamer.kamervraag.link_kamervragen_and_antwoorden()
