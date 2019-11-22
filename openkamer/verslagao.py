@@ -1,9 +1,12 @@
 import logging
 import re
-import csv
-import requests
+import datetime
+from typing import List
 
 from django.db import transaction
+
+import tkapi
+import tkapi.document
 
 from document.models import Kamerstuk
 from document.models import CommissieDocument
@@ -16,32 +19,42 @@ logger = logging.getLogger(__name__)
 
 def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
     logger.info('BEGIN')
-    infos = get_verlag_algemeen_overleg_infos(year)
+    begin_datetime = datetime.datetime(year=year, month=1, day=1)
+    end_datetime = datetime.datetime(year=year+1, month=1, day=1)
+    tk_verslagen = get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime)
     counter = 1
-    for info in infos:
+    for tk_verslag in tk_verslagen:
         try:
-            dossier_id = str(info['dossier_id'])
-            dossier_id_extra = str(info['dossier_extra_id'])
-            name = info['commissie_name'].strip()
-            logger.info('commissie name: {}'.format(name))
-            name_short = Commissie.create_short_name(name)
-            slug = Commissie.create_slug(name_short)
-            commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
-            commissie_document = create_verslag(
-                overheidnl_document_id=info['document_url'].replace('https://zoek.officielebekendmakingen.nl/', ''),
-                dossier_id=dossier_id,
-                dossier_id_extra=dossier_id_extra,
-                kamerstuk_nr=info['kamerstuk_nr'],
-                commissie=commissie,
-                skip_if_exists=skip_if_exists,
-            )
+            create_verslag_ao(tk_verslag, skip_if_exists=skip_if_exists)
         except Exception as error:
-            logger.error('error for kamervraag id: ' + str(info['document_url']))
+            logger.error('error for kamervraag id: {}'.format(tk_verslag.document_url))
             logger.exception(error)
         if max_n and counter >= max_n:
             return
         counter += 1
     logger.info('END')
+
+
+def create_verslag_ao(tk_verslag, skip_if_exists=False):
+    dossier = tk_verslag.dossiers[0]
+    dossier_id = str(dossier.nummer)
+    dossier_id_extra = ''
+    if dossier.toevoeging:
+        dossier_id_extra = str(dossier.toevoeging)
+    name = tk_verslag.voortouwcommissie_namen[0] if tk_verslag.voortouwcommissie_namen else ''
+    logger.info('commissie name: {}'.format(name))
+    name_short = Commissie.create_short_name(name)
+    slug = Commissie.create_slug(name_short)
+    commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
+    commissie_document = create_verslag(
+        overheidnl_document_id=tk_verslag.document_url.replace('https://zoek.officielebekendmakingen.nl/', ''),
+        dossier_id=dossier_id,
+        dossier_id_extra=dossier_id_extra,
+        kamerstuk_nr=tk_verslag.volgnummer,
+        commissie=commissie,
+        skip_if_exists=skip_if_exists,
+    )
+    return commissie_document
 
 
 @transaction.atomic
@@ -78,24 +91,8 @@ def upperfirst(x):
     return x[0].upper() + x[1:]
 
 
-def get_verlag_algemeen_overleg_infos(year):
-    url = 'https://raw.githubusercontent.com/openkamer/ok-tk-data/master/verslagen/verslagen_algemeen_overleg_{}.csv'.format(year)
-    response = requests.get(url, timeout=60)
-    rows = response.content.decode('utf-8').splitlines()
-    rows = csv.reader(rows)
-    next(rows, None)  # skip table headers
-    verslagen_info = []
-    for colums in rows:
-        if colums[4] == '':  # no document url
-            continue
-        info = {
-            'date_published': colums[0],
-            'dossier_id': colums[1],
-            'dossier_extra_id': colums[2],
-            'kamerstuk_nr': colums[3],
-            'document_url': str(colums[4]),
-            'commissie_name': str(colums[5]),
-        }
-        logger.info('verslag info: {}'.format(info))
-        verslagen_info.append(info)
-    return verslagen_info
+def get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime) -> List[tkapi.document.VerslagAlgemeenOverleg]:
+    pd_filter = tkapi.document.Document.create_filter()
+    pd_filter.filter_date_range(begin_datetime, end_datetime)
+    tk_verslagen = tkapi.Api().get_verslagen_van_algemeen_overleg(pd_filter)
+    return tk_verslagen

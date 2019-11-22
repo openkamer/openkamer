@@ -562,7 +562,7 @@ class VerslagenAlgemeenOverlegView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        verslagen_all = CommissieDocument.objects.all()
+        verslagen_all = CommissieDocument.objects.order_by('-document__date_published').all()
         paginator = Paginator(verslagen_all, settings.DOSSIERS_PER_PAGE)
         page = self.request.GET.get('page')
         try:
