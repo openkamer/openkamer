@@ -142,40 +142,6 @@ def get_receiver_from_title(title_full):
 
 
 @transaction.atomic
-def link_kamervragen_and_antwoorden():
-    logger.info('BEGIN')
-    from django.db.utils import IntegrityError
-    kamerantwoorden = Kamerantwoord.objects.all()
-    for kamerantwoord in kamerantwoorden:
-        kamervragen = Kamervraag.objects.filter(vraagnummer=kamerantwoord.vraagnummer)
-        if kamervragen:
-            kamervraag = kamervragen[0]
-            try:
-                with transaction.atomic():
-                    kamervraag.kamerantwoord = kamerantwoord
-                    kamervraag.save()
-            except IntegrityError as error:
-                logger.error('kamervraag: ' + str(kamervraag.id))
-                logger.error('kamerantwoord: ' + str(kamerantwoord.id))
-                logger.exception(error)
-
-    mededelingen = KamervraagMededeling.objects.all()
-    for mededeling in mededelingen:
-        kamervragen = Kamervraag.objects.filter(vraagnummer=mededeling.vraagnummer)
-        if kamervragen:
-            kamervraag = kamervragen[0]
-            try:
-                with transaction.atomic():
-                    mededeling.kamervraag = kamervraag
-                    mededeling.save()
-            except IntegrityError as error:
-                logger.error('mededeling: ' + str(mededeling.id))
-                logger.error('kamervraag: ' + str(kamervraag.id))
-                logger.exception(error)
-    logger.info('END')
-
-
-@transaction.atomic
 def create_vragen_from_kamervraag_html(kamervraag):
     logger.info('BEGIN')
     Vraag.objects.filter(kamervraag=kamervraag).delete()

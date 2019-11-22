@@ -7,6 +7,7 @@ import stats.models
 import openkamer.besluitenlijst
 import openkamer.dossier
 import openkamer.parliament
+import openkamer.kamervraag
 
 logger = logging.getLogger(__name__)
 
@@ -29,4 +30,5 @@ class Command(BaseCommand):
         failed_dossiers = openkamer.dossier.create_wetsvoorstellen_all(options['skip-existing'])
         if failed_dossiers:
             logger.error('the following dossiers failed: ' + str(failed_dossiers))
+        openkamer.kamervraag.create_kamervragen(year=2019)
         stats.models.update_all()

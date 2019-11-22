@@ -143,10 +143,9 @@ class UpdateKamervragenRecent(LockJob):
 
     def do_imp(self):
         logger.info('update kamervragen and kamerantwoorden')
-        years = years_from_str_list(2018)
+        years = years_from_str_list(2019)
         for year in years:
             openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
-            # openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
 class UpdateKamervragenAll(LockJob):
@@ -159,7 +158,6 @@ class UpdateKamervragenAll(LockJob):
         years = years_from_str_list(2010)
         for year in years:
             openkamer.kamervraag.create_kamervragen(year, skip_if_exists=False)
-            # openkamer.kamervraag.link_kamervragen_and_antwoorden()
 
 
 class UpdateSubmitters(LockJob):
