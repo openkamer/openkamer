@@ -25,24 +25,7 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
     counter = 1
     for tk_verslag in tk_verslagen:
         try:
-            dossier = tk_verslag.dossiers[0]
-            dossier_id = str(dossier.nummer)
-            dossier_id_extra = ''
-            if dossier.toevoeging:
-                dossier_id_extra = str(dossier.toevoeging)
-            name = tk_verslag.voortouwcommissie_namen[0] if tk_verslag.voortouwcommissie_namen else ''
-            logger.info('commissie name: {}'.format(name))
-            name_short = Commissie.create_short_name(name)
-            slug = Commissie.create_slug(name_short)
-            commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
-            commissie_document = create_verslag(
-                overheidnl_document_id=tk_verslag.document_url.replace('https://zoek.officielebekendmakingen.nl/', ''),
-                dossier_id=dossier_id,
-                dossier_id_extra=dossier_id_extra,
-                kamerstuk_nr=tk_verslag.volgnummer,
-                commissie=commissie,
-                skip_if_exists=skip_if_exists,
-            )
+            create_verslag_ao(tk_verslag, skip_if_exists=skip_if_exists)
         except Exception as error:
             logger.error('error for kamervraag id: {}'.format(tk_verslag.document_url))
             logger.exception(error)
@@ -50,6 +33,28 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
             return
         counter += 1
     logger.info('END')
+
+
+def create_verslag_ao(tk_verslag, skip_if_exists=False):
+    dossier = tk_verslag.dossiers[0]
+    dossier_id = str(dossier.nummer)
+    dossier_id_extra = ''
+    if dossier.toevoeging:
+        dossier_id_extra = str(dossier.toevoeging)
+    name = tk_verslag.voortouwcommissie_namen[0] if tk_verslag.voortouwcommissie_namen else ''
+    logger.info('commissie name: {}'.format(name))
+    name_short = Commissie.create_short_name(name)
+    slug = Commissie.create_slug(name_short)
+    commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
+    commissie_document = create_verslag(
+        overheidnl_document_id=tk_verslag.document_url.replace('https://zoek.officielebekendmakingen.nl/', ''),
+        dossier_id=dossier_id,
+        dossier_id_extra=dossier_id_extra,
+        kamerstuk_nr=tk_verslag.volgnummer,
+        commissie=commissie,
+        skip_if_exists=skip_if_exists,
+    )
+    return commissie_document
 
 
 @transaction.atomic
