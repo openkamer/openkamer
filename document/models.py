@@ -278,24 +278,6 @@ class Kamerantwoord(models.Model):
     def antwoorden(self):
         return self.antwoord_set.all()
 
-    @classmethod
-    def get_antwoorden_info(cls, year):
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/antwoorden_' + str(year) + '.csv')
-        lines.pop(0)  # remove table headers
-        cls.antwoorden_info = []
-        for line in lines:
-            colums = line.split(',')
-            info = {
-                'datum': colums[0],
-                'document_number': colums[1],
-                'overheidnl_document_id': colums[2].replace('https://zoek.officielebekendmakingen.nl/', ''),
-                'document_url': colums[2],
-            }
-            if colums[2] == '':  # no document url
-                continue
-            cls.antwoorden_info.append(info)
-        return cls.antwoorden_info
-
 
 class Kamervraag(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
@@ -325,24 +307,6 @@ class Kamervraag(models.Model):
         if not self.kamerantwoord:
             return (datetime.date.today() - self.document.date_published).days
         return (self.kamerantwoord.document.date_published - self.document.date_published).days
-
-    @classmethod
-    def get_kamervragen_info(cls, year):
-        lines = Dossier.get_lines_from_url('https://raw.githubusercontent.com/openkamer/ok-tk-data/master/kamervragen/kamervragen_' + str(year) + '.csv')
-        lines.pop(0)  # remove table headers
-        cls.kamervragen_info = []
-        for line in lines:
-            colums = line.split(',')
-            info = {
-                'datum': colums[0],
-                'document_number': colums[1],
-                'overheidnl_document_id': colums[2].replace('https://zoek.officielebekendmakingen.nl/', ''),
-                'document_url': colums[2],
-            }
-            if colums[2] == '':  # no document url
-                continue
-            cls.kamervragen_info.append(info)
-        return cls.kamervragen_info
 
 
 class Vraag(models.Model):

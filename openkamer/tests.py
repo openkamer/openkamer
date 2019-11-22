@@ -291,9 +291,13 @@ class TestCreateBesluitenLijst(TestCase):
 class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
-        infos = Kamervraag.get_kamervragen_info(2016)
+        year = 2016
+        begin_datetime = datetime.datetime(year=year, month=1, day=1)
+        end_datetime = datetime.datetime(year=year + 1, month=1, day=1)
+        tk_vragen = openkamer.kamervraag.get_tk_kamervragen(begin_datetime, end_datetime)
+        overheid_id = tk_vragen[0].document_url.replace('https://zoek.officielebekendmakingen.nl/', '')
         document_factory = DocumentFactory()
-        document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(infos[0]['overheidnl_document_id'])
+        document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheid_id)
         # print(metadata)
 
     def test_get_receiver_from_title(self):
@@ -376,6 +380,14 @@ class TestKamervraag(TestCase):
         kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id)
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
+
+    def test_get_tk_kamervragen(self):
+        year = 2016
+        month = 1
+        begin_datetime = datetime.datetime(year=year, month=month, day=1)
+        end_datetime = datetime.datetime(year=year + 1, month=month, day=1)
+        infos = openkamer.kamervraag.get_tk_kamervragen(begin_datetime, end_datetime)
+        self.assertEqual(len(infos), 2626)
 
 
 class TestKamerantwoord(TestCase):

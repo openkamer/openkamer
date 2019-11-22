@@ -1,8 +1,14 @@
 import logging
 import re
 import lxml
+import datetime
+from typing import List
 
 from django.db import transaction
+
+import tkapi
+import tkapi.document
+import tkapi.kamervraag
 
 from document.models import Kamervraag
 from document.models import Kamerantwoord
@@ -18,26 +24,38 @@ logger = logging.getLogger(__name__)
 
 def create_kamervragen(year, max_n=None, skip_if_exists=False):
     logger.info('BEGIN')
-    infos = Kamervraag.get_kamervragen_info(year)
+    year = int(year)
+    month = 1
+    begin_datetime = datetime.datetime(year=year, month=month, day=1)
+    end_datetime = datetime.datetime(year=year+1, month=month, day=1)
+    tk_kamervragen = get_tk_kamervragen(begin_datetime, end_datetime)
     counter = 1
     kamervragen = []
     kamerantwoorden = []
-    for info in infos:
+    for tk_vraag in tk_kamervragen:
         try:
-            kamervraag, related_document_overheid_ids = create_kamervraag(info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
+            overheid_id = tk_vraag.document_url.replace('https://zoek.officielebekendmakingen.nl/', '')
+            kamervraag, related_document_overheid_ids = create_kamervraag(overheid_id, skip_if_exists=skip_if_exists)
             if kamervraag is not None:
                 kamervragen.append(kamervraag)
                 kamerantwoord, mededelingen = create_related_kamervraag_documents(kamervraag, related_document_overheid_ids)
                 if kamerantwoord:
                     kamerantwoorden.append(kamerantwoord)
         except Exception as error:
-            logger.error('error for kamervraag id: ' + str(info['overheidnl_document_id']))
+            logger.error('error for kamervraag id: ' + str(overheid_id))
             logger.exception(error)
         if max_n and counter >= max_n:
             return kamervragen, kamerantwoorden
         counter += 1
     logger.info('END')
     return kamervragen, kamerantwoorden
+
+
+def get_tk_kamervragen(begin_datetime, end_datetime) -> List[tkapi.kamervraag.Kamervraag]:
+    kv_filter = tkapi.document.Document.create_filter()
+    kv_filter.filter_date_range(begin_datetime, end_datetime)
+    kamervragen = tkapi.Api().get_kamervragen(kv_filter)
+    return kamervragen
 
 
 def create_related_kamervraag_documents(kamervraag, overheid_document_ids):
@@ -53,23 +71,6 @@ def create_related_kamervraag_documents(kamervraag, overheid_document_ids):
             mededeling.save()
             mededelingen.append(mededeling)
     return kamerantwoord, mededelingen
-
-
-def create_antwoorden(year, max_n=None, skip_if_exists=False):
-    logger.info('BEGIN')
-    infos = Kamerantwoord.get_antwoorden_info(year)
-    counter = 1
-    for info in infos:
-        logger.info(info['overheidnl_document_id'])
-        try:
-            create_kamerantwoord(info['overheidnl_document_id'], skip_if_exists=skip_if_exists)
-        except Exception as error:
-            logger.error('error for kamerantwoord id: ' + str(info['overheidnl_document_id']))
-            logger.exception(error)
-        if max_n and counter >= max_n:
-            break
-        counter += 1
-    logger.info('END')
 
 
 def get_or_create_kamervraag(vraagnummer, document):
@@ -138,40 +139,6 @@ def get_receiver_from_title(title_full):
     if result:
         return result[0]
     return ''
-
-
-@transaction.atomic
-def link_kamervragen_and_antwoorden():
-    logger.info('BEGIN')
-    from django.db.utils import IntegrityError
-    kamerantwoorden = Kamerantwoord.objects.all()
-    for kamerantwoord in kamerantwoorden:
-        kamervragen = Kamervraag.objects.filter(vraagnummer=kamerantwoord.vraagnummer)
-        if kamervragen:
-            kamervraag = kamervragen[0]
-            try:
-                with transaction.atomic():
-                    kamervraag.kamerantwoord = kamerantwoord
-                    kamervraag.save()
-            except IntegrityError as error:
-                logger.error('kamervraag: ' + str(kamervraag.id))
-                logger.error('kamerantwoord: ' + str(kamerantwoord.id))
-                logger.exception(error)
-
-    mededelingen = KamervraagMededeling.objects.all()
-    for mededeling in mededelingen:
-        kamervragen = Kamervraag.objects.filter(vraagnummer=mededeling.vraagnummer)
-        if kamervragen:
-            kamervraag = kamervragen[0]
-            try:
-                with transaction.atomic():
-                    mededeling.kamervraag = kamervraag
-                    mededeling.save()
-            except IntegrityError as error:
-                logger.error('mededeling: ' + str(mededeling.id))
-                logger.error('kamervraag: ' + str(kamervraag.id))
-                logger.exception(error)
-    logger.info('END')
 
 
 @transaction.atomic
