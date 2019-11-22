@@ -51,9 +51,7 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 @transaction.atomic
 def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: ' + str(dossier_id))
-    dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-    logger.info('dossiers: {}'.format(len(dossiers)))
-    dossiers[0].delete()
+    Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
 
     # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example

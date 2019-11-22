@@ -57,7 +57,7 @@ class TestPositionHeld(TestCase):
     def test_search_all(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
         positions = item.get_positions_held()
-        self.assertEqual(len(positions), 6)
+        self.assertEqual(len(positions), 8)
         item = wikidata.WikidataItem(self.wikidata_id_wa)
         positions = item.get_positions_held()
         self.assertEqual(len(positions), 2)

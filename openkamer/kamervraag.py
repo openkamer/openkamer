@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 def create_kamervragen(year, max_n=None, skip_if_exists=False):
     logger.info('BEGIN')
+    year = int(year)
     month = 1
     begin_datetime = datetime.datetime(year=year, month=month, day=1)
     end_datetime = datetime.datetime(year=year+1, month=month, day=1)
