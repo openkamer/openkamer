@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
-    logger.info('BEGIN')
+    logger.info('BEGIN: {}'.format(year))
+    year = int(year)
     begin_datetime = datetime.datetime(year=year, month=1, day=1)
     end_datetime = datetime.datetime(year=year+1, month=1, day=1)
     tk_verslagen = get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime)
@@ -32,7 +33,7 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
         if max_n and counter >= max_n:
             return
         counter += 1
-    logger.info('END')
+    logger.info('END: {}'.format(year))
 
 
 def create_verslag_ao(tk_verslag, skip_if_exists=False):
