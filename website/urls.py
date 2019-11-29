@@ -87,16 +87,16 @@ urlpatterns = [
     url(r'^wetsvoorstellen/$', DossiersView.as_view(), name='wetsvoorstellen'),
     url(r'^wetsvoorstellen/tabel/$', DossiersTableView.as_view(), name='wetsvoorstellen-table'),
     url(r'^dossiers/$', RedirectView.as_view(url='/wetsvoorstellen/', permanent=False)),
-    url(r'^dossier/tiles/(?P<dossier_id>\d+)/$', DossierView.as_view(), name='dossier-tiles'),
-    url(r'^dossier/tijdlijn/(?P<dossier_id>\d+)/$', DossierTimelineView.as_view(), name='dossier-timeline'),
-    url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>\d+)/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),
+    url(r'^dossier/tiles/(?P<dossier_id>[\w{}.-]{1,40})/$', DossierView.as_view(), name='dossier-tiles'),
+    url(r'^dossier/tijdlijn/(?P<dossier_id>[\w{}.-]{1,40})/$', DossierTimelineView.as_view(), name='dossier-timeline'),
+    url(r'^dossier/tijdlijn/horizontal/(?P<dossier_id>[\w{}.-]{1,40})/$', DossierTimelineHorizontalView.as_view(), name='dossier-timeline-horizontal'),
     url(r'^dossier/timeline/horizontal/json/?', get_dossier_timeline_json),
 
     url(r'^agendas/$', AgendasView.as_view()),
     url(r'^agenda/(?P<agenda_id>.*)/$', AgendaView.as_view()),
 
-    url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
-    url(r'^kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
+    url(r'^kamerstuk/(?P<dossier_id>[\w{}.-]{1,40})/(?P<sub_id>0.*)/$', KamerstukRedirectView.as_view(permanent=True)),
+    url(r'^kamerstuk/(?P<dossier_id>[\w{}.-]{1,40})/(?P<sub_id>.*)/$', KamerstukView.as_view(), name='kamerstuk'),
     url(r'^kamerstuk/check/$', KamerstukCheckView.as_view(), name='kamerstuk-check'),
     url(r'^document/(?P<document_id>.*)/$', DocumentView.as_view(), name='document'),
 
@@ -114,8 +114,8 @@ urlpatterns = [
     url(r'^besluitenlijst/(?P<activity_id>.*)/$', BesluitenLijstView.as_view(), name='besluitenlijst'),
 
     url(r'^stemmingen/$', VotingsView.as_view(), name='votings'),
-    url(r'^stemming/dossier/(?P<dossier_id>\d+)/$', VotingView.as_view(), name='voting-dossier'),
-    url(r'^stemming/kamerstuk/(?P<dossier_id>\d+)/(?P<sub_id>.*)/$', VotingView.as_view(), name='voting-kamerstuk'),
+    url(r'^stemming/dossier/(?P<dossier_id>[\w{}.-]{1,40})/$', VotingView.as_view(), name='voting-dossier'),
+    url(r'^stemming/kamerstuk/(?P<dossier_id>[\w{}.-]{1,40})/(?P<sub_id>.*)/$', VotingView.as_view(), name='voting-kamerstuk'),
 
     url(r'^geschenken/$', gift.views.GiftsView.as_view(), name='gifts'),
     url(r'^reizen/$', travel.views.TravelsView.as_view(), name='travels'),

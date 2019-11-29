@@ -8,8 +8,9 @@ from django.db import transaction
 import tkapi
 import tkapi.document
 
-from document.models import Kamerstuk
 from document.models import CommissieDocument
+from document.models import Dossier
+from document.models import Kamerstuk
 from parliament.models import Commissie
 
 from openkamer.document import DocumentFactory
@@ -38,10 +39,7 @@ def create_verslagen_algemeen_overleg(year, max_n=None, skip_if_exists=False):
 
 def create_verslag_ao(tk_verslag, skip_if_exists=False):
     dossier = tk_verslag.dossiers[0]
-    dossier_id = str(dossier.nummer)
-    dossier_id_extra = ''
-    if dossier.toevoeging:
-        dossier_id_extra = str(dossier.toevoeging)
+    dossier_id = Dossier.create_dossier_id(dossier.nummer, dossier.toevoeging)
     name = tk_verslag.voortouwcommissie_namen[0] if tk_verslag.voortouwcommissie_namen else ''
     logger.info('commissie name: {}'.format(name))
     name_short = Commissie.create_short_name(name)
@@ -50,7 +48,6 @@ def create_verslag_ao(tk_verslag, skip_if_exists=False):
     commissie_document = create_verslag(
         overheidnl_document_id=tk_verslag.document_url.replace('https://zoek.officielebekendmakingen.nl/', ''),
         dossier_id=dossier_id,
-        dossier_id_extra=dossier_id_extra,
         kamerstuk_nr=tk_verslag.volgnummer,
         commissie=commissie,
         skip_if_exists=skip_if_exists,
@@ -59,7 +56,7 @@ def create_verslag_ao(tk_verslag, skip_if_exists=False):
 
 
 @transaction.atomic
-def create_verslag(overheidnl_document_id, dossier_id, dossier_id_extra, kamerstuk_nr, commissie, skip_if_exists=False):
+def create_verslag(overheidnl_document_id, dossier_id, kamerstuk_nr, commissie, skip_if_exists=False):
     if skip_if_exists and Kamerstuk.objects.filter(document__document_id=overheidnl_document_id).exists():
         return
     document_factory = DocumentFactory()
@@ -70,7 +67,6 @@ def create_verslag(overheidnl_document_id, dossier_id, dossier_id_extra, kamerst
     kamerstuk = Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
-        id_main_extra=dossier_id_extra,
         id_sub=kamerstuk_nr,
         type_short='Verslag',
         type_long='Verslag van een algemeen overleg'

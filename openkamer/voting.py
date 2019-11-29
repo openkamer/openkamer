@@ -43,7 +43,8 @@ class VotingFactory(object):
     def create_votings(self, dossier_id):
         logger.info('BEGIN')
         logger.info('dossier id: ' + str(dossier_id))
-        besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id)
+        dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
+        besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id_main, toevoeging=dossier_id_sub)
         for besluit in besluiten:
             self.create_votings_dossier_besluit(besluit, dossier_id)
         logger.info('END')

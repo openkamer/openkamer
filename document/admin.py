@@ -21,6 +21,8 @@ class DossierAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'dossier_id',
+        'dossier_main_id',
+        'dossier_sub_id',
         'title',
         'decision',
         'status',
@@ -56,7 +58,6 @@ class KamerstukAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'id_main',
-        'id_main_extra',
         'id_sub',
         'type',
         'type_short',

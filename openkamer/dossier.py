@@ -16,7 +16,7 @@ from tkapi.activiteit import ActiviteitStatus
 
 import scraper.documents
 
-from document.create import get_dossier_ids
+from document.create import get_dossier_ids, DossierId
 from document.models import CategoryDossier
 from document.models import Dossier
 from document.models import Kamerstuk
@@ -50,20 +50,25 @@ def create_dossier_retry_on_error(dossier_id, max_tries=3):
 
 @transaction.atomic
 def create_or_update_dossier(dossier_id):
-    logger.info('BEGIN - dossier id: ' + str(dossier_id))
+    logger.info('BEGIN - dossier id: {}'.format(dossier_id))
     Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
 
     # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example
-    last_besluit = get_besluit_last_with_voting(dossier_id)
+    dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
+    logger.info('dossier id main: {} | dossier id sub: {}'.format(dossier_id_main, dossier_id_sub))
+    last_besluit = get_besluit_last_with_voting(dossier_id_main, dossier_id_sub)
     if not last_besluit:
-        last_besluit = get_besluit_last(dossier_id)
+        last_besluit = get_besluit_last(dossier_id_main, dossier_id_sub)
 
     decision = 'Onbekend'
     if last_besluit:
         decision = last_besluit.tekst.replace('.', '')
+
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
+        dossier_main_id=dossier_id_main,
+        dossier_sub_id=dossier_id_sub,
         url=dossier_url,
         decision=decision
     )
@@ -185,12 +190,14 @@ def get_inactive_dossier_ids():
 
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
-    dossier_ids = get_dossier_ids()
+    dossiers = get_dossier_ids()
+    logger.info('dossiers: {}'.format(len(dossiers)))
     dossier_ids_inactive = get_inactive_dossier_ids()
     dossier_ids_active = []
-    for dossier_id in dossier_ids:
+    for dossier in dossiers:
+        dossier_id = Dossier.create_dossier_id(dossier.dossier_id, dossier.dossier_sub_id)
         if dossier_id not in dossier_ids_inactive:
-            dossier_ids_active.append(dossier_id)
+            dossier_ids_active.append(dossier)
     dossier_ids_active.reverse()
     logger.info('dossiers active: {}'.format(dossier_ids_active))
     failed_dossiers = create_wetsvoorstellen(dossier_ids_active, skip_existing=skip_existing, max_tries=max_tries)
@@ -216,10 +223,11 @@ def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
     return failed_dossiers
 
 
-def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
+def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, max_tries=3):
     logger.info('BEGIN')
     failed_dossiers = []
     for dossier_id in dossier_ids:
+        dossier_id = Dossier.create_dossier_id(dossier_id.dossier_id, dossier_id.dossier_sub_id)
         dossiers = Dossier.objects.filter(dossier_id=dossier_id)
         if skip_existing and dossiers.exists():
             logger.info('dossier already exists, skip')
@@ -233,16 +241,16 @@ def create_wetsvoorstellen(dossier_ids, skip_existing=False, max_tries=3):
     return failed_dossiers
 
 
-def get_besluiten_dossier_main(dossier_id) -> List[Besluit]:
-    zaken = get_zaken_dossier_main(dossier_id)
+def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub) -> List[Besluit]:
+    zaken = get_zaken_dossier_main(dossier_id_main, dossier_id_sub)
     besluiten = []
     for zaak in zaken:
         besluiten += zaak.besluiten
     return besluiten
 
 
-def get_besluit_last(dossier_id, filter_has_votings=False) -> Besluit:
-    besluiten = get_besluiten_dossier_main(dossier_id=dossier_id)
+def get_besluit_last(dossier_id_main, dossier_id_sub, filter_has_votings=False) -> Besluit:
+    besluiten = get_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
     last_besluit = None
     for besluit in besluiten:
         if filter_has_votings and not besluit.stemmingen:
@@ -255,19 +263,19 @@ def get_besluit_last(dossier_id, filter_has_votings=False) -> Besluit:
     return last_besluit
 
 
-def get_besluit_last_with_voting(dossier_id) -> Besluit:
-    return get_besluit_last(dossier_id=dossier_id, filter_has_votings=True)
+def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub) -> Besluit:
+    return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
 
 
-def get_zaken_dossier_main(dossier_id) -> List[Zaak]:
+def get_zaken_dossier_main(dossier_id_main, dossier_id_sub) -> List[Zaak]:
     # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi makes it possible
     filter = Zaak.create_filter()
-    filter.filter_kamerstukdossier(nummer=dossier_id)
+    filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
     filter.filter_soort(ZaakSoort.WETGEVING)
     zaken = Api().get_zaken(filter=filter)
     if not zaken:
         filter = Zaak.create_filter()
-        filter.filter_kamerstukdossier(nummer=dossier_id)
+        filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
         filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING)
         zaken = Api().get_zaken(filter=filter)
     return zaken

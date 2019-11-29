@@ -67,6 +67,8 @@ class Dossier(models.Model):
         (AANGEHOUDEN, 'Aangehouden'), (IN_BEHANDELING, 'In behandeling'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
     dossier_id = models.CharField(max_length=100, blank=True, unique=True, db_index=True)
+    dossier_main_id = models.CharField(max_length=100, blank=True, db_index=True)
+    dossier_sub_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     title = models.CharField(max_length=2000, blank=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     url = models.URLField(blank=True, max_length=1000)
@@ -76,9 +78,23 @@ class Dossier(models.Model):
 
     class Meta:
         ordering = ['-dossier_id']
+        unique_together = ['dossier_main_id', 'dossier_sub_id']
 
     def __str__(self):
         return str(self.dossier_id)
+
+    @staticmethod
+    def create_dossier_id(main_id, sub_id):
+        return '{}-{}'.format(main_id, sub_id)
+
+    @staticmethod
+    def split_dossier_id(dossier_id):
+        dossier_ids = dossier_id.split('-')
+        dossier_id_main = dossier_ids[0]
+        dossier_id_sub = None
+        if len(dossier_ids) > 1:
+            dossier_id_sub = dossier_ids[1]
+        return dossier_id_main, dossier_id_sub
 
     @cached_property
     def documents(self):
@@ -373,11 +389,10 @@ class Kamerstuk(models.Model):
     )
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     id_main = models.CharField(max_length=40, blank=True, db_index=True)  # dossier vetnummer/ID
-    id_main_extra = models.CharField(max_length=40, blank=True, db_index=True)
     id_sub = models.CharField(max_length=40, blank=True, db_index=True)  # kamerstuk ondernummer
     type_short = models.CharField(max_length=400, blank=True)
     type_long = models.CharField(max_length=2000, blank=True)
-    original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-22
+    original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-[XVI]-22
     date_updated = models.DateTimeField(auto_now=True)
     type = models.CharField(choices=TYPE_CHOICES, default=UNKNOWN, max_length=30, db_index=True)
 
@@ -441,22 +456,21 @@ class Kamerstuk(models.Model):
         if not self.original_id:
             return None
         ids = self.original_id.split('-')
-        if ids[1] == 'voorstel_van_wet':
-            kamerstukken = Kamerstuk.objects.filter(id_main=ids[0]).exclude(id=self.id)
-            for stuk in kamerstukken:
-                if 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
-                    return stuk
-        kamerstukken = Kamerstuk.objects.filter(id_main=ids[0], id_sub=ids[1])
+        main_id = ids[0]
+        sub_id = None
+        if len(ids) == 2:
+            sub_id = ids[1]
+        if len(ids) == 3:
+            main_id = Dossier.split_dossier_id(self.original_id)
+            sub_id = ids[2]
+        kamerstukken = Kamerstuk.objects.filter(id_main=main_id, id_sub=sub_id)
         if kamerstukken.exists():
             return kamerstukken[0]
         return None
 
     @cached_property
     def modifications(self):
-        if self.voorstelwet:
-            stukken = Kamerstuk.objects.filter(original_id=self.id_main+'-voorstel_van_wet').exclude(id=self.id)
-        else:
-            stukken = Kamerstuk.objects.filter(original_id=self.id_full)
+        stukken = Kamerstuk.objects.filter(original_id=self.id_full)
         return stukken.order_by('document__date_published', 'id_sub')
 
 
@@ -703,11 +717,15 @@ class BesluitItemCase(models.Model):
             if not document_id:
                 continue
             id_parts = document_id.split('-')
-            if len(id_parts) != 2:
+            if len(id_parts) < 2:
                 logger.info('no kamerstuk found for id: ' + document_id)
                 continue
-            id_main = document_id.split('-')[0]
-            id_sub = document_id.split('-')[1]
+            if len(id_parts) == 2:
+                id_main = document_id.split('-', 0)
+                id_sub = document_id.split('-', 1)
+            if len(id_parts) == 3:
+                id_main = '{}-{}'.format(document_id.split('-', 0), document_id.split('-', 1))
+                id_sub = document_id.split('-', 2)
             kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
             if kamerstukken:
                 related_stukken.append(kamerstukken[0])

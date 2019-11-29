@@ -506,7 +506,6 @@ class TestVerslagAlgemeenOverleg(TestCase):
         verslag = openkamer.verslagao.create_verslag(
             overheidnl_document_id=overheidnl_document_id,
             dossier_id=dossier_id,
-            dossier_id_extra='',
             kamerstuk_nr=kamerstuk_nr,
             commissie=commissie
         )
