@@ -218,7 +218,7 @@ class Document(models.Model):
     publisher = models.CharField(max_length=200, blank=True)
     date_published = models.DateField(blank=True, null=True, db_index=True)
     source_url = models.URLField(max_length=1000)
-    content_html = models.CharField(max_length=4000000, blank=True)
+    content_html = models.CharField(max_length=10000000, blank=True)
     date_updated = models.DateTimeField(auto_now=True)
 
     @cached_property
