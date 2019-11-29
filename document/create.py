@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class DossierId:
-    dossier_id: None
-    dossier_sub_id: None
+    dossier_id = None
+    dossier_sub_id = None
 
     def __init__(self, dossier_id, dossier_sub_id=None):
         self.dossier_id = dossier_id
