@@ -5,7 +5,7 @@ from django.db import transaction
 from wikidata import wikidata
 
 from tkapi.util import queries
-
+from tkapi.zaak import ZaakSoort
 from person.util import parse_name_surname_initials
 
 from parliament.models import ParliamentMember
@@ -61,7 +61,8 @@ class VotingFactory(object):
         if zaak.volgnummer:
             document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
 
-        is_dossier_voting = zaak.soort in ['Wetgeving', 'Initiatiefwetgeving']
+        is_dossier_voting = zaak.soort in [ZaakSoort.WETGEVING, ZaakSoort.INITIATIEF_WETGEVING, ZaakSoort.BEGROTING]
+        is_dossier_voting = is_dossier_voting or str(zaak.volgnummer) == '0'
         logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
         voting_obj = Voting(
             dossier=dossier,
