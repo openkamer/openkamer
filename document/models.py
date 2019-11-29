@@ -85,7 +85,9 @@ class Dossier(models.Model):
 
     @staticmethod
     def create_dossier_id(main_id, sub_id):
-        return '{}-{}'.format(main_id, sub_id)
+        if sub_id:
+            return '{}-{}'.format(main_id, sub_id)
+        return main_id
 
     @staticmethod
     def split_dossier_id(dossier_id):
