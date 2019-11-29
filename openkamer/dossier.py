@@ -9,6 +9,7 @@ from requests.exceptions import ConnectionError, ConnectTimeout
 from django.db import transaction
 
 from tkapi import Api
+from tkapi.util import queries
 from tkapi.dossier import Dossier as TKDossier
 from tkapi.besluit import Besluit
 from tkapi.zaak import Zaak
@@ -262,17 +263,16 @@ def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, ma
 
 
 def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub) -> List[Besluit]:
-    zaken = get_zaken_dossier_main(dossier_id_main, dossier_id_sub)
-    besluiten = []
-    for zaak in zaken:
-        besluiten += zaak.besluiten
-    return besluiten
+    return queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
 
 
 def get_besluit_last(dossier_id_main, dossier_id_sub, filter_has_votings=False) -> Besluit:
     besluiten = get_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
     last_besluit = None
     for besluit in besluiten:
+        # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
+        if str(besluit.zaak.volgnummer) != '0':
+            continue
         if filter_has_votings and not besluit.stemmingen:
             continue
         if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
