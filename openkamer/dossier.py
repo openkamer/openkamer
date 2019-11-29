@@ -9,6 +9,7 @@ from requests.exceptions import ConnectionError, ConnectTimeout
 from django.db import transaction
 
 from tkapi import Api
+from tkapi.dossier import Dossier as TKDossier
 from tkapi.besluit import Besluit
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
@@ -53,9 +54,20 @@ def create_or_update_dossier(dossier_id):
     logger.info('BEGIN - dossier id: {}'.format(dossier_id))
     Dossier.objects.filter(dossier_id=dossier_id).delete()
     dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
+    dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
+
+    dossier_filter = TKDossier.create_filter()
+    dossier_filter.filter_nummer(dossier_id_main)
+    if dossier_id_sub:
+        dossier_filter.filter_toevoeging(dossier_id_sub)
+    dossiers = Api().get_dossiers(filter=dossier_filter)
+
+    if len(dossiers) != 1:
+        logger.error('{} dossiers found while one expected for {}'.format(len(dossiers), dossier_id))
+
+    tk_dossier = dossiers[0]
 
     # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example
-    dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
     logger.info('dossier id main: {} | dossier id sub: {}'.format(dossier_id_main, dossier_id_sub))
     last_besluit = get_besluit_last_with_voting(dossier_id_main, dossier_id_sub)
     if not last_besluit:
@@ -69,6 +81,7 @@ def create_or_update_dossier(dossier_id):
         dossier_id=dossier_id,
         dossier_main_id=dossier_id_main,
         dossier_sub_id=dossier_id_sub,
+        title=tk_dossier.titel,
         url=dossier_url,
         decision=decision
     )
@@ -119,7 +132,11 @@ def get_document_data_mp(document_id, outputs):
         return
 
     document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else document_id
-    content_html = scraper.documents.get_html_content(document_id)
+    try:
+        content_html = scraper.documents.get_html_content(document_id)
+    except:
+        logger.exception('error getting document html for document id: {}'.format(document_id))
+        content_html = ''
     document_data = DocumentDataOverheidNL(
         document_id=document_id,
         title=metadata['title_full'],
@@ -131,6 +148,7 @@ def get_document_data_mp(document_id, outputs):
 
 @transaction.atomic
 def create_dossier_documents(dossier, dossier_id):
+    logger.info('create_dossier_documents - BEGIN')
     document_ids = scraper.documents.search_politieknl_dossier(dossier_id)
 
     pool = ThreadPool(processes=4)
@@ -146,6 +164,8 @@ def create_dossier_documents(dossier, dossier_id):
         pool.apply_async(get_document_data_mp, args=(document_id, outputs))
     pool.close()
     pool.join()
+
+    logger.info('create_dossier_documents - outputs: {}'.format(len(outputs)))
 
     for data in outputs:
         if 'submitter' not in data.metadata:

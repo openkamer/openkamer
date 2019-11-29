@@ -151,6 +151,8 @@ class Dossier(models.Model):
         return Dossier.IN_BEHANDELING
 
     def get_title(self):
+        if self.title:
+            return self.title
         kamerstukken = self.kamerstukken
         titles = {}
         for stuk in kamerstukken:
