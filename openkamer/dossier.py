@@ -203,21 +203,22 @@ def create_dossier_documents(dossier, dossier_id):
         #     create_agenda(document, metadata)
 
 
-def get_inactive_dossier_ids():
-    return list(Dossier.objects.filter(status__in=[
+def get_inactive_dossier_ids() -> List[DossierId]:
+    dossier_ids_inactive = list(Dossier.objects.filter(status__in=[
         Dossier.VERWORPEN, Dossier.AANGENOMEN, Dossier.INGETROKKEN, Dossier.CONTROVERSIEEL
     ]).values_list('dossier_id', flat=True))
+    return [DossierId(*Dossier.split_dossier_id(dossier_id)) for dossier_id in dossier_ids_inactive]
 
 
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
     dossiers = get_dossier_ids()
-    logger.info('dossiers: {}'.format(len(dossiers)))
+    logger.info('active dossiers found: {}'.format(len(dossiers)))
     dossier_ids_inactive = get_inactive_dossier_ids()
+    dossier_ids_inactive = [str(dossier_id) for dossier_id in dossier_ids_inactive]
     dossier_ids_active = []
     for dossier in dossiers:
-        dossier_id = Dossier.create_dossier_id(dossier.dossier_id, dossier.dossier_sub_id)
-        if dossier_id not in dossier_ids_inactive:
+        if str(dossier) not in dossier_ids_inactive:
             dossier_ids_active.append(dossier)
     dossier_ids_active.reverse()
     logger.info('dossiers active: {}'.format(dossier_ids_active))
@@ -230,6 +231,7 @@ def create_wetsvoorstellen_inactive(skip_existing=False, max_tries=3):
     logger.info('BEGIN')
     dossier_ids_inactive = get_inactive_dossier_ids()
     dossier_ids_inactive.reverse()
+    logger.info('inactive dossiers found: {}'.format(len(dossier_ids_inactive)))
     failed_dossiers = create_wetsvoorstellen(dossier_ids_inactive, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
@@ -247,8 +249,9 @@ def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
 def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, max_tries=3):
     logger.info('BEGIN')
     failed_dossiers = []
-    for dossier_id in dossier_ids:
-        dossier_id = Dossier.create_dossier_id(dossier_id.dossier_id, dossier_id.dossier_sub_id)
+    for dossier in dossier_ids:
+        dossier_id = Dossier.create_dossier_id(dossier.dossier_id, dossier.dossier_sub_id)
+        logger.info('dossier id: {}'.format(dossier_id))
         dossiers = Dossier.objects.filter(dossier_id=dossier_id)
         if skip_existing and dossiers.exists():
             logger.info('dossier already exists, skip')
@@ -262,7 +265,7 @@ def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, ma
     return failed_dossiers
 
 
-def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub) -> List[Besluit]:
+def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Besluit]:
     return queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
 
 
@@ -283,11 +286,11 @@ def get_besluit_last(dossier_id_main, dossier_id_sub, filter_has_votings=False) 
     return last_besluit
 
 
-def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub) -> Besluit:
+def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> Besluit:
     return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
 
 
-def get_zaken_dossier_main(dossier_id_main, dossier_id_sub) -> List[Zaak]:
+def get_zaken_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Zaak]:
     # TODO BR: filter by Wetgeving OR Initiatiefwetgeving if tkapi makes it possible
     filter = Zaak.create_filter()
     filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)

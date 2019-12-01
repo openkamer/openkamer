@@ -242,3 +242,9 @@ class TestParseName(TestCase):
         initials, surname, surname_prefix = parse_name_surname_initials(name)
         self.assertEqual(surname_prefix, 'van')
         self.check_result(initials, surname)
+
+    # TODO BR: fix and enable
+    # def test_initials_multicharacter(self):
+    #     name = 'A.Th.B. Bijleveld-Schouten'
+    #     initials, surname, surname_prefix = parse_name_surname_initials(name)
+    #     self.assertEqual(initials, 'A.Th.B.')

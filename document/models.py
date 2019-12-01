@@ -84,7 +84,7 @@ class Dossier(models.Model):
         return str(self.dossier_id)
 
     @staticmethod
-    def create_dossier_id(main_id, sub_id):
+    def create_dossier_id(main_id, sub_id) -> str:
         if sub_id:
             return '{}-{}'.format(main_id, sub_id)
         return main_id
@@ -462,11 +462,16 @@ class Kamerstuk(models.Model):
         ids = self.original_id.split('-')
         main_id = ids[0]
         sub_id = None
-        if len(ids) == 2:
+        if len(ids) == 2:  # Example: 33885-voorstel_van_wet
             sub_id = ids[1]
-        if len(ids) == 3:
-            main_id = Dossier.split_dossier_id(self.original_id)
+        if len(ids) == 3:  # Example: 35300-XVI-voorstel_van_wet
+            main_id = '{}-{}'.format(ids[0], ids[1])
             sub_id = ids[2]
+        if ids[1] == 'voorstel_van_wet':
+            kamerstukken = Kamerstuk.objects.filter(id_main=ids[0]).exclude(id=self.id)
+            for stuk in kamerstukken:
+                if 'voorstel van wet' in stuk.type_short.lower() and 'gewijzigd' not in stuk.type_short.lower():
+                    return stuk
         kamerstukken = Kamerstuk.objects.filter(id_main=main_id, id_sub=sub_id)
         if kamerstukken.exists():
             return kamerstukken[0]
