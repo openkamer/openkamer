@@ -152,6 +152,13 @@ class TestFindOriginalKamerstukId(TestCase):
         original_id = openkamer.kamerstuk.find_original_kamerstuk_id(self.dossier_id, title)
         self.assertEqual(original_id, expected_result)
 
+    def test_find_original_begroting_motie(self):
+        title = 'Gewijzigde motie van de leden ... signaleren (t.v.v. 35300-XVI-108)'
+        dossier_id = '35300-XVI'
+        expected_result = '35300-XVI-108'
+        original_id = openkamer.kamerstuk.find_original_kamerstuk_id(dossier_id, title)
+        self.assertEqual(original_id, expected_result)
+
 
 class TestCreateParliamentMember(TestCase):
 
