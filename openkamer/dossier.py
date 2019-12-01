@@ -266,16 +266,19 @@ def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, ma
 
 
 def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Besluit]:
-    return queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+    besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+    besluiten_dossier = []
+    # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
+    for besluit in besluiten:
+        if str(besluit.zaak.volgnummer) == '0':
+            besluiten_dossier.append(besluit)
+    return besluiten_dossier
 
 
-def get_besluit_last(dossier_id_main, dossier_id_sub, filter_has_votings=False) -> Besluit:
+def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> Besluit:
     besluiten = get_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
     last_besluit = None
     for besluit in besluiten:
-        # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
-        if str(besluit.zaak.volgnummer) != '0':
-            continue
         if filter_has_votings and not besluit.stemmingen:
             continue
         if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
