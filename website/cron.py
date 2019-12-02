@@ -112,9 +112,9 @@ class UpdateActiveDossiers(LockJob):
 
 
 class UpdateInactiveDossiers(LockJob):
-    RUN_EVERY_MINS = 60 * 24  # note that while it runs every day, it only updates a set depending on the week day
+    RUN_AT_TIMES = ['22:00']  # note that while it runs every day, it only updates a set depending on the week day
     DAYS_PER_WEEK = 7
-    schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
     code = 'website.cron.UpdateInactiveDossiers'
 
     def do_imp(self):

@@ -211,7 +211,7 @@ def get_inactive_dossier_ids(year=None) -> List[DossierId]:
         dossier_ids_inactive_year = []
         for dossier_id in dossier_ids_inactive:
             dossier = Dossier.objects.get(dossier_id=dossier_id)
-            if dossier.start_date.year == int(year):
+            if dossier.start_date and dossier.start_date.year == int(year):
                 dossier_ids_inactive_year.append(dossier_id)
         dossier_ids_inactive = dossier_ids_inactive_year
     return [DossierId(*Dossier.split_dossier_id(dossier_id)) for dossier_id in dossier_ids_inactive]
