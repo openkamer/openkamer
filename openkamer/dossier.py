@@ -203,10 +203,17 @@ def create_dossier_documents(dossier, dossier_id):
         #     create_agenda(document, metadata)
 
 
-def get_inactive_dossier_ids() -> List[DossierId]:
+def get_inactive_dossier_ids(year=None) -> List[DossierId]:
     dossier_ids_inactive = list(Dossier.objects.filter(status__in=[
         Dossier.VERWORPEN, Dossier.AANGENOMEN, Dossier.INGETROKKEN, Dossier.CONTROVERSIEEL
     ]).values_list('dossier_id', flat=True))
+    if year is not None:
+        dossier_ids_inactive_year = []
+        for dossier_id in dossier_ids_inactive:
+            dossier = Dossier.objects.get(dossier_id=dossier_id)
+            if dossier.start_date.year == int(year):
+                dossier_ids_inactive_year.append(dossier_id)
+        dossier_ids_inactive = dossier_ids_inactive_year
     return [DossierId(*Dossier.split_dossier_id(dossier_id)) for dossier_id in dossier_ids_inactive]
 
 
@@ -227,9 +234,9 @@ def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
     return failed_dossiers
 
 
-def create_wetsvoorstellen_inactive(skip_existing=False, max_tries=3):
-    logger.info('BEGIN')
-    dossier_ids_inactive = get_inactive_dossier_ids()
+def create_wetsvoorstellen_inactive(year=None, skip_existing=False, max_tries=3):
+    logger.info('BEGIN - year: {}'.format(year))
+    dossier_ids_inactive = get_inactive_dossier_ids(year=year)
     dossier_ids_inactive.reverse()
     logger.info('inactive dossiers found: {}'.format(len(dossier_ids_inactive)))
     failed_dossiers = create_wetsvoorstellen(dossier_ids_inactive, skip_existing=skip_existing, max_tries=max_tries)

@@ -112,15 +112,24 @@ class UpdateActiveDossiers(LockJob):
 
 
 class UpdateInactiveDossiers(LockJob):
-    RUN_EVERY_MINS = 60*24*3  # 3 days
+    RUN_EVERY_MINS = 60 * 24  # note that while it runs every day, it only updates a set depending on the week day
+    DAYS_PER_WEEK = 7
     schedule = Schedule(run_every_mins=RUN_EVERY_MINS)
     code = 'website.cron.UpdateInactiveDossiers'
 
     def do_imp(self):
         logger.info('update inactive dossiers cronjob')
-        failed_dossiers = openkamer.dossier.create_wetsvoorstellen_inactive()
-        if failed_dossiers:
-            logger.error('the following dossiers failed: ' + str(failed_dossiers))
+        week_day = datetime.datetime.today().weekday()
+        try:
+            years = years_from_str_list(2008)
+            for year in years:
+                year = int(year)
+                if year % self.DAYS_PER_WEEK == week_day:
+                    failed_dossiers = openkamer.dossier.create_wetsvoorstellen_inactive(year=year)
+                    if failed_dossiers:
+                        logger.error('the following dossiers failed: {}'.format(failed_dossiers))
+        except:
+            logger.exception('something failed')
 
 
 class UpdateVerslagenAlgemeenOverleg(LockJob):
