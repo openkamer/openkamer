@@ -16,6 +16,7 @@ class PersonAdmin(admin.ModelAdmin):
         'tk_id',
         'wikidata_id',
         'parlement_and_politiek_id',
+        'datetime_updated',
     )
 
 
