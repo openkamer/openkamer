@@ -13,6 +13,7 @@ class PersonAdmin(admin.ModelAdmin):
         'initials',
         'slug',
         'birthdate',
+        'tk_id',
         'wikidata_id',
         'parlement_and_politiek_id',
     )

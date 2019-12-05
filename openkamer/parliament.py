@@ -1,6 +1,7 @@
 import datetime
 import logging
 from typing import List
+import urllib.parse
 
 from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 
@@ -10,8 +11,10 @@ from django.db import transaction
 
 from wikidata import wikidata
 import wikidata.government as wikidata_government
+
 import tkapi
 from tkapi.fractie import Fractie
+from tkapi.persoon import Persoon as TKPersoon
 
 import scraper.persons
 
@@ -299,8 +302,62 @@ def create_person(wikidata_id, fullname, wikidata_item, add_initials):
     if add_initials and person.parlement_and_politiek_id:
         person.initials = scraper.persons.get_initials(person.parlement_and_politiek_id)
         person.save()
+    add_tk_person_id(person)
     assert person.wikidata_id == wikidata_id
     return person
+
+
+def add_tk_person_id(person: Person) -> Person:
+    tkperson = find_tkapi_person(person)
+    if tkperson:
+        person.tk_id = tkperson.id
+        person.save()
+    return person
+
+
+def find_tkapi_person(person: Person) -> TKPersoon or None:
+    # TODO BR: cleanup: this is a mess!
+    filter = TKPersoon.create_filter()
+    filter.filter_achternaam(person.surname)
+    try:
+        persons = tkapi.Api().get_personen(filter=filter)
+        if not persons:
+            persons = []
+            surname_parts = person.surname.split('-')
+            surname_parts += person.surname.split(' ')
+            for part in surname_parts:
+                filter = TKPersoon.create_filter()
+                filter.filter_achternaam(part)
+                persons += tkapi.Api().get_personen(filter=filter)
+    except KeyError:
+        logger.exception('Could not find TK Person for {} ({})'.format(person.surname, person.initials))
+        return None
+    surname_matches = [tkperson for tkperson in persons if tkperson.achternaam.lower() == person.surname.lower()]
+    if len(surname_matches) == 1:
+        return surname_matches[0]
+    if len(surname_matches) == 0:
+        surname_parts = person.surname.split('-')
+        surname_parts += person.surname.split(' ')
+        surname_parts = [surname.lower() for surname in surname_parts]
+        tk_surname_parts = []
+        surname_matches = []
+        for tkperson in persons:
+            tk_surname_parts += tkperson.achternaam.split('-')
+            tk_surname_parts += tkperson.achternaam.split(' ')
+            tk_surname_parts = [surname.lower() for surname in tk_surname_parts]
+            for tk_part in tk_surname_parts:
+                if tk_part in surname_parts:
+                    surname_matches.append(tkperson)
+    if len(surname_matches) == 1:
+        return surname_matches[0]
+    for tkperson in surname_matches:
+        if tkperson.initialen.lower() == person.initials.lower():
+            return tkperson
+        elif tkperson.initialen.replace('.', '').lower() == person.initials.replace('.', '').lower():
+            return tkperson
+    if surname_matches:
+        return surname_matches[0]
+    return None
 
 
 @transaction.atomic

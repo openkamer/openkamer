@@ -81,6 +81,9 @@ datepickerElement.datepicker()
         {% if user.is_superuser and member.person.wikidata_id %}
           <a href="//www.wikidata.org/wiki/{{ member.person.wikidata_id }}" target="_blank">wikidata</a> |
         {% endif %}
+        {% if user.is_superuser and member.person.tk_id %}
+          <span>{{ member.person.tk_id }} </span> |
+        {% endif %}
         {% if member.person.parlement_and_politiek_id %}
           <a href="https://www.parlement.com/id/{{ member.person.parlement_and_politiek_id }}" target="_blank">parlement.com</a>
         {% endif %}

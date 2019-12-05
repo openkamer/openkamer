@@ -518,3 +518,61 @@ class TestVerslagAlgemeenOverleg(TestCase):
         )
 
 
+class TestFindTKAPIPerson(TestCase):
+
+    def test_find_person(self):
+        person = Person(
+            surname='Samsom',
+            forename='Diederik'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, person.surname)
+
+    def test_find_person_common_surname(self):
+        person = Person(
+            surname='Vries',
+            initials='J.M.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, person.surname)
+
+    def test_find_person_bijsterveldt(self):
+        person = Person(
+            surname='Bijsterveldt',
+            initials='J.M.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, 'Bijsterveldt-Vliegenthart')
+
+    def test_find_person_ozturk(self):
+        person = Person(
+            surname='Öztürk'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, 'Öztürk')
+
+    def test_find_person_pater_postma(self):
+        person = Person(
+            surname='Pater-Postma',
+            forename='Wytske',
+            initials='W.L.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, 'Postma')
+
+    def test_find_person_arissen(self):
+        person = Person(
+            surname='Merel Arissen',
+            forename='Femke',
+            initials='F.M.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, 'Kooten-Arissen')
+
+    def test_find_person_common_surname_initials_without_dots(self):
+        person = Person(
+            surname='Vries',
+            initials='JM'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, person.surname)

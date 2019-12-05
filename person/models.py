@@ -37,11 +37,12 @@ class Person(models.Model):
     initials = models.CharField(max_length=200, blank=True, default='', db_index=True)
     slug = models.SlugField(max_length=250, default='')
     birthdate = models.DateField(blank=True, null=True)
-    wikidata_id = models.CharField(max_length=200, blank=True)
+    tk_id = models.CharField(max_length=200, blank=True, db_index=True)
+    wikidata_id = models.CharField(max_length=200, blank=True, db_index=True)
     wikipedia_url = models.URLField(blank=True, max_length=1000)
     wikimedia_image_name = models.CharField(blank=True, max_length=300)
     wikimedia_image_url = models.URLField(blank=True, max_length=1000)
-    parlement_and_politiek_id = models.CharField(max_length=200, blank=True)
+    parlement_and_politiek_id = models.CharField(max_length=200, blank=True, db_index=True)
     twitter_username = models.CharField(max_length=200, blank=True)
 
     def __str__(self):

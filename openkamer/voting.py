@@ -8,6 +8,7 @@ from tkapi.util import queries
 from tkapi.zaak import ZaakSoort
 from person.util import parse_name_surname_initials
 
+from person.models import Person
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 
@@ -157,23 +158,33 @@ class VoteFactory(object):
         logger.info('BEGIN')
         for stemming in stemmingen:
             persoon = stemming.persoon
+            parliament_member = None
 
-            if persoon:
-                initials = persoon.initialen
-                surname = persoon.achternaam
-                forname = persoon.roepnaam
-            else:
-                logger.error('Persoon not found for stemming: ' + stemming.id)
-                surname_initials = stemming.json['AnnotatieActorNaam']
-                forname = ''
-                initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
+            persons = Person.objects.filter(tk_id=persoon.id)
+            if persons:
+                person = persons[0]
+                members = ParliamentMember.objects.filter(person=person).order_by('-joined')
+                parliament_member = members[0] if members.exists() else None
+                person_name = ' '.join([person.surname, person.surname, person.initials]).strip()
 
-            parliament_member = ParliamentMember.find(surname=surname, initials=initials)
-            if not parliament_member:
-                logger.error('parliament member not found for vote: ' + str(stemming.id))
-                logger.error('creating vote with empty parliament member')
+            # TODO BR: this is a fallback, remove or extract function and log
+            if parliament_member is None:
+                if persoon:
+                    initials = persoon.initialen
+                    surname = persoon.achternaam
+                    forname = persoon.roepnaam
+                else:
+                    logger.error('Persoon not found for stemming: ' + stemming.id)
+                    surname_initials = stemming.json['AnnotatieActorNaam']
+                    forname = ''
+                    initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
 
-            person_name = ' '.join([forname, surname, initials]).strip()
+                parliament_member = ParliamentMember.find(surname=surname, initials=initials)
+                if not parliament_member:
+                    logger.error('parliament member not found for vote: ' + str(stemming.id))
+                    logger.error('creating vote with empty parliament member')
+                person_name = ' '.join([forname, surname, initials]).strip()
+
             VoteIndividual.objects.create(
                 voting=voting,
                 person_name=person_name,
