@@ -19,6 +19,6 @@ class ParliamentMemberFilter(django_filters.FilterSet):
     def party_filter(self, queryset, name, value):
         pm_ids = []
         for pm in queryset:
-            if pm.political_party().id == value.id:
+            if pm.party and pm.party.id == value.id:
                 pm_ids.append(pm.id)
         return queryset.filter(id__in=pm_ids)
