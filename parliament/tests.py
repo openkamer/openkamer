@@ -19,6 +19,17 @@ class TestPoliticalParty(TestCase):
         parties = item.get_political_party_memberships()
         self.assertEqual(len(parties), 1)
 
+    def test_get_political_party_memberships_ignore_local_parties(self):
+        loes_ypma_wikidata_id = 'Q1194971'
+        item = wikidata.WikidataItem(loes_ypma_wikidata_id)
+        parties = item.get_political_party_memberships()
+        local_parties = 0
+        for party in parties:
+            if wikidata.WikidataItem(party['party_wikidata_id']).is_local_party():
+                local_parties += 1
+        self.assertEqual(2, len(parties))
+        self.assertEqual(1, local_parties)
+
     def test_create_political_party(self):
         name = 'Houwers'
         name_short = 'Houwers'

@@ -69,6 +69,7 @@ def create_governments():
 
 @transaction.atomic
 def create_government(wikidata_id, max_members=None):
+    logger.info('BEGIN: {}'.format(wikidata_id))
     gov_info = wikidata_government.get_government(wikidata_id)
     Government.objects.filter(wikidata_id=wikidata_id).delete()
     government = Government.objects.create(
@@ -78,6 +79,7 @@ def create_government(wikidata_id, max_members=None):
         wikidata_id=wikidata_id
     )
     create_government_members(government, max_members=max_members)
+    logger.info('END: {}'.format(wikidata_id))
     return government
 
 
@@ -171,15 +173,19 @@ def create_party_members():
 
 
 @transaction.atomic
-def create_party_members_for_person(person):
-    logger.info('BEGIN, person: ' + str(person))
+def create_party_members_for_person(person: Person):
+    logger.info('BEGIN - person: {}'.format(person))
     if not person.wikidata_id:
-        logger.warning('could not update party member for person: ' + str(person) + ' because person has no wikidata id.')
+        logger.warning('could not update party member for person: {} because person has no wikidata id.'.format(person))
         return
     wikidata_person_item = wikidata.WikidataItem(person.wikidata_id)
     memberships = wikidata_person_item.get_political_party_memberships()
+    PartyMember.objects.filter(person=person).delete()
     for membership in memberships:
-        parties = PoliticalParty.objects.filter(wikidata_id=membership['party_wikidata_id'])
+        wikidata_party = wikidata.WikidataItem(membership['party_wikidata_id'])
+        if wikidata_party.is_local_party():
+            continue
+        parties = PoliticalParty.objects.filter(wikidata_id=wikidata_party.id)
         if parties.exists():
             party = parties[0]
         else:

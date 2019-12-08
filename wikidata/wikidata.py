@@ -192,6 +192,9 @@ class WikidataItem(object):
                     return True
         return False
 
+    def is_local_party(self):
+        return 'P131' in self.get_claims()
+
     def get_given_names(self):
         claims = self.get_claims()
         if 'P735' in claims:
@@ -253,7 +256,7 @@ class WikidataItem(object):
     def get_wikipedia_url(self, language='nl'):
         site = language + 'wiki'
         if 'sitelinks' not in self.item or site not in self.item['sitelinks']:
-            logger.info('wikipedia url not found for wikidata item: ' + str(self.id))
+            logger.info('wikipedia url not found for wikidata item: {}'.format(self.id))
             return ''
         title = self.item['sitelinks'][site]['title']
         url = 'https://' + language + '.wikipedia.org/wiki/' + urllib.parse.quote(title)
@@ -284,11 +287,11 @@ class WikidataItem(object):
         try:
             date = datetime.datetime.strptime(date_str[1:11], '%Y-%m-%d')
             return date.date()
-        except ValueError as error:
+        except ValueError:
             result = re.findall("(\d{4})-00-00", date_str)
             if result:
                 return datetime.date(year=int(result[0]), day=1, month=1)
-            logger.error(error)
+            logger.exception('error parsing wikidata date')
             return None
 
     def get_twitter_username(self):
@@ -312,7 +315,7 @@ class WikidataItem(object):
         # print(json.dumps(political_parties, sort_keys=True, indent=4))
         for party in political_parties:
             if not 'datavalue' in party['mainsnak']:
-                logger.warning('datavalue not in party[\'mainsnak\'] for person with wikidata id: ' + str(id))
+                logger.warning('datavalue not in party[\'mainsnak\'] for person with wikidata id: {}'.format(self.id))
                 continue
             member_info = {
                 'party_wikidata_id': party['mainsnak']['datavalue']['value']['id'],
@@ -338,7 +341,7 @@ class WikidataItem(object):
         for pos in claims['P39']:
             # print(json.dumps(pos, sort_keys=True, indent=4))
             if not 'datavalue' in pos['mainsnak']:
-                logger.warning('datavalue not in pos[\'mainsnak\'] for person with wikidata id: ' + str(id))
+                logger.warning('datavalue not in pos[\'mainsnak\'] for person with wikidata id: {}'.format(self.id))
                 continue
             position_id = pos['mainsnak']['datavalue']['value']['id']
             if filter_position_id and position_id != filter_position_id:
@@ -349,15 +352,19 @@ class WikidataItem(object):
             if 'qualifiers' in pos and 'P580' in pos['qualifiers']:
                 start_time = WikidataItem.get_date(pos['qualifiers']['P580'][0]['datavalue']['value']['time'])
                 if len(pos['qualifiers']['P580']) > 1:
-                    logger.warning('multiple start-times for a single position for wikidata_id: ' + str(id))
+                    logger.warning('multiple start-times for a single position for wikidata_id: {}'.format(self.id))
             if 'qualifiers' in pos and 'P582' in pos['qualifiers']:
                 end_time = WikidataItem.get_date(pos['qualifiers']['P582'][0]['datavalue']['value']['time'])
                 if len(pos['qualifiers']['P582']) > 1:
-                    logger.warning('multiple end-times for a single position for wikidata_id: ' + str(id))
+                    logger.warning('multiple end-times for a single position for wikidata_id: {}'.format(self.id))
             if 'qualifiers' in pos and 'P361' in pos['qualifiers']:
                 part_of_id = pos['qualifiers']['P361'][0]['datavalue']['value']['id']
                 if len(pos['qualifiers']['P361']) > 1:
-                    logger.warning('multiple part of for a single position for wikidata_id: ' + str(id))
+                    logger.warning('multiple part of for a single position for wikidata_id: {}'.format(self.id))
+            elif 'qualifiers' in pos and 'P4100' in pos['qualifiers']:
+                part_of_id = pos['qualifiers']['P4100'][0]['datavalue']['value']['id']
+                if len(pos['qualifiers']['P4100']) > 1:
+                    logger.warning('multiple parliamentary groups for a single position for wikidata_id: {}'.format(self.id))
             position = {
                 'id': position_id,
                 # 'label': WikidataItem.get_label_for_id(position_id),
