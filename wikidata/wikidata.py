@@ -112,6 +112,7 @@ def search_parliament_member_ids():
 
 
 class WikidataItem(object):
+    _cache = {}
 
     def __init__(self, wikidata_id, language='nl'):
         self.id = wikidata_id
@@ -120,6 +121,9 @@ class WikidataItem(object):
 
     @staticmethod
     def get_item(id, sites=None, props=None):
+        item_hash = '{}-{}-{}'.format(id, sites, props)
+        if item_hash in WikidataItem._cache:
+            return WikidataItem._cache[item_hash]
         assert id
         url = 'https://www.wikidata.org/w/api.php'
         params = {
@@ -134,6 +138,7 @@ class WikidataItem(object):
         response = request_wikidata(url, params)
         reponse_json = response.json()
         item = reponse_json['entities'][id]
+        WikidataItem._cache[item_hash] = item
         return item
 
     def get_claims(self):
