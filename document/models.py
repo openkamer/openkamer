@@ -651,12 +651,18 @@ class VoteParty(Vote):
 
 class VoteIndividual(Vote):
     person_name = models.CharField(max_length=500, blank=True)
+    person_tk_id = models.CharField(max_length=200, blank=True, db_index=True)
     parliament_member = models.ForeignKey(ParliamentMember, blank=True, null=True, on_delete=models.SET_NULL)
 
     def set_derived(self):
-        initials, surname, surname_prefix = parse_name_surname_initials(self.person_name)
-        self.parliament_member = ParliamentMember.find(surname=surname, initials=initials, date=self.voting.date)
-        self.save()
+        persons = Person.objects.filter(tk_id=self.person_tk_id)
+        if not persons:
+            logger.error('No person found for individual vote for name {} and tk_id {}'.format(self.person_name, self.person_tk_id))
+            return
+        members = ParliamentMember.find_at_date(persons[0], self.voting.date)
+        if members:
+            self.parliament_member = members[0]
+            self.save()
 
     def get_name(self):
         return str(self.parliament_member)

@@ -165,7 +165,7 @@ class VoteFactory(object):
                 person = persons[0]
                 members = ParliamentMember.objects.filter(person=person).order_by('-joined')
                 parliament_member = members[0] if members.exists() else None
-                person_name = ' '.join([person.surname, person.surname, person.initials]).strip()
+                person_name = ' '.join([person.forename, person.surname, person.initials]).strip()
 
             # TODO BR: this is a fallback, remove or extract function and log
             if parliament_member is None:
@@ -174,20 +174,21 @@ class VoteFactory(object):
                     surname = persoon.achternaam
                     forname = persoon.roepnaam
                 else:
-                    logger.error('Persoon not found for stemming: ' + stemming.id)
+                    logger.error('Persoon not found for stemming: {}'.format(stemming.id))
                     surname_initials = stemming.json['AnnotatieActorNaam']
                     forname = ''
                     initials, surname, surname_prefix = parse_name_surname_initials(surname_initials)
 
                 parliament_member = ParliamentMember.find(surname=surname, initials=initials)
                 if not parliament_member:
-                    logger.error('parliament member not found for vote: ' + str(stemming.id))
+                    logger.error('parliament member not found for vote: {}'.format(stemming.id))
                     logger.error('creating vote with empty parliament member')
                 person_name = ' '.join([forname, surname, initials]).strip()
 
             VoteIndividual.objects.create(
                 voting=voting,
                 person_name=person_name,
+                person_tk_id=persoon.id,
                 parliament_member=parliament_member,
                 number_of_seats=1,
                 decision=self.get_decision(stemming.soort),

@@ -121,9 +121,11 @@ class TestVoting(TestCase):
         self.assertEqual(vote.party, party_expected)
 
     def test_individual_voting(self):
+        pijkstra = Person.find_surname_initials('Dijkstra', 'P.A.')
         vote = VoteIndividual.objects.create(
             voting=self.voting,
             person_name='Dijkstra, P.A.',
+            person_tk_id=pijkstra.tk_id,
             number_of_seats=1
         )
         vote.set_derived()
@@ -134,6 +136,7 @@ class TestVoting(TestCase):
         vote = VoteIndividual.objects.create(
             voting=self.voting,
             person_name='Dijkstra, P.A.',
+            person_tk_id=member.person.tk_id,
             number_of_seats=1
         )
         vote.set_derived()

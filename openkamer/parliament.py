@@ -164,15 +164,6 @@ def create_party_wikidata(wikidata_id):
 
 
 @transaction.atomic
-def create_party_members():
-    logger.info('BEGIN')
-    persons = Person.objects.filter(wikidata_id__isnull=False).order_by('surname')
-    for person in persons:
-        create_party_members_for_person(person)
-    logger.info('END')
-
-
-@transaction.atomic
 def create_party_members_for_person(person: Person):
     logger.info('BEGIN - person: {}'.format(person))
     if not person.wikidata_id:
