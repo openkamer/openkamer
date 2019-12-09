@@ -52,10 +52,11 @@ class LockJob(CronJobBase):
     django-cron does provide a file lock backend,
     but this is not working due to issue https://github.com/Tivix/django-cron/issues/74
     """
+    code = None
 
     def do(self):
-        logger.info('BEGIN')
-        lockfilepath = os.path.join(settings.CRON_LOCK_DIR, 'tmp_' + self.code + '_lockfile')
+        logger.info('BEGIN: {}'.format(self.code))
+        lockfilepath = os.path.join(settings.CRON_LOCK_DIR, 'tmp_{}_lockfile'.format(self.code))
         a_lock = fasteners.InterProcessLock(lockfilepath)
         gotten = a_lock.acquire(timeout=1.0)
         try:
@@ -66,7 +67,7 @@ class LockJob(CronJobBase):
         finally:
             if gotten:
                 a_lock.release()
-        logger.info('END')
+        logger.info('END: {}'.format(self.code))
 
     def do_imp(self):
         raise NotImplementedError
@@ -179,7 +180,7 @@ class UpdateSubmitters(LockJob):
         try:
             submitters = Submitter.objects.all()
             n_total = submitters.count()
-            logger.info('submitters: ' + str(n_total))
+            logger.info('submitters: {}'.format(n_total))
             counter = 0
             progress_percent = 0
             submitters_batch = []
