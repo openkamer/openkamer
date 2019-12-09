@@ -1,5 +1,5 @@
 import logging
-from enum import Enum
+from typing import List
 
 import lxml
 import re
@@ -7,6 +7,11 @@ import re
 from django.db import transaction
 from django.urls import resolve, Resolver404
 from django.urls import reverse
+
+from tkapi.persoon import Persoon as TKPersoon
+from tkapi.document import Document as TKDocument
+from tkapi.document import DocumentActor as TKDocumentActor
+from tkapi.zaak import Zaak as TKZaak
 
 import scraper.documents
 
@@ -30,95 +35,104 @@ logger = logging.getLogger(__name__)
 
 class DocumentData(object):
 
-    def __init__(self, document_id, metadata, content_html, document_url):
+    def __init__(self, document_id, tk_document: TKDocument, tk_zaak: TKZaak, metadata, content_html):
         self.document_id = document_id
+        self.tk_document = tk_document
+        self.tk_zaak = tk_zaak
         self.metadata = metadata
         self.content_html = update_document_html_links(content_html)
-        self.title = metadata['title_full']
-        self.document_url = document_url
-        self.update_metadata()
+
+    @property
+    def url(self):
+        document_id = re.sub(r'-\(.*\)', '', self.document_id)  # Rijkswet ID is not used in url
+        return 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
+
+    @property
+    def title(self):
+        return self.tk_document.titel
 
     @property
     def date_published(self):
-        if self.metadata['date_published']:
-            return self.metadata['date_published']
-        elif self.metadata['date_submitted']:
-            return self.metadata['date_submitted']
-        elif self.metadata['date_received']:
-            return self.metadata['date_received']
-        elif self.metadata['date_available']:
-            return self.metadata['date_available']
-        elif self.metadata['date_letter_sent']:
-            return self.metadata['date_letter_sent']
-        return None
+        return self.tk_document.datum
 
-    def update_metadata(self):
-        if 'officiële publicatie' in self.metadata['title_short']:
-            self.metadata['title_short'] = self.metadata['title_full']
-        if 'submitter' not in self.metadata:
-            self.metadata['submitter'] = 'undefined'
-        if self.metadata['receiver']:
-            self.metadata['submitter'] = self.metadata['receiver']
+    @property
+    def submitters(self) -> List[TKPersoon]:
+        actors = []
+        if self.tk_document.actors:
+            actors = [actor.persoon for actor in self.tk_document.actors if actor.persoon and actor.persoon.achternaam]
+        if not actors:
+            actors = [actor.persoon for actor in self.tk_zaak.zaak_actors if actor.persoon and actor.persoon.achternaam]
+        return actors
+
+    @property
+    def submitters_names(self) -> List[str]:
+        names = []
+        if self.tk_document.actors:
+            names = [actor.naam for actor in self.tk_document.actors if actor.naam]
+        if not names:
+            names = [actor.naam for actor in self.tk_zaak.zaak_actors if actor.naam]
+        return names
 
 
 class DocumentFactory(object):
 
-    def get_document_data(self, overheidnl_document_id):
-        document_url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(overheidnl_document_id)
+    def get_document_data(self, tk_document: TKDocument, overheidnl_document_id):
+        logger.info(overheidnl_document_id)
         metadata = scraper.documents.get_metadata(overheidnl_document_id)
         overheidnl_document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else overheidnl_document_id
         content_html = scraper.documents.get_html_content(overheidnl_document_id)
-        return DocumentData(overheidnl_document_id, metadata, content_html, document_url)
+        tk_zaak = tk_document.zaken[0] if tk_document.zaken else None
+        return DocumentData(
+            overheidnl_document_id,
+            tk_document=tk_document,
+            tk_zaak=tk_zaak,
+            metadata=metadata,
+            content_html=content_html
+        )
 
-    def create_document(self, overheidnl_document_id, dossier_id=None, dossier=None):
+    def create_document(self, tk_document: TKDocument, overheidnl_document_id, dossier_id=None, dossier=None):
         logger.info('BEGIN')
-        document_data = self.get_document_data(overheidnl_document_id)
-        metadata = document_data.metadata
+        document_data = self.get_document_data(tk_document, overheidnl_document_id)
 
         if dossier is None:
             dossier = self.get_or_create_dossier(dossier_id)
 
         properties = {
             'dossier': dossier,
-            'title_full': metadata['title_full'],
-            'title_short': metadata['title_short'],
-            'publication_type': metadata['publication_type'],
-            'types': metadata['types'],
-            'publisher': metadata['publisher'],
+            'title_full': document_data.metadata['title_full'],
+            'title_short': document_data.metadata['title_short'],
+            'publication_type': document_data.metadata['publication_type'],
+            'publisher': document_data.metadata['publisher'],
             'date_published': document_data.date_published,
-            'source_url': document_data.document_url,
+            'source_url': document_data.url,
             'content_html': document_data.content_html,
         }
 
         document = self.create_document_and_related(document_data, properties)
         logger.info('END')
-        return document, metadata
+        return document, document_data.metadata
 
-    def create_kamervraag_document(self, overheidnl_document_id):
+    def create_kamervraag_document(self, tk_document: TKDocument, overheidnl_document_id):
         logger.info('BEGIN')
-        document_data = self.get_document_data(overheidnl_document_id)
-        metadata = document_data.metadata
+        document_data = self.get_document_data(tk_document, overheidnl_document_id)
 
         properties = {
             'dossier': None,
-            'title_full': document_data.title,
-            'title_short': metadata['title_full'],
-            'publication_type': metadata['publication_type'],
-            'types': metadata['types'],
-            'publisher': metadata['publisher'],
+            'title_full': tk_document.onderwerp,
+            'title_short': tk_document.onderwerp,
+            'publication_type': document_data.metadata['publication_type'],
+            'publisher': document_data.metadata['publisher'],
             'date_published': document_data.date_published,
-            'source_url': document_data.document_url,
+            'source_url': document_data.url,
             'content_html': document_data.content_html,
         }
 
         document = self.create_document_and_related(document_data, properties)
-        related_document_ids = scraper.documents.get_kamervraag_antwoord_ids(document_data.document_url)
         logger.info('END')
-        return document, related_document_ids, metadata['vraagnummer']
+        return document, document_data.metadata['vraagnummer']
 
     @staticmethod
-    def create_document_and_related(document_data, properties):
-
+    def create_document_and_related(document_data: DocumentData, properties) -> Document:
         if not document_data.date_published:
             logger.error('No published date for document: ' + str(document_data.document_id))
 
@@ -128,10 +142,7 @@ class DocumentFactory(object):
         )
         category_list = get_categories(text=document_data.metadata['category'], category_class=CategoryDocument)
         document.categories.add(*category_list)
-
-        submitters = document_data.metadata['submitter'].split('|')
-        for submitter in submitters:
-            SubmitterFactory.create_submitter(document, submitter, document_data.date_published)
+        SubmitterFactory.create_submitters(document, document_data)
         return document
 
     @staticmethod
@@ -189,42 +200,40 @@ def create_new_url(url):
 class SubmitterFactory(object):
 
     @staticmethod
-    @transaction.atomic
-    def create_submitter(document, submitter, date):
-        # TODO: fix this ugly if else mess
-        has_initials = len(submitter.split('.')) > 1
-        initials = ''
-        if has_initials:
-            initials, surname, surname_prefix = parse_name_surname_initials(submitter)
+    def create_submitters(document: Document, document_data: DocumentData):
+        if document_data.submitters:
+            for submitter in document_data.submitters:
+                SubmitterFactory.create_submitter(document, document_data.date_published, tk_person=submitter)
         else:
-            surname, surname_prefix = parse_surname_comma_surname_prefix(submitter)
-        if initials == 'C.S.':  # this is an abbreviation used in old metadata to indicate 'and usual others'
-            initials = ''
+            for name in document_data.submitters_names:
+                SubmitterFactory.create_submitter(document, document_data.date_published, name=name)
 
-        person = Person.find_surname_initials(surname=surname, initials=initials)
-        if surname == 'JAN JACOB VAN DIJK':  # 'Jan Jacob van Dijk' and ' Jasper van Dijk' have the same surname and initials, to solve this they have included the forename in the surname
-            person = Person.objects.filter(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
-        if surname == 'JASPER VAN DIJK':
-            person = Person.objects.filter(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')[0]
-        if surname == 'JAN DE VRIES':
-            person = Person.objects.filter(forename='Jan', surname_prefix='de', surname='Vries', initials='J.M.')[0]
+    @staticmethod
+    @transaction.atomic
+    def create_submitter(document: Document, date, tk_person: TKPersoon = None, name=None):
+        person = None
 
-        if not person:
-            active_persons = SubmitterFactory.get_active_persons(date)
-            persons_similar = active_persons.filter(surname__iexact=surname).exclude(initials='').exclude(forename='')
-            if persons_similar.count() == 1:
-                person = persons_similar[0]
-        if not person:
-            if surname == '' and initials == '':
-                persons = Person.objects.filter(surname='', initials='', forename='')
-                if persons:
-                    person = persons[0]
-        if not person:
-            persons = Person.objects.filter(surname__iexact=surname, initials__iexact=initials)
+        if not tk_person:
+            logger.warning('No document submitter found for document: {}'.format(document.document_id))
+        else:
+            persons = Person.objects.filter(tk_id=tk_person.id)
             if persons:
                 person = persons[0]
+
+            if person is None:
+                logger.warning('No person found for tk_persoon: {} ({})'.format(tk_person.achternaam, tk_person.initialen))
+
+        if person is None:
+            if tk_person:
+                surname = tk_person.achternaam
+                surname_prefix = tk_person.tussenvoegsel
+                initials = tk_person.initialen
+            else:
+                initials, surname, surname_prefix = parse_name_surname_initials(name)
+            person = Person.find_surname_initials(surname=surname, initials=initials)
+
         if not person:
-            logger.warning('Cannot find person: ' + str(surname) + ' ' + str(initials) + '. Creating new person!')
+            logger.warning('Cannot find person: {} ({}). Creating new person!'.format(surname, initials))
             person = Person.objects.create(surname=surname, surname_prefix=surname_prefix, initials=initials)
 
         party_members = PartyMember.get_at_date(person, date)

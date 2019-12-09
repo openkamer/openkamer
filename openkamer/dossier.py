@@ -1,16 +1,20 @@
 import logging
+import re
 import multiprocessing as mp
 from multiprocessing.pool import ThreadPool
 import time
 from typing import List
 
-from requests.exceptions import ConnectionError, ConnectTimeout
+from requests.exceptions import ConnectTimeout
+from requests.exceptions import ConnectionError
 
 from django.db import transaction
 
 from tkapi import Api
 from tkapi.util import queries
+from tkapi.persoon import Persoon as TKPersoon
 from tkapi.dossier import Dossier as TKDossier
+from tkapi.document import Document as TKDocument
 from tkapi.besluit import Besluit
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
@@ -23,7 +27,6 @@ from document.models import CategoryDossier
 from document.models import Dossier
 from document.models import Kamerstuk
 
-from openkamer.document import update_document_html_links
 from openkamer.document import DocumentFactory
 from openkamer.document import DocumentData
 from openkamer.document import get_categories
@@ -97,110 +100,98 @@ def create_or_update_dossier(dossier_id):
 class DocumentDataOverheidNL(object):
     # TODO: merge/replace with DocumentData
 
-    def __init__(self, document_id, title, metadata, content_html):
+    def __init__(self, document_id, tk_document: TKDocument, tk_zaak: Zaak, content_html, metadata):
         self.document_id = document_id
-        self.title = title
+        self.tk_document = tk_document
+        self.tk_zaak = tk_zaak
         self.metadata = metadata
         self.content_html = content_html
-        self.url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
 
     @property
     def date_published(self):
-        if self.metadata['date_published']:
-            return self.metadata['date_published']
-        elif self.metadata['date_submitted']:
-            return self.metadata['date_submitted']
-        elif self.metadata['date_received']:
-            return self.metadata['date_received']
-        elif self.metadata['date_available']:
-            return self.metadata['date_available']
-        elif self.metadata['date_letter_sent']:
-            return self.metadata['date_letter_sent']
-        return None
+        return self.tk_document.datum
+
+    @property
+    def submitters(self) -> List[TKPersoon]:
+        if self.tk_document.actors:
+            return [actor.person for actor in self.tk_document.actors if actor.person]
+        else:
+            return [actor.person for actor in self.tk_zaak.zaak_actors if actor.person]
 
 
-def get_document_data_mp(document_id, outputs):
-    if not document_id:
-        logger.error('No document id found for document_id: ' + document_id + ' - will not create document')
-        return
+def get_document_data(tk_document: TKDocument, tk_zaak: Zaak, dossier_id):
+    dossier_id = re.sub(r'-\(.*\)', '', dossier_id)  # Rijkswet ID is not used in url
+    overheid_document_id = 'kst-{}-{}'.format(dossier_id, tk_document.volgnummer)
+    metadata = scraper.documents.get_metadata(overheid_document_id)
 
-    metadata = scraper.documents.get_metadata(document_id)
-
-    # skip eerste kamer documents, first focus on the tweede kamer
-    # TODO: handle eerste kamer documents
-    if 'eerste kamer' in metadata['publisher'].lower():
-        logger.info('skipping Eerste Kamer document')
-        return
-
-    document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else document_id
     try:
-        content_html = scraper.documents.get_html_content(document_id)
+        content_html = scraper.documents.get_html_content(overheid_document_id)
     except:
-        logger.exception('error getting document html for document id: {}'.format(document_id))
+        logger.exception('error getting document html for document id: {}'.format(overheid_document_id))
         content_html = ''
-    document_data = DocumentDataOverheidNL(
-        document_id=document_id,
-        title=metadata['title_full'],
+    document_data = DocumentData(
+        document_id=overheid_document_id,
+        tk_document=tk_document,
+        tk_zaak=tk_zaak,
         metadata=metadata,
-        content_html=content_html
+        content_html=content_html,
     )
-    outputs.append(document_data)
+    return document_data
 
 
 @transaction.atomic
 def create_dossier_documents(dossier, dossier_id):
     logger.info('create_dossier_documents - BEGIN')
-    document_ids = scraper.documents.search_politieknl_dossier(dossier_id)
 
-    pool = ThreadPool(processes=4)
-    manager = mp.Manager()
-    outputs = manager.list()
-    for document_id in document_ids:
-        if 'stcrt' in document_id:
-            continue  # skip Staatscourant for now
-        if 'ag-tk' in document_id:
-            continue  # skip agenda for now
-        if 'blg' in document_id:
-            continue  # skip bijlage for now
-        pool.apply_async(get_document_data_mp, args=(document_id, outputs))
-    pool.close()
-    pool.join()
+    # overheid_document_ids = []
+    tk_dossier = queries.get_dossier(nummer=dossier.dossier_main_id, toevoeging=dossier.dossier_sub_id)
+    # for zaak in tk_dossier.zaken:
+    #     overheid_document_ids.append('kst-{}-{}'.format(dossier.dossier_id, zaak.volgnummer))
+
+    # document_ids = scraper.documents.search_politieknl_dossier(dossier_id)
+    # print(overheid_document_ids)
+    # print(document_ids)
+
+    # pool = ThreadPool(processes=4)
+    # manager = mp.Manager()
+    # outputs = manager.list()
+    # for tk_document in tk_documents:
+    #     pool.apply_async(get_document_data, args=(tk_document, dossier_id, outputs))
+    # pool.close()
+    # pool.join()
+
+    outputs = []
+    for tk_zaak in tk_dossier.zaken:
+        for doc in tk_zaak.documenten:
+            outputs.append(get_document_data(doc, tk_zaak, dossier_id))
 
     logger.info('create_dossier_documents - outputs: {}'.format(len(outputs)))
 
     for data in outputs:
-        if 'submitter' not in data.metadata:
-            data.metadata['submitter'] = 'undefined'
-
-        dossier_for_document = dossier
-
-        data.content_html = update_document_html_links(data.content_html)
+        # data.tk_document.print_json()
         properties = {
-            'dossier': dossier_for_document,
-            'title_full': data.metadata['title_full'],
-            'title_short': data.metadata['title_short'],
-            'publication_type': data.metadata['publication_type'],
-            'types': data.metadata['types'],
-            'publisher': data.metadata['publisher'],
-            'date_published': data.date_published,
+            'dossier': dossier,
+            'title_full': data.tk_document.onderwerp,
+            'title_short': data.tk_document.onderwerp,
+            'publication_type': 'Kamerstuk',
+            'publisher': '',
+            'date_published': data.tk_document.datum,
             'source_url': data.url,
             'content_html': data.content_html,
         }
 
-        document_data = DocumentData(data.document_id, data.metadata, data.content_html, data.url)
-        document = DocumentFactory.create_document_and_related(document_data, properties)
+        document = DocumentFactory.create_document_and_related(data, properties)
 
-        if data.metadata['is_kamerstuk']:
-            is_attachement = "Bijlage" in properties['types']
-            dossier_id = data.metadata.get('dossier_ids', dossier_id).split(';')[0]
-            if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.metadata['id_sub']).exists():
-                create_kamerstuk(document, dossier_id, data.title, data.metadata, is_attachement)
-                category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
-                dossier_for_document.categories.add(*category_list)
-
-        # TODO BR: enable
-        # if metadata['is_agenda']:
-        #     create_agenda(document, metadata)
+        if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.tk_document.volgnummer).exists():
+            create_kamerstuk(
+                document=document,
+                dossier_id=dossier_id,
+                number=data.tk_document.volgnummer,
+                type_long=data.tk_document.onderwerp,
+                type_short=data.tk_document.soort.value
+            )
+            category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
+            dossier.categories.add(*category_list)
 
 
 def get_inactive_dossier_ids(year=None) -> List[DossierId]:

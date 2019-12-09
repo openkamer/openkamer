@@ -232,7 +232,6 @@ def create_parliament_member_from_wikidata_id(parliament, person_wikidata_id):
             joined=position['start_time'],
             left=position['end_time']
         )
-        logger.info(parliament_member)
         members.append(parliament_member)
         if position['part_of_id']:
             party_item = wikidata.WikidataItem(position['part_of_id'])

@@ -3,7 +3,12 @@ import datetime
 from django.urls import reverse
 from django.test import TestCase
 
+from tkapi import Api
+from tkapi.document import DocumentSoort
+from tkapi.document import Document as TKDocument
 from tkapi.util import queries
+from tkapi.util.document import get_overheidnl_id
+from tkapi.zaak import Zaak
 
 from person.models import Person
 
@@ -81,48 +86,6 @@ class TestCreatePerson(TestCase):
         self.assertEqual(person.surname_prefix, '')
         self.assertEqual(person.surname, 'Koşer Kaya')
         self.assertEqual(person.fullname(), 'Fatma Koşer Kaya')
-
-    def test_submitter(self):
-        date = datetime.date(day=30, month=1, year=2010)
-        p1 = Person.objects.create(forename='Jeroen', surname='Dijsselbloem', initials='J.R.V.A.')
-        parliament = Parliament.get_or_create_tweede_kamer()
-        ParliamentMember.objects.create(person=p1, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
-        document = Document.objects.create(date_published=datetime.date.today())
-        submitter = SubmitterFactory.create_submitter(document, 'L. van Tongeren', date)
-        self.assertEqual(submitter.person.initials, 'L.')
-        submitter = SubmitterFactory.create_submitter(document, 'Tongeren C.S.', date)
-        self.assertEqual(submitter.person.initials, '')
-        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
-        self.assertEqual(submitter.person, p1)
-        p5 = Person.objects.create(forename='', surname='Dijsselbloem', initials='')
-        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
-        self.assertEqual(submitter.person, p1)
-        p2 = Person.objects.create(forename='Pieter', surname='Dijsselbloem', initials='P.')
-        ParliamentMember.objects.create(person=p2, parliament=parliament, joined=datetime.date(2010, 1, 1), left=datetime.date(2010, 2, 1))
-        submitter = SubmitterFactory.create_submitter(document, 'DIJSSELBLOEM', date)
-        self.assertNotEqual(submitter.person, p1)
-        self.assertNotEqual(submitter.person, p2)
-        p3 = Person.objects.create(forename='Jan Jacob', surname_prefix='van', surname='Dijk', initials='J.J.')
-        p4 = Person.objects.create(forename='Jasper', surname_prefix='van', surname='Dijk', initials='J.J.')
-        submitter = SubmitterFactory.create_submitter(document, 'JAN JACOB VAN DIJK', date)
-        self.assertEqual(submitter.person, p3)
-        submitter = SubmitterFactory.create_submitter(document, 'JASPER VAN DIJK', date)
-        self.assertEqual(submitter.person, p4)
-
-    def test_submitter_empty(self):
-        p1 = Person.objects.create(forename='', surname='', initials='')
-        document = Document.objects.create(date_published=datetime.date.today())
-        submitter = SubmitterFactory.create_submitter(document, '', datetime.date.today())
-        self.assertEqual(submitter.person, p1)
-
-    def test_submitter_surname_only(self):
-        p1 = Person.objects.create(forename='', surname='van Raak', initials='')
-        document = Document.objects.create(date_published=datetime.date.today())
-        submitter = SubmitterFactory.create_submitter(document, 'VAN RAAK', datetime.date.today())
-        self.assertEqual(submitter.person, p1)
-        p2 = Person.objects.create(forename='', surname_prefix='van der', surname='Ham', initials='')
-        submitter = SubmitterFactory.create_submitter(document, 'Ham, van der', datetime.date.today())  # example: https://zoek.officielebekendmakingen.nl/kst-30830-13
-        self.assertEqual(submitter.person, p2)
 
 
 class TestFindOriginalKamerstukId(TestCase):
@@ -300,12 +263,17 @@ class TestKamervraag(TestCase):
     def test_create_kamervraag(self):
         year = 2016
         begin_datetime = datetime.datetime(year=year, month=1, day=1)
-        end_datetime = datetime.datetime(year=year + 1, month=1, day=1)
-        tk_vragen = openkamer.kamervraag.get_tk_kamervragen(begin_datetime, end_datetime)
-        overheid_id = tk_vragen[0].document_url.replace('https://zoek.officielebekendmakingen.nl/', '')
-        document_factory = DocumentFactory()
-        document, related_document_ids, vraagnummer = document_factory.create_kamervraag_document(overheid_id)
-        # print(metadata)
+        end_datetime = datetime.datetime(year=year, month=2, day=1)
+        tk_zaken = openkamer.kamervraag.get_tk_kamervraag_zaken(begin_datetime, end_datetime)
+        tk_zaak = tk_zaken[0]
+        kamervraag = None
+        for tk_doc in tk_zaak.documenten:
+            if tk_doc.soort != DocumentSoort.SCHRIFTELIJKE_VRAGEN:
+                continue
+            overheid_id = get_overheidnl_id(tk_doc)
+            document_factory = DocumentFactory()
+            kamervraag, vraagnummer = document_factory.create_kamervraag_document(tk_doc, overheid_id)
+        self.assertIsNotNone(kamervraag)
 
     def test_get_receiver_from_title(self):
         receiver_expected = 'Staatssecretaris van Infrastructuur en Milieu'
@@ -370,44 +338,66 @@ class TestKamervraag(TestCase):
         self.assertEqual(len(kamervragen), n_create)
         self.assertEqual(len(kamerantwoorden), n_create)
 
+    @staticmethod
+    def get_tk_zaak(zaak_nummer):
+        filter = Zaak.create_filter()
+        filter.filter_nummer(zaak_nummer)
+        tk_zaken = Api().get_zaken(filter=filter)
+        return tk_zaken[0]
+
+    @staticmethod
+    def get_tk_document_for_zaak(zaak_nummer):
+        tk_zaak = TestKamervraag.get_tk_zaak(zaak_nummer)
+        for tk_doc in tk_zaak.documenten:
+            if tk_doc.soort == DocumentSoort.SCHRIFTELIJKE_VRAGEN:
+                return tk_doc
+        return None
+
     def test_postponed_answer(self):
-        overheid_id = 'kv-tk-2017Z07318'
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_id)
-        self.assertEqual(len(related_document_ids), 2)
-        kamerantwoord, mededelingen = openkamer.kamervraag.create_related_kamervraag_documents(kamervraag, related_document_ids)
-        self.assertTrue(kamerantwoord)
-        self.assertEqual(len(mededelingen), 1)
-        self.assertTrue(mededelingen[0].text)
+        zaak_nummer = '2017Z07318'
+        tk_zaak = self.get_tk_zaak(zaak_nummer)
+        overheid_id = 'kv-tk-{}'.format(zaak_nummer)
+        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak, overheid_id)
+        self.assertIsNotNone(kamervraag)
+        self.assertEqual(1, len(kamervraag.mededelingen))
+        self.assertTrue(kamervraag.mededelingen[0].text)
 
     def test_update_or_create(self):
-        overheid_doc_id = 'kv-tk-2017Z07318'
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id)
+        zaak_nummer = '2017Z07318'
+        tk_document = self.get_tk_document_for_zaak(zaak_nummer)
+        overheid_doc_id = 'kv-tk-{}'.format(zaak_nummer)
+        kamervraag = openkamer.kamervraag.create_kamervraag(tk_document, overheid_doc_id)
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
-        kamervraag, related_document_ids = openkamer.kamervraag.create_kamervraag(overheid_doc_id)
+        kamervraag = openkamer.kamervraag.create_kamervraag(tk_document, overheid_doc_id)
         documents = Document.objects.all()
         self.assertEqual(documents.count(), 1)
 
-    def test_get_tk_kamervragen(self):
+    def test_get_tk_kamervraag_zaken(self):
         year = 2016
         month = 1
         begin_datetime = datetime.datetime(year=year, month=month, day=1)
         end_datetime = datetime.datetime(year=year + 1, month=month, day=1)
-        infos = openkamer.kamervraag.get_tk_kamervragen(begin_datetime, end_datetime)
+        infos = openkamer.kamervraag.get_tk_kamervraag_zaken(begin_datetime, end_datetime)
         self.assertEqual(len(infos), 2626)
 
 
 class TestKamerantwoord(TestCase):
 
     def test_combined_answers(self):
+        filter = TKDocument.create_filter()
+        filter.filter_aanhangselnummer('151601580')
+        docs = Api().get_documenten(filter=filter)
+        self.assertEqual(1, len(docs))
+        doc = docs[0]
         overheidnl_document_id = 'ah-tk-20152016-1580'
-        kamerantwoord, mededeling = openkamer.kamervraag.create_kamerantwoord(overheidnl_document_id)
-        self.assertEqual(kamerantwoord.antwoord_set.count(), 4)
+        kamerantwoord = openkamer.kamervraag.create_kamerantwoord(doc, overheidnl_document_id)
+        self.assertEqual(4, kamerantwoord.antwoord_set.count())
         antwoorden = kamerantwoord.antwoord_set.all()
-        self.assertEqual(antwoorden[0].see_answer_nr, None)
-        self.assertEqual(antwoorden[1].see_answer_nr, None)
-        self.assertEqual(antwoorden[2].see_answer_nr, 2)
-        self.assertEqual(antwoorden[3].see_answer_nr, None)
+        self.assertEqual(None, antwoorden[0].see_answer_nr)
+        self.assertEqual(None, antwoorden[1].see_answer_nr)
+        self.assertEqual(2, antwoorden[2].see_answer_nr)
+        self.assertEqual(None, antwoorden[3].see_answer_nr)
 
 
 class TestVoting(TestCase):
@@ -506,11 +496,17 @@ class TestGifts(TestCase):
 class TestVerslagAlgemeenOverleg(TestCase):
 
     def test_create_verslag(self):
+        filter = TKDocument.create_filter()
         dossier_id = 26234
         kamerstuk_nr = 225
+        filter.filter_dossier(dossier_id)
+        filter.filter_volgnummer(kamerstuk_nr)
+        docs = Api().get_documenten(filter=filter, max_items=10)
+        self.assertEqual(1, len(docs))
         overheidnl_document_id = 'kst-{}-{}'.format(dossier_id, kamerstuk_nr)
         commissie = Commissie.objects.create(name='test commissie', name_short='tc', slug='tc')
         verslag = openkamer.verslagao.create_verslag(
+            tk_document=docs[0],
             overheidnl_document_id=overheidnl_document_id,
             dossier_id=dossier_id,
             kamerstuk_nr=kamerstuk_nr,
