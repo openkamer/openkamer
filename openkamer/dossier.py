@@ -15,7 +15,7 @@ from tkapi.util import queries
 from tkapi.persoon import Persoon as TKPersoon
 from tkapi.dossier import Dossier as TKDossier
 from tkapi.document import Document as TKDocument
-from tkapi.besluit import Besluit
+from tkapi.besluit import Besluit as TKBesluit
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
 from tkapi.activiteit import ActiviteitStatus
@@ -249,31 +249,31 @@ def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, ma
     return failed_dossiers
 
 
-def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Besluit]:
-    besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+def get_tk_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[TKBesluit]:
+    tk_besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
     besluiten_dossier = []
     # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
-    for besluit in besluiten:
-        if str(besluit.zaak.volgnummer) == '0':
-            besluiten_dossier.append(besluit)
+    for tk_besluit in tk_besluiten:
+        if str(tk_besluit.zaak.volgnummer) == '0':
+            besluiten_dossier.append(tk_besluit)
     return besluiten_dossier
 
 
-def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> Besluit:
-    besluiten = get_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
+def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> TKBesluit:
+    tk_besluiten = get_tk_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
     last_besluit = None
-    for besluit in besluiten:
-        if filter_has_votings and not besluit.stemmingen:
+    for tk_besluit in tk_besluiten:
+        if filter_has_votings and not tk_besluit.stemmingen:
             continue
-        if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
+        if tk_besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
             # TODO: create dossier agendapunt with planned activiteit
             continue
-        if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
-            last_besluit = besluit
+        if last_besluit is None or tk_besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
+            last_besluit = tk_besluit
     return last_besluit
 
 
-def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> Besluit:
+def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> TKBesluit:
     return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
 
 

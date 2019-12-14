@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 
 import stats.models
 
-import openkamer.besluitenlijst
 import openkamer.dossier
 import openkamer.parliament
 import openkamer.kamervraag

@@ -3,29 +3,4 @@
 
 {% with case=item.obj %}
 
-<div class="cd-timeline-img text-center bg-info">
-  <span style="font-size:24px;" class="fa fa-gavel"></span>
-</div> <!-- cd-timeline-img -->
-
-<div class="cd-timeline-content">
-  <div class="kamertuk-id-timeline-container">
-    Besluitenlijst {{ case.besluit_item.besluiten_lijst.activity_id }}
-  </div>
-    {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
-    <h6><a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.title }}</a></h6>
-  <p>
-    <strong>Indiener:</strong>  {{ case.besluit_item.besluiten_lijst.commission }}
-    <br/>
-    {% for decision in case.decision_list %}
-      <strong>Besluit:</strong> {{ decision }}<br/>
-    {% endfor %}
-    {% for note in case.notes_list %}
-      Noot: {{ note }}
-    {% endfor %}
-  </p>
-
-  <span class="cd-date"><h2>{{ case.besluit_item.besluiten_lijst.date_published|date:"j F Y" }}</h2></span>
-
-</div> <!-- cd-timeline-content -->
-
 {% endwith %}

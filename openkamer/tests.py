@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.test import TestCase
 
 from tkapi import TKApi
+from tkapi.besluit import Besluit as TKBesluit
 from tkapi.document import DocumentSoort
 from tkapi.document import Document as TKDocument
 from tkapi.util import queries
@@ -15,7 +16,6 @@ from person.models import Person
 from government.models import Government
 
 from parliament.models import Parliament
-from parliament.models import ParliamentMember
 from parliament.models import PartyMember
 from parliament.models import PoliticalParty
 from parliament.models import Commissie
@@ -25,9 +25,7 @@ from document.models import Dossier
 from document.models import Kamervraag
 from document.models import Voting, Vote
 
-import openkamer.besluitenlijst
 from openkamer.document import DocumentFactory
-from openkamer.document import SubmitterFactory
 import openkamer.dossier
 import openkamer.kamerstuk
 import openkamer.kamervraag
@@ -226,38 +224,6 @@ class TestCreateGovernment(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestCreateBesluitenLijst(TestCase):
-    urls = [
-        'https://www.tweedekamer.nl/downloads/document?id=4f728174-02ac-4822-a13f-66e0454a61c5&title=Besluitenlijst%20Financi%C3%ABn%20-%2026%20oktober%202016.pdf',
-        'https://www.tweedekamer.nl/downloads/document?id=a1473f2c-79b1-47dd-b82c-7d7cd628e395&title=Besluitenlijst%20procedurevergadering%20Rijksuitgaven%20-%205%20juni%202014.pdf',
-        'https://www.tweedekamer.nl/downloads/document?id=57fad866-5252-492f-9974-0ef396ba9080&title=Procedurevergadering%20RU%20-%2011%20oktober%202012%20VINDT%20GEEN%20DOORGANG.pdf',
-        'https://www.tweedekamer.nl/downloads/document?id=a1342689-a7e4-4b17-a058-439005b22991&title=Herziene%20besluitenlijst%20e-mailprocedure%20BIZA%20-%2030%20mei%202016%20.pdf',
-        'https://www.tweedekamer.nl/downloads/document?id=39d1fda2-24ce-4b11-b979-ce9b3b0ae7cf&title=Besluitenlijst%20procedurevergadering%20Buza%2017%20mrt.pdf',
-        'https://www.tweedekamer.nl/downloads/document?id=8f30f5b6-eadc-4d9f-8ef4-59feed7d62f5&title=Besluitenlijst%20extra%20procedurevergadering%208%2F3%2F2011%20Buza%2FDef%20.pdf',
-        # 'https://www.tweedekamer.nl/downloads/document?id=61a2686e-ec4a-4881-892b-04e215462ecd&title=Besluitenlijst%20extra%20procedurevergadering%20IM%20d.d.%207%20juni%202011.pdf',  # gives a TypeError, may be corrupt pdf or pdfminer bug
-    ]
-
-    def test_create_besluitenlijst_from_url(self):
-        for url in self.urls:
-            besluitenlijst = openkamer.besluitenlijst.create_besluitenlijst(url)
-            self.assertFalse(besluitenlijst.title == '')
-            items = besluitenlijst.items()
-            for item in items:
-                self.assertFalse('Zaak:' in item.title)
-                self.assertFalse('Besluit:' in item.title)
-                self.assertFalse('Document:' in item.title)
-                self.assertFalse('Noot:' in item.title)
-                for case in item.cases():
-                    self.assertFalse('Besluit:' in case.title)
-                    self.assertFalse('Noot:' in case.title)
-            dossier_ids = besluitenlijst.related_dossier_ids
-
-    def test_create_besluitenlijst_to_commissions(self):
-        url = 'https://www.tweedekamer.nl/downloads/document?id=a458091b-5963-4b5d-becb-664a10f55b8f&title=Besluitenlijst%20extra%20procedurevergadering%20werkbezoek%20Auschwitz.pdf'
-        besluitenlijst = openkamer.besluitenlijst.create_besluitenlijst(url)
-        self.assertEqual(besluitenlijst.commission, 'vaste commissie voor Volksgezondheid, Welzijn en Sport')
-
-
 class TestKamervraag(TestCase):
 
     def test_create_kamervraag(self):
@@ -445,9 +411,9 @@ class TestVoting(TestCase):
         dossier_id = 33542
         volgnummer = 39
         Dossier.objects.create(dossier_id=dossier_id)
-        besluit = self.get_besluit_kamerstuk(dossier_id=dossier_id, volgnummer=volgnummer)
+        tk_besluit = self.get_besluit_kamerstuk(dossier_id=dossier_id, volgnummer=volgnummer)
         voting_factory = openkamer.voting.VotingFactory(do_create_missing_party=False)
-        voting_factory.create_votings_dossier_besluit(besluit, dossier_id)
+        voting_factory.create_votings_dossier_besluit(tk_besluit, dossier_id)
         votings = Voting.objects.all()
         did_check = False
         for voting in votings:
@@ -458,10 +424,10 @@ class TestVoting(TestCase):
         self.assertTrue(did_check)
 
     def get_besluit_kamerstuk(self, dossier_id, volgnummer):
-        besluiten = queries.get_kamerstuk_besluiten(nummer=dossier_id, volgnummer=volgnummer)
-        self.assertEqual(1, len(besluiten))
-        besluit = besluiten[0]
-        return besluit
+        tk_besluiten = queries.get_kamerstuk_besluiten(nummer=dossier_id, volgnummer=volgnummer)
+        self.assertEqual(1, len(tk_besluiten))
+        tk_besluit = tk_besluiten[0]
+        return tk_besluit
 
 
 class TestDossierBesluit(TestCase):
@@ -472,19 +438,19 @@ class TestDossierBesluit(TestCase):
         self.assertEqual(1, len(zaken))
 
     def test_get_dossier_besluiten(self):
-        besluiten = openkamer.dossier.get_besluiten_dossier_main(dossier_id_main=self.DOSSIER_ID)
+        besluiten = openkamer.dossier.get_tk_besluiten_dossier_main(dossier_id_main=self.DOSSIER_ID)
         # print('{} besluiten found'.format(len(besluiten)))
         # for index, besluit in enumerate(besluiten):
         #     print('{} | {} | {} besluit stemmingen'.format(index, besluit.tekst, len(besluit.stemmingen)))
         self.assertEqual(7, len(besluiten))
 
     def test_get_last_besluit(self):
-        besluit = openkamer.dossier.get_besluit_last(dossier_id_main=self.DOSSIER_ID)
-        self.assertEqual(0, len(besluit.stemmingen))
+        tk_besluit = openkamer.dossier.get_besluit_last(dossier_id_main=self.DOSSIER_ID)
+        self.assertEqual(0, len(tk_besluit.stemmingen))
 
     def test_get_last_besluit_with_voting(self):
-        besluit = openkamer.dossier.get_besluit_last_with_voting(dossier_id_main=self.DOSSIER_ID)
-        self.assertEqual(13, len(besluit.stemmingen))
+        tk_besluit = openkamer.dossier.get_besluit_last_with_voting(dossier_id_main=self.DOSSIER_ID)
+        self.assertEqual(13, len(tk_besluit.stemmingen))
 
 
 class TestGifts(TestCase):

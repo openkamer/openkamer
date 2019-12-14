@@ -1,6 +1,5 @@
 from django.contrib import admin
 
-from document.models import BesluitenLijst
 from document.models import Dossier
 from document.models import Document
 from document.models import CategoryDossier
@@ -72,17 +71,6 @@ class KamerstukAdmin(admin.ModelAdmin):
         return obj.document.date_published
 
 
-class BesluitenLijstAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'title',
-        'date_published',
-        'commission',
-        'activity_id',
-        'url',
-    )
-
-
 class KamervraagAdmin(admin.ModelAdmin):
     list_display = (
         'vraagnummer', 'document',
@@ -134,8 +122,6 @@ admin.site.register(Submitter, SubmitterAdmin)
 admin.site.register(Kamervraag, KamervraagAdmin)
 admin.site.register(Kamerantwoord, KamerantwoordAdmin)
 admin.site.register(KamervraagMededeling, KamervraagMededelingAdmin)
-
-admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
 
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)

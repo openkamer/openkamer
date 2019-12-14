@@ -10,7 +10,6 @@ from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
 from document.views import PersonAutocomplete
 from document.views import PartyAutocomplete
-from document.views import BesluitenLijstView, BesluitenLijstenView
 from document.views import DocumentSearchView
 from document.views import DossiersView
 from document.views import DossiersTableView
@@ -109,9 +108,6 @@ urlpatterns = [
     url(r'^commissie/(?P<slug>[-\w]+)/$', CommissieView.as_view(), name='commissie'),
 
     url(r'^persoon/documenten/(?P<person_id>\d+)/$', PersonDocumentsView.as_view(), name='person-documents'),
-
-    url(r'^besluitenlijsten/$', BesluitenLijstenView.as_view(), name='besluitenlijsten'),
-    url(r'^besluitenlijst/(?P<activity_id>.*)/$', BesluitenLijstView.as_view(), name='besluitenlijst'),
 
     url(r'^stemmingen/$', VotingsView.as_view(), name='votings'),
     url(r'^stemming/dossier/(?P<dossier_id>[\w()-]{1,40})/$', VotingView.as_view(), name='voting-dossier'),

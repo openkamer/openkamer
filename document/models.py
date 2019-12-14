@@ -107,10 +107,6 @@ class Dossier(models.Model):
         return Kamerstuk.objects.filter(document__dossier=self).select_related('document')
 
     @cached_property
-    def besluitenlijst_cases(self):
-        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id).select_related('besluit_item', 'besluit_item__besluiten_lijst')
-
-    @cached_property
     def start_date(self):
         documents = Document.objects.filter(dossier=self).order_by('date_published')
         if documents.exists():
@@ -666,85 +662,6 @@ class VoteIndividual(Vote):
 
     def get_name(self):
         return str(self.parliament_member)
-
-
-class BesluitenLijst(models.Model):
-    title = models.CharField(max_length=1000)
-    commission = models.CharField(max_length=500)
-    activity_id = models.CharField(max_length=100)
-    date_published = models.DateField()
-    url = models.URLField(max_length=1000)
-
-    class Meta:
-        ordering = ['-date_published']
-
-    def items(self):
-        return BesluitItem.objects.filter(besluiten_lijst=self)
-
-    def cases_all(self):
-        return BesluitItemCase.objects.filter(besluit_item__in=self.items())
-
-    @cached_property
-    def related_dossier_ids(self):
-        dossier_ids = []
-        for case in self.cases_all():
-            document_ids = case.related_document_id_list()
-            for doc_id in document_ids:
-                if doc_id:
-                    dossier_ids.append(doc_id.split('-')[0])
-        return dossier_ids
-
-
-class BesluitItem(models.Model):
-    title = models.CharField(max_length=4000)
-    besluiten_lijst = models.ForeignKey(BesluitenLijst, on_delete=models.CASCADE)
-
-    def cases(self):
-        return BesluitItemCase.objects.filter(besluit_item=self)
-
-
-class BesluitItemCase(models.Model):
-    title = models.CharField(max_length=2000)
-    besluit_item = models.ForeignKey(BesluitItem, on_delete=models.CASCADE)
-    decisions = models.CharField(max_length=7000)
-    notes = models.CharField(max_length=5000)
-    related_commissions = models.CharField(max_length=1000)
-    related_document_ids = models.CharField(max_length=1000)
-    SEP_CHAR = '|'
-
-    def decision_list(self):
-        return self.decisions.split(self.SEP_CHAR)
-
-    def note_list(self):
-        return self.notes.split(self.SEP_CHAR)
-
-    def related_commission_list(self):
-        return self.related_commissions.split(self.SEP_CHAR)
-
-    def related_document_id_list(self):
-        return self.related_document_ids.split(self.SEP_CHAR)
-
-    @cached_property
-    def related_kamerstukken(self):
-        document_ids = self.related_document_id_list()
-        related_stukken = []
-        for document_id in document_ids:
-            if not document_id:
-                continue
-            id_parts = document_id.split('-')
-            if len(id_parts) < 2:
-                logger.info('no kamerstuk found for id: ' + document_id)
-                continue
-            if len(id_parts) == 2:
-                id_main = document_id.split('-', 0)
-                id_sub = document_id.split('-', 1)
-            if len(id_parts) == 3:
-                id_main = '{}-{}'.format(document_id.split('-', 0), document_id.split('-', 1))
-                id_sub = document_id.split('-', 2)
-            kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
-            if kamerstukken:
-                related_stukken.append(kamerstukken[0])
-        return related_stukken
 
 
 class CommissieDocument(models.Model):
