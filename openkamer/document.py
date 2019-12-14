@@ -39,7 +39,7 @@ class DocumentData(object):
         self.document_id = document_id
         self.tk_document = tk_document
         self.tk_zaak = tk_zaak
-        self.metadata = metadata
+        self._metadata = metadata
         self.content_html = update_document_html_links(content_html)
 
     @property
@@ -48,12 +48,12 @@ class DocumentData(object):
         return 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
 
     @property
-    def title(self):
-        return self.tk_document.titel
-
-    @property
     def date_published(self):
         return self.tk_document.datum
+
+    @property
+    def category(self):
+        return self._metadata['category']
 
     @property
     def submitters(self) -> List[TKPersoon]:
@@ -99,18 +99,17 @@ class DocumentFactory(object):
 
         properties = {
             'dossier': dossier,
-            'title_full': document_data.metadata['title_full'],
-            'title_short': document_data.metadata['title_short'],
-            'publication_type': document_data.metadata['publication_type'],
-            'publisher': document_data.metadata['publisher'],
+            'title_full': tk_document.onderwerp,
+            'title_short': tk_document.titel,
+            'publication_type': document_data.tk_document.soort.value,
             'date_published': document_data.date_published,
             'source_url': document_data.url,
             'content_html': document_data.content_html,
         }
 
-        document = self.create_document_and_related(document_data, properties)
+        document = self.create_or_update_document(document_data, properties)
         logger.info('END')
-        return document, document_data.metadata
+        return document
 
     def create_kamervraag_document(self, tk_document: TKDocument, overheidnl_document_id):
         logger.info('BEGIN')
@@ -120,19 +119,18 @@ class DocumentFactory(object):
             'dossier': None,
             'title_full': tk_document.onderwerp,
             'title_short': tk_document.onderwerp,
-            'publication_type': document_data.metadata['publication_type'],
-            'publisher': document_data.metadata['publisher'],
+            'publication_type': tk_document.soort.value,
             'date_published': document_data.date_published,
             'source_url': document_data.url,
             'content_html': document_data.content_html,
         }
 
-        document = self.create_document_and_related(document_data, properties)
+        document = self.create_or_update_document(document_data, properties)
         logger.info('END')
-        return document, document_data.metadata['vraagnummer']
+        return document, document_data._metadata['vraagnummer']
 
     @staticmethod
-    def create_document_and_related(document_data: DocumentData, properties) -> Document:
+    def create_or_update_document(document_data: DocumentData, properties) -> Document:
         if not document_data.date_published:
             logger.error('No published date for document: ' + str(document_data.document_id))
 
@@ -140,7 +138,7 @@ class DocumentFactory(object):
             document_id=document_data.document_id,
             defaults=properties
         )
-        category_list = get_categories(text=document_data.metadata['category'], category_class=CategoryDocument)
+        category_list = get_categories(text=document_data.category, category_class=CategoryDocument)
         document.categories.add(*category_list)
         SubmitterFactory.create_submitters(document, document_data)
         return document

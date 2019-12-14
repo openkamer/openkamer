@@ -75,12 +75,6 @@ def get_metadata(document_id):
         if elements:
             metadata['title_short'] = elements[0].get('content')
 
-    metadata['is_kamerstuk'] = False
-    elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')
-    for element in elements:
-        if element.get('scheme') == 'OVERHEIDop.Parlementair':
-            metadata['is_kamerstuk'] = element.get('content') == 'Kamerstuk'
-
     """ agenda code """
     metadata['is_agenda'] = False
     elements = tree.xpath('/metadata_gegevens/metadata[@name="DC.type"]')

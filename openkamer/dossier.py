@@ -168,19 +168,17 @@ def create_dossier_documents(dossier, dossier_id):
     logger.info('create_dossier_documents - outputs: {}'.format(len(outputs)))
 
     for data in outputs:
-        # data.tk_document.print_json()
         properties = {
             'dossier': dossier,
             'title_full': data.tk_document.onderwerp,
             'title_short': data.tk_document.onderwerp,
-            'publication_type': 'Kamerstuk',
-            'publisher': '',
+            'publication_type': data.tk_document.soort.value,
             'date_published': data.tk_document.datum,
             'source_url': data.url,
             'content_html': data.content_html,
         }
 
-        document = DocumentFactory.create_document_and_related(data, properties)
+        document = DocumentFactory.create_or_update_document(data, properties)
 
         if not Kamerstuk.objects.filter(id_main=dossier_id, id_sub=data.tk_document.volgnummer).exists():
             create_kamerstuk(
@@ -190,7 +188,7 @@ def create_dossier_documents(dossier, dossier_id):
                 type_long=data.tk_document.onderwerp,
                 type_short=data.tk_document.soort.value
             )
-            category_list = get_categories(text=data.metadata['category'], category_class=CategoryDossier, sep_char='|')
+            category_list = get_categories(text=data.category, category_class=CategoryDossier, sep_char='|')
             dossier.categories.add(*category_list)
 
 

@@ -65,7 +65,6 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'publication_type',
             'submitters',
             'categories',
-            'publisher',
             'date_published',
             # 'content_html'  # too large, needs link to content
         )

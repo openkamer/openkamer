@@ -62,8 +62,7 @@ def create_verslag(tk_document: TKDocument, overheidnl_document_id, dossier_id, 
     if skip_if_exists and Kamerstuk.objects.filter(document__document_id=overheidnl_document_id).exists():
         return
     document_factory = DocumentFactory()
-    document, metadata = document_factory.create_document(tk_document, overheidnl_document_id, dossier_id=dossier_id)
-    document.title_short = get_verslag_document_title(document.title_short)
+    document = document_factory.create_document(tk_document, overheidnl_document_id, dossier_id=dossier_id)
     document.save()
     Kamerstuk.objects.filter(document=document).delete()
     kamerstuk = Kamerstuk.objects.create(
@@ -71,7 +70,7 @@ def create_verslag(tk_document: TKDocument, overheidnl_document_id, dossier_id, 
         id_main=dossier_id,
         id_sub=kamerstuk_nr,
         type_short='Verslag',
-        type_long='Verslag van een algemeen overleg'
+        type_long=tk_document.soort.value
     )
     CommissieDocument.objects.filter(document=document).delete()
     verslag = CommissieDocument.objects.create(
@@ -80,14 +79,6 @@ def create_verslag(tk_document: TKDocument, overheidnl_document_id, dossier_id, 
         commissie=commissie
     )
     return verslag
-
-
-def get_verslag_document_title(title):
-    return upperfirst(re.sub(r'(Verslag van een algemeen overleg, gehouden.*? \d{4}, over )', '', title))
-
-
-def upperfirst(x):
-    return x[0].upper() + x[1:]
 
 
 def get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime) -> List[VerslagAlgemeenOverleg]:
