@@ -1,7 +1,5 @@
-import datetime
 import logging
 from typing import List
-import urllib.parse
 
 from requests.exceptions import ConnectionError, ConnectTimeout, ChunkedEncodingError
 
@@ -13,7 +11,7 @@ from wikidata import wikidata
 import wikidata.government as wikidata_government
 
 import tkapi
-from tkapi.fractie import Fractie
+from tkapi.fractie import Fractie as TKFractie
 from tkapi.persoon import Persoon as TKPersoon
 
 import scraper.persons
@@ -129,12 +127,12 @@ def create_goverment_member(government, member, person, position):
 def create_parties(update_votes=True, active_only=False) -> List[PoliticalParty]:
     filter_fractie = None
     if active_only:
-        filter_fractie = Fractie.create_filter()
+        filter_fractie = TKFractie.create_filter()
         filter_fractie.filter_actief()
-    fracties = tkapi.TKApi.get_fracties(filter=filter_fractie)
+    tk_fracties = tkapi.TKApi.get_fracties(filter=filter_fractie)
     parties = []
-    for fractie in fracties:
-        party = create_party(fractie.naam, fractie.afkorting)
+    for tk_fractie in tk_fracties:
+        party = create_party(tk_fractie.naam, tk_fractie.afkorting, tk_fractie.id)
         parties.append(party)
     if update_votes:
         set_party_votes_derived_info()
@@ -142,11 +140,11 @@ def create_parties(update_votes=True, active_only=False) -> List[PoliticalParty]
 
 
 @transaction.atomic
-def create_party(name, name_short):
+def create_party(name, name_short, tk_id=None):
     party = PoliticalParty.find_party(name)
     if party:
         party.delete()
-    party = PoliticalParty.objects.create(name=name, name_short=name_short)
+    party = PoliticalParty.objects.create(tk_id=tk_id, name=name, name_short=name_short)
     party.update_info(language='nl')
     return party
 
@@ -158,7 +156,11 @@ def create_party_wikidata(wikidata_id):
     name_short = wikidata_party_item.get_short_name(language='nl')
     if not name_short:
         name_short = name
-    party = create_party(name=name, name_short=name_short)
+    filter_fractie = TKFractie.create_filter()
+    filter_fractie.filter_fractie(naam=name)
+    tk_fracties = tkapi.TKApi.get_fracties(filter=filter_fractie)
+    tk_fractie_id = tk_fracties[0].id if tk_fracties else None
+    party = create_party(name=name, name_short=name_short, tk_id=tk_fractie_id)
     return party
 
 

@@ -7,6 +7,7 @@ from parliament.models import Commissie
 class PoliticalPartyAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'tk_id',
         'name',
         'name_short',
         'founded',

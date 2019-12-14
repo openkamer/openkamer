@@ -178,6 +178,7 @@ class TestCreatePoliticalParty(TestCase):
         self.assertEqual(party.name_short, 'SP')
         self.assertEqual(party.founded, datetime.date(year=1971, month=10, day=22))
         self.assertEqual(party.slug, 'sp')
+        self.assertTrue(party.tk_id)
 
 
 class TestCreateGovernment(TestCase):
