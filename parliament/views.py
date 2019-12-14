@@ -151,3 +151,13 @@ class CommissieView(TemplateView):
         context['commissie'] = commissie
         context['timeline_items'] = timeline_items
         return context
+
+
+class CommissiesView(TemplateView):
+    template_name = 'parliament/commissies.html'
+
+    def get_context_data(self, **kwargs):
+        commissies = Commissie.objects.all()
+        context = super().get_context_data(**kwargs)
+        context['commissies'] = commissies
+        return context

@@ -1,0 +1,37 @@
+{% extends "website/base.html" %}
+
+{% block title %}Commissies - Tweede Kamer {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12 text-center">
+    <div><h3>Commissies</h3></div>
+  </div>
+</div>
+
+<div class="row text-center">
+  {% for commissie in commissies %}
+    <div class="col-sm-4">
+
+      <div class="panel panel-default">
+
+        <div class="panel-heading panel-small">
+          <a href="{% url 'commissie' commissie.slug %}"><h5>{{ commissie.name_short }}</h5></a>
+        </div>
+
+        <div class="panel-body">
+          <span>{{ commissie.name }}</span>
+        </div>
+
+      </div>
+
+    </div>
+    {% if forloop.counter|divisibleby:3 %}
+    <div class="clearfix"></div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+
+{% endblock %}
