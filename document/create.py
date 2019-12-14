@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from tkapi import Api
+from tkapi import TKApi
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
 
@@ -31,7 +31,7 @@ def get_dossier_ids() -> List[DossierId]:
     filter.filter_soort(ZaakSoort.WETGEVING, is_or=True)
     filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING, is_or=True)
     filter.filter_soort(ZaakSoort.BEGROTING, is_or=True)
-    zaken = Api.get_zaken(filter=filter)
+    zaken = TKApi.get_zaken(filter=filter)
     dossier_ids = set()
     for zaak in zaken:
         dossier_id = str(zaak.dossier.nummer)

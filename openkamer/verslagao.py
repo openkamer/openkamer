@@ -93,5 +93,5 @@ def upperfirst(x):
 def get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime) -> List[VerslagAlgemeenOverleg]:
     pd_filter = TKDocument.create_filter()
     pd_filter.filter_date_range(begin_datetime, end_datetime)
-    tk_verslagen = tkapi.Api().get_verslagen_van_algemeen_overleg(pd_filter)
+    tk_verslagen = tkapi.TKApi.get_verslagen_van_algemeen_overleg(pd_filter)
     return tk_verslagen

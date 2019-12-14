@@ -20,6 +20,6 @@ python-twitter==3.4.2
 scipy==1.3.3
 unidecode==1.1.1
 #tkapi==0.9.5
--e git+https://github.com/openkamer/tkapi.git#egg=fb78a0979bb2e7a737141d5505788f72da1df91c
+-e git+https://github.com/openkamer/tkapi.git#egg=416acfc05f9b9d51304ebc62a658c93e7c9a7173
 pdfminer.six==20170720
 django-debug-toolbar

@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError
 
 from django.db import transaction
 
-from tkapi import Api
+from tkapi import TKApi
 from tkapi.util import queries
 from tkapi.persoon import Persoon as TKPersoon
 from tkapi.dossier import Dossier as TKDossier
@@ -64,7 +64,7 @@ def create_or_update_dossier(dossier_id):
     dossier_filter.filter_nummer(dossier_id_main)
     if dossier_id_sub:
         dossier_filter.filter_toevoeging(dossier_id_sub)
-    dossiers = Api().get_dossiers(filter=dossier_filter)
+    dossiers = TKApi.get_dossiers(filter=dossier_filter)
 
     if len(dossiers) != 1:
         logger.error('{} dossiers found while one expected for {}'.format(len(dossiers), dossier_id))
@@ -296,10 +296,10 @@ def get_zaken_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Zaak]:
     filter = Zaak.create_filter()
     filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
     filter.filter_soort(ZaakSoort.WETGEVING)
-    zaken = Api().get_zaken(filter=filter)
+    zaken = TKApi.get_zaken(filter=filter)
     if not zaken:
         filter = Zaak.create_filter()
         filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
         filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING)
-        zaken = Api().get_zaken(filter=filter)
+        zaken = TKApi.get_zaken(filter=filter)
     return zaken

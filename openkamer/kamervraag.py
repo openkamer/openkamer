@@ -84,7 +84,7 @@ def get_tk_kamervraag_zaken(begin_datetime, end_datetime) -> List[tkapi.zaak.Zaa
     filter = tkapi.zaak.Zaak.create_filter()
     filter.filter_date_range(begin_datetime, end_datetime)
     filter.filter_soort(tkapi.zaak.ZaakSoort.SCHRIFTELIJKE_VRAGEN)
-    zaken = tkapi.Api().get_zaken(filter=filter)
+    zaken = tkapi.TKApi.get_zaken(filter=filter)
     return zaken
 
 

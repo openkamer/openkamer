@@ -3,7 +3,7 @@ import datetime
 from django.urls import reverse
 from django.test import TestCase
 
-from tkapi import Api
+from tkapi import TKApi
 from tkapi.document import DocumentSoort
 from tkapi.document import Document as TKDocument
 from tkapi.util import queries
@@ -342,7 +342,7 @@ class TestKamervraag(TestCase):
     def get_tk_zaak(zaak_nummer):
         filter = Zaak.create_filter()
         filter.filter_nummer(zaak_nummer)
-        tk_zaken = Api().get_zaken(filter=filter)
+        tk_zaken = TKApi.get_zaken(filter=filter)
         return tk_zaken[0]
 
     @staticmethod
@@ -387,7 +387,7 @@ class TestKamerantwoord(TestCase):
     def test_combined_answers(self):
         filter = TKDocument.create_filter()
         filter.filter_aanhangselnummer('151601580')
-        docs = Api().get_documenten(filter=filter)
+        docs = TKApi.get_documenten(filter=filter)
         self.assertEqual(1, len(docs))
         doc = docs[0]
         overheidnl_document_id = 'ah-tk-20152016-1580'
@@ -501,7 +501,7 @@ class TestVerslagAlgemeenOverleg(TestCase):
         kamerstuk_nr = 225
         filter.filter_dossier(dossier_id)
         filter.filter_volgnummer(kamerstuk_nr)
-        docs = Api().get_documenten(filter=filter, max_items=10)
+        docs = TKApi.get_documenten(filter=filter, max_items=10)
         self.assertEqual(1, len(docs))
         overheidnl_document_id = 'kst-{}-{}'.format(dossier_id, kamerstuk_nr)
         commissie = Commissie.objects.create(name='test commissie', name_short='tc', slug='tc')

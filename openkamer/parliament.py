@@ -131,8 +131,7 @@ def create_parties(update_votes=True, active_only=False) -> List[PoliticalParty]
     if active_only:
         filter_fractie = Fractie.create_filter()
         filter_fractie.filter_actief()
-    api = tkapi.Api()
-    fracties = api.get_fracties(filter=filter_fractie)
+    fracties = tkapi.TKApi.get_fracties(filter=filter_fractie)
     parties = []
     for fractie in fracties:
         party = create_party(fractie.naam, fractie.afkorting)
@@ -316,7 +315,7 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
     filter = TKPersoon.create_filter()
     filter.filter_achternaam(person.surname)
     try:
-        persons = tkapi.Api().get_personen(filter=filter)
+        persons = tkapi.TKApi.get_personen(filter=filter)
         if not persons:
             persons = []
             surname_parts = person.surname.split('-')
@@ -324,7 +323,7 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
             for part in surname_parts:
                 filter = TKPersoon.create_filter()
                 filter.filter_achternaam(part)
-                persons += tkapi.Api().get_personen(filter=filter)
+                persons += tkapi.TKApi.get_personen(filter=filter)
     except KeyError:
         logger.exception('Could not find TK Person for {} ({})'.format(person.surname, person.initials))
         return None
