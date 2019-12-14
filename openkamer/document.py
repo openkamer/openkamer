@@ -10,6 +10,7 @@ from django.urls import reverse
 
 from tkapi.persoon import Persoon as TKPersoon
 from tkapi.document import Document as TKDocument
+from tkapi.commissie import Commissie as TKCommissie
 from tkapi.document import DocumentActor as TKDocumentActor
 from tkapi.zaak import Zaak as TKZaak
 
@@ -62,6 +63,15 @@ class DocumentData(object):
             actors = [actor.persoon for actor in self.tk_document.actors if actor.persoon and actor.persoon.achternaam]
         if not actors:
             actors = [actor.persoon for actor in self.tk_zaak.zaak_actors if actor.persoon and actor.persoon.achternaam]
+        return actors
+
+    @property
+    def submitters_commissie(self) -> List[TKCommissie]:
+        actors = []
+        if self.tk_document.actors:
+            actors = [actor.commissie for actor in self.tk_document.actors if actor.commissie]
+        if not actors:
+            actors = [actor.commissie for actor in self.tk_zaak.zaak_actors if actor.commissie]
         return actors
 
     @property
@@ -204,6 +214,9 @@ class SubmitterFactory(object):
                 SubmitterFactory.create_submitter(document, document_data.date_published, tk_person=submitter)
         else:
             for name in document_data.submitters_names:
+                if 'commissie' in name.lower():
+                    # TODO BR: extend submitters to be a commissie instead of person only
+                    continue
                 SubmitterFactory.create_submitter(document, document_data.date_published, name=name)
 
     @staticmethod
