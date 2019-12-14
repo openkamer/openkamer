@@ -12,23 +12,25 @@
 
 <div class="row text-center">
   {% for commissie in commissies %}
-    <div class="col-sm-4">
+    {% if commissie.slug %}
+      <div class="col-sm-4">
 
-      <div class="panel panel-default">
+        <div class="panel panel-default">
 
-        <div class="panel-heading panel-small">
-          <a href="{% url 'commissie' commissie.slug %}"><h5>{{ commissie.name_short }}</h5></a>
-        </div>
+          <div class="panel-heading panel-small">
+            <a href="{% url 'commissie' commissie.slug %}"><h5>{{ commissie.name_short }}</h5></a>
+          </div>
 
-        <div class="panel-body">
-          <span>{{ commissie.name }}</span>
+          <div class="panel-body">
+            <span>{{ commissie.name }}</span>
+          </div>
+
         </div>
 
       </div>
-
-    </div>
-    {% if forloop.counter|divisibleby:3 %}
-    <div class="clearfix"></div>
+      {% if forloop.counter|divisibleby:3 %}
+      <div class="clearfix"></div>
+      {% endif %}
     {% endif %}
   {% endfor %}
 </div>
