@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from document.models import Dossier
 from document.models import Document
+from document.models import Decision
 from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import CommissieDocument
@@ -23,7 +24,7 @@ class DossierAdmin(admin.ModelAdmin):
         'dossier_main_id',
         'dossier_sub_id',
         'title',
-        'decision',
+        'decision_text',
         'status',
         'date_updated',
     )
@@ -44,6 +45,7 @@ class DocumentAdmin(admin.ModelAdmin):
         'document_id',
         'title_short',
         'date_published',
+        'datetime',
         'publication_type',
         'publisher',
         'document_url',
@@ -94,7 +96,7 @@ class SubmitterAdmin(admin.ModelAdmin):
 
 
 class VotingAdmin(admin.ModelAdmin):
-    list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'kamerstuk')
+    list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'decision', 'kamerstuk')
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -107,6 +109,10 @@ class VotePartyAdmin(admin.ModelAdmin):
 
 class VoteIndividualAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
+
+
+class DecisionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'tk_id', 'datetime', 'dossier', 'kamerstuk', 'status', 'text', 'type', 'note', 'date_updated')
 
 
 class CommissieDocumentAdmin(admin.ModelAdmin):
@@ -127,5 +133,6 @@ admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)
 admin.site.register(VoteIndividual, VoteIndividualAdmin)
 admin.site.register(Voting, VotingAdmin)
+admin.site.register(Decision, DecisionAdmin)
 
 admin.site.register(CommissieDocument, CommissieDocumentAdmin)

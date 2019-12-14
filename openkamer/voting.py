@@ -7,13 +7,14 @@ from wikidata import wikidata
 from tkapi.util import queries
 from tkapi.zaak import ZaakSoort
 from tkapi.besluit import Besluit as TKBesluit
-from person.util import parse_name_surname_initials
 
+from person.util import parse_name_surname_initials
 from person.models import Person
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 
 from document.models import Dossier
+from document.models import Decision
 from document.models import Kamerstuk
 from document.models import Vote
 from document.models import VoteIndividual
@@ -68,6 +69,7 @@ class VotingFactory(object):
         logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
         voting_obj = Voting(
             dossier=dossier,
+            decision=Decision.objects.filter(tk_id=tk_besluit.id).first(),
             kamerstuk_raw_id=document_id,
             result=result,
             date=tk_besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date

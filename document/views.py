@@ -170,17 +170,17 @@ class TimelineKamerstukItem(TimelineItem):
         return self.obj.document.date_published
 
 
-class TimelineBesluitItem(TimelineItem):
+class TimelineDecisionItem(TimelineItem):
     def __init__(self, obj):
         super().__init__(obj)
 
     @staticmethod
     def template_name():
-        return 'document/items/timeline_besluit.html'
+        return 'document/items/timeline_decision.html'
 
     @property
     def date(self):
-        return self.obj.besluit_item.besluiten_lijst.date_published
+        return self.obj.datetime.date()
 
 
 class TimelineKamervraagItem(TimelineItem):
@@ -206,6 +206,10 @@ class DossierTimelineView(TemplateView):
         timeline_items = []
         for kamerstuk in dossier.kamerstukken:
             timeline_items.append(TimelineKamerstukItem(kamerstuk))
+        for decisions in dossier.decisions:
+            if decisions.kamerstuk:
+                continue
+            timeline_items.append(TimelineDecisionItem(decisions))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items
         return context

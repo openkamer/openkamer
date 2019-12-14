@@ -44,6 +44,15 @@
   </div>
   {% endif %}
 
+  {% if kamerstuk.decisions %}
+  <div class="panel-footer panel-footer-timeline">
+    <h6>Besluiten</h6>
+    {% for decision in kamerstuk.decisions %}
+    <h6 class="small">{{ decision.datetime|date:"j F Y" }}: {{ decision.text }}</h6>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   {% if is_person_timeline and kamerstuk.dossier %}
   <div class="panel-footer panel-footer-timeline" align="left">
     <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title|truncatechars:200 }}</a></h6>
@@ -61,6 +70,7 @@
     {% endwith %}
 
     <h6 class="small">{% include "document/items/kamerstuk_modifications.html" %}</h6>
+
   </div>
 
   {% if kamerstuk.voting %}

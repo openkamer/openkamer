@@ -1,7 +1,6 @@
 import logging
 import re
-import multiprocessing as mp
-from multiprocessing.pool import ThreadPool
+
 import time
 from typing import List
 
@@ -30,6 +29,7 @@ from document.models import Kamerstuk
 from openkamer.document import DocumentFactory
 from openkamer.document import DocumentData
 from openkamer.document import get_categories
+from openkamer.decision import create_dossier_decisions
 from openkamer.kamerstuk import create_kamerstuk
 from openkamer.voting import VotingFactory
 
@@ -77,9 +77,9 @@ def create_or_update_dossier(dossier_id):
     if not last_besluit:
         last_besluit = get_besluit_last(dossier_id_main, dossier_id_sub)
 
-    decision = 'Onbekend'
+    decision_text = 'Onbekend'
     if last_besluit:
-        decision = last_besluit.tekst.replace('.', '')
+        decision_text = last_besluit.tekst.replace('.', '')
 
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
@@ -87,36 +87,15 @@ def create_or_update_dossier(dossier_id):
         dossier_sub_id=dossier_id_sub,
         title=tk_dossier.titel,
         url=dossier_url,
-        decision=decision
+        decision_text=decision_text
     )
     create_dossier_documents(dossier_new, dossier_id)
+    create_dossier_decisions(dossier_id_main, dossier_id_sub, dossier_new)
     voting_factory = VotingFactory()
     voting_factory.create_votings(dossier_id)
     dossier_new.set_derived_fields()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
-
-
-class DocumentDataOverheidNL(object):
-    # TODO: merge/replace with DocumentData
-
-    def __init__(self, document_id, tk_document: TKDocument, tk_zaak: Zaak, content_html, metadata):
-        self.document_id = document_id
-        self.tk_document = tk_document
-        self.tk_zaak = tk_zaak
-        self.metadata = metadata
-        self.content_html = content_html
-
-    @property
-    def date_published(self):
-        return self.tk_document.datum
-
-    @property
-    def submitters(self) -> List[TKPersoon]:
-        if self.tk_document.actors:
-            return [actor.person for actor in self.tk_document.actors if actor.person]
-        else:
-            return [actor.person for actor in self.tk_zaak.zaak_actors if actor.person]
 
 
 def get_document_data(tk_document: TKDocument, tk_zaak: Zaak, dossier_id):
@@ -162,6 +141,7 @@ def create_dossier_documents(dossier, dossier_id):
             'title_short': data.tk_document.onderwerp,
             'publication_type': data.tk_document.soort.value,
             'date_published': data.tk_document.datum,
+            'datetime': data.tk_document.datum,
             'source_url': data.url,
             'content_html': data.content_html,
         }
@@ -287,5 +267,10 @@ def get_zaken_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Zaak]:
         filter = Zaak.create_filter()
         filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
         filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING)
+        zaken = TKApi.get_zaken(filter=filter)
+    if not zaken:
+        filter = Zaak.create_filter()
+        filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+        filter.filter_soort(ZaakSoort.BEGROTING)
         zaken = TKApi.get_zaken(filter=filter)
     return zaken
