@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from document.models import BesluitenLijst
 from document.models import Dossier
 from document.models import Document
+from document.models import Decision
 from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import CommissieDocument
@@ -24,7 +24,7 @@ class DossierAdmin(admin.ModelAdmin):
         'dossier_main_id',
         'dossier_sub_id',
         'title',
-        'decision',
+        'decision_text',
         'status',
         'date_updated',
     )
@@ -72,17 +72,6 @@ class KamerstukAdmin(admin.ModelAdmin):
         return obj.document.date_published
 
 
-class BesluitenLijstAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'title',
-        'date_published',
-        'commission',
-        'activity_id',
-        'url',
-    )
-
-
 class KamervraagAdmin(admin.ModelAdmin):
     list_display = (
         'vraagnummer', 'document',
@@ -106,7 +95,7 @@ class SubmitterAdmin(admin.ModelAdmin):
 
 
 class VotingAdmin(admin.ModelAdmin):
-    list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'kamerstuk')
+    list_display = ('dossier', 'result', 'date', 'is_dossier_voting', 'decision', 'kamerstuk')
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -119,6 +108,10 @@ class VotePartyAdmin(admin.ModelAdmin):
 
 class VoteIndividualAdmin(admin.ModelAdmin):
     list_display = ('id', 'voting', 'parliament_member', 'decision', 'number_of_seats', 'details')
+
+
+class DecisionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'tk_id', 'datetime', 'dossier', 'kamerstuk', 'status', 'text', 'type', 'note', 'date_updated')
 
 
 class CommissieDocumentAdmin(admin.ModelAdmin):
@@ -135,11 +128,10 @@ admin.site.register(Kamervraag, KamervraagAdmin)
 admin.site.register(Kamerantwoord, KamerantwoordAdmin)
 admin.site.register(KamervraagMededeling, KamervraagMededelingAdmin)
 
-admin.site.register(BesluitenLijst, BesluitenLijstAdmin)
-
 admin.site.register(Vote, VoteAdmin)
 admin.site.register(VoteParty, VotePartyAdmin)
 admin.site.register(VoteIndividual, VoteIndividualAdmin)
 admin.site.register(Voting, VotingAdmin)
+admin.site.register(Decision, DecisionAdmin)
 
 admin.site.register(CommissieDocument, CommissieDocumentAdmin)

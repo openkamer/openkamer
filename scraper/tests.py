@@ -2,57 +2,8 @@ import re
 
 from django.test import TestCase
 
-import scraper.besluitenlijst
 import scraper.documents
 import scraper.persons
-
-
-class TestBesluitenlijstScraper(TestCase):
-    filenames = [
-        'data/besluitenlijsten/besluitenlijst_example1.pdf',
-        'data/besluitenlijsten/besluitenlijst_example2.pdf',
-        'data/besluitenlijsten/besluitenlijst_example3.pdf',
-        'data/besluitenlijsten/besluitenlijst_example4.pdf',
-    ]
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.texts = []
-        for filename in cls.filenames:
-            text = scraper.besluitenlijst.besluitenlijst_pdf_to_text(filename)
-            cls.texts.append(text)
-
-    def test_regex(self):
-        pattern = "\d{1,3}\.\s{0,}Agendapunt:"
-        text = 'BuZa6.Agendapunt:Stukken'
-        result = re.findall(pattern, text)
-        self.assertEqual(result[0], '6.Agendapunt:')
-        text = 'BuZa6.  Agendapunt:Stukken'
-        result = re.findall(pattern, text)
-        self.assertEqual(result[0], '6.  Agendapunt:')
-
-    def test_find_agendapunten(self):
-        for text in self.texts:
-            items = scraper.besluitenlijst.find_agendapunten(text)
-            self.assertTrue(len(items) > 0)
-
-    def test_create_besluitenlijst(self):
-        for text in self.texts:
-            lijst = scraper.besluitenlijst.create_besluitenlijst(text)
-
-    def test_find_cases(self):
-        for text in self.texts:
-            cases = scraper.besluitenlijst.find_cases(text)
-
-    def test_find_case_decisions(self):
-        for text in self.texts:
-            punten = scraper.besluitenlijst.find_agendapunten(text)
-            cases = scraper.besluitenlijst.find_cases(text)
-            decisions = scraper.besluitenlijst.find_decisions(text)
-
-    def test_create_besluit_items(self):
-        for text in self.texts:
-            items = scraper.besluitenlijst.create_besluit_items(text)
 
 
 class TestPersonInfoScraper(TestCase):

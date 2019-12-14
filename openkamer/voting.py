@@ -6,13 +6,15 @@ from wikidata import wikidata
 
 from tkapi.util import queries
 from tkapi.zaak import ZaakSoort
-from person.util import parse_name_surname_initials
+from tkapi.besluit import Besluit as TKBesluit
 
+from person.util import parse_name_surname_initials
 from person.models import Person
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 
 from document.models import Dossier
+from document.models import Decision
 from document.models import Kamerstuk
 from document.models import Vote
 from document.models import VoteIndividual
@@ -45,18 +47,18 @@ class VotingFactory(object):
         logger.info('BEGIN')
         logger.info('dossier id: ' + str(dossier_id))
         dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
-        besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id_main, toevoeging=dossier_id_sub)
-        for besluit in besluiten:
-            self.create_votings_dossier_besluit(besluit, dossier_id)
+        tk_besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+        for tk_besluit in tk_besluiten:
+            self.create_votings_dossier_besluit(tk_besluit, dossier_id)
         logger.info('END')
 
     @transaction.atomic
-    def create_votings_dossier_besluit(self, besluit, dossier_id):
+    def create_votings_dossier_besluit(self, tk_besluit: TKBesluit, dossier_id):
         dossiers = Dossier.objects.filter(dossier_id=dossier_id)
         assert dossiers.count() == 1
         dossier = dossiers[0]
-        result = self.get_result_choice(besluit.tekst)
-        zaak = besluit.zaak
+        result = self.get_result_choice(tk_besluit.tekst)
+        zaak = tk_besluit.zaak
 
         document_id = ''
         if zaak.volgnummer:
@@ -67,9 +69,10 @@ class VotingFactory(object):
         logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
         voting_obj = Voting(
             dossier=dossier,
+            decision=Decision.objects.filter(tk_id=tk_besluit.id).first(),
             kamerstuk_raw_id=document_id,
             result=result,
-            date=besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
+            date=tk_besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
             source_url='',
             is_dossier_voting=is_dossier_voting
         )
@@ -89,13 +92,13 @@ class VotingFactory(object):
             logger.error(
                 'Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
 
-        voting_obj.is_individual = ('hoofdelijk' in besluit.tekst.lower())
+        voting_obj.is_individual = ('hoofdelijk' in tk_besluit.tekst.lower())
         voting_obj.save()
 
         if voting_obj.is_individual:
-            self.vote_factory.create_votes_individual(voting_obj, besluit.stemmingen)
+            self.vote_factory.create_votes_individual(voting_obj, tk_besluit.stemmingen)
         else:
-            self.vote_factory.create_votes_party(voting_obj, besluit.stemmingen)
+            self.vote_factory.create_votes_party(voting_obj, tk_besluit.stemmingen)
 
     @staticmethod
     def get_result_choice(result_string):

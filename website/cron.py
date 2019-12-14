@@ -20,7 +20,6 @@ from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 from person.models import Person
 
-import openkamer.besluitenlijst
 import openkamer.dossier
 import openkamer.gift
 import openkamer.kamervraag

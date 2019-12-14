@@ -6,15 +6,12 @@ from django.test import Client
 from django.test import TestCase
 from django.urls import reverse
 
-import scraper.documents
-
 from person.models import Person
 
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 
 from document.models import Agenda
-from document.models import BesluitenLijst
 from document.models import CategoryDossier
 from document.models import CategoryDocument
 from document.models import Dossier
@@ -22,7 +19,6 @@ from document.models import Document
 from document.models import Kamerstuk
 from document.models import Voting
 
-import openkamer.besluitenlijst
 import openkamer.document
 import openkamer.dossier
 import openkamer.kamerstuk
@@ -210,16 +206,6 @@ class TestWebsite(TestCase):
             response = self.client.get(reverse('party', args=(party.slug,)))
             self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(parties), 50)
-
-    def test_besluitenlijsten_view(self):
-        response = self.client.get(reverse('besluitenlijsten'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_besluitenlijst_view(self):
-        lijsten = BesluitenLijst.objects.all()
-        for lijst in lijsten:
-            response = self.client.get(reverse('besluitenlijst', args=(lijst.activity_id,)))
-            self.assertEqual(response.status_code, 200)
 
     def test_parliament_members_overview(self):
         response = self.client.get(reverse('parliament-members'))

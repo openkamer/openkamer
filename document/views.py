@@ -18,7 +18,6 @@ from parliament.models import PoliticalParty
 
 from document.models import Agenda
 from document.models import AgendaItem
-from document.models import BesluitenLijst
 from document.models import Document, Kamerstuk
 from document.models import CommissieDocument
 from document.models import Dossier
@@ -159,9 +158,8 @@ class TimelineItem(object):
 
 
 class TimelineKamerstukItem(TimelineItem):
-    def __init__(self, obj, besluit_cases=None):
+    def __init__(self, obj):
         super().__init__(obj)
-        self.besluit_cases = besluit_cases
 
     @staticmethod
     def template_name():
@@ -172,17 +170,17 @@ class TimelineKamerstukItem(TimelineItem):
         return self.obj.document.date_published
 
 
-class TimelineBesluitItem(TimelineItem):
+class TimelineDecisionItem(TimelineItem):
     def __init__(self, obj):
         super().__init__(obj)
 
     @staticmethod
     def template_name():
-        return 'document/items/timeline_besluit.html'
+        return 'document/items/timeline_decision.html'
 
     @property
     def date(self):
-        return self.obj.besluit_item.besluiten_lijst.date_published
+        return self.obj.datetime.date()
 
 
 class TimelineKamervraagItem(TimelineItem):
@@ -206,20 +204,12 @@ class DossierTimelineView(TemplateView):
         dossier = Dossier.objects.get(dossier_id=dossier_id)
         context['dossier'] = dossier
         timeline_items = []
-        besluitenlijst_cases = dossier.besluitenlijst_cases
-        to_exclude = []
         for kamerstuk in dossier.kamerstukken:
-            besluit_cases = []
-            for case in besluitenlijst_cases:
-                if kamerstuk in case.related_kamerstukken:
-                    besluit_cases.append(case)
-            if besluit_cases:
-                for case in besluit_cases:
-                    to_exclude.append(case.id)
-            timeline_items.append(TimelineKamerstukItem(kamerstuk, besluit_cases=besluit_cases))
-        besluitenlijst_cases = besluitenlijst_cases.exclude(pk__in=to_exclude)
-        for case in besluitenlijst_cases:
-            timeline_items.append(TimelineBesluitItem(case))
+            timeline_items.append(TimelineKamerstukItem(kamerstuk))
+        for decisions in dossier.decisions:
+            if decisions.kamerstuk:
+                continue
+            timeline_items.append(TimelineDecisionItem(decisions))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items
         return context
@@ -311,32 +301,6 @@ class VotingsView(TemplateView):
         context['votings'] = votings
         context['filter'] = voting_filter
         context['n_results'] = votings_filtered.count()
-        return context
-
-
-class BesluitenLijstenView(TemplateView):
-    template_name = 'document/besluitenlijsten.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        paginator = Paginator(BesluitenLijst.objects.all(), settings.BESLUITENLIJSTEN_PER_PAGE)
-        page = self.request.GET.get('page')
-        try:
-            besluitenlijsten = paginator.page(page)
-        except PageNotAnInteger:
-            besluitenlijsten = paginator.page(1)
-        except EmptyPage:
-            besluitenlijsten = paginator.page(paginator.num_pages)
-        context['besluitenlijsten'] = besluitenlijsten
-        return context
-
-
-class BesluitenLijstView(TemplateView):
-    template_name = 'document/besluitenlijst.html'
-
-    def get_context_data(self, activity_id, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['besluitenlijst'] = BesluitenLijst.objects.get(activity_id=activity_id)
         return context
 
 

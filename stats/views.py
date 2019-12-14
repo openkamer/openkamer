@@ -1,23 +1,18 @@
 import json
 import random
 import logging
-import datetime
 from urllib.parse import urlparse
 
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
-from django.utils import timezone
 
 from person.models import Person
 
 from parliament.models import ParliamentMember
 from parliament.models import PoliticalParty
 from government.models import GovernmentMember
-from government.models import Government
 
-from document.models import BesluitenLijst
-from document.models import BesluitItemCase
 from document.models import Dossier
 from document.models import Document
 from document.models import Kamerstuk
@@ -27,13 +22,10 @@ from document.models import Vraag
 from document.models import Antwoord
 from document.models import Voting
 from document.models import Vote
-from document.models import VoteParty
 from document.models import FootNote
 
-import stats.util
 from stats.filters import PartyVotesFilter
 from stats.filters import PartyVoteBehaviour
-from stats.models import StatsVotingSubmitter
 from stats.models import Plot
 
 
@@ -54,8 +46,7 @@ class DataStatsView(TemplateView):
         context['n_kamerantwoorden'] = Kamerantwoord.objects.all().count()
         context['n_votings'] = Voting.objects.all().count()
         context['n_votes'] = Vote.objects.all().count()
-        context['n_besluitenlijsten'] = BesluitenLijst.objects.all().count()
-        context['n_besluiten'] = BesluitItemCase.objects.all().count()
+        # context['n_besluiten'] = Besluit.objects.all().count()
         context['n_parliament_members'] = ParliamentMember.objects.all().count()
         context['n_government_members'] = GovernmentMember.objects.all().count()
         context['n_persons'] = Person.objects.all().count()

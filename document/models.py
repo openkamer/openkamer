@@ -7,8 +7,9 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils.functional import cached_property
 
+from tkapi.besluit import BesluitStatus as TKBesluitStatus
+
 from person.models import Person
-from person.util import parse_name_surname_initials
 
 from parliament.models import PoliticalParty
 from parliament.models import ParliamentMember
@@ -72,7 +73,7 @@ class Dossier(models.Model):
     title = models.CharField(max_length=2000, blank=True, db_index=True)
     categories = models.ManyToManyField(CategoryDossier, blank=True)
     url = models.URLField(blank=True, max_length=1000)
-    decision = models.CharField(max_length=2000, blank=True)
+    decision_text = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -107,8 +108,8 @@ class Dossier(models.Model):
         return Kamerstuk.objects.filter(document__dossier=self).select_related('document')
 
     @cached_property
-    def besluitenlijst_cases(self):
-        return BesluitItemCase.objects.filter(related_document_ids__contains=self.dossier_id).select_related('besluit_item', 'besluit_item__besluiten_lijst')
+    def decisions(self):
+        return Decision.objects.filter(dossier=self)
 
     @cached_property
     def start_date(self):
@@ -180,7 +181,7 @@ class Dossier(models.Model):
 
     @cached_property
     def passed(self):
-        if 'aangenomen' in self.decision.lower():
+        if 'aangenomen' in self.decision_text.lower():
             return True
         voting = self.voting
         if voting and voting.result == Voting.AANGENOMEN:
@@ -444,6 +445,10 @@ class Kamerstuk(models.Model):
         return None
 
     @cached_property
+    def decisions(self):
+        return Decision.objects.filter(kamerstuk=self).select_related('kamerstuk').order_by('-datetime')
+
+    @cached_property
     def visible(self):
         if self.type_short == 'Koninklijke boodschap':
             return False
@@ -499,7 +504,19 @@ class AgendaItem(models.Model):
     def __str__(self):
         return str(self.agenda)
 
-    
+
+class Decision(models.Model):
+    tk_id = models.CharField(max_length=200, blank=True, db_index=True)
+    datetime = models.DateTimeField(blank=True, null=True, db_index=True)
+    dossier = models.ForeignKey(Dossier, blank=True, null=True, on_delete=models.CASCADE)
+    kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True, on_delete=models.CASCADE)
+    status = models.CharField(max_length=200, choices=[(tag, tag.value) for tag in TKBesluitStatus], db_index=True)
+    text = models.CharField(max_length=10000, blank=True)
+    type = models.CharField(max_length=10000, blank=True)
+    note = models.CharField(max_length=10000, blank=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+
 class Voting(models.Model):
     AANGENOMEN = 'AAN'
     VERWORPEN = 'VER'
@@ -511,7 +528,9 @@ class Voting(models.Model):
         (AANGENOMEN, 'Aangenomen'), (VERWORPEN, 'Verworpen'), (INGETROKKEN, 'Ingetrokken'),
         (AANGEHOUDEN, 'Aangehouden'), (CONTROVERSIEEL, 'Controversieel'), (ONBEKEND, 'Onbekend')
     )
+    tk_id = models.CharField(max_length=200, blank=True, db_index=True)
     dossier = models.ForeignKey(Dossier, on_delete=models.CASCADE)
+    decision = models.OneToOneField(Decision, blank=True, null=True, on_delete=models.CASCADE)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True, on_delete=models.CASCADE)
     kamerstuk_raw_id = models.CharField(max_length=200, blank=True, default='')
     is_dossier_voting = models.BooleanField(default=False)
@@ -666,85 +685,6 @@ class VoteIndividual(Vote):
 
     def get_name(self):
         return str(self.parliament_member)
-
-
-class BesluitenLijst(models.Model):
-    title = models.CharField(max_length=1000)
-    commission = models.CharField(max_length=500)
-    activity_id = models.CharField(max_length=100)
-    date_published = models.DateField()
-    url = models.URLField(max_length=1000)
-
-    class Meta:
-        ordering = ['-date_published']
-
-    def items(self):
-        return BesluitItem.objects.filter(besluiten_lijst=self)
-
-    def cases_all(self):
-        return BesluitItemCase.objects.filter(besluit_item__in=self.items())
-
-    @cached_property
-    def related_dossier_ids(self):
-        dossier_ids = []
-        for case in self.cases_all():
-            document_ids = case.related_document_id_list()
-            for doc_id in document_ids:
-                if doc_id:
-                    dossier_ids.append(doc_id.split('-')[0])
-        return dossier_ids
-
-
-class BesluitItem(models.Model):
-    title = models.CharField(max_length=4000)
-    besluiten_lijst = models.ForeignKey(BesluitenLijst, on_delete=models.CASCADE)
-
-    def cases(self):
-        return BesluitItemCase.objects.filter(besluit_item=self)
-
-
-class BesluitItemCase(models.Model):
-    title = models.CharField(max_length=2000)
-    besluit_item = models.ForeignKey(BesluitItem, on_delete=models.CASCADE)
-    decisions = models.CharField(max_length=7000)
-    notes = models.CharField(max_length=5000)
-    related_commissions = models.CharField(max_length=1000)
-    related_document_ids = models.CharField(max_length=1000)
-    SEP_CHAR = '|'
-
-    def decision_list(self):
-        return self.decisions.split(self.SEP_CHAR)
-
-    def note_list(self):
-        return self.notes.split(self.SEP_CHAR)
-
-    def related_commission_list(self):
-        return self.related_commissions.split(self.SEP_CHAR)
-
-    def related_document_id_list(self):
-        return self.related_document_ids.split(self.SEP_CHAR)
-
-    @cached_property
-    def related_kamerstukken(self):
-        document_ids = self.related_document_id_list()
-        related_stukken = []
-        for document_id in document_ids:
-            if not document_id:
-                continue
-            id_parts = document_id.split('-')
-            if len(id_parts) < 2:
-                logger.info('no kamerstuk found for id: ' + document_id)
-                continue
-            if len(id_parts) == 2:
-                id_main = document_id.split('-', 0)
-                id_sub = document_id.split('-', 1)
-            if len(id_parts) == 3:
-                id_main = '{}-{}'.format(document_id.split('-', 0), document_id.split('-', 1))
-                id_sub = document_id.split('-', 2)
-            kamerstukken = Kamerstuk.objects.filter(id_main=id_main, id_sub=id_sub)
-            if kamerstukken:
-                related_stukken.append(kamerstukken[0])
-        return related_stukken
 
 
 class CommissieDocument(models.Model):

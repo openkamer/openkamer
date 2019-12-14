@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 
 import openkamer.parliament
 import openkamer.dossier
-import openkamer.besluitenlijst
 
 
 class Command(BaseCommand):

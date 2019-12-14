@@ -44,6 +44,15 @@
   </div>
   {% endif %}
 
+  {% if kamerstuk.decisions %}
+  <div class="panel-footer panel-footer-timeline">
+    <h6>Besluiten</h6>
+    {% for decision in kamerstuk.decisions %}
+    <h6 class="small">{{ decision.datetime|date:"j F Y" }}: {{ decision.text }}</h6>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   {% if is_person_timeline and kamerstuk.dossier %}
   <div class="panel-footer panel-footer-timeline" align="left">
     <h6 class="small">Dossier: <a href="{% url 'dossier-timeline' kamerstuk.document.dossier.dossier_id %}">{{ kamerstuk.document.dossier.title|truncatechars:200 }}</a></h6>
@@ -61,6 +70,7 @@
     {% endwith %}
 
     <h6 class="small">{% include "document/items/kamerstuk_modifications.html" %}</h6>
+
   </div>
 
   {% if kamerstuk.voting %}
@@ -68,22 +78,6 @@
     {% with voting=kamerstuk.voting %}
     {% include "document/items/voting_result_bar_small.html" %}
     {% endwith %}
-  </div>
-  {% endif %}
-
-  {% if item.besluit_cases %}
-  <div class="panel-footer panel-footer-timeline">
-    {% for case in item.besluit_cases %}
-      <p>
-      {% get_besluitenlijst_item_anchor case.besluit_item as item_anchor %}
-      <strong>Commissie besluit</strong> - {{ case.besluit_item.besluiten_lijst.date_published }} -
-      besluitenlijst <a href="{% url 'besluitenlijst' case.besluit_item.besluiten_lijst.activity_id %}#{{ item_anchor }}">{{ case.besluit_item.besluiten_lijst.activity_id }}</a><br/>
-      <font class="text-info">{{ case.besluit_item.besluiten_lijst.commission }}</font><br/>
-      {% for decision in case.decision_list %}
-        {{ decision }}{% if not forloop.last %}<br/>{% endif %}
-      {% endfor %}
-      </p>
-    {% endfor %}
   </div>
   {% endif %}
 

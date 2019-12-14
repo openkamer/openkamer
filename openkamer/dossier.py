@@ -1,7 +1,6 @@
 import logging
 import re
-import multiprocessing as mp
-from multiprocessing.pool import ThreadPool
+
 import time
 from typing import List
 
@@ -15,7 +14,7 @@ from tkapi.util import queries
 from tkapi.persoon import Persoon as TKPersoon
 from tkapi.dossier import Dossier as TKDossier
 from tkapi.document import Document as TKDocument
-from tkapi.besluit import Besluit
+from tkapi.besluit import Besluit as TKBesluit
 from tkapi.zaak import Zaak
 from tkapi.zaak import ZaakSoort
 from tkapi.activiteit import ActiviteitStatus
@@ -30,6 +29,7 @@ from document.models import Kamerstuk
 from openkamer.document import DocumentFactory
 from openkamer.document import DocumentData
 from openkamer.document import get_categories
+from openkamer.decision import create_dossier_decisions
 from openkamer.kamerstuk import create_kamerstuk
 from openkamer.voting import VotingFactory
 
@@ -77,9 +77,9 @@ def create_or_update_dossier(dossier_id):
     if not last_besluit:
         last_besluit = get_besluit_last(dossier_id_main, dossier_id_sub)
 
-    decision = 'Onbekend'
+    decision_text = 'Onbekend'
     if last_besluit:
-        decision = last_besluit.tekst.replace('.', '')
+        decision_text = last_besluit.tekst.replace('.', '')
 
     dossier_new = Dossier.objects.create(
         dossier_id=dossier_id,
@@ -87,36 +87,15 @@ def create_or_update_dossier(dossier_id):
         dossier_sub_id=dossier_id_sub,
         title=tk_dossier.titel,
         url=dossier_url,
-        decision=decision
+        decision_text=decision_text
     )
     create_dossier_documents(dossier_new, dossier_id)
+    create_dossier_decisions(dossier_id_main, dossier_id_sub, dossier_new)
     voting_factory = VotingFactory()
     voting_factory.create_votings(dossier_id)
     dossier_new.set_derived_fields()
     logger.info('END - dossier id: ' + str(dossier_id))
     return dossier_new
-
-
-class DocumentDataOverheidNL(object):
-    # TODO: merge/replace with DocumentData
-
-    def __init__(self, document_id, tk_document: TKDocument, tk_zaak: Zaak, content_html, metadata):
-        self.document_id = document_id
-        self.tk_document = tk_document
-        self.tk_zaak = tk_zaak
-        self.metadata = metadata
-        self.content_html = content_html
-
-    @property
-    def date_published(self):
-        return self.tk_document.datum
-
-    @property
-    def submitters(self) -> List[TKPersoon]:
-        if self.tk_document.actors:
-            return [actor.person for actor in self.tk_document.actors if actor.person]
-        else:
-            return [actor.person for actor in self.tk_zaak.zaak_actors if actor.person]
 
 
 def get_document_data(tk_document: TKDocument, tk_zaak: Zaak, dossier_id):
@@ -249,31 +228,31 @@ def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, ma
     return failed_dossiers
 
 
-def get_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Besluit]:
-    besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+def get_tk_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[TKBesluit]:
+    tk_besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
     besluiten_dossier = []
     # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
-    for besluit in besluiten:
-        if str(besluit.zaak.volgnummer) == '0':
-            besluiten_dossier.append(besluit)
+    for tk_besluit in tk_besluiten:
+        if str(tk_besluit.zaak.volgnummer) == '0':
+            besluiten_dossier.append(tk_besluit)
     return besluiten_dossier
 
 
-def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> Besluit:
-    besluiten = get_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
+def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> TKBesluit:
+    tk_besluiten = get_tk_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
     last_besluit = None
-    for besluit in besluiten:
-        if filter_has_votings and not besluit.stemmingen:
+    for tk_besluit in tk_besluiten:
+        if filter_has_votings and not tk_besluit.stemmingen:
             continue
-        if besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
+        if tk_besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
             # TODO: create dossier agendapunt with planned activiteit
             continue
-        if last_besluit is None or besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
-            last_besluit = besluit
+        if last_besluit is None or tk_besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
+            last_besluit = tk_besluit
     return last_besluit
 
 
-def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> Besluit:
+def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> TKBesluit:
     return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
 
 
@@ -287,5 +266,10 @@ def get_zaken_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Zaak]:
         filter = Zaak.create_filter()
         filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
         filter.filter_soort(ZaakSoort.INITIATIEF_WETGEVING)
+        zaken = TKApi.get_zaken(filter=filter)
+    if not zaken:
+        filter = Zaak.create_filter()
+        filter.filter_kamerstukdossier(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+        filter.filter_soort(ZaakSoort.BEGROTING)
         zaken = TKApi.get_zaken(filter=filter)
     return zaken

@@ -1,0 +1,54 @@
+{% load openkamer %}
+{% load document %}
+
+{% with decision=item.obj %}
+
+<a class="anchor" id="{{ decision.id }}"></a>
+<div class="cd-timeline-img text-center bg-info">
+  <span style="font-size:24px;" class="fa fa-gavel"></span>
+</div> <!-- cd-timeline-img -->
+
+<div class="panel panel-default cd-timeline-content">
+
+  <div class="panel-heading panel-heading-timeline">
+    <div class="row">
+
+      <div class="col-xs-2">
+      {% if decision.voting %}
+        {% with voting=decision.voting %}
+        <h2>{% include "document/items/voting_result_small.html" %}</h2>
+        {% endwith %}
+      {% endif %}
+      </div>
+
+      <div class="col-xs-8 text-center">
+        <h6>{{ decision.type }}</h6>
+      </div>
+
+      <div class="hidden-xs hidden-sm col-xs-2 kamertuk-id-timeline-container">
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="panel-footer panel-footer-timeline">
+    <h6 class="small">{{ decision.text }}</h6>
+  </div>
+
+  {% if decision.voting %}
+  <div class="panel-footer panel-footer-timeline-vote-bar">
+    {% with voting=decision.voting %}
+    {% include "document/items/voting_result_bar_small.html" %}
+    {% endwith %}
+  </div>
+  {% endif %}
+
+  <div class="visible-xs visible-sm panel-footer panel-footer-timeline">
+    <h6 class="small">{{ decision.datetime|date:"j F Y" }}</h6>
+  </div>
+  <span class="hidden-xs hidden-sm cd-date"><h2>{{ decision.datetime|date:"j F Y" }}</h2></span>
+
+</div> <!-- cd-timeline-content -->
+
+{% endwith %}
