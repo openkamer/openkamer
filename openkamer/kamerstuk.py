@@ -9,34 +9,18 @@ logger = logging.getLogger(__name__)
 
 
 @transaction.atomic
-def create_kamerstuk(document, dossier_id, title, metadata, is_attachement):
+def create_kamerstuk(document, dossier_id, number, type_short, type_long):
     logger.info('BEGIN')
-    logger.info('document: ' + str(document))
-    title_parts = metadata['title_full'].split(';')
-    type_short = ''
-    type_long = ''
-    if len(title_parts) > 2:
-        type_short = title_parts[1].strip()
-        type_long = title_parts[2].strip()
-    if is_attachement:
-        type_short = 'Bijlage'
-        type_long = 'Bijlage'
-    if type_short == '':
-        type_short = document.title_short
-    if type_short == 'officiële publicatie':
-        type_short = title
-    if type_long == '':
-        type_long = document.title_full
     original_id = find_original_kamerstuk_id(dossier_id, type_long)
     stuk = Kamerstuk.objects.create(
         document=document,
         id_main=dossier_id,
-        id_sub=metadata['id_sub'],
+        id_sub=number,
         type_short=type_short,
         type_long=type_long,
         original_id=original_id
     )
-    logger.info('kamerstuk created: ' + str(stuk))
+    logger.info('kamerstuk created: {}'.format(stuk))
     logger.info('END')
 
 

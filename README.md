@@ -1,7 +1,7 @@
 # openkamer
 Openkamer gives insight into the Dutch parliament by gathering, organizing and visualizing parliamentary data.
 
-Openkamer gathers (scrapes) parliamentary data from several external sources, creates relations, and visualizes this data in a web application.
+Openkamer extracts parliamentary data from several external sources (Tweede Kamer API, WikiData, overheid.nl, creates relations, and visualizes this data in a web application.
 
 Openkamer is a Python 3.5+ and Django 2.2+ project under MIT license. 
 

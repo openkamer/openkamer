@@ -6,7 +6,8 @@ from typing import List
 from django.db import transaction
 
 import tkapi
-import tkapi.document
+from tkapi.document import Document as TKDocument
+from tkapi.document import VerslagAlgemeenOverleg
 
 from document.models import CommissieDocument
 from document.models import Dossier
@@ -46,6 +47,7 @@ def create_verslag_ao(tk_verslag, skip_if_exists=False):
     slug = Commissie.create_slug(name_short)
     commissie, created = Commissie.objects.get_or_create(name=name, name_short=name_short, slug=slug)
     commissie_document = create_verslag(
+        tk_document=tk_verslag,
         overheidnl_document_id=tk_verslag.document_url.replace('https://zoek.officielebekendmakingen.nl/', ''),
         dossier_id=dossier_id,
         kamerstuk_nr=tk_verslag.volgnummer,
@@ -56,12 +58,11 @@ def create_verslag_ao(tk_verslag, skip_if_exists=False):
 
 
 @transaction.atomic
-def create_verslag(overheidnl_document_id, dossier_id, kamerstuk_nr, commissie, skip_if_exists=False):
+def create_verslag(tk_document: TKDocument, overheidnl_document_id, dossier_id, kamerstuk_nr, commissie, skip_if_exists=False):
     if skip_if_exists and Kamerstuk.objects.filter(document__document_id=overheidnl_document_id).exists():
         return
     document_factory = DocumentFactory()
-    document, metadata = document_factory.create_document(overheidnl_document_id, dossier_id=dossier_id)
-    document.title_short = get_verslag_document_title(document.title_short)
+    document = document_factory.create_document(tk_document, overheidnl_document_id, dossier_id=dossier_id)
     document.save()
     Kamerstuk.objects.filter(document=document).delete()
     kamerstuk = Kamerstuk.objects.create(
@@ -69,7 +70,7 @@ def create_verslag(overheidnl_document_id, dossier_id, kamerstuk_nr, commissie, 
         id_main=dossier_id,
         id_sub=kamerstuk_nr,
         type_short='Verslag',
-        type_long='Verslag van een algemeen overleg'
+        type_long=tk_document.soort.value
     )
     CommissieDocument.objects.filter(document=document).delete()
     verslag = CommissieDocument.objects.create(
@@ -80,16 +81,8 @@ def create_verslag(overheidnl_document_id, dossier_id, kamerstuk_nr, commissie, 
     return verslag
 
 
-def get_verslag_document_title(title):
-    return upperfirst(re.sub(r'(Verslag van een algemeen overleg, gehouden.*? \d{4}, over )', '', title))
-
-
-def upperfirst(x):
-    return x[0].upper() + x[1:]
-
-
-def get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime) -> List[tkapi.document.VerslagAlgemeenOverleg]:
-    pd_filter = tkapi.document.Document.create_filter()
+def get_tk_verlag_algemeen_overleg(begin_datetime, end_datetime) -> List[VerslagAlgemeenOverleg]:
+    pd_filter = TKDocument.create_filter()
     pd_filter.filter_date_range(begin_datetime, end_datetime)
-    tk_verslagen = tkapi.Api().get_verslagen_van_algemeen_overleg(pd_filter)
+    tk_verslagen = tkapi.TKApi.get_verslagen_van_algemeen_overleg(pd_filter)
     return tk_verslagen

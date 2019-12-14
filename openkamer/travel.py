@@ -2,7 +2,7 @@ import logging
 
 from django.db import transaction
 
-from tkapi import Api
+from tkapi import TKApi
 from tkapi.persoon import PersoonReis
 
 from person.models import Person
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def create_travels(max_items=None):
-    travels = Api.get_items(PersoonReis, max_items=max_items)
+    travels = TKApi.get_items(PersoonReis, max_items=max_items)
     logger.info('{} travels found.'.format(len(travels)))
     if len(travels) < 1000:
         logger.error('Only {} travels found. This is unexpected. Skip re-creating travels.'.format(len(travels)))

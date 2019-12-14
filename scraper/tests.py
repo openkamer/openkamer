@@ -7,24 +7,6 @@ import scraper.documents
 import scraper.persons
 
 
-class TestKamervraagScraper(TestCase):
-
-    def test_get_kamervraag_id_and_content(self):
-        document_id = 'kv-tk-2017Z06952'
-        metadata = scraper.documents.get_metadata(document_id)
-        kamervraag_html_url = 'https://zoek.officielebekendmakingen.nl/{}.html'.format(document_id)
-        overheidnl_document_ids = scraper.documents.get_kamervraag_antwoord_ids(kamervraag_html_url)
-        self.assertEqual(1, len(overheidnl_document_ids))
-        self.assertEqual('ah-tk-20162017-2167', overheidnl_document_ids[0])
-
-    def test_get_related_ids(self):
-        url = 'https://zoek.officielebekendmakingen.nl/kv-tk-2017Z07318'
-        related_document_ids = scraper.documents.get_kamervraag_antwoord_ids(url)
-        self.assertEqual(len(related_document_ids), 2)
-        self.assertEqual(related_document_ids[0], 'ah-tk-20162017-2129')
-        self.assertEqual(related_document_ids[1], 'ah-tk-20162017-2338')
-
-
 class TestBesluitenlijstScraper(TestCase):
     filenames = [
         'data/besluitenlijsten/besluitenlijst_example1.pdf',

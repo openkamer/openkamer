@@ -3,7 +3,7 @@ import re
 
 from django.db import transaction
 
-from tkapi import Api
+from tkapi import TKApi
 from tkapi.persoon import PersoonGeschenk
 
 from person.models import Person
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 @transaction.atomic
 def create_gifts(max_items=None):
-    gifts = Api.get_items(PersoonGeschenk, max_items=max_items)
+    gifts = TKApi.get_items(PersoonGeschenk, max_items=max_items)
     logger.info('{} gifts found.'.format(len(gifts)))
     if len(gifts) < 1000:
         logger.error('Only {} gifts found. This is unexpected. Skip re-creating gifts.'.format(len(gifts)))
