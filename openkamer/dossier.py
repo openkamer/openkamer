@@ -143,26 +143,14 @@ def get_document_data(tk_document: TKDocument, tk_zaak: Zaak, dossier_id):
 def create_dossier_documents(dossier, dossier_id):
     logger.info('create_dossier_documents - BEGIN')
 
-    # overheid_document_ids = []
     tk_dossier = queries.get_dossier(nummer=dossier.dossier_main_id, toevoeging=dossier.dossier_sub_id)
-    # for zaak in tk_dossier.zaken:
-    #     overheid_document_ids.append('kst-{}-{}'.format(dossier.dossier_id, zaak.volgnummer))
-
-    # document_ids = scraper.documents.search_politieknl_dossier(dossier_id)
-    # print(overheid_document_ids)
-    # print(document_ids)
-
-    # pool = ThreadPool(processes=4)
-    # manager = mp.Manager()
-    # outputs = manager.list()
-    # for tk_document in tk_documents:
-    #     pool.apply_async(get_document_data, args=(tk_document, dossier_id, outputs))
-    # pool.close()
-    # pool.join()
 
     outputs = []
     for tk_zaak in tk_dossier.zaken:
         for doc in tk_zaak.documenten:
+            if int(doc.volgnummer) == -1:
+                # TODO BR: this document is not found at overheid.nl, fix this
+                continue
             outputs.append(get_document_data(doc, tk_zaak, dossier_id))
 
     logger.info('create_dossier_documents - outputs: {}'.format(len(outputs)))
