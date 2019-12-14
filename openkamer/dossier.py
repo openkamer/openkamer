@@ -141,7 +141,6 @@ def create_dossier_documents(dossier, dossier_id):
             'title_short': data.tk_document.onderwerp,
             'publication_type': data.tk_document.soort.value,
             'date_published': data.tk_document.datum,
-            'datetime': data.tk_document.datum,
             'source_url': data.url,
             'content_html': data.content_html,
         }

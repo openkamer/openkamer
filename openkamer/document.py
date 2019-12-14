@@ -113,7 +113,6 @@ class DocumentFactory(object):
             'title_short': tk_document.titel,
             'publication_type': document_data.tk_document.soort.value,
             'date_published': document_data.date_published,
-            'datetime': document_data.date_published,
             'source_url': document_data.url,
             'content_html': document_data.content_html,
         }
@@ -132,7 +131,6 @@ class DocumentFactory(object):
             'title_short': tk_document.onderwerp,
             'publication_type': tk_document.soort.value,
             'date_published': document_data.date_published,
-            'datetime': document_data.date_published,
             'source_url': document_data.url,
             'content_html': document_data.content_html,
         }

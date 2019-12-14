@@ -45,7 +45,6 @@ class DocumentAdmin(admin.ModelAdmin):
         'document_id',
         'title_short',
         'date_published',
-        'datetime',
         'publication_type',
         'publisher',
         'document_url',
