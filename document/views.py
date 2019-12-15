@@ -206,10 +206,10 @@ class DossierTimelineView(TemplateView):
         timeline_items = []
         for kamerstuk in dossier.kamerstukken:
             timeline_items.append(TimelineKamerstukItem(kamerstuk))
-        for decisions in dossier.decisions:
-            if decisions.kamerstuk:
+        for decision in dossier.decisions:
+            if decision.kamerstuk or decision.datetime is None:
                 continue
-            timeline_items.append(TimelineDecisionItem(decisions))
+            timeline_items.append(TimelineDecisionItem(decision))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items
         return context
