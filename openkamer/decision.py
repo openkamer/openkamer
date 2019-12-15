@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 from django.db import transaction
 
@@ -17,6 +18,8 @@ def create_dossier_decisions(dossier_id_main: str, dossier_id_sub: str, dossier:
     tk_besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
     decisions = []
     for tk_besluit in tk_besluiten:
+        if not tk_besluit.tekst:
+            continue
         kamerstuk = Kamerstuk.objects.filter(
             id_main=dossier.dossier_id,
             id_sub=tk_besluit.zaak.volgnummer
