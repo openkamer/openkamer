@@ -136,6 +136,7 @@ class ParliamentMember(models.Model):
 
 
 class PoliticalParty(models.Model):
+    tk_id = models.CharField(max_length=200, blank=True, null=True, db_index=True)
     name = models.CharField(max_length=200)
     name_short = models.CharField(max_length=200)
     founded = models.DateField(blank=True, null=True)
