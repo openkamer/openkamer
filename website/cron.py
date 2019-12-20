@@ -3,16 +3,15 @@ import gzip
 import logging
 import os
 import shutil
-import traceback
 import time
 
 import fasteners
 
 from django.core import management
 from django.conf import settings
+from django.core.paginator import Paginator
 from django_cron import CronJobBase, Schedule
 from django.db import transaction
-
 
 from document.models import Submitter
 from government.models import GovernmentMember
@@ -177,21 +176,16 @@ class UpdateSubmitters(LockJob):
 
     def do_imp(self):
         logger.info('BEGIN')
+        BATCH_SIZE = 1000
         try:
-            submitters = Submitter.objects.all()
-            n_total = submitters.count()
-            logger.info('submitters: {}'.format(n_total))
-            counter = 0
-            progress_percent = 0
-            submitters_batch = []
-            for submitter in submitters:
-                submitters_batch.append(submitter)
-                if counter/n_total*100 > (progress_percent+1):
-                    self.update_batch(submitters_batch)
-                    submitters_batch = []
-                    progress_percent = counter/n_total*100
-                    logger.info(str(int(progress_percent)) + '%')
-                counter += 1
+            submitters = Submitter.objects.all().order_by('party_slug')
+            paginator = Paginator(submitters, BATCH_SIZE)
+            logger.info('{} submitters to update'.format(paginator.count))
+            for page in paginator.page_range:
+                progress_percent = int(page / paginator.num_pages * 100)
+                logger.info('{}%'.format(progress_percent))
+                submitters = paginator.get_page(page)
+                self.update_batch(submitters)
         except Exception as error:
             logger.exception(error)
             raise
