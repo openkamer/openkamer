@@ -18,9 +18,10 @@ from parliament.models import PoliticalParty
 
 from document.models import Agenda
 from document.models import AgendaItem
-from document.models import Document, Kamerstuk
 from document.models import CommissieDocument
+from document.models import Document
 from document.models import Dossier
+from document.models import Kamerstuk
 from document.models import Kamervraag
 from document.models import Submitter
 from document.models import Voting
@@ -183,6 +184,19 @@ class TimelineDecisionItem(TimelineItem):
         return self.obj.datetime.date()
 
 
+class TimelineActivityItem(TimelineItem):
+    def __init__(self, obj):
+        super().__init__(obj)
+
+    @staticmethod
+    def template_name():
+        return 'document/items/timeline_activity.html'
+
+    @property
+    def date(self):
+        return self.obj.datetime.date()
+
+
 class TimelineKamervraagItem(TimelineItem):
     def __init__(self, obj):
         super().__init__(obj)
@@ -207,9 +221,13 @@ class DossierTimelineView(TemplateView):
         for kamerstuk in dossier.kamerstukken:
             timeline_items.append(TimelineKamerstukItem(kamerstuk))
         for decision in dossier.decisions:
-            if decision.kamerstuk or decision.datetime is None:
+            if decision.kamerstuk or decision.activity or decision.datetime is None:
                 continue
             timeline_items.append(TimelineDecisionItem(decision))
+        for activity in dossier.activities:
+            if activity.datetime is None:
+                continue
+            timeline_items.append(TimelineActivityItem(activity))
         timeline_items = sorted(timeline_items, key=lambda items: items.date, reverse=True)
         context['timeline_items'] = timeline_items
         return context

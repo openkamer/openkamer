@@ -1,0 +1,49 @@
+{% load openkamer %}
+{% load document %}
+
+{% with activity=item.obj %}
+
+<a class="anchor" id="{{ activity.id }}"></a>
+<div class="cd-timeline-img text-center bg-info">
+  <span style="font-size:24px;" class="fa fa-calendar"></span>
+</div> <!-- cd-timeline-img -->
+
+<div class="panel panel-default cd-timeline-content">
+
+  <div class="panel-heading panel-heading-timeline">
+    <div class="row">
+
+      <div class="col-xs-2">
+      </div>
+
+      <div class="col-xs-8 text-center">
+        <h6>{{ activity.get_type_display }}</h6>
+      </div>
+
+      <div class="hidden-xs hidden-sm col-xs-2 kamertuk-id-timeline-container">
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel-body panel-body-timeline">
+    <h6 class="small">{{ activity.subject }}</h6>
+  </div>
+
+  {% if activity.decisions %}
+  <div class="panel-footer panel-footer-timeline">
+    <h6>Besluiten</h6>
+    {% for decision in activity.decisions %}
+    <h6 class="small">{{ decision.datetime|date:"j F Y" }}: {{ decision.text }}</h6>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="visible-xs visible-sm panel-footer panel-footer-timeline">
+    <h6 class="small">{{ activity.datetime|date:"j F Y" }}</h6>
+  </div>
+  <span class="hidden-xs hidden-sm cd-date"><h2>{{ activity.datetime|date:"j F Y" }}</h2></span>
+
+</div> <!-- cd-timeline-content -->
+
+{% endwith %}
