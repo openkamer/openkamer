@@ -8,6 +8,8 @@ from django.utils.text import slugify
 from django.utils.functional import cached_property
 
 from tkapi.besluit import BesluitStatus as TKBesluitStatus
+from tkapi.activiteit import ActiviteitSoort as TKActiviteitSoort
+from tkapi.activiteit import ActiviteitStatus as TKActiviteitStatus
 
 from person.models import Person
 
@@ -110,6 +112,10 @@ class Dossier(models.Model):
     @cached_property
     def decisions(self):
         return Decision.objects.filter(dossier=self)
+
+    @cached_property
+    def activities(self):
+        return Activity.objects.filter(dossier=self)
 
     @cached_property
     def start_date(self):
@@ -505,12 +511,30 @@ class AgendaItem(models.Model):
         return str(self.agenda)
 
 
+class Activity(models.Model):
+    tk_id = models.CharField(max_length=200, blank=True, db_index=True)
+    dossier = models.ForeignKey(Dossier, blank=True, null=True, on_delete=models.CASCADE)
+    kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True, on_delete=models.CASCADE)
+    type = models.CharField(max_length=200, choices=[(tag.name, tag.value) for tag in TKActiviteitSoort], db_index=True)
+    status = models.CharField(max_length=200, choices=[(tag.name, tag.value) for tag in TKActiviteitStatus], db_index=True)
+    datetime = models.DateTimeField(blank=True, null=True, db_index=True)
+    begin = models.DateTimeField(blank=True, null=True, db_index=True)
+    end = models.DateTimeField(blank=True, null=True, db_index=True)
+    subject = models.CharField(max_length=10000, blank=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    @property
+    def decisions(self):
+        return Decision.objects.filter(activity=self)
+
+
 class Decision(models.Model):
     tk_id = models.CharField(max_length=200, blank=True, db_index=True)
     datetime = models.DateTimeField(blank=True, null=True, db_index=True)
     dossier = models.ForeignKey(Dossier, blank=True, null=True, on_delete=models.CASCADE)
     kamerstuk = models.ForeignKey(Kamerstuk, blank=True, null=True, on_delete=models.CASCADE)
-    status = models.CharField(max_length=200, choices=[(tag, tag.value) for tag in TKBesluitStatus], db_index=True)
+    activity = models.ForeignKey(Activity, blank=True, null=True, on_delete=models.CASCADE)
+    status = models.CharField(max_length=200, choices=[(tag.name, tag.value) for tag in TKBesluitStatus], db_index=True)
     text = models.CharField(max_length=10000, blank=True)
     type = models.CharField(max_length=10000, blank=True)
     note = models.CharField(max_length=10000, blank=True)

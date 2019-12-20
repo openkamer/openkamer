@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from document.models import Activity
 from document.models import Dossier
 from document.models import Document
 from document.models import Decision
@@ -111,7 +112,11 @@ class VoteIndividualAdmin(admin.ModelAdmin):
 
 
 class DecisionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tk_id', 'datetime', 'dossier', 'kamerstuk', 'status', 'text', 'type', 'note', 'date_updated')
+    list_display = ('id', 'tk_id', 'datetime', 'dossier', 'status', 'text', 'type', 'activity', 'kamerstuk', 'note', 'date_updated')
+
+
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('id', 'tk_id', 'datetime', 'dossier', 'kamerstuk', 'type', 'status', 'begin', 'end', 'subject', 'date_updated')
 
 
 class CommissieDocumentAdmin(admin.ModelAdmin):
@@ -133,5 +138,6 @@ admin.site.register(VoteParty, VotePartyAdmin)
 admin.site.register(VoteIndividual, VoteIndividualAdmin)
 admin.site.register(Voting, VotingAdmin)
 admin.site.register(Decision, DecisionAdmin)
+admin.site.register(Activity, ActivityAdmin)
 
 admin.site.register(CommissieDocument, CommissieDocumentAdmin)
