@@ -29,6 +29,7 @@ from document.models import Kamerstuk
 from openkamer.document import DocumentFactory
 from openkamer.document import DocumentData
 from openkamer.document import get_categories
+from openkamer.activity import create_dossier_activities
 from openkamer.decision import create_dossier_decisions
 from openkamer.kamerstuk import create_kamerstuk
 from openkamer.voting import VotingFactory
@@ -91,6 +92,7 @@ def create_or_update_dossier(dossier_id):
     )
     create_dossier_documents(dossier_new, dossier_id)
     create_dossier_decisions(dossier_id_main, dossier_id_sub, dossier_new)
+    create_dossier_activities(dossier_id_main, dossier_id_sub, dossier_new)
     voting_factory = VotingFactory()
     voting_factory.create_votings(dossier_id)
     dossier_new.set_derived_fields()
