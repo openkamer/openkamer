@@ -483,7 +483,7 @@ class TestVerslagAlgemeenOverleg(TestCase):
 
 class TestFindTKAPIPerson(TestCase):
 
-    def test_find_person(self):
+    def test_find_person_diederik(self):
         person = Person(
             surname='Samsom',
             forename='Diederik'
@@ -509,7 +509,8 @@ class TestFindTKAPIPerson(TestCase):
 
     def test_find_person_ozturk(self):
         person = Person(
-            surname='Öztürk'
+            surname='Öztürk',
+            initials='S'
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertEqual(tkperson.achternaam, 'Öztürk')
@@ -539,3 +540,11 @@ class TestFindTKAPIPerson(TestCase):
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertEqual(tkperson.achternaam, person.surname)
+
+    def test_find_person_wrong_initials(self):
+        person = Person(
+            surname='Wiersma',
+            initials='H.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertIsNone(tkperson)

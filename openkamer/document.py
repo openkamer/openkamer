@@ -228,7 +228,7 @@ class SubmitterFactory(object):
             logger.warning('No document submitter found for document: {}'.format(document.document_id))
         else:
             persons = Person.objects.filter(tk_id=tk_person.id)
-            if persons:
+            if len(persons):
                 person = persons[0]
 
             if person is None:

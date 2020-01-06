@@ -306,9 +306,8 @@ def create_person(wikidata_id, fullname, wikidata_item, add_initials):
 
 def add_tk_person_id(person: Person) -> Person:
     tkperson = find_tkapi_person(person)
-    if tkperson:
-        person.tk_id = tkperson.id
-        person.save()
+    person.tk_id = tkperson.id if tkperson else None
+    person.save()
     return person
 
 
@@ -329,9 +328,9 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
     except KeyError:
         logger.exception('Could not find TK Person for {} ({})'.format(person.surname, person.initials))
         return None
+
     surname_matches = [tkperson for tkperson in persons if tkperson.achternaam.lower() == person.surname.lower()]
-    if len(surname_matches) == 1:
-        return surname_matches[0]
+
     if len(surname_matches) == 0:
         surname_parts = person.surname.split('-')
         surname_parts += person.surname.split(' ')
@@ -345,16 +344,30 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
             for tk_part in tk_surname_parts:
                 if tk_part in surname_parts:
                     surname_matches.append(tkperson)
-    if len(surname_matches) == 1:
-        return surname_matches[0]
+
     for tkperson in surname_matches:
-        if tkperson.initialen.lower() == person.initials.lower():
+        if initials_equal(tkperson.initialen, person.initials):
             return tkperson
-        elif tkperson.initialen.replace('.', '').lower() == person.initials.replace('.', '').lower():
+
+    for tkperson in surname_matches:
+        if not person.forename:
+            continue
+        if tkperson.voornamen.lower() in person.forename.lower():
             return tkperson
-    if surname_matches:
-        return surname_matches[0]
+        if person.forename.lower() in tkperson.voornamen.lower():
+            return tkperson
+
     return None
+
+
+def initials_equal(initials_a: str, initials_b) -> bool:
+    initials_a = initials_a.lower()
+    initials_b = initials_b.lower()
+    if initials_a == initials_b:
+        return True
+    elif initials_a.replace('.', '') == initials_b.replace('.', ''):
+        return True
+    return False
 
 
 @transaction.atomic
