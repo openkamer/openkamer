@@ -62,7 +62,7 @@ class DocumentData(object):
         if self.tk_document.actors:
             actors = [actor.persoon for actor in self.tk_document.actors if actor.persoon and actor.persoon.achternaam]
         if not actors:
-            actors = [actor.persoon for actor in self.tk_zaak.zaak_actors if actor.persoon and actor.persoon.achternaam]
+            actors = [actor.persoon for actor in self.tk_zaak.actors if actor.persoon and actor.persoon.achternaam]
         return actors
 
     @property
@@ -71,7 +71,7 @@ class DocumentData(object):
         if self.tk_document.actors:
             actors = [actor.commissie for actor in self.tk_document.actors if actor.commissie]
         if not actors:
-            actors = [actor.commissie for actor in self.tk_zaak.zaak_actors if actor.commissie]
+            actors = [actor.commissie for actor in self.tk_zaak.actors if actor.commissie]
         return actors
 
     @property
@@ -80,7 +80,7 @@ class DocumentData(object):
         if self.tk_document.actors:
             names = [actor.naam for actor in self.tk_document.actors if actor.naam]
         if not names:
-            names = [actor.naam for actor in self.tk_zaak.zaak_actors if actor.naam]
+            names = [actor.naam for actor in self.tk_zaak.actors if actor.naam]
         return names
 
 
