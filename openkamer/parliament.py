@@ -306,7 +306,7 @@ def create_person(wikidata_id, fullname, wikidata_item, add_initials):
 
 def add_tk_person_id(person: Person) -> Person:
     tkperson = find_tkapi_person(person)
-    person.tk_id = tkperson.id if tkperson else None
+    person.tk_id = tkperson.id if tkperson else ''
     person.save()
     return person
 

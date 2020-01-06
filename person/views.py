@@ -35,12 +35,20 @@ class TwitterPersonsView(TemplateView):
 
 
 class PersonsCheckView(TemplateView):
-    template_name = 'person/persons_check.html'
+    template_name = 'person/check/persons_check.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['persons_same_surname'] = Person.same_surname()
         context['persons_surname_only'] = Person.objects.filter(forename='', initials='')
+        return context
+
+
+class PersonSlugCheckView(TemplateView):
+    template_name = 'person/check/persons_slug_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         same_slug_ids = []
         persons = Person.objects.all()
         for person in persons:
@@ -49,6 +57,22 @@ class PersonsCheckView(TemplateView):
                 for p in persons_same_slug:
                     same_slug_ids.append(p.id)
         context['persons_same_slug'] = Person.objects.filter(pk__in=same_slug_ids).order_by('slug')
+        return context
+
+
+class PersonTKIDCheckView(TemplateView):
+    template_name = 'person/check/persons_tk_id_check.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        persons = Person.objects.all()
+        duplicate_tk_ids = []
+        for p in persons:
+            if not p.tk_id:
+                continue
+            if Person.objects.filter(tk_id=p.tk_id).count() > 1:
+                duplicate_tk_ids.append(p.id)
+        context['duplicate_tk_ids'] = Person.objects.filter(id__in=duplicate_tk_ids).order_by('tk_id')
         return context
 
 
@@ -62,4 +86,3 @@ class PersonSearchView(SearchView):
 #        return {
 #            'yourValue': 112,
 #        }
-    

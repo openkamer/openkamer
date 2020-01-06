@@ -1,6 +1,6 @@
 {% extends "website/base.html" %}
 
-{% block title %}Wetsvoorstellen Test Lijst - Tweede Kamer {{ block.super }}{% endblock %}
+{% block title %}Checks {{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -15,9 +15,10 @@
 <div class="row">
   <div class="col-md-4">
     <h4><a href="{% url 'persons-check' %}">Personen</a></h4>
+    <h4><a href="{% url 'persons-check-slug' %}">Personen Slug</a></h4>
+    <h4><a href="{% url 'persons-check-tkid' %}">Personen TK ID</a></h4>
     <h4><a href="{% url 'party-members-check' %}">Partijleden</a></h4>
     <h4><a href="{% url 'parliament-members-check' %}">Kamerleden</a> (alleen beheerders)</h4>
-    <h4><a href="{% url 'dossiers-check' %}">Dossiers</a></h4>
     <h4><a href="{% url 'kamerstuk-check' %}">Kamerstukken</a></h4>
     <h4><a href="{% url 'votings-check' %}">Stemmingen</a></h4>
   </div>

@@ -1,0 +1,66 @@
+{% extends "website/base.html" %}
+
+{% load openkamer %}
+
+{% block title %}Personen Slug Check {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <div align="center"><h3>Personen Slug Check</h3></div>
+  </div>
+</div>
+
+<div class="row" align="center">
+  <div class="col-lg-12">
+    <h4>Personen met dezelfde slug/url ({{ persons_same_slug|length }})</h4>
+    <table class="table table-striped table-hover table-condensed">
+      <thead>
+        <tr>
+          <th>naam</th>
+          <th>voornaam</th>
+          <th>achternaam</th>
+          <th>initialen</th>
+          <th>slug</th>
+          <th>documents</th>
+          <th>submitters</th>
+          <th>kamerleden</th>
+          <th>kabinetsleden</th>
+          <th>partijleden</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for person in persons_same_slug %}
+        <tr>
+          <td>{{ person.fullname }}</td>
+          <td>{{ person.forename }}</td>
+          <td>{{ person.surname }}</td>
+          <td>{{ person.initials }}</td>
+          <td>{{ person.slug }}</td>
+          {% get_documents_for_person person as documents %}
+          <td><a href="{% url 'person-documents' person.id %}">{{ documents|length }}</a></td>
+          <td>
+            {% get_submitters person as submitters %}
+            {{ submitters|length }}
+          </td>
+          <td>
+            {% get_parliament_members_for_person person as members %}
+            {{ members|length }}
+          </td>
+          <td>
+            {% get_government_members_for_person person as members %}
+            {{ members|length }}
+          </td>
+          <td>
+            {% get_party_members_for_person person as members %}
+            {{ members|length }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

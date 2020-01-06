@@ -8,6 +8,8 @@ from person.views import PersonSearchView
 from person.views import PersonsView
 from person.views import TwitterPersonsView
 from person.views import PersonsCheckView
+from person.views import PersonSlugCheckView
+from person.views import PersonTKIDCheckView
 from document.views import PersonAutocomplete
 from document.views import PartyAutocomplete
 from document.views import DocumentSearchView
@@ -134,6 +136,8 @@ urlpatterns = [
     url(r'^testlist/$', TemplateView.as_view(template_name='website/testlist.html'), name='testlist'),
 
     url(r'^personen/check/$', PersonsCheckView.as_view(), name='persons-check'),
+    url(r'^personen/check/slug/$', PersonSlugCheckView.as_view(), name='persons-check-slug'),
+    url(r'^personen/check/tkid/$', PersonTKIDCheckView.as_view(), name='persons-check-tkid'),
     url(r'^partijleden/check/$', PartyMembersCheckView.as_view(), name='party-members-check'),
     url(r'^tweedekamerleden/check/$', ParliamentMembersCheckView.as_view(), name='parliament-members-check'),
     url(r'^stemmingen/check/$', VotingsCheckView.as_view(), name='votings-check'),
