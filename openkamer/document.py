@@ -208,7 +208,9 @@ def create_new_url(url):
 class SubmitterFactory(object):
 
     @staticmethod
+    @transaction.atomic
     def create_submitters(document: Document, document_data: DocumentData):
+        Submitter.objects.filter(document=document).delete()
         if document_data.submitters:
             for submitter in document_data.submitters:
                 SubmitterFactory.create_submitter(document, document_data.date_published, tk_person=submitter)
