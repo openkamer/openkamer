@@ -361,7 +361,7 @@ class KamervragenView(TemplateView):
             kamervragen = paginator.page(paginator.num_pages)
         recently_answered = kamervraag_filter.qs.filter(kamerantwoord__isnull=False).order_by('-kamerantwoord__document__date_published')[0:4]
         context['kamervragen'] = kamervragen
-        context['kamervragen_answered_recently'] = recently_answered
+        context['kamervragen_answered_recently'] = recently_answered if not page else []
         context['filter'] = kamervraag_filter
         context['n_results'] = kamervraag_filter.qs.count()
         return context
