@@ -14,16 +14,38 @@
         <thead>
           <tr>
             <th>Vraag nummer</th>
+            <th>Datum</th>
             <th>Title</th>
             <th>Ontvanger</th>
+            <th>Beantwoord door</th>
+            <th>Ministerie</th>
           </tr>
         </thead>
         <tbody>
           {% for kamervraag in kamervragen %}
           <tr>
             <td><a href="{% url 'kamervraag' kamervraag.vraagnummer %}">{{ kamervraag.vraagnummer }}</a></td>
+            <td>{{ kamervraag.document.date_published }}</td>
             <td>{{ kamervraag.document.title_short }}</td>
-            <td>{{ kamervraag.receiver }}</td>
+            <td>
+              {% with submitters=kamervraag.document.receivers %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+            </td>
+            <td>
+              {% with submitters=kamervraag.kamerantwoord.document.submitters %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+            </td>
+            <td>
+              {% for receiver in kamervraag.document.receivers %}
+                {% for member in receiver.government_members %}
+                  {% if member.position.ministry %}
+                    {{ member.position.ministry }}{% if not forloop.parentloop.last %}; {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>

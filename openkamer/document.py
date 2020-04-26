@@ -10,14 +10,14 @@ from django.urls import reverse
 
 from tkapi.persoon import Persoon as TKPersoon
 from tkapi.document import Document as TKDocument
+from tkapi.document import DocumentSoort as TKDocumentSoort
 from tkapi.commissie import Commissie as TKCommissie
-from tkapi.document import DocumentActor as TKDocumentActor
 from tkapi.zaak import Zaak as TKZaak
+from tkapi.zaak import ZaakActorRelatieSoort as TKZaakActorRelatieSoort
 
 import scraper.documents
 
 from person.util import parse_name_surname_initials
-from person.util import parse_surname_comma_surname_prefix
 from person.models import Person
 
 from government.models import GovernmentMember
@@ -86,7 +86,7 @@ class DocumentData(object):
 
 class DocumentFactory(object):
 
-    def get_document_data(self, tk_document: TKDocument, overheidnl_document_id):
+    def get_document_data(self, tk_document: TKDocument, overheidnl_document_id) -> DocumentData:
         logger.info(overheidnl_document_id)
         metadata = scraper.documents.get_metadata(overheidnl_document_id)
         overheidnl_document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else overheidnl_document_id
@@ -100,7 +100,7 @@ class DocumentFactory(object):
             content_html=content_html
         )
 
-    def create_document(self, tk_document: TKDocument, overheidnl_document_id, dossier_id=None, dossier=None):
+    def create_document(self, tk_document: TKDocument, overheidnl_document_id, dossier_id=None, dossier=None) -> Document:
         logger.info('BEGIN')
         document_data = self.get_document_data(tk_document, overheidnl_document_id)
 
@@ -211,19 +211,29 @@ class SubmitterFactory(object):
     @transaction.atomic
     def create_submitters(document: Document, document_data: DocumentData):
         Submitter.objects.filter(document=document).delete()
-        if document_data.submitters:
+        if document_data.tk_document.soort in [TKDocumentSoort.ANTWOORD_SCHRIFTELIJKE_VRAGEN, TKDocumentSoort.ANTWOORD_SCHRIFTELIJKE_VRAGEN_NADER]:
+            SubmitterFactory.create_submitters_kamerantwoord(document, document_data.tk_zaak)
+        elif document_data.submitters:
             for submitter in document_data.submitters:
-                SubmitterFactory.create_submitter(document, document_data.date_published, tk_person=submitter)
+                SubmitterFactory.create_submitter(document, tk_person=submitter)
         else:
             for name in document_data.submitters_names:
                 if 'commissie' in name.lower():
                     # TODO BR: extend submitters to be a commissie instead of person only
                     continue
-                SubmitterFactory.create_submitter(document, document_data.date_published, name=name)
+                SubmitterFactory.create_submitter(document, name=name)
 
     @staticmethod
     @transaction.atomic
-    def create_submitter(document: Document, date, tk_person: TKPersoon = None, name=None):
+    def create_submitters_kamerantwoord(document, tk_zaak: TKZaak):
+        for actor in tk_zaak.actors:
+            # The receivers of the zaak (or question) are the ones who answer the question,
+            # so they are the (true) submitters of the answer
+            if actor.relatie == TKZaakActorRelatieSoort.GERICHT_AAN and actor.persoon is not None:
+                SubmitterFactory.create_submitter(document, tk_person=actor.persoon, name=actor.naam)
+
+    @staticmethod
+    def get_person(document: Document, tk_person: TKPersoon = None, name: str = None):
         person = None
 
         if not tk_person:
@@ -237,7 +247,7 @@ class SubmitterFactory(object):
                 logger.warning('No person found for tk_persoon: {} ({})'.format(tk_person.achternaam, tk_person.initialen))
 
         if person is None:
-            if tk_person:
+            if tk_person and tk_person.achternaam and tk_person.initialen:
                 surname = tk_person.achternaam
                 surname_prefix = tk_person.tussenvoegsel
                 initials = tk_person.initialen
@@ -248,13 +258,26 @@ class SubmitterFactory(object):
         if not person:
             logger.warning('Cannot find person: {} ({}). Creating new person!'.format(surname, initials))
             person = Person.objects.create(surname=surname, surname_prefix=surname_prefix, initials=initials)
+        return person
 
-        party_members = PartyMember.get_at_date(person, date)
-        party_slug = ''
-        if party_members:
-            party_slug = party_members[0].party.slug
+    @staticmethod
+    def get_party_slug(person, document):
+        party_members = PartyMember.get_at_date(person, document.date_published)
+        return party_members[0].party.slug if party_members else ''
 
-        submitter, created = Submitter.objects.get_or_create(person=person, document=document, party_slug=party_slug)
+    @staticmethod
+    @transaction.atomic
+    def create_submitter(
+        document: Document,
+        tk_person: TKPersoon = None,
+        name: str = None,
+        submitter_type = Submitter.SUBMITTER
+    ) -> Submitter:
+        person = SubmitterFactory.get_person(document, tk_person, name)
+        party_slug = SubmitterFactory.get_party_slug(person, document)
+        submitter, created = Submitter.objects.get_or_create(
+            person=person, document=document, party_slug=party_slug, type=submitter_type
+        )
         return submitter
 
     @staticmethod

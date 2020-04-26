@@ -60,10 +60,7 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
     dossier = indexes.CharField(model_attr='document', faceted=True)
     date = indexes.FacetDateField(model_attr='document')
     decision = indexes.CharField(faceted=True)
-    receiver = indexes.CharField(model_attr='receiver', faceted=True)
-    
-    def prepare_receiver(self, obj):
-        return obj.receiver
+    receivers = indexes.MultiValueField(model_attr='document', faceted=True)
     
     def prepare_decision(self,obj):
         return "Onbeantwoord" if not obj.kamerantwoord else "Beantwoord"
@@ -90,7 +87,18 @@ class KamervraagIndex(indexes.SearchIndex, indexes.Indexable):
                         submitters = [n.person.fullname() if n.person else '' for n in obj.document.submitters]
         
         return submitters
-    
+
+    def prepare_receivers(self, obj):
+        if not obj.document:
+            receivers = ''
+        else:
+            if obj.kamerantwoord:
+                receivers = [n.person.fullname() if n.person else '' for n in
+                              obj.document.receivers | obj.kamerantwoord.document.submitters]
+            else:
+                receivers = [n.person.fullname() if n.person else '' for n in obj.document.receivers]
+        return receivers
+
     def prepare_parties(self, obj):
         return '' if not obj.document else [n.party.name_short if n.party else '' for n in obj.document.submitters]  
     

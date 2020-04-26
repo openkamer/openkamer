@@ -13,14 +13,17 @@ from tkapi.util.document import get_overheidnl_id
 import tkapi.zaak
 from tkapi.document import DocumentSoort
 
+from document.models import Document
 from document.models import Kamervraag
 from document.models import Kamerantwoord
 from document.models import KamervraagMededeling
 from document.models import Antwoord
 from document.models import Vraag
 from document.models import FootNote
+from document.models import Submitter
 
 from openkamer.document import DocumentFactory
+from openkamer.document import SubmitterFactory
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +91,7 @@ def get_tk_kamervraag_zaken(begin_datetime, end_datetime) -> List[tkapi.zaak.Zaa
     return zaken
 
 
-def get_or_create_kamervraag(vraagnummer, document):
+def get_or_create_kamervraag(vraagnummer, document: Document, tk_document: TKDocument) -> Kamervraag:
     kamervragen = Kamervraag.objects.filter(vraagnummer=vraagnummer)
     if kamervragen.count() == 1:
         kamervraag = kamervragen[0]
@@ -97,9 +100,17 @@ def get_or_create_kamervraag(vraagnummer, document):
         kamervraag = Kamervraag()
     kamervraag.document = document
     kamervraag.vraagnummer = vraagnummer
-    kamervraag.receiver = get_receiver_from_title(document.title_full)
+    create_kamervraag_receivers(document, tk_document)
     kamervraag.save()
     return kamervraag
+
+
+def create_kamervraag_receivers(document: Document, tk_document: TKDocument) -> Submitter or None:
+    for actor in tk_document.zaken[0].actors:
+        if actor.relatie == tkapi.zaak.ZaakActorRelatieSoort.GERICHT_AAN and actor.persoon is not None:
+            SubmitterFactory.create_submitter(
+                document, tk_person=actor.persoon, name=actor.naam, submitter_type=Submitter.RECEIVER
+            )
 
 
 def get_or_create_kamerantwoord(vraagnummer, document):
@@ -121,7 +132,7 @@ def create_kamervraag(tk_document: TKDocument, overheidnl_document_id, skip_if_e
         return Kamervraag.objects.filter(document__document_id=overheidnl_document_id)[0]
     document_factory = DocumentFactory()
     document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
-    kamervraag = get_or_create_kamervraag(vraagnummer, document)
+    kamervraag = get_or_create_kamervraag(vraagnummer, document, tk_document)
     create_vragen_from_kamervraag_html(kamervraag)
     footnotes = create_footnotes(kamervraag.document.content_html)
     FootNote.objects.filter(document=document).delete()
@@ -149,14 +160,6 @@ def create_mededeling(tk_document: TKDocument, overheidnl_document_id):
     mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
     create_kamervraag_mededeling_from_html(mededeling)
     return mededeling
-
-
-def get_receiver_from_title(title_full):
-    pattern = 'Vragen\s.*aan de\s(.*) over\s.*'
-    result = re.findall(pattern, title_full)
-    if result:
-        return result[0]
-    return ''
 
 
 @transaction.atomic
