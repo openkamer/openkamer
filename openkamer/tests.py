@@ -346,6 +346,19 @@ class TestKamervraag(TestCase):
         self.assertEqual(expected_name, kamervraag.document.receivers[0].person.surname)
         self.assertEqual(expected_initials, kamervraag.document.receivers[0].person.initials)
 
+    def test_kamervraag_answered_by_2020Z03941(self):
+        zaak_nummer = '2020Z03941'
+        tk_zaak = self.get_tk_zaak(zaak_nummer)
+        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak)
+        self.assertIsNotNone(kamervraag)
+        self.assertIsNotNone(kamerantwoord)
+        self.assertEqual(2, len(kamervraag.document.receivers))
+        self.assertEqual(4, len(kamervraag.document.submitters))
+        self.assertEqual(0, len(kamerantwoord.document.receivers))
+        self.assertEqual(2, len(kamerantwoord.document.submitters))
+        self.assertEqual('Bruins', kamervraag.document.receivers[0].person.surname)
+        self.assertEqual('Blok', kamervraag.document.receivers[1].person.surname)
+
     def test_update_or_create(self):
         zaak_nummer = '2017Z07318'
         tk_document = self.get_tk_document_for_zaak(zaak_nummer)
