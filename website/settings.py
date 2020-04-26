@@ -291,6 +291,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'tkapi': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
         'django.db.backends': {
             'level': 'ERROR',
             'handlers': ['console'],
