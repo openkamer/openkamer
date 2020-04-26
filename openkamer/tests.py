@@ -242,12 +242,6 @@ class TestKamervraag(TestCase):
             kamervraag, vraagnummer = document_factory.create_kamervraag_document(tk_doc, overheid_id)
         self.assertIsNotNone(kamervraag)
 
-    def test_get_receiver_from_title(self):
-        receiver_expected = 'Staatssecretaris van Infrastructuur en Milieu'
-        title = "Vragen van het lid Monasch (PvdA) aan de Staatssecretaris van Infrastructuur en Milieu over het artikel «Schiphol kan verder met uitbreiding» (ingezonden 23 november 2015)."
-        receiver = openkamer.kamervraag.get_receiver_from_title(title)
-        self.assertEqual(receiver, receiver_expected)
-
     def test_parse_footnotes(self):
         footnote_html = """
         <div id="noten">
@@ -323,11 +317,47 @@ class TestKamervraag(TestCase):
     def test_postponed_answer(self):
         zaak_nummer = '2017Z07318'
         tk_zaak = self.get_tk_zaak(zaak_nummer)
-        overheid_id = 'kv-tk-{}'.format(zaak_nummer)
-        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak, overheid_id)
+        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak)
         self.assertIsNotNone(kamervraag)
         self.assertEqual(1, len(kamervraag.mededelingen))
         self.assertTrue(kamervraag.mededelingen[0].text)
+
+    def test_kamervraag_answered_by_2020Z05842(self):
+        zaak_nummer = '2020Z05842'
+        expected_name = 'Rijn'
+        expected_initials = 'M.J.'
+        self.check_answer_submitter(zaak_nummer, expected_name, expected_initials)
+
+    def test_kamervraag_answered_by_2018Z04429(self):
+        zaak_nummer = '2018Z04429'
+        expected_name = 'Grapperhaus'
+        expected_initials = 'F.B.J.'
+        self.check_answer_submitter(zaak_nummer, expected_name, expected_initials)
+
+    def check_answer_submitter(self, zaak_nummer, expected_name, expected_initials):
+        tk_zaak = self.get_tk_zaak(zaak_nummer)
+        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak)
+        self.assertIsNotNone(kamervraag)
+        self.assertIsNotNone(kamerantwoord)
+        self.assertEqual(1, len(kamervraag.document.receivers))
+        self.assertEqual(1, len(kamerantwoord.document.submitters))
+        self.assertEqual(expected_name, kamerantwoord.document.submitters[0].person.surname)
+        self.assertEqual(expected_initials, kamerantwoord.document.submitters[0].person.initials)
+        self.assertEqual(expected_name, kamervraag.document.receivers[0].person.surname)
+        self.assertEqual(expected_initials, kamervraag.document.receivers[0].person.initials)
+
+    def test_kamervraag_answered_by_2020Z03941(self):
+        zaak_nummer = '2020Z03941'
+        tk_zaak = self.get_tk_zaak(zaak_nummer)
+        kamervraag, kamerantwoord = openkamer.kamervraag.create_for_zaak(tk_zaak)
+        self.assertIsNotNone(kamervraag)
+        self.assertIsNotNone(kamerantwoord)
+        self.assertEqual(2, len(kamervraag.document.receivers))
+        self.assertEqual(4, len(kamervraag.document.submitters))
+        self.assertEqual(0, len(kamerantwoord.document.receivers))
+        self.assertEqual(2, len(kamerantwoord.document.submitters))
+        self.assertEqual('Bruins', kamervraag.document.receivers[0].person.surname)
+        self.assertEqual('Blok', kamervraag.document.receivers[1].person.surname)
 
     def test_update_or_create(self):
         zaak_nummer = '2017Z07318'

@@ -52,7 +52,13 @@
               {% endwith %}
             {% else %}
             <th><h6 class="small"><i class="fa fa-envelope-open text-primary kamervraag-panel-icon" title="Ontvanger"></i></h6></th>
-            <td><h6 class="small">{{ kamervraag.receiver }}</h6></td>
+            <td>
+              <h6 class="small">
+              {% with submitters=kamervraag.document.receivers %}
+                {% include "document/items/submitters_list.html" %}
+              {% endwith %}
+              </h6>
+            </td>
             {% endif %}
           </tr>
 

@@ -224,7 +224,11 @@ class Document(models.Model):
 
     @cached_property
     def submitters(self):
-        return Submitter.objects.filter(document=self).exclude(person__surname='').select_related('person', 'document')
+        return Submitter.objects.filter(document=self, type=Submitter.SUBMITTER).exclude(person__surname='').select_related('person', 'document')
+
+    @cached_property
+    def receivers(self):
+        return Submitter.objects.filter(document=self, type=Submitter.RECEIVER).exclude(person__surname='').select_related('person', 'document')
 
     @cached_property
     def title(self):
@@ -248,9 +252,15 @@ class Document(models.Model):
 
 
 class Submitter(models.Model):
+    SUBMITTER = 'submitter'
+    RECEIVER = 'receiver'
+    TYPE_CHOICES = (
+        (SUBMITTER, SUBMITTER), (RECEIVER, RECEIVER)
+    )
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     party_slug = models.CharField(max_length=500, blank=True, default='', db_index=True)
+    type = models.CharField(choices=TYPE_CHOICES, default=SUBMITTER, max_length=30, db_index=True, null=False)
 
     class Meta:
         unique_together = ['person', 'document']
@@ -303,7 +313,6 @@ class Kamerantwoord(models.Model):
 class Kamervraag(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     vraagnummer = models.CharField(max_length=200, db_index=True)
-    receiver = models.CharField(max_length=1000)
     kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
