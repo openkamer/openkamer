@@ -8,6 +8,7 @@ from json.decoder import JSONDecodeError
 from django.db import transaction
 
 from wikidata import wikidata
+from wikidata.government import GovernmentMemberData
 import wikidata.government as wikidata_government
 
 import tkapi
@@ -86,34 +87,30 @@ def create_government_members(government, max_members=None):
     members_created = []
     members = wikidata_government.get_government_members(government.wikidata_id, max_members=max_members)
     for member in members:
-        if 'position' not in member:
-            logger.error('no position found for government member: ' + member['name'] + ' with wikidata id: ' + member['wikidata_id'])
+        if member.position is None:
+            logger.error('no position found for government member: {} with wikidata id: {}'.format(member.name, member.wikidata_id))
             continue
-        logger.info(member['name'] + ' ' + member['position'])
+        logger.info('{} {}'.format(member.name, member.position))
         ministry = create_ministry(government, member)
         position = create_government_position(government, member, ministry)
-        person = get_or_create_person(member['wikidata_id'], member['name'], add_initials=True)
+        person = get_or_create_person(member.wikidata_id, member.name, add_initials=True)
         gov_member = create_goverment_member(government, member, person, position)
         members_created.append(gov_member)
     return members_created
 
 
 @transaction.atomic
-def create_ministry(government, member):
+def create_ministry(government, member: GovernmentMemberData):
     ministry = None
-    if 'ministry' in member:
-        ministry, created = Ministry.objects.get_or_create(name=member['ministry'].lower(), government=government)
+    if member.ministry:
+        ministry, created = Ministry.objects.get_or_create(name=member.ministry.lower(), government=government)
     return ministry
 
 
 @transaction.atomic
-def create_goverment_member(government, member, person, position):
-    start_date = government.date_formed
-    if 'start_date' in member:
-        start_date = member['start_date']
-    end_date = government.date_dissolved
-    if 'end_date' in member:
-        end_date = member['end_date']
+def create_goverment_member(government, member: GovernmentMemberData, person, position):
+    start_date = member.start_date if member.start_date else government.date_formed
+    end_date = member.end_date if member.end_date else government.date_dissolved
     member = GovernmentMember.objects.get_or_create(
         person=person,
         position=position,
@@ -379,13 +376,13 @@ def update_initials():
 
 
 @transaction.atomic
-def create_government_position(government, member, ministry):
-    position_type = GovernmentPosition.find_position_type(member['position'])
+def create_government_position(government, member: GovernmentMemberData, ministry):
+    position_type = GovernmentPosition.find_position_type(member.position)
     positions = GovernmentPosition.objects.filter(
         ministry=ministry,
         position=position_type,
         government=government,
-        extra_info=member['position_name'],
+        extra_info=member.position_name,
     )
     if positions.exists():
         if positions.count() > 1:
@@ -396,6 +393,6 @@ def create_government_position(government, member, ministry):
             ministry=ministry,
             position=position_type,
             government=government,
-            extra_info=member['position_name'],
+            extra_info=member.position_name,
         )
     return position
