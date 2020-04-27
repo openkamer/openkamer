@@ -44,7 +44,7 @@ def get_government_members(government_wikidata_id, max_members=None) -> List[Gov
                 if 'ministerie' in item_label:
                     member.ministry = item_label.replace('ministerie van', '').strip()
                 elif 'minister voor' in item_label or 'minister van' in item_label:
-                    member.position_name = item_label.replace('minister voor', '').strip()
+                    member.position_name = item_label.replace('minister voor', '').replace('minister van', '').strip()
                 elif member.position is None:
                     if 'viceminister' in item_label or 'vicepremier' in item_label:
                         member.position = 'viceminister-president'
