@@ -18,6 +18,7 @@ class PersonAdmin(admin.ModelAdmin):
         'parlement_and_politiek_id',
         'datetime_updated',
     )
+    search_fields = ['forename', 'surname', 'tk_id', 'wikidata_id', 'parlement_and_politiek_id']
 
 
 admin.site.register(Person, PersonAdmin)
