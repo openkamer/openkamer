@@ -44,6 +44,7 @@ CRON_CLASSES = [
     # 'website.cron.TestJob',
     'website.cron.BackupDaily',
     'website.cron.CleanUnusedPersons',
+    'website.cron.MergeDuplicatePersons',
     # 'website.cron.UpdateSubmitters'
     # 'website.cron.UpdateParliamentAndGovernment',
     # 'website.cron.UpdateActiveDossiers',
