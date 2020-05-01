@@ -14,7 +14,7 @@ REQUEST_TIMEOUT = 60
 
 
 def request_wikidata(url, params, **kwargs):
-    headers = {'User-Agent': 'OpenKamer 1.0'}
+    headers = {'User-Agent': 'OpenKamer 1.0', 'Accept-Encoding': 'gzip'}
     response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
     if response.status_code == 429:
         backoff = int(response.headers.get('retry-after', REQUEST_TIMEOUT))
