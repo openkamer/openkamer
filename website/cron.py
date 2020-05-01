@@ -18,6 +18,7 @@ from government.models import GovernmentMember
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
 from person.models import Person
+from person.views import PersonTKIDCheckView
 
 import openkamer.dossier
 import openkamer.gift
@@ -282,6 +283,40 @@ class CleanUnusedPersons(CronJobBase):
             persons_to_delete_ids.append(person.id)
         Person.objects.filter(id__in=persons_to_delete_ids).delete()
         logger.info('deleted persons: ' + str(persons_to_delete_ids))
+        logger.info('END')
+
+
+class MergeDuplicatePersons(CronJobBase):
+    RUN_AT_TIMES = ['08:15']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.MergeDuplicatePersons'
+
+    def do(self):
+        logger.info('run merge duplicate persons')
+        tk_ids = PersonTKIDCheckView.get_duplicate_person_tk_ids()
+        logger.info('duplicate ids: {}'.format(tk_ids))
+        try:
+            for tk_id in tk_ids:
+                persons = Person.objects.filter(tk_id=tk_id)
+                for person in persons:
+                    logger.info('===============')
+                    logger.info('person: {}'.format(person))
+                    if not person.surname or not person.initials:
+                        continue
+                    person_best = Person.find_surname_initials(person.surname, person.initials, persons)
+                    persons_delete = persons.exclude(id=person_best.id)
+                    logger.info('best {}, delete: {}'.format(person_best, persons_delete))
+                    submitters = Submitter.objects.filter(person__in=persons_delete)
+                    for submitter in submitters:
+                        submitter.person = person
+                        submitter.update_submitter_party_slug()
+                        submitter.save()
+                    persons_delete.delete()
+                    logger.info('deleted persons: {}'.format(persons_delete))
+                    break
+        except Exception as e:
+            logger.exception('Error merging duplicated persons')
+            raise
         logger.info('END')
 
 

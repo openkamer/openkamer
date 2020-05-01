@@ -31,11 +31,11 @@ NAME_PREFIXES = [
 
 
 class Person(models.Model):
-    forename = models.CharField(max_length=200, db_index=True)
+    forename = models.CharField(max_length=200, db_index=True, blank=True)
     surname = models.CharField(max_length=200, db_index=True)
     surname_prefix = models.CharField(max_length=200, blank=True, default='', db_index=True)
     initials = models.CharField(max_length=200, blank=True, default='', db_index=True)
-    slug = models.SlugField(max_length=250, default='')
+    slug = models.SlugField(max_length=250, default='', blank=True)
     birthdate = models.DateField(blank=True, null=True)
     tk_id = models.CharField(max_length=200, blank=True, db_index=True)
     wikidata_id = models.CharField(max_length=200, blank=True, db_index=True)
@@ -67,11 +67,11 @@ class Person(models.Model):
         return '', -1
 
     @staticmethod
-    def find_surname_initials(surname, initials=''):
+    def find_surname_initials(surname, initials='', persons=None):
         # TODO: improve performance; use queries
         surname = unidecode(surname)
         initials = unidecode(initials)
-        persons = Person.objects.all()
+        persons = persons if persons is not None else Person.objects.all()
         best_match = None
         best_score = 0
         for person in persons:
@@ -84,14 +84,16 @@ class Person(models.Model):
                 score += 1
             elif surname_no_second == unidecode(person.surname_prefix.lower() + ' ' + person_surname_no_second):
                 score += 1
-            intials_letters = initials.split('.')
+            initials_letters = initials.split('.')
             forename = unidecode(person.forename)
             if initials and initials.lower() == unidecode(person.initials.lower()):
                 score += 1
-            elif intials_letters and forename and intials_letters[0] == forename[0]:
+            elif initials_letters and forename and initials_letters[0] == forename[0]:
                 score += 0.5
             if person.initials and person.forename and person.surname:
                 score += 0.1
+            if person.wikidata_id:
+                score += 0.05
             if score >= 1.5 and score > best_score:
                 best_match = person
                 best_score = score
