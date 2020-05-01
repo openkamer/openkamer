@@ -308,13 +308,12 @@ class MergeDuplicatePersons(CronJobBase):
                     logger.info('best {}, delete: {}'.format(person_best, persons_delete))
                     submitters = Submitter.objects.filter(person__in=persons_delete)
                     for submitter in submitters:
-                        if Submitter.objects.filter(person=person, document=submitter.document).exists():
+                        if Submitter.objects.filter(person=person_best, document=submitter.document).exists():
                             continue
-                        submitter.person = person
+                        submitter.person = person_best
                         submitter.update_submitter_party_slug()
                         submitter.save()
                     persons_delete.delete()
-                    logger.info('deleted persons: {}'.format(persons_delete))
                     break
         except Exception as e:
             logger.exception('Error merging duplicated persons')
