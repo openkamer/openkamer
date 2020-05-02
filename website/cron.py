@@ -298,27 +298,31 @@ class MergeDuplicatePersons(CronJobBase):
         try:
             for tk_id in tk_ids:
                 persons = Person.objects.filter(tk_id=tk_id)
-                for person in persons:
-                    logger.info('===============')
-                    logger.info('person: {}'.format(person))
-                    if not person.surname or not person.initials:
-                        continue
-                    person_best = Person.find_surname_initials(person.surname, person.initials, persons)
-                    persons_delete = persons.exclude(id=person_best.id)
-                    logger.info('best {}, delete: {}'.format(person_best, persons_delete))
-                    submitters = Submitter.objects.filter(person__in=persons_delete)
-                    for submitter in submitters:
-                        if Submitter.objects.filter(person=person_best, document=submitter.document).exists():
-                            continue
-                        submitter.person = person_best
-                        submitter.update_submitter_party_slug()
-                        submitter.save()
-                    persons_delete.delete()
-                    break
+                self.try_merge_persons(persons)
         except Exception as e:
             logger.exception('Error merging duplicated persons')
             raise
         logger.info('END')
+
+    @staticmethod
+    def try_merge_persons(persons):
+        for person in persons:
+            logger.info('===============')
+            logger.info('person: {}'.format(person))
+            if not person.surname or not person.initials:
+                continue
+            person_best = Person.find_surname_initials(person.surname, person.initials, persons)
+            persons_delete = persons.exclude(id=person_best.id)
+            logger.info('best {}, delete: {}'.format(person_best, persons_delete))
+            submitters = Submitter.objects.filter(person__in=persons_delete)
+            for submitter in submitters:
+                if Submitter.objects.filter(person=person_best, document=submitter.document).exists():
+                    continue
+                submitter.person = person_best
+                submitter.update_submitter_party_slug()
+                submitter.save()
+            persons_delete.delete()
+            break
 
 
 class BackupDaily(LockJob):

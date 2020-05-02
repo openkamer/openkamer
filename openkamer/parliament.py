@@ -331,35 +331,51 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
     if len(surname_matches) == 0:
         surname_parts = person.surname.split('-')
         surname_parts += person.surname.split(' ')
-        surname_parts = [surname.lower() for surname in surname_parts]
-        tk_surname_parts = []
+        surname_parts = [surname.lower() for surname in surname_parts if len(surname) > 3]
         surname_matches = []
         for tkperson in persons:
+            tk_surname_parts = []
             tk_surname_parts += tkperson.achternaam.split('-')
             tk_surname_parts += tkperson.achternaam.split(' ')
-            tk_surname_parts = [surname.lower() for surname in tk_surname_parts]
+            tk_surname_parts = [surname.lower() for surname in tk_surname_parts if len(surname) > 3]
             for tk_part in tk_surname_parts:
                 if tk_part in surname_parts:
                     surname_matches.append(tkperson)
 
+    initial_matches = []
     for tkperson in surname_matches:
         if initials_equal(tkperson.initialen, person.initials):
+            initial_matches.append(tkperson)
+
+    if len(initial_matches) == 1:
+        return initial_matches[0]
+
+    for tkperson in initial_matches:
+        if forename_almost_equal(person, tkperson):
             return tkperson
 
     for tkperson in surname_matches:
-        if not person.forename:
-            continue
-        if tkperson.voornamen.lower() in person.forename.lower():
-            return tkperson
-        if person.forename.lower() in tkperson.voornamen.lower():
+        if forename_almost_equal(person, tkperson):
             return tkperson
 
     return None
 
 
+def forename_almost_equal(person, tkperson) -> bool:
+    if not person.forename or not tkperson.voornamen:
+        return False
+    if tkperson.voornamen.lower() in person.forename.lower():
+        return True
+    if person.forename.lower() in tkperson.voornamen.lower():
+        return True
+    return False
+
+
 def initials_equal(initials_a: str, initials_b) -> bool:
     initials_a = initials_a.lower()
     initials_b = initials_b.lower()
+    if initials_a == '' or initials_b == '':
+        return False
     if initials_a == initials_b:
         return True
     elif initials_a.replace('.', '') == initials_b.replace('.', ''):

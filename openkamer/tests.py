@@ -523,8 +523,18 @@ class TestFindTKAPIPerson(TestCase):
 
     def test_find_person_common_surname(self):
         person = Person(
+            forename='Jan',
             surname='Vries',
             initials='J.M.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertEqual(tkperson.achternaam, person.surname)
+
+    def test_find_person_common_surname_initials_without_dots(self):
+        person = Person(
+            forename='Jan',
+            surname='Vries',
+            initials='JM'
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertEqual(tkperson.achternaam, person.surname)
@@ -563,18 +573,30 @@ class TestFindTKAPIPerson(TestCase):
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertEqual(tkperson.achternaam, 'Kooten-Arissen')
 
-    def test_find_person_common_surname_initials_without_dots(self):
-        person = Person(
-            surname='Vries',
-            initials='JM'
-        )
-        tkperson = openkamer.parliament.find_tkapi_person(person)
-        self.assertEqual(tkperson.achternaam, person.surname)
-
     def test_find_person_wrong_initials(self):
         person = Person(
             surname='Wiersma',
             initials='H.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertIsNone(tkperson)
+
+    def test_find_no_results(self):
+        person = Person(
+            forename='Willem Caspar',
+            surname_prefix='de',
+            surname='Jonge',
+            initials='J.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertIsNone(tkperson)
+
+    def test_find_person_no_results_jean(self):
+        person = Person(
+            forename='Jean Baptiste Anne',
+            surname_prefix='de',
+            surname='Gerlache de Biourge',
+            initials='J.B.A.'
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertIsNone(tkperson)
