@@ -296,9 +296,6 @@ class Plot(models.Model):
     KAMERVRAAG_REPLY_TIME_2DHIST = 'KRT2D'
     KAMERVRAAG_REPLY_TIME_PER_PARTY = 'KRTPP'
     KAMERVRAAG_REPLY_TIME_PER_YEAR = 'KRTPY'
-    KAMERVRAAG_REPLY_TIME_PER_MINISTRY = 'KRTPM'
-    KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION = 'KRTPMP'
-    KAMERVRAAG_REPLY_TIME_PER_POSITION = 'KRTPPO'
     SEATS_PER_PARTY_VS_TIME = 'SPPVT'
     PLOT_TYPES = (
         (KAMERVRAAG_VS_TIME, 'Kamervraag vs time'),
@@ -308,9 +305,6 @@ class Plot(models.Model):
         (KAMERVRAAG_REPLY_TIME_2DHIST, 'Kamervraag reply time 2D histogram'),
         (KAMERVRAAG_REPLY_TIME_PER_PARTY, 'Kamervraag reply time per party'),
         (KAMERVRAAG_REPLY_TIME_PER_YEAR, 'Kamervraag reply time per year'),
-        (KAMERVRAAG_REPLY_TIME_PER_MINISTRY, 'Kamervraag reply time per ministerie'),
-        (KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION, 'Kamervraag reply time per ministerie bewindspersoon'),
-        (KAMERVRAAG_REPLY_TIME_PER_POSITION, 'Kamervraag reply time per minister of staatssecretaris'),
         (SEATS_PER_PARTY_VS_TIME, 'Seats per party vs time'),
     )
     type = models.CharField(max_length=10, choices=PLOT_TYPES, default=KAMERVRAAG_VS_TIME, db_index=True, unique=True)
@@ -332,7 +326,6 @@ class Plot(models.Model):
             Plot.create_kamervragen_general_plots(start_year)
             Plot.create_kamervragen_vs_time_party_plots(start_year)
             Plot.create_kamervragen_party_plots(start_year)
-            Plot.create_kamervragen_ministry_plots(start_year)
             Plot.create_kamervragen_years_plots(start_year)
             Plot.create_kamervragen_vs_time_party_seats_plots(start_year)
             Plot.create_party_seats_vs_time_plot(start_year)
@@ -372,7 +365,7 @@ class Plot(models.Model):
         party_labels = []
         party_durations = []
         for party_slug in party_slugs:
-            submitters = Submitter.objects.filter(party_slug=party_slug)
+            submitters = Submitter.objects.filter(party_slug=party_slug, type=Submitter.SUBMITTER)
             submitter_ids = list(submitters.values_list('id', flat=True))
             kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
             if start_year:
@@ -386,82 +379,6 @@ class Plot(models.Model):
 
         plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY)
         plot.html = kamervragen_reply_time_per_party(party_labels, party_durations)
-        plot.save()
-        logger.info('END')
-
-    @staticmethod
-    @transaction.atomic
-    def create_kamervragen_ministry_plots(start_year=None):
-        logger.info('BEGIN')
-        rutte_2 = Government.objects.filter(slug='kabinet-rutte-ii')[0]
-        ministries = rutte_2.ministries
-
-        ministry_names = []
-        position_names = []
-        ministry_durations = []
-        position_durations = []
-        position_types = {}
-
-        for ministry in ministries:
-            ministry_person_ids = []
-            positions = ministry.positions()
-            for position in positions:
-                position_person_ids = []
-                members = position.members
-                for member in members:
-                    ministry_person_ids.append(member.person.id)
-                    position_person_ids.append(member.person.id)
-                submitters = Submitter.objects.filter(person__in=position_person_ids)
-                submitter_ids = list(submitters.values_list('id', flat=True))
-                antwoorden = Kamerantwoord.objects.filter(
-                    document__submitter__in=submitter_ids,
-                    document__date_published__gt=rutte_2.date_formed,
-                ).select_related('document').distinct()
-                kamervragen = Kamervraag.objects.filter(kamerantwoord__in=antwoorden)
-                if start_year:
-                    kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
-                kamervraag_durations = []
-                for kamervraag in kamervragen:
-                    kamervraag_durations.append(kamervraag.duration)
-                if kamervraag_durations:
-                    position_durations.append(kamervraag_durations)
-                    position_names.append(ministry.name + ' (' + position.get_position_display() + ') (' + str(kamervragen.count()) + ')')
-                    if position.get_position_display() in position_types:
-                        position_types[position.get_position_display()] += kamervraag_durations
-                    else:
-                        position_types[position.get_position_display()] = kamervraag_durations
-
-            submitters = Submitter.objects.filter(person__in=ministry_person_ids)
-            submitter_ids = list(submitters.values_list('id', flat=True))
-            antwoorden = Kamerantwoord.objects.filter(
-                document__submitter__in=submitter_ids,
-                document__date_published__gt=rutte_2.date_formed,
-            ).select_related('document').distinct()
-            kamervragen = Kamervraag.objects.filter(kamerantwoord__in=antwoorden)
-            if start_year:
-                kamervragen = kamervragen.filter(document__date_published__gt=datetime.datetime(year=start_year, month=1, day=1))
-            kamervraag_durations = []
-            for kamervraag in kamervragen:
-                kamervraag_durations.append(kamervraag.duration)
-            if kamervraag_durations:
-                ministry_durations.append(kamervraag_durations)
-                ministry_names.append(ministry.name + ' (' + str(kamervragen.count()) + ')')
-
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY)
-        plot.html = kamervragen_reply_time_per_ministry(ministry_names, ministry_durations)
-        plot.save()
-
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION)
-        plot.html = kamervragen_reply_time_per_ministry(position_names, position_durations)
-        plot.save()
-
-        position_type_names = []
-        position_type_durations = []
-        for key in position_types:
-            position_type_names.append(key + ' (' + str(len(position_types[key])) + ')')
-            position_type_durations.append(position_types[key])
-        plot, created = Plot.objects.get_or_create(type=Plot.KAMERVRAAG_REPLY_TIME_PER_POSITION)
-        plot.html = kamervragen_reply_time_per_ministry(position_type_names, position_type_durations)
         plot.save()
         logger.info('END')
 
@@ -507,7 +424,7 @@ class Plot(models.Model):
         party_kamervragen_dates = []
 
         for party_slug in Plot.party_slugs:
-            submitters = Submitter.objects.filter(party_slug=party_slug)
+            submitters = Submitter.objects.filter(party_slug=party_slug, type=Submitter.SUBMITTER)
             submitter_ids = list(submitters.values_list('id', flat=True))
             kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
             if start_year:
@@ -533,7 +450,7 @@ class Plot(models.Model):
         party_seats = []
 
         for party_slug in Plot.party_slugs:
-            submitters = Submitter.objects.filter(party_slug=party_slug)
+            submitters = Submitter.objects.filter(party_slug=party_slug, type=Submitter.SUBMITTER)
             submitter_ids = list(submitters.values_list('id', flat=True))
             kamervragen = Kamervraag.objects.filter(document__submitter__in=submitter_ids, kamerantwoord__isnull=False).select_related('document').distinct()
             if start_year:

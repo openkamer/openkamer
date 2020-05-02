@@ -113,39 +113,4 @@ function resize_plots() {
   </div>
 </div>
 
-<hr/>
-
-<div class="row">
-  <div class="col-lg-12" align="center">
-    <h4>Antwoordtijd verdeling per ministerie</h4>
-    <h5>Tijdens kabinet Rutte-II</h5>
-    {{ plot_kamervraag_reply_times_per_ministry_html }}
-    <h5 class="text-info small">Klik op de legenda items om lijnen te verbergen. Dubbelklik om de rest te verbergen.</h5>
-    <p>Bovenstaande verdeling is een probability density distributie benadering via een <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">KDE</a>.</p>
-  </div>
-</div>
-
-<hr/>
-
-<div class="row">
-  <div class="col-lg-12" align="center">
-    <h4>Antwoordtijd verdeling per ministerie en bewindspersoon</h4>
-    <h5>Tijdens kabinet Rutte-II</h5>
-    {{ plot_kamervraag_reply_times_per_ministry_position_html }}
-    <h5 class="text-info small">Klik op de legenda items om lijnen te verbergen. Dubbelklik om de rest te verbergen.</h5>
-    <p>Bovenstaande verdeling is een probability density distributie benadering via een <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">KDE</a>.</p>
-  </div>
-</div>
-
-<hr/>
-
-<div class="row">
-  <div class="col-lg-12" align="center">
-    <h4>Antwoordtijd verdeling voor de verschillende bewindslieden</h4>
-    <h5>Tijdens kabinet Rutte-II</h5>
-    {{ plot_kamervraag_reply_times_per_position_html }}
-    <p>Bovenstaande verdeling is een probability density distributie benadering via een <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">KDE</a>.</p>
-  </div>
-</div>
-
 {% endblock %}

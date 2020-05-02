@@ -161,9 +161,6 @@ class KamervraagStats(TemplateView):
         context['plot_kamervraag_reply_times_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_HIST).html)
         context['plot_kamervraag_reply_times_per_party_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_PARTY).html)
         context['plot_kamervraag_reply_times_per_year_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_YEAR).html)
-        context['plot_kamervraag_reply_times_per_ministry_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY).html)
-        context['plot_kamervraag_reply_times_per_position_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_POSITION).html)
-        context['plot_kamervraag_reply_times_per_ministry_position_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_PER_MINISTRY_POSITION).html)
         context['plot_kamervraag_reply_times_contour_html'] = mark_safe(Plot.objects.get(type=Plot.KAMERVRAAG_REPLY_TIME_2DHIST).html)
         # context['plot_party_seats_vs_time_html'] = mark_safe(Plot.objects.get(type=Plot.SEATS_PER_PARTY_VS_TIME).html)
         return context
