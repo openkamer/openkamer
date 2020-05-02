@@ -403,7 +403,7 @@ class CreateCSVExports(LockJob):
             filepath = os.path.join(settings.CSV_EXPORT_PATH, 'openkamer_kamervragen_{}.csv'.format(year))
             with open(filepath, 'w') as csvfile:
                 filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-                headers = ['vraagnummer', 'datum', 'ministeries', 'titel']
+                headers = ['vraagnummer', 'datum', 'ministeries', 'ontvangers', 'titel']
                 filewriter.writerow(headers)
                 for kamervraag in kamervragen:
                     ministries = []
@@ -411,10 +411,12 @@ class CreateCSVExports(LockJob):
                         for member in receiver.government_members:
                             if member.position.ministry:
                                 ministries.append(member.position.ministry.name)
+                    receivers = [receiver.person.fullname() for receiver in kamervraag.document.receivers]
                     row = [
                         kamervraag.vraagnummer,
                         str(kamervraag.document.date_published),
                         ';'.join(ministries),
+                        ';'.join(receivers),
                         kamervraag.document.title_short,
                     ]
                     filewriter.writerow(row)
