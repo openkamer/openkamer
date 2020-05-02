@@ -63,6 +63,7 @@ CRON_CLASSES = [
 # OPENKAMER
 CONTACT_EMAIL = 'info@openkamer.org'
 OK_TMP_DIR = os.path.join(BASE_DIR, 'data/tmp/')
+CSV_EXPORT_PATH = os.path.join(BASE_DIR, STATIC_ROOT, 'csv/')
 
 # DOCUMENT
 NUMBER_OF_LATEST_DOSSIERS = 6

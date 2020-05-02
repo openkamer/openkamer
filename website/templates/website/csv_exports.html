@@ -12,12 +12,12 @@
 
 <hr/>
 
-<table>
+<table class="table table-striped">
   {% for file in files %}
   <tr>
     <td><a href="{% static 'csv/' %}{{ file.file }}">{{ file.file }}</a></td>
-    <td>{{ file.datetime_created|date:"Y-m-d H:i" }}</td>
-    <td>{{ backup.size|floatformat:0 }} MB</td>
+    <td><span>{{ file.datetime_created|date:"Y-m-d H:i" }}</span></td>
+    <td><span>{{ file.size|floatformat:2 }} MB</span></td>
   </tr>
   {% endfor %}
 </table>
