@@ -612,3 +612,12 @@ class TestFindTKAPIPerson(TestCase):
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertIsNone(tkperson)
+
+    def test_find_person_haegen(self):
+        person = Person(
+            forename='Melanie',
+            surname='Schultz van Haegen',
+            initials='M.H.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertIsNotNone(tkperson)

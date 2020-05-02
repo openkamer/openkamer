@@ -178,6 +178,15 @@ class TestWikidataNameParts(TestCase):
         self.assertEqual(surname_prefix, 'de')
         self.assertEqual(surname, 'Lange')
 
+    def test_melanie_schultz_van_hagen(self):
+        wikidata_id = 'Q435886'
+        wikidata_item = wikidata.WikidataItem(wikidata_id)
+        fullname = wikidata_item.get_label()
+        forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
+        self.assertEqual(forename, 'Melanie')
+        self.assertEqual(surname_prefix, '')
+        self.assertEqual(surname, 'Schultz van Haegen')
+
 
 class TestParseName(TestCase):
     """ Tests name parsing """

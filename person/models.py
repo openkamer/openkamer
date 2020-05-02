@@ -29,6 +29,10 @@ NAME_PREFIXES = [
     'te',
 ]
 
+NAMES_WITH_PREFIX_INSIDE_SURNAME = [
+    'melanie schultz van haegen'
+]
+
 
 class Person(models.Model):
     forename = models.CharField(max_length=200, db_index=True, blank=True)
@@ -176,7 +180,8 @@ class Person(models.Model):
             forename = name_parts[0]
             surname = name_parts[1]
             return forename.strip(), surname.strip(), surname_prefix.strip()
-        surname_prefix, prefix_pos = Person.find_prefix(fullname)
+        if fullname.lower() not in NAMES_WITH_PREFIX_INSIDE_SURNAME:
+            surname_prefix, prefix_pos = Person.find_prefix(fullname)
         if surname_prefix:
             forename = fullname[0:prefix_pos]
             surname_pos = prefix_pos + len(surname_prefix)
