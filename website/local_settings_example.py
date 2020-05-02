@@ -57,6 +57,7 @@ CRON_CLASSES = [
     # 'website.cron.UpdateGifts',
     # 'website.cron.UpdateTravels',
     # 'website.cron.UpdateSearchIndex',
+    # 'website.cron.CreateCSVExports'
 ]
 
 # OPENKAMER

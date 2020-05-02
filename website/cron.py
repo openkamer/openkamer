@@ -1,3 +1,4 @@
+import csv
 import datetime
 import gzip
 import logging
@@ -13,6 +14,7 @@ from django.core.paginator import Paginator
 from django_cron import CronJobBase, Schedule
 from django.db import transaction
 
+from document.models import Kamervraag
 from document.models import Submitter
 from government.models import GovernmentMember
 from parliament.models import PartyMember
@@ -341,7 +343,7 @@ class BackupDaily(LockJob):
 
     @staticmethod
     def create_json_dump():
-        filepath = os.path.join(settings.DBBACKUP_STORAGE_OPTIONS['location'], 'openkamer-' + str(datetime.date.today()) + '.json')
+        filepath = os.path.join(settings.DBBACKUP_STORAGE_OPTIONS['location'], 'openkamer-{}.json'.format(datetime.date.today()))
         filepath_compressed = filepath + '.gz'
         with open(filepath, 'w') as fileout:
             management.call_command(
@@ -374,3 +376,45 @@ class BackupDaily(LockJob):
                 datetime_created = datetime.datetime.fromtimestamp(os.path.getctime(filepath))
                 if datetime_created < datetime.datetime.now() - datetime.timedelta(days=days_old):
                     os.remove(filepath)
+
+
+class CreateCSVExports(LockJob):
+    RUN_AT_TIMES = ['18:15']
+    schedule = Schedule(run_at_times=RUN_AT_TIMES)
+    code = 'website.cron.CreateCSVExports'
+
+    def do_imp(self):
+        logger.info('run daily csv export job')
+        try:
+            self.create_kamervragen_csv_exports()
+        except Exception as e:
+            logger.exception(e)
+            raise
+
+    @staticmethod
+    def create_kamervragen_csv_exports():
+        years = years_from_str_list(2008)
+        for year in years:
+            logger.info('create year {}'.format(year))
+            year = int(year)
+            year_begin = datetime.date(year=year, month=1, day=1)
+            year_end = datetime.date(year=year + 1, month=1, day=1)
+            kamervragen = Kamervraag.objects.filter(document__date_published__gte=year_begin, document__date_published__lt=year_end).order_by('document__date_published')
+            filepath = os.path.join(settings.CSV_EXPORT_PATH, 'openkamer_kamervragen_{}.csv'.format(year))
+            with open(filepath, 'w') as csvfile:
+                filewriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+                headers = ['vraagnummer', 'datum', 'ministeries', 'titel']
+                filewriter.writerow(headers)
+                for kamervraag in kamervragen:
+                    ministries = []
+                    for receiver in kamervraag.document.receivers:
+                        for member in receiver.government_members:
+                            if member.position.ministry:
+                                ministries.append(member.position.ministry.name)
+                    row = [
+                        kamervraag.vraagnummer,
+                        str(kamervraag.document.date_published),
+                        ';'.join(ministries),
+                        kamervraag.document.title_short,
+                    ]
+                    filewriter.writerow(row)

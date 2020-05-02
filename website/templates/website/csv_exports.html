@@ -1,0 +1,27 @@
+{% extends "website/base.html" %}
+
+{% load static %}
+
+{% block title %}CSV Exports - {{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="row" align="center">
+  <h3>CSV Exports</h3>
+</div>
+
+<hr/>
+
+<table>
+  {% for file in files %}
+  <tr>
+    <td><a href="{% static 'csv/' %}{{ file.file }}">{{ file.file }}</a></td>
+    <td>{{ file.datetime_created|date:"Y-m-d H:i" }}</td>
+    <td>{{ backup.size|floatformat:0 }} MB</td>
+  </tr>
+  {% endfor %}
+</table>
+
+</div>
+
+{% endblock %}

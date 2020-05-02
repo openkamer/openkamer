@@ -51,6 +51,7 @@ from stats.views import KamervraagReplyTimeContour
 import gift.views
 import travel.views
 
+from website.views import CSVExportsView
 from website.views import DatabaseDumpsView
 from website.views import PersonTimelineView
 from website.views import HomeView
@@ -131,6 +132,7 @@ urlpatterns = [
     url(r'^stats/kamervraag/antwoordtijd/contour/$', KamervraagReplyTimeContour.as_view(), name='stats-kamervraag-reply-time-contour'),
 
     url(r'^database/dumps/$', DatabaseDumpsView.as_view(), name='database-dumps'),
+    url(r'^csv/exports/$', CSVExportsView.as_view(), name='csv-exports'),
 
     url(r'^checks/$', TemplateView.as_view(template_name='website/checks.html'), name='checks'),
     url(r'^testlist/$', TemplateView.as_view(template_name='website/testlist.html'), name='testlist'),

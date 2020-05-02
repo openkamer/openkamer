@@ -103,20 +103,35 @@ class DatabaseDumpsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        backup_files = []
-        for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
+        backup_files = self.get_files(settings.DBBACKUP_STORAGE_OPTIONS['location'])
+        context['backup_files'] = sorted(backup_files, key=lambda backup: backup['datetime_created'], reverse=True)
+        return context
+
+    @staticmethod
+    def get_files(path):
+        files = []
+        for (dirpath, dirnames, filenames) in os.walk(path):
             for file in filenames:
                 if '.gitignore' in file or 'readme.txt' in file:
                     continue
                 filepath = os.path.join(dirpath, file)
                 size = os.path.getsize(filepath)
                 datetime_created = os.path.getctime(filepath)
-                backup_files.append({
+                files.append({
                     'file': file,
                     'size': int(size)/1024/1024,
                     'datetime_created': datetime.datetime.fromtimestamp(datetime_created)
                 })
-        context['backup_files'] = sorted(backup_files, key=lambda backup: backup['datetime_created'], reverse=True)
+        return files
+
+
+class CSVExportsView(TemplateView):
+    template_name = "website/csv_exports.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        files = DatabaseDumpsView.get_files(settings.CSV_EXPORT_PATH)
+        context['files'] = sorted(files, key=lambda file: file['datetime_created'], reverse=True)
         return context
 
 
