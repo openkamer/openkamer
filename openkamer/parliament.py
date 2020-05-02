@@ -347,9 +347,6 @@ def find_tkapi_person(person: Person) -> TKPersoon or None:
         if initials_equal(tkperson.initialen, person.initials):
             initial_matches.append(tkperson)
 
-    if len(initial_matches) == 1:
-        return initial_matches[0]
-
     for tkperson in initial_matches:
         if forename_almost_equal(person, tkperson):
             return tkperson
@@ -367,6 +364,8 @@ def forename_almost_equal(person, tkperson) -> bool:
     if tkperson.voornamen.lower() in person.forename.lower():
         return True
     if person.forename.lower() in tkperson.voornamen.lower():
+        return True
+    if person.forename.lower() in tkperson.roepnaam.lower():
         return True
     return False
 

@@ -541,6 +541,7 @@ class TestFindTKAPIPerson(TestCase):
 
     def test_find_person_bijsterveldt(self):
         person = Person(
+            forename='Marja',
             surname='Bijsterveldt',
             initials='J.M.'
         )
@@ -549,6 +550,7 @@ class TestFindTKAPIPerson(TestCase):
 
     def test_find_person_ozturk(self):
         person = Person(
+            forename='Selçuk',
             surname='Öztürk',
             initials='S'
         )
@@ -597,6 +599,16 @@ class TestFindTKAPIPerson(TestCase):
             surname_prefix='de',
             surname='Gerlache de Biourge',
             initials='J.B.A.'
+        )
+        tkperson = openkamer.parliament.find_tkapi_person(person)
+        self.assertIsNone(tkperson)
+
+    def test_find_person_no_results_dekker(self):
+        """Should not be confused with Sander Dekker."""
+        person = Person(
+            forename='Suzanne',
+            surname='Dekker',
+            initials='S.'
         )
         tkperson = openkamer.parliament.find_tkapi_person(person)
         self.assertIsNone(tkperson)
