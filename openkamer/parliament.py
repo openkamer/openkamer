@@ -61,7 +61,8 @@ def create_governments():
     # Rutte I : Q168828
     # Rutte II : Q1638648
     # Rutte III : Q42293409
-    government_ids = ['Q42293409', 'Q1638648', 'Q168828', 'Q1719725', 'Q1473297']
+    # Rutte IV : Q110111120
+    government_ids = ['Q110111120', 'Q42293409', 'Q1638648', 'Q168828', 'Q1719725', 'Q1473297']
     for wikidata_id in government_ids:
         create_government(wikidata_id)
 
