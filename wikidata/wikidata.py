@@ -180,6 +180,12 @@ class WikidataItem(object):
             return claims['P527']  # has part
         return None
 
+    def get_subclass_of(self):
+        claims = self.get_claims()
+        if 'P279' in claims:
+            return claims['P279']  # subclass_of
+        return None
+
     def get_country_id(self):
         claims = self.get_claims()
         if 'P17' in claims:
@@ -379,3 +385,12 @@ class WikidataItem(object):
 
     def get_parliament_positions_held(self):
         return self.get_positions_held(filter_position_id=PARLIAMENT_MEMBER_DUTCH_ITEM_ID)
+
+    def is_subclass_of_minister_without_portfolio(self):
+        subclasses = self.get_subclass_of()
+        if subclasses is None:
+            return False
+        for subclass in subclasses:
+            if subclass['mainsnak']['datavalue']['value']['id'] == 'Q1937160':
+                return True
+        return False

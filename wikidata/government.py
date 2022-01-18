@@ -49,7 +49,11 @@ def create_government_member(part, language) -> GovernmentMemberData:
         # print(json.dumps(prop, sort_keys=True, indent=2))
         if prop['datatype'] == 'wikibase-item':
             item_id = prop['datavalue']['value']['id']
-            item_label = wikidata.WikidataItem(item_id).get_label(language=language)
+            item = wikidata.WikidataItem(item_id)
+            is_without_portfolio = item.is_subclass_of_minister_without_portfolio()
+            if is_without_portfolio:
+                member.position = 'minister zonder portefeuille'
+            item_label = item.get_label(language=language)
             item_label = item_label.lower()
             member.properties.append(item_label)
             if 'ministerie' in item_label:
