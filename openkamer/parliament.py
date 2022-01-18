@@ -88,10 +88,12 @@ def create_government_members(government, max_members=None):
     members = wikidata_government.get_government_members(government.wikidata_id, max_members=max_members)
     for member in members:
         if member.position is None:
-            logger.error('no position found for government member: {} with wikidata id: {}'.format(member.name, member.wikidata_id))
+            logger.error('no position found for government member: {} ({})'.format(member.name, member.wikidata_id))
             continue
-        logger.info('{} {}'.format(member.name, member.position))
+        logger.info('{} | {} | {}'.format(member.name, member.position, member.ministry))
         ministry = create_ministry(government, member)
+        if ministry is None:
+            logger.warning('No ministry found for government member: {} ({})'.format(member.name, member.wikidata_id))
         position = create_government_position(government, member, ministry)
         person = get_or_create_person(member.wikidata_id, member.name, add_initials=True)
         gov_member = create_goverment_member(government, member, person, position)

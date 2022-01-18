@@ -27,45 +27,53 @@ def get_government_members(government_wikidata_id, max_members=None) -> List[Gov
     parts = wikidata.WikidataItem(government_wikidata_id).get_parts()
     members = []
     for part in parts:
-        member = GovernmentMemberData()
-        member.wikidata_id = part['mainsnak']['datavalue']['value']['id']
-        member_item = wikidata.WikidataItem(member.wikidata_id)
-        member.wikipedia_url = member_item.get_wikipedia_url(language=language)
-        member.name = member_item.get_label(language=language)
-        member.parlement_and_politiek_id = member_item.get_parlement_and_politiek_id()
-        for prop_id in part['qualifiers']:
-            prop = part['qualifiers'][prop_id][0]
-            # print(json.dumps(prop, sort_keys=True, indent=4))
-            if prop['datatype'] == 'wikibase-item':
-                item_id = prop['datavalue']['value']['id']
-                item_label = wikidata.WikidataItem(item_id).get_label(language=language)
-                item_label = item_label.lower()
-                member.properties.append(item_label)
-                if 'ministerie' in item_label:
-                    member.ministry = item_label.replace('ministerie van', '').strip()
-                elif 'minister voor' in item_label or 'minister van' in item_label:
-                    member.position_name = item_label.replace('minister voor', '').replace('minister van', '').strip()
-                elif member.position is None:
-                    if 'viceminister' in item_label or 'vicepremier' in item_label:
-                        member.position = 'viceminister-president'
-                    elif 'minister-president' in item_label or 'premier' in item_label:
-                        member.position = 'minister-president'
-                    elif 'staatssecretaris' in item_label:
-                        member.position = 'staatssecretaris'
-                    elif 'minister zonder portefeuille' in item_label:
-                        member.position = 'minister zonder portefeuille'
-                    elif 'minister' in item_label:
-                        member.position = 'minister'
-            if prop['property'] == 'P580':  # start time
-                member.start_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
-            if prop['property'] == 'P582':  # end time
-                member.end_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
+        member = create_government_member(part, language)
+        logger.info(member.name)
         logger.info(json.dumps(member.__dict__, sort_keys=True, default=str))
         members.append(member)
-        if max_members and  len(members) >= max_members:
+        if max_members and len(members) >= max_members:
             break
     logger.info('END')
     return members
+
+
+def create_government_member(part, language) -> GovernmentMemberData:
+    member = GovernmentMemberData()
+    member.wikidata_id = part['mainsnak']['datavalue']['value']['id']
+    member_item = wikidata.WikidataItem(member.wikidata_id)
+    member.wikipedia_url = member_item.get_wikipedia_url(language=language)
+    member.name = member_item.get_label(language=language)
+    member.parlement_and_politiek_id = member_item.get_parlement_and_politiek_id()
+    for prop_id in part['qualifiers']:
+        prop = part['qualifiers'][prop_id][0]
+        # print(json.dumps(prop, sort_keys=True, indent=2))
+        if prop['datatype'] == 'wikibase-item':
+            item_id = prop['datavalue']['value']['id']
+            item_label = wikidata.WikidataItem(item_id).get_label(language=language)
+            item_label = item_label.lower()
+            member.properties.append(item_label)
+            if 'ministerie' in item_label:
+                member.ministry = item_label.replace('ministerie van', '').strip()
+            elif 'nederlands minister voor' in item_label or 'nederlands minister van' in item_label:
+                member.position_name = item_label.replace('nederlands minister voor', '').replace('nederlands minister van', '').strip()
+            elif 'minister voor' in item_label or 'minister van' in item_label:
+                member.position_name = item_label.replace('minister voor', '').replace('minister van', '').strip()
+            if member.position is None:
+                if 'viceminister' in item_label or 'vicepremier' in item_label:
+                    member.position = 'viceminister-president'
+                elif 'minister-president' in item_label or 'premier' in item_label:
+                    member.position = 'minister-president'
+                elif 'staatssecretaris' in item_label:
+                    member.position = 'staatssecretaris'
+                elif 'minister zonder portefeuille' in item_label:
+                    member.position = 'minister zonder portefeuille'
+                elif 'minister ' in item_label or 'nederlandse minister' in item_label:
+                    member.position = 'minister'
+        if prop['property'] == 'P580':  # start time
+            member.start_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
+        if prop['property'] == 'P582':  # end time
+            member.end_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
+    return member
 
 
 def get_government(government_wikidata_id):
