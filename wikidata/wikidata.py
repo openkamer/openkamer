@@ -160,6 +160,13 @@ class WikidataItem(object):
             return WikidataItem.get_date(inception)
         return None
 
+    def get_dissolved(self):
+        claims = self.get_claims()
+        if 'P576' in claims:
+            start_time = claims['P576'][0]['mainsnak']['datavalue']['value']['time']
+            return WikidataItem.get_date(start_time)
+        return None
+
     def get_start_time(self):
         claims = self.get_claims()
         if 'P580' in claims:

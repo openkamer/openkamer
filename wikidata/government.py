@@ -84,6 +84,6 @@ def get_government(government_wikidata_id):
     item = wikidata.WikidataItem(government_wikidata_id)
     return {
         'name': item.get_label(language='nl'),
-        'start_date': item.get_start_time(),
-        'end_date': item.get_end_time(),
+        'start_date': item.get_start_time() or item.get_inception(),
+        'end_date': item.get_end_time() or item.get_dissolved(),
     }
