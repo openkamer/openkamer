@@ -18,5 +18,5 @@ python-twitter==3.4.2
 scipy==1.4.1
 unidecode==1.1.1
 # tkapi==0.9.6
--e git+https://github.com/openkamer/tkapi.git#egg=907b98cc
+-e git+https://github.com/openkamer/tkapi.git@907b98cc#egg=tkapi
 django-debug-toolbar
