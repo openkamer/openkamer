@@ -67,7 +67,7 @@ def create_government_member(part, language) -> GovernmentMemberData:
                     member.position = 'staatssecretaris'
                 elif 'minister zonder portefeuille' in item_label:
                     member.position = 'minister zonder portefeuille'
-                elif 'minister ' in item_label or 'nederlandse minister' in item_label:
+                elif 'minister ' in item_label or 'nederlandse minister' in item_label or 'minister' == item_label:
                     member.position = 'minister'
         if prop['property'] == 'P580':  # start time
             member.start_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
