@@ -70,7 +70,7 @@
                             <a href="{% url result.model_name result.object.id_main result.object.id_sub %}">{{result.title}}</a>
                             <a class="text-muted" href="{% url 'dossier-timeline' result.object.id_main %}">(Dossier {{result.object.id_main}})</a>
                         {% else %}
-                            {{result.title}
+                            {{result.title}}
                         {% endif %}
                         <br>
                     {% elif result.model_name == "kamervraag" %}
