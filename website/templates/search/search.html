@@ -65,9 +65,25 @@
             <h4>{{ count }}</h4>
             {% for result in page_obj.object_list %}
                 <p>
-                    {% if result.model_name == "kamerstuk" %}<a href="{% url result.model_name result.object.id_main result.object.id_sub %}">{{result.title}}</a> <a class="text-muted" href="{% url 'dossier-timeline' result.object.id_main %}">(Dossier {{result.object.id_main}})</a><br>
-                    {% elif result.model_name == "kamervraag" %}<a href="{% url result.model_name result.object.vraagnummer %}">{{result.title}}</a><br>
-                    {% elif result.model_name == "person" %}<a href="{% url result.model_name result.object.slug %}">{% if result.forename %}{{result.forename}}{% else %}{{result.object.initials}}{% endif %}{% if result.surname_prefix %} {{ result.surname_prefix}}{% endif %} {{result.surname}}</a><br>
+                    {% if result.model_name == "kamerstuk" %}
+                        {% if result.object.id_main and result.object.id_sub %}
+                            <a href="{% url result.model_name result.object.id_main result.object.id_sub %}">{{result.title}}</a>
+                            <a class="text-muted" href="{% url 'dossier-timeline' result.object.id_main %}">(Dossier {{result.object.id_main}})</a>
+                        {% else %}
+                            {{result.title}
+                        {% endif %}
+                        <br>
+                    {% elif result.model_name == "kamervraag" %}
+                        {% if result.object.vraagnummer %}
+                            <a href="{% url result.model_name result.object.vraagnummer %}">{{result.title}}</a>
+                        {% else %}
+                            {{result.title}
+                        {% endif %}
+                        <br>
+                    {% elif result.model_name == "person" %}
+                        <a href="{% url result.model_name result.object.slug %}">
+                            {% if result.forename %}{{result.forename}}{% else %}{{result.object.initials}}{% endif %}{% if result.surname_prefix %} {{ result.surname_prefix}}{% endif %} {{result.surname}}</a>
+                        <br>
                     {% else %}
                     {% endif %}
                     {% for hl in result.highlighted.text %}
