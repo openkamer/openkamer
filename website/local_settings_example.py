@@ -32,7 +32,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 
 #MEDIA_URL = '//www.<your-domain>.com/static/media/'
-MEDIA_URL = '/static/media/'
+# MEDIA_URL = '/static/media/'
 
 # DBBACKUP
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
