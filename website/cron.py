@@ -208,7 +208,7 @@ class UpdateSearchIndex(LockJob):
     def do_imp(self):
         logger.info('BEGIN')
         try:
-            management.call_command('update_index', remove=True)
+            management.call_command('rebuild_index', '--remove', '--noinput')
         except Exception as error:
             logger.exception(error)
             raise
