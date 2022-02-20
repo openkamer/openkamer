@@ -69,7 +69,8 @@ class Government(models.Model):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self, position=GovernmentPosition.MINISTER_WO_PORTFOLIO)
         for position in positions:
-            member_ids.append(position.member_latest.id)
+            if position.member_latest is not None:
+                member_ids.append(position.member_latest.id)
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
     @cached_property
