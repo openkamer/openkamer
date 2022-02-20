@@ -64,7 +64,7 @@ datepickerElement.datepicker()
       </div>
 
       <div class="panel-body">
-        {% if member.party %}
+        {% if member.party and member.party.slug %}
           {% if member.party.wikimedia_logo_url %}
             <a href="{% url 'party' member.party.slug %}"><img class='party-logo-small' src="{{ member.party.wikimedia_logo_url }}"></a> <br/>
           {% else %}
