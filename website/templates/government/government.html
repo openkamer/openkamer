@@ -59,12 +59,12 @@
 
       <div class="panel-body">
       {% for position in ministry.positions %}
-        {% if position.member_latest %}
-        {% get_current_party position.member_latest.person.id as party %}
-        {{ position }}: <a href="{% url 'person' position.member_latest.person.slug %}">{{ position.member_latest.person.fullname }}</a>
-        {% if party %}(<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>){% endif %}
-        <br/>
-        {% endif %}
+        {% for member in position.members_latest %}
+          {% get_current_party member.person.id as party %}
+          {{ position }}: <a href="{% url 'person' member.person.slug %}">{{ member.person.fullname }}</a>
+          {% if party %}(<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>){% endif %}
+          <br/>
+        {% endfor %}
       {% endfor %}
       </div>
 

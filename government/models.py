@@ -53,7 +53,8 @@ class Government(models.Model):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self)
         for position in positions:
-            member_ids.append(position.member_latest.id)
+            for member in position.members_latest:
+                member_ids.append(member.id)
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
     @cached_property
@@ -69,8 +70,8 @@ class Government(models.Model):
         member_ids = []
         positions = GovernmentPosition.objects.filter(government=self, position=GovernmentPosition.MINISTER_WO_PORTFOLIO)
         for position in positions:
-            if position.member_latest is not None:
-                member_ids.append(position.member_latest.id)
+            for member in position.members_latest:
+                member_ids.append(member.id)
         return GovernmentMember.objects.filter(pk__in=member_ids)
 
     @cached_property
@@ -122,6 +123,7 @@ class GovernmentPosition(models.Model):
 
     @cached_property
     def member_latest(self):
+        """Warning: some positions can have more than one current members"""
         if self.members_latest:
             return self.members_latest[0]
         return None
