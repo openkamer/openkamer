@@ -137,7 +137,7 @@ class GovernmentPosition(models.Model):
             at_end = GovernmentMember.objects.filter(position=self, end_date__gte=self.government.date_dissolved).order_by('-end_date')
             if at_end:
                 return at_end
-        return None
+        return []
 
     @cached_property
     def members_replaced(self):
