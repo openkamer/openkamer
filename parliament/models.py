@@ -218,8 +218,7 @@ class PoliticalParty(models.Model):
         logger.info(self.name + ' - id: ' + str(self.wikidata_id))
         logo_filename = wikidata_item.get_logo_filename()
         self.founded = wikidata_item.get_inception()
-        if not self.name_short and wikidata_item.get_short_name():
-            self.name_short = wikidata_item.get_short_name()
+        self.name_short = wikidata_item.get_short_name() or self.name
         if logo_filename:
             self.wikimedia_logo_url = wikidata.WikidataItem.get_wikimedia_image_url(logo_filename)
         self.save()
