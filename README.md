@@ -1,4 +1,5 @@
 # openkamer
+![CI/CD status](https://github.com/openkamer/openkamer/actions/workflows/main.yml/badge.svg)  
 Openkamer gives insight into the Dutch parliament by gathering, organizing and visualizing parliamentary data.
 
 Openkamer extracts parliamentary data from several external sources (Tweede Kamer API, WikiData, overheid.nl, creates relations, and visualizes this data in a web application.
