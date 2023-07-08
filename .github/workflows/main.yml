@@ -18,7 +18,7 @@ jobs:
           pip install -r requirements.txt
       - name: Setup local test configuration
         run: |
-          python create_local_settings
+          python create_local_settings.py
       - name: Test with Django
         run: |
           python manage.py test
