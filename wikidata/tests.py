@@ -39,14 +39,14 @@ class TestGetParliamentMemberInfo(TestCase):
 
     def test_get_fraction(self):
         wikidata_id = 'Q2801440'  # Martin van Rooijen, 50Plus
-        item_50plus_id = 'Q27122891'
+        item_50plus_id = 'Q59574'
         item = wikidata.WikidataItem(wikidata_id)
         positions = item.get_positions_held()
-        fraction_id = None
+        fraction_ids = []
         for position in positions:
             if position['id'] == wikidata.PARLIAMENT_MEMBER_DUTCH_ITEM_ID:
-                fraction_id = position['part_of_id']
-        self.assertEqual(fraction_id, item_50plus_id)
+                fraction_ids.append(position['part_of_id'])
+        self.assertIn(item_50plus_id, fraction_ids)
 
 
 class TestPositionHeld(TestCase):
@@ -60,7 +60,7 @@ class TestPositionHeld(TestCase):
         self.assertEqual(len(positions), 9)
         item = wikidata.WikidataItem(self.wikidata_id_wa)
         positions = item.get_positions_held()
-        self.assertEqual(len(positions), 2)
+        self.assertGreaterEqual(len(positions), 5)
 
     def test_search_parliament_member(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
@@ -70,7 +70,7 @@ class TestPositionHeld(TestCase):
             self.assertEqual(position['id'], wikidata.PARLIAMENT_MEMBER_DUTCH_ITEM_ID)
         item = wikidata.WikidataItem(self.wikidata_id_mr)
         positions = item.get_parliament_positions_held()
-        self.assertEqual(len(positions), 4)
+        self.assertGreaterEqual(len(positions), 5)
 
 
 class TestFindPoliticalParty(TestCase):

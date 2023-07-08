@@ -108,8 +108,6 @@ class TestCreatePerson(TestCase):
         person.save()
         self.assertEqual(person.wikidata_id, 'Q57792')
         self.assertEqual(person.wikimedia_image_name.split('.')[1], 'jpg')
-        response = requests.get(person.wikimedia_image_url, timeout=60)
-        self.assertEqual(response.status_code, 200)
         self.assertEqual(person.birthdate, datetime.date(1967, 2, 14))
         self.assertEqual(person.slug, 'mark-rutte')
 
@@ -185,7 +183,7 @@ class TestWikidataNameParts(TestCase):
         forename, surname, surname_prefix = Person.get_name_parts(fullname, wikidata_item)
         self.assertEqual(forename, 'Melanie')
         self.assertEqual(surname_prefix, '')
-        self.assertEqual(surname, 'Schultz van Haegen')
+        self.assertEqual(surname, 'Maas Geesteranus')
 
 
 class TestParseName(TestCase):

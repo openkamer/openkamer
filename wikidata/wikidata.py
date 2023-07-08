@@ -200,13 +200,13 @@ class WikidataItem(object):
         return None
 
     def is_political_party(self):
-        claims = self.get_claims()
-        if 'P31' in claims:
-            for instance_of in claims['P31']:
-                if instance_of['mainsnak']['datavalue']['value']['id'] == 'Q7278':
-                    return True
-        return False
+        return self._is_instance_of('Q7278')
 
+    @property
+    def is_youth_party(self):
+        return self._is_instance_of('Q2493450')
+
+    @property
     def is_local_party(self):
         return 'P131' in self.get_claims()
 
@@ -229,7 +229,7 @@ class WikidataItem(object):
         claims = self.get_claims()
         if 'P31' in claims:
             for instance_of in claims['P31']:
-                if instance_of['mainsnak']['datavalue']['value']['id'] == 'Q848197':
+                if instance_of['mainsnak']['datavalue']['value']['id'] in ['Q848197', 'Q2200288']:
                     return True
         return False
 
@@ -400,4 +400,12 @@ class WikidataItem(object):
         for subclass in subclasses:
             if subclass['mainsnak']['datavalue']['value']['id'] == 'Q1937160':
                 return True
+        return False
+
+    def _is_instance_of(self, wikidata_id):
+        claims = self.get_claims()
+        if 'P31' in claims:
+            for instance_of in claims['P31']:
+                if instance_of['mainsnak']['datavalue']['value']['id'] == wikidata_id:
+                    return True
         return False

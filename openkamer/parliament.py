@@ -175,7 +175,7 @@ def create_party_members_for_person(person: Person):
     PartyMember.objects.filter(person=person).delete()
     for membership in memberships:
         wikidata_party = wikidata.WikidataItem(membership['party_wikidata_id'])
-        if wikidata_party.is_local_party():
+        if wikidata_party.is_local_party or wikidata_party.is_youth_party:
             continue
         parties = PoliticalParty.objects.filter(wikidata_id=wikidata_party.id)
         if parties.exists():
