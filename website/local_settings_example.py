@@ -35,6 +35,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'website/static/media/')
 # MEDIA_URL = '/static/media/'
 
 # DBBACKUP
+JSON_DUMP_KEEP_DAYS = 3
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, STATIC_ROOT, 'backup/')}
 

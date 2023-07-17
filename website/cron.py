@@ -366,7 +366,7 @@ class BackupDaily(LockJob):
             with gzip.open(filepath_compressed, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
         os.remove(filepath)
-        BackupDaily.remove_old_json_dumps(days_old=30)
+        BackupDaily.remove_old_json_dumps(days_old=settings.JSON_DUMP_KEEP_DAYS)
 
     @staticmethod
     def remove_old_json_dumps(days_old):
