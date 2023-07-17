@@ -356,6 +356,8 @@ class BackupDaily(LockJob):
                 'parliament',
                 'government',
                 'document',
+                'gift',
+                'travel',
                 'stats',
                 'website',
                 stdout=fileout
