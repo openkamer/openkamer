@@ -116,6 +116,9 @@ DATABASES = {
     }
 }
 
+# DB dumps
+JSON_DUMP_KEEP_DAYS = 3
+
 
 ##################
 # LOCAL SETTINGS #
