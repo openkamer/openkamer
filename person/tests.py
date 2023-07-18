@@ -107,7 +107,7 @@ class TestCreatePerson(TestCase):
         person.update_info(language='nl')
         person.save()
         self.assertEqual(person.wikidata_id, 'Q57792')
-        self.assertEqual(person.wikimedia_image_name.split('.')[1], 'jpg')
+        self.assertEqual(person.wikimedia_image_name.split('.')[-1], 'jpg')
         self.assertEqual(person.birthdate, datetime.date(1967, 2, 14))
         self.assertEqual(person.slug, 'mark-rutte')
 
