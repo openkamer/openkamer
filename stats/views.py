@@ -108,13 +108,15 @@ class KamervraagFootnotesView(TemplateView):
 
         x = []
         y = []
-        for domain in reversed(domains):
+        for domain in domains:
             if len(x) > cls.MAX_ITEMS_PLOT:
                 break
             if domain[0] == 'zoek.officielebekendmakingen.nl':
                 continue
             x.append(domain[0])
             y.append(domain[1])
+        y = list(reversed(y))
+        x = list(reversed(x))
         data = [Bar(
             x=y,
             y=x,
