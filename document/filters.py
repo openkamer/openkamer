@@ -1,9 +1,12 @@
+import datetime
+
 from django import forms
 
 from dal import autocomplete
 
 import django_filters
 
+from document.util import years_from_str_list
 from person.models import Person
 
 from parliament.models import PoliticalParty
@@ -110,6 +113,8 @@ class KamervraagFilter(django_filters.FilterSet):
         (ANSWERED, 'Beantwoord'),
         (UNANSWERED, 'Onbeantwoord'),
     )
+    YEAR_CHOICES = [(year, str(year)) for year in years_from_str_list(2008)]
+    
     title = django_filters.CharFilter(method='title_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),
@@ -134,6 +139,10 @@ class KamervraagFilter(django_filters.FilterSet):
         queryset=CategoryDocument.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
         method='category_filter',
+    )
+    year = django_filters.ChoiceFilter(
+        choices=YEAR_CHOICES,
+        method='year_filter',
     )
 
     class Meta:
@@ -163,6 +172,14 @@ class KamervraagFilter(django_filters.FilterSet):
         elif value == KamervraagFilter.UNANSWERED:
             return queryset.filter(kamerantwoord__isnull=True)
         return queryset
+
+    def year_filter(self, queryset, name, value):
+        if not value:
+            return queryset
+        year = int(value)
+        begin = datetime.datetime(year=year, month=1, day=1)
+        end = datetime.datetime(year=year+1, month=1, day=1)
+        return queryset.filter(document__date_published__gte=begin, document__date_published__lt=end)
 
 
 class VotingFilter(django_filters.FilterSet):
