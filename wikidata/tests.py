@@ -30,7 +30,7 @@ class TestGetParliamentMemberInfo(TestCase):
         fullname = item.get_label()
         self.assertEqual(fullname, 'Frans Timmermans')
         given_name = item.get_given_names()[0]
-        self.assertEqual(given_name, 'Frans')
+        self.assertEqual(given_name, 'Franciscus')
         birth_date = item.get_birth_date()
         self.assertEqual(birth_date, datetime.date(day=6, month=5, year=1961))
         parlement_positions = item.get_parliament_positions_held()
@@ -57,7 +57,7 @@ class TestPositionHeld(TestCase):
     def test_search_all(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
         positions = item.get_positions_held()
-        self.assertEqual(len(positions), 9)
+        self.assertEqual(len(positions), 10)
         item = wikidata.WikidataItem(self.wikidata_id_wa)
         positions = item.get_positions_held()
         self.assertGreaterEqual(len(positions), 5)
@@ -65,7 +65,7 @@ class TestPositionHeld(TestCase):
     def test_search_parliament_member(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
         positions = item.get_parliament_positions_held()
-        self.assertEqual(len(positions), 2)
+        self.assertEqual(len(positions), 3)
         for position in positions:
             self.assertEqual(position['id'], wikidata.PARLIAMENT_MEMBER_DUTCH_ITEM_ID)
         item = wikidata.WikidataItem(self.wikidata_id_mr)
