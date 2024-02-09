@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
 
+from document.filters import KamervraagFilter
 from person.models import Person
 
 from parliament.models import ParliamentMember
@@ -76,24 +77,40 @@ class VotingsPerPartyView(TemplateView):
 
 class KamervraagFootnotesView(TemplateView):
     template_name = "stats/kamervraag_footnote_sources.html"
+    MIN_MENTIONS_TABLE_DEFAULT = 10
+    MAX_ITEMS_PLOT = 50
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
+        vragen_count = kamervraag_filter.qs.count()
+        domains = self.get_domains(kamervraag_filter.qs)
+
+        min_mentions_table = self.MIN_MENTIONS_TABLE_DEFAULT if len(domains) > 50 else 1
+
+        domains_selection = []
+        for domain in domains:
+            if domain[1] < min_mentions_table:
+                break
+            domains_selection.append(domain)
+
+        context['plot_html'] = mark_safe(self._create_plot(domains))
+        context['domains'] = domains_selection
+        context['min_mentions'] = min_mentions_table
+        context['filter'] = kamervraag_filter
+        context['n_results'] = vragen_count
+        return context
+
+    @classmethod
+    def _create_plot(cls, domains):
         import plotly.offline
         from plotly.graph_objs import Layout, Bar, Margin
 
-        context = super().get_context_data(**kwargs)
-        domains = self.get_domains()
         x = []
         y = []
-        domains_selection = []
-        min_mentions = 10
-        for domain in domains:
-            if domain[1] < min_mentions:
-                break
-            domains_selection.append(domain)
         for domain in reversed(domains):
-            if domain[1] < 20:
-                continue
+            if len(x) > cls.MAX_ITEMS_PLOT:
+                break
             if domain[0] == 'zoek.officielebekendmakingen.nl':
                 continue
             x.append(domain[0])
@@ -103,7 +120,7 @@ class KamervraagFootnotesView(TemplateView):
             y=x,
             orientation='h'
         )]
-        plot_html = plotly.offline.plot(
+        return plotly.offline.plot(
             figure_or_data={
                 "data": data,
                 "layout": Layout(
@@ -124,15 +141,12 @@ class KamervraagFootnotesView(TemplateView):
             include_plotlyjs=False,
             auto_open=False,
         )
-        context['plot_html'] = mark_safe(plot_html)
-        context['domains'] = domains_selection
-        context['min_mentions'] = min_mentions
-        return context
 
     @staticmethod
-    def get_domains():
-        """ Returns an sorted list of domains and how often they are used in FootNotes """
-        footnotes = FootNote.objects.exclude(url='')
+    def get_domains(kamervragen):
+        """ Returns a sorted list of domains and how often they are used in FootNotes """
+        document_ids = [kv.document.id for kv in kamervragen]
+        footnotes = FootNote.objects.filter(document_id__in=document_ids).exclude(url='')
         domains = {}
         for note in footnotes:
             parsed_url = urlparse(note.url)

@@ -18,6 +18,33 @@
 </div>
 
 <div class="row">
+  <div class="col-sm-12 well well-filters">
+
+    <div class="row">
+      <form action="" method="get">
+        <div class="col-sm-6 col-lg-4">
+          <h6 class="text-primary">Indiener (persoon)</h6>
+          {% bootstrap_field filter.form.submitter bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
+        <div class="col-sm-6 col-lg-4">
+          <h6 class="text-primary">Indiener (partij)</h6>
+          {% bootstrap_field filter.form.submitter_party bound_css_class='' show_label=False show_help=False %}
+          {{ filter.form.media }}
+        </div>
+
+        <div class="col-sm-12">
+          {% bootstrap_button content='Filter' button_type='submit' %}
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div class="row">
   <div class="col-lg-12" align="center">
     {{ plot_html }}
   </div>
