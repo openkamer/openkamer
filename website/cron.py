@@ -16,6 +16,7 @@ from django.db import transaction
 
 from document.models import Kamervraag
 from document.models import Submitter
+from document.util import years_from_str_list
 from government.models import GovernmentMember
 from parliament.models import PartyMember
 from parliament.models import ParliamentMember
@@ -34,18 +35,6 @@ import stats.models
 from website import settings
 
 logger = logging.getLogger(__name__)
-
-
-def years_from_str_list(year_start):
-    start_date = datetime.date(year=int(year_start), month=1, day=1)
-    current_date = start_date
-    today = datetime.date.today()
-    years = []
-    while current_date.year <= today.year:
-        years.append(str(current_date.year))
-        current_date = datetime.date(year=current_date.year + 1, month=1, day=1)
-    years.reverse()
-    return years
 
 
 class LockJob(CronJobBase):

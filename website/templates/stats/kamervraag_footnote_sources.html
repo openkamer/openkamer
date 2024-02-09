@@ -34,6 +34,11 @@
           {{ filter.form.media }}
         </div>
 
+        <div class="col-sm-6 col-lg-2">
+          <h6 class="text-primary">Year</h6>
+          {% bootstrap_field filter.form.year bound_css_class='' show_label=False show_help=False %}
+        </div>
+
         <div class="col-sm-12">
           {% bootstrap_button content='Filter' button_type='submit' %}
         </div>
