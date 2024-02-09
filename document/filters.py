@@ -114,7 +114,7 @@ class KamervraagFilter(django_filters.FilterSet):
         (UNANSWERED, 'Onbeantwoord'),
     )
     YEAR_CHOICES = [(year, str(year)) for year in years_from_str_list(2008)]
-    
+
     title = django_filters.CharFilter(method='title_filter', label='')
     submitter = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),

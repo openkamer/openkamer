@@ -84,7 +84,12 @@ class KamervraagFootnotesView(TemplateView):
         context = super().get_context_data(**kwargs)
         kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
         vragen_count = kamervraag_filter.qs.count()
-        domains = self.get_domains(kamervraag_filter.qs)
+
+        # optimize query if all kamervragen are queried
+        if vragen_count == Kamervraag.objects.count():
+            domains = self.get_domains()
+        else:
+            domains = self.get_domains(kamervraag_filter.qs)
 
         min_mentions_table = self.MIN_MENTIONS_TABLE_DEFAULT if len(domains) > 50 else 1
 
@@ -145,10 +150,14 @@ class KamervraagFootnotesView(TemplateView):
         )
 
     @staticmethod
-    def get_domains(kamervragen):
+    def get_domains(kamervragen=None):
         """ Returns a sorted list of domains and how often they are used in FootNotes """
-        document_ids = [kv.document.id for kv in kamervragen]
-        footnotes = FootNote.objects.filter(document_id__in=document_ids).exclude(url='')
+        if kamervragen is not None:
+            document_ids = [kv.document.id for kv in kamervragen]
+            footnotes = FootNote.objects.filter(document_id__in=document_ids)
+        else:
+            footnotes = FootNote.objects
+        footnotes = footnotes.exclude(url='')
         domains = {}
         for note in footnotes:
             parsed_url = urlparse(note.url)
