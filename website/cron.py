@@ -323,6 +323,7 @@ class BackupDaily(LockJob):
 
     def do_imp(self):
         logger.info('run daily backup cronjob')
+        BackupDaily.remove_old_json_dumps(days_old=settings.JSON_DUMP_KEEP_DAYS)
         management.call_command('dbbackup', '--clean')
         try:
             BackupDaily.create_json_dump()
@@ -355,7 +356,6 @@ class BackupDaily(LockJob):
             with gzip.open(filepath_compressed, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
         os.remove(filepath)
-        BackupDaily.remove_old_json_dumps(days_old=settings.JSON_DUMP_KEEP_DAYS)
 
     @staticmethod
     def remove_old_json_dumps(days_old):
