@@ -361,7 +361,7 @@ class BackupDaily(LockJob):
     def remove_old_json_dumps(days_old):
         for (dirpath, dirnames, filenames) in os.walk(settings.DBBACKUP_STORAGE_OPTIONS['location']):
             for file in filenames:
-                if '.json.gz' not in file:
+                if '.json' not in file:
                     continue
                 filepath = os.path.join(dirpath, file)
                 datetime_created = datetime.datetime.fromtimestamp(os.path.getctime(filepath))
