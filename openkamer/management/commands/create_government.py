@@ -10,6 +10,7 @@ class Command(BaseCommand):
     # Rutte II : Q1638648
     # Rutte III : Q42293409
     # Rutte IV : Q110111120
+    # Schoof: Q126527270
 
     def add_arguments(self, parser):
         parser.add_argument('wikidata_id', nargs='+', type=str)
