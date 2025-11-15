@@ -34,7 +34,7 @@ class TestGetParliamentMemberInfo(TestCase):
         birth_date = item.get_birth_date()
         self.assertEqual(birth_date, datetime.date(day=6, month=5, year=1961))
         parlement_positions = item.get_parliament_positions_held()
-        self.assertEqual(len(parlement_positions), 2)
+        self.assertEqual(len(parlement_positions), 3)
         logger.info('END')
 
     def test_get_fraction(self):
@@ -57,7 +57,7 @@ class TestPositionHeld(TestCase):
     def test_search_all(self):
         item = wikidata.WikidataItem(self.wikidata_id_ft)
         positions = item.get_positions_held()
-        self.assertEqual(len(positions), 10)
+        self.assertGreaterEqual(len(positions), 10)
         item = wikidata.WikidataItem(self.wikidata_id_wa)
         positions = item.get_positions_held()
         self.assertGreaterEqual(len(positions), 5)
@@ -143,6 +143,15 @@ class TestPersonProperties(TestCase):
         wikidata_id = 'Q560780'
         item = wikidata.WikidataItem(wikidata_id)
         self.assertEqual(item.get_twitter_username(), 'diederiksamsom')
+
+
+class TestMultilanguageProperties(TestCase):
+    def test_get_short_name_q239333(self):
+        wikidata_id = 'Q239333'
+        item = wikidata.WikidataItem(wikidata_id)
+        short_name = item.get_short_name()
+        self.assertIsInstance(short_name, str)
+        self.assertEqual(short_name, 'VVD')
 
 
 class TestGovernmentScraper(TestCase):

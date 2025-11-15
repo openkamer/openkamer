@@ -256,9 +256,15 @@ class WikidataItem(object):
     def get_short_name(self, language='nl'):
         claims = self.get_claims()
         if 'P1813' in claims:
+            mul_value = None
             for claim in claims['P1813']:
-                if claim['mainsnak']['datavalue']['value']['language'] == language:
+                claim_language = claim['mainsnak']['datavalue']['value']['language']
+                if claim_language == language:
                     return claim['mainsnak']['datavalue']['value']['text']
+                elif claim_language == 'mul':
+                    mul_value = claim['mainsnak']['datavalue']['value']['text']
+            if mul_value is not None:
+                return mul_value
         return ''
 
     @staticmethod
