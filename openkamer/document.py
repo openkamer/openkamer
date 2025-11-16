@@ -272,8 +272,13 @@ class SubmitterFactory(object):
         tk_person: TKPersoon = None,
         name: str = None,
         submitter_type = Submitter.SUBMITTER
-    ) -> Submitter:
-        document.refresh_from_db()
+    ):
+        try:
+            document = Document.objects.get(document_id=document.document_id)
+        except Document.DoesNotExist:
+            logger.warning('Document {} does not exist, skipping submitter creation'.format(document.document_id))
+            return None
+
         person = SubmitterFactory.get_person(document, tk_person, name)
         party_slug = SubmitterFactory.get_party_slug(person, document)
         submitter, created = Submitter.objects.get_or_create(
