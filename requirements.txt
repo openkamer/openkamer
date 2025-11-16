@@ -17,6 +17,6 @@ pysolr==3.8.1
 python-twitter==3.5
 numpy==1.23.0
 unidecode==1.3.6
-tkapi==0.9.7
+tkapi==0.9.10
 # -e git+https://github.com/openkamer/tkapi.git@907b98cc#egg=tkapi
 django-debug-toolbar
