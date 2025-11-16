@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django_cron import CronJobBase, Schedule
 from django.db import transaction
+from django.db.utils import IntegrityError
 
 from document.models import Kamervraag
 from document.models import Submitter
@@ -168,7 +169,7 @@ class UpdateSubmitters(LockJob):
 
     def do_imp(self):
         logger.info('BEGIN')
-        BATCH_SIZE = 1000
+        BATCH_SIZE = 100
         try:
             submitters = Submitter.objects.all().order_by('party_slug')
             paginator = Paginator(submitters, BATCH_SIZE)
@@ -186,7 +187,13 @@ class UpdateSubmitters(LockJob):
     @transaction.atomic
     def update_batch(self, submitters):
         for submitter in submitters:
-            submitter.update_submitter_party_slug()
+            try:
+                submitter.update_submitter_party_slug()
+            except IntegrityError as e:
+                # Handle case of 'Key (document_id)=(N) is not present in table "document_document".'
+                logger.exception('IntegrityError updating submitter {} (document_id={})'.format(
+                    submitter.id, submitter.document_id))
+                continue
 
 
 class UpdateSearchIndex(LockJob):
