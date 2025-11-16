@@ -263,7 +263,7 @@ class Submitter(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, default=SUBMITTER, max_length=30, db_index=True, null=False)
 
     class Meta:
-        unique_together = ['person', 'document']
+        unique_together = ['person', 'document', 'type']
 
     def __str__(self):
         return self.person.fullname()

@@ -273,16 +273,16 @@ class SubmitterFactory(object):
         name: str = None,
         submitter_type = Submitter.SUBMITTER
     ) -> Submitter:
+        document.refresh_from_db()
         person = SubmitterFactory.get_person(document, tk_person, name)
         party_slug = SubmitterFactory.get_party_slug(person, document)
         submitter, created = Submitter.objects.get_or_create(
-            person=person, document=document,
-            defaults={'party_slug': party_slug, 'type': submitter_type}
+            person=person, document=document, type=submitter_type,
+            defaults={'party_slug': party_slug}
         )
         if not created:
-            if submitter.party_slug != party_slug or submitter.type != submitter_type:
+            if submitter.party_slug != party_slug:
                 submitter.party_slug = party_slug
-                submitter.type = submitter_type
                 submitter.save()
         return submitter
 
