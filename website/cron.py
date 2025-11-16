@@ -187,10 +187,13 @@ class UpdateSubmitters(LockJob):
     @transaction.atomic
     def update_batch(self, submitters):
         for submitter in submitters:
+            sid = transaction.savepoint()
             try:
                 submitter.update_submitter_party_slug()
+                transaction.savepoint_commit(sid)
             except IntegrityError as e:
                 # Handle case of 'Key (document_id)=(N) is not present in table "document_document".'
+                transaction.savepoint_rollback(sid)
                 logger.exception('IntegrityError updating submitter {} (document_id={})'.format(
                     submitter.id, submitter.document_id))
                 continue
