@@ -178,7 +178,11 @@ class UpdateSubmitters(LockJob):
                 progress_percent = int(page / paginator.num_pages * 100)
                 logger.info('{}%'.format(progress_percent))
                 submitters = paginator.get_page(page)
-                self.update_batch(submitters)
+                try:
+                    self.update_batch(submitters)
+                except IntegrityError as e:
+                    logger.exception('Error updating batch submitters at page {}, skipping batch'.format(page))
+                    continue
         except Exception as error:
             logger.exception(error)
             raise
@@ -187,16 +191,7 @@ class UpdateSubmitters(LockJob):
     @transaction.atomic
     def update_batch(self, submitters):
         for submitter in submitters:
-            sid = transaction.savepoint()
-            try:
-                submitter.update_submitter_party_slug()
-                transaction.savepoint_commit(sid)
-            except IntegrityError as e:
-                # Handle case of 'Key (document_id)=(N) is not present in table "document_document".'
-                transaction.savepoint_rollback(sid)
-                logger.exception('IntegrityError updating submitter {} (document_id={})'.format(
-                    submitter.id, submitter.document_id))
-                continue
+            submitter.update_submitter_party_slug()
 
 
 class UpdateSearchIndex(LockJob):
