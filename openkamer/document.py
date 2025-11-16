@@ -5,7 +5,6 @@ import lxml
 import re
 
 from django.db import transaction
-from django.db import IntegrityError
 from django.urls import resolve, Resolver404
 from django.urls import reverse
 
@@ -273,32 +272,19 @@ class SubmitterFactory(object):
         tk_person: TKPersoon = None,
         name: str = None,
         submitter_type = Submitter.SUBMITTER
-    ):
-        try:
-            document = Document.objects.get(document_id=document.document_id)
-        except Document.DoesNotExist:
-            logger.warning('Document {} does not exist, skipping submitter creation'.format(document.document_id))
-            return None
-
+    ) -> Submitter:
+        document.refresh_from_db()
         person = SubmitterFactory.get_person(document, tk_person, name)
         party_slug = SubmitterFactory.get_party_slug(person, document)
-        
-        try:
-            submitter, created = Submitter.objects.get_or_create(
-                person=person, document=document, type=submitter_type,
-                defaults={'party_slug': party_slug}
-            )
-            if not created:
-                if submitter.party_slug != party_slug:
-                    submitter.party_slug = party_slug
-                    submitter.save()
-            return submitter
-        except IntegrityError as e:
-            # Document was deleted between fetch and insert
-            if 'document_submitter_document_id' in str(e):
-                logger.exception('Document {} was deleted during submitter creation, skipping'.format(document.document_id))
-                return None
-            raise
+        submitter, created = Submitter.objects.get_or_create(
+            person=person, document=document, type=submitter_type,
+            defaults={'party_slug': party_slug}
+        )
+        if not created:
+            if submitter.party_slug != party_slug:
+                submitter.party_slug = party_slug
+                submitter.save()
+        return submitter
 
     @staticmethod
     def get_active_persons(date):
