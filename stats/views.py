@@ -80,32 +80,6 @@ class KamervraagFootnotesView(TemplateView):
     MIN_MENTIONS_TABLE_DEFAULT = 10
     MAX_ITEMS_PLOT = 50
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
-        vragen_count = kamervraag_filter.qs.count()
-
-        # optimize query if all kamervragen are queried
-        if vragen_count == Kamervraag.objects.count():
-            domains = self.get_domains()
-        else:
-            domains = self.get_domains(kamervraag_filter.qs)
-
-        min_mentions_table = self.MIN_MENTIONS_TABLE_DEFAULT if len(domains) > 50 else 1
-
-        domains_selection = []
-        for domain in domains:
-            if domain[1] < min_mentions_table:
-                break
-            domains_selection.append(domain)
-
-        context['plot_html'] = mark_safe(self._create_plot(domains))
-        context['domains'] = domains_selection
-        context['min_mentions'] = min_mentions_table
-        context['filter'] = kamervraag_filter
-        context['n_results'] = vragen_count
-        return context
-
     @classmethod
     def _create_plot(cls, domains):
         import plotly.offline
@@ -148,6 +122,32 @@ class KamervraagFootnotesView(TemplateView):
             include_plotlyjs=False,
             auto_open=False,
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        kamervraag_filter = KamervraagFilter(self.request.GET, queryset=Kamervraag.objects.all())
+        vragen_count = kamervraag_filter.qs.count()
+
+        # optimize query if all kamervragen are queried
+        if vragen_count == Kamervraag.objects.count():
+            domains = self.get_domains()
+        else:
+            domains = self.get_domains(kamervraag_filter.qs)
+
+        min_mentions_table = self.MIN_MENTIONS_TABLE_DEFAULT if len(domains) > 50 else 1
+
+        domains_selection = []
+        for domain in domains:
+            if domain[1] < min_mentions_table:
+                break
+            domains_selection.append(domain)
+
+        context['plot_html'] = mark_safe(self._create_plot(domains))
+        context['domains'] = domains_selection
+        context['min_mentions'] = min_mentions_table
+        context['filter'] = kamervraag_filter
+        context['n_results'] = vragen_count
+        return context
 
     @staticmethod
     def get_domains(kamervragen=None):
