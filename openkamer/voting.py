@@ -37,87 +37,6 @@ def clean_voting_results(voting_results, dossier_id):
     return voting_results_cleaned
 
 
-class VotingFactory(object):
-
-    def __init__(self, do_create_missing_party=True):
-        self.vote_factory = VoteFactory(do_create_missing_party=do_create_missing_party)
-
-    @transaction.atomic
-    def create_votings(self, dossier_id):
-        logger.info('BEGIN')
-        logger.info('dossier id: ' + str(dossier_id))
-        dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
-        tk_besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id_main, toevoeging=dossier_id_sub)
-        for tk_besluit in tk_besluiten:
-            self.create_votings_dossier_besluit(tk_besluit, dossier_id)
-        logger.info('END')
-
-    @transaction.atomic
-    def create_votings_dossier_besluit(self, tk_besluit: TKBesluit, dossier_id):
-        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-        assert dossiers.count() == 1
-        dossier = dossiers[0]
-        result = self.get_result_choice(tk_besluit.tekst)
-        zaak = tk_besluit.zaak
-
-        document_id = ''
-        if zaak.volgnummer:
-            document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
-
-        is_dossier_voting = zaak.soort in [ZaakSoort.WETGEVING, ZaakSoort.INITIATIEF_WETGEVING, ZaakSoort.BEGROTING]
-        is_dossier_voting = is_dossier_voting or str(zaak.volgnummer) == '0'
-        logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
-        voting_obj = Voting(
-            dossier=dossier,
-            decision=Decision.objects.filter(tk_id=tk_besluit.id).first(),
-            kamerstuk_raw_id=document_id,
-            result=result,
-            date=tk_besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
-            source_url='',
-            is_dossier_voting=is_dossier_voting
-        )
-
-        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=zaak.volgnummer)
-        if kamerstukken.exists():
-            kamerstuk = kamerstukken[0]
-            voting_obj.kamerstuk = kamerstuk
-            # A voting can be postponed and later voted on
-            # we do not save the postponed voting if there is a newer voting
-            if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:
-                logger.info('newer voting for this kamerstuk already exits, skip this voting')
-                return
-            elif kamerstuk.voting:
-                kamerstuk.voting.delete()
-        elif not is_dossier_voting:
-            logger.error(
-                'Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
-
-        voting_obj.is_individual = ('hoofdelijk' in tk_besluit.tekst.lower())
-        voting_obj.save()
-
-        if voting_obj.is_individual:
-            self.vote_factory.create_votes_individual(voting_obj, tk_besluit.stemmingen)
-        else:
-            self.vote_factory.create_votes_party(voting_obj, tk_besluit.stemmingen)
-
-    @staticmethod
-    def get_result_choice(result_string):
-        result_string = result_string.lower()
-        result_string.replace('.', '')
-        if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
-            return Voting.AANGENOMEN
-        elif 'verworpen' in result_string:
-            return Voting.VERWORPEN
-        elif 'ingetrokken' in result_string:
-            return Voting.INGETROKKEN
-        elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
-            return Voting.AANGEHOUDEN
-        elif 'controversieel verklaard' in result_string:
-            return Voting.CONTROVERSIEEL
-        logger.error('could not interpret the voting result: ' + result_string)
-        return Voting.ONBEKEND
-
-
 class VoteFactory(object):
 
     def __init__(self, do_create_missing_party=True):
@@ -212,4 +131,82 @@ class VoteFactory(object):
         return Vote.NONE
 
 
+class VotingFactory(object):
 
+    def __init__(self, do_create_missing_party=True):
+        self.vote_factory = VoteFactory(do_create_missing_party=do_create_missing_party)
+
+    @transaction.atomic
+    def create_votings(self, dossier_id):
+        logger.info('BEGIN')
+        logger.info('dossier id: ' + str(dossier_id))
+        dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
+        tk_besluiten = queries.get_dossier_besluiten_with_stemmingen(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+        for tk_besluit in tk_besluiten:
+            self.create_votings_dossier_besluit(tk_besluit, dossier_id)
+        logger.info('END')
+
+    @transaction.atomic
+    def create_votings_dossier_besluit(self, tk_besluit: TKBesluit, dossier_id):
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        assert dossiers.count() == 1
+        dossier = dossiers[0]
+        result = self.get_result_choice(tk_besluit.tekst)
+        zaak = tk_besluit.zaak
+
+        document_id = ''
+        if zaak.volgnummer:
+            document_id = str(dossier_id) + '-' + str(zaak.volgnummer)
+
+        is_dossier_voting = zaak.soort in [ZaakSoort.WETGEVING, ZaakSoort.INITIATIEF_WETGEVING, ZaakSoort.BEGROTING]
+        is_dossier_voting = is_dossier_voting or str(zaak.volgnummer) == '0'
+        logger.info('{} | dossier voting: {}'.format(document_id, is_dossier_voting))
+        voting_obj = Voting(
+            dossier=dossier,
+            decision=Decision.objects.filter(tk_id=tk_besluit.id).first(),
+            kamerstuk_raw_id=document_id,
+            result=result,
+            date=tk_besluit.agendapunt.activiteit.begin.date(),  # TODO BR: replace with besluit date
+            source_url='',
+            is_dossier_voting=is_dossier_voting
+        )
+
+        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=zaak.volgnummer)
+        if kamerstukken.exists():
+            kamerstuk = kamerstukken[0]
+            voting_obj.kamerstuk = kamerstuk
+            # A voting can be postponed and later voted on
+            # we do not save the postponed voting if there is a newer voting
+            if kamerstuk.voting and kamerstuk.voting.date > voting_obj.date:
+                logger.info('newer voting for this kamerstuk already exits, skip this voting')
+                return
+            elif kamerstuk.voting:
+                kamerstuk.voting.delete()
+        elif not is_dossier_voting:
+            logger.error(
+                'Kamerstuk ' + document_id + ' not found in database. Kamerstuk is probably not yet published.')
+
+        voting_obj.is_individual = ('hoofdelijk' in tk_besluit.tekst.lower())
+        voting_obj.save()
+
+        if voting_obj.is_individual:
+            self.vote_factory.create_votes_individual(voting_obj, tk_besluit.stemmingen)
+        else:
+            self.vote_factory.create_votes_party(voting_obj, tk_besluit.stemmingen)
+
+    @staticmethod
+    def get_result_choice(result_string):
+        result_string = result_string.lower()
+        result_string.replace('.', '')
+        if 'aangenomen' in result_string or 'overeenkomstig' in result_string:
+            return Voting.AANGENOMEN
+        elif 'verworpen' in result_string:
+            return Voting.VERWORPEN
+        elif 'ingetrokken' in result_string:
+            return Voting.INGETROKKEN
+        elif 'aangehouden' in result_string or 'uitgesteld' in result_string:
+            return Voting.AANGEHOUDEN
+        elif 'controversieel verklaard' in result_string:
+            return Voting.CONTROVERSIEEL
+        logger.error('could not interpret the voting result: ' + result_string)
+        return Voting.ONBEKEND
