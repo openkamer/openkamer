@@ -50,9 +50,6 @@ class Person(models.Model):
     twitter_username = models.CharField(max_length=200, blank=True)
     datetime_updated = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.get_full_name() + ' (' + self.initials + ')'
-
     def save(self, *args, **kwargs):
         name = self.fullname()
         if name.strip() == '':
@@ -215,3 +212,6 @@ class Person(models.Model):
                 for p in persons_same_name:
                     same_name_ids.append(p.id)
         return Person.objects.filter(pk__in=same_name_ids).order_by('surname')
+
+    def __str__(self):
+        return self.get_full_name() + ' (' + self.initials + ')'
