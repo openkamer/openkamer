@@ -142,11 +142,17 @@ def create_parties(update_votes=True, active_only=False) -> List[PoliticalParty]
 
 @transaction.atomic
 def create_party(name, name_short, tk_id=None):
-    party = PoliticalParty.find_party(name)
-    if party:
-        party.delete()
-    party = PoliticalParty.objects.create(tk_id=tk_id, name=name, name_short=name_short)
-    party.update_info(language='nl')
+    party, created = PoliticalParty.objects.get_or_create(
+        name_short=name_short,
+        defaults={'name': name, 'tk_id': tk_id}
+    )
+    if not created:
+        party.name = name
+        if tk_id:
+            party.tk_id = tk_id
+        party.save()
+    if created:
+        party.update_info(language='nl')
     return party
 
 
