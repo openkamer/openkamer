@@ -47,13 +47,6 @@ def search(search_str, language='en'):
     return response.json()
 
 
-def search_wikidata_id(search_str, language='en'):
-    ids = search_wikidata_ids(search_str, language)
-    if ids:
-        return ids[0]
-    return ''
-
-
 def search_wikidata_ids(search_str, language='en'):
     results = search(search_str, language)
     ids = []
@@ -63,63 +56,11 @@ def search_wikidata_ids(search_str, language='en'):
     return ids
 
 
-def search_political_party_id(search_str, country_id='Q55', language='en'):
-    wikidata_ids = search_wikidata_ids(search_str, language)
-    wikidata_ids += search_wikidata_ids('Lid-' + search_str, language)
-    possible_items = []
-    for wikidata_id in wikidata_ids:
-        item = WikidataItem(wikidata_id)
-        if item.is_political_party():
-            possible_items.append(item)
-        elif item.is_fractie():
-            possible_items.append(item)
-    if len(possible_items) == 1:
-        return possible_items[0].id
-    for item in possible_items:
-        if item.get_country_id() == country_id:
-            return item.id
+def search_wikidata_id(search_str, language='en'):
+    ids = search_wikidata_ids(search_str, language)
+    if ids:
+        return ids[0]
     return ''
-
-
-def search_parliament_member_ids_with_start_date():
-    logger.info('BEGIN')
-    url = 'https://query.wikidata.org/sparql?'
-    params = {
-        'query': 'SELECT ?item WHERE { '
-                 '?item wdt:P31 wd:Q5 . '
-                 '?item p:P39 ?position_held_statement .'
-                 '?position_held_statement ps:P39 wd:Q18887908 .'
-                 '?position_held_statement pq:P580 ?start . '
-                 '} ORDER BY DESC(?start)',
-    ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
-        'format': 'json',
-    }
-    response = request_wikidata(url, params)
-    response_json = response.json()
-    member_ids = []
-    for item in response_json['results']['bindings']:
-        member_id = item['item']['value'].split('/')[-1]
-        member_ids.append(member_id)
-    logger.info('END')
-    return set(member_ids)
-
-
-def search_parliament_member_ids():
-    logger.info('BEGIN')
-    url = 'https://query.wikidata.org/sparql?'
-    params = {
-        'query': 'SELECT ?item WHERE { ?item wdt:P31 wd:Q5 . ?item wdt:P39 wd:Q18887908 . }',
-    ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
-        'format': 'json',
-    }
-    response = request_wikidata(url, params)
-    response_json = response.json()
-    member_ids = []
-    for item in response_json['results']['bindings']:
-        member_id = item['item']['value'].split('/')[-1]
-        member_ids.append(member_id)
-    logger.info('END')
-    return member_ids
 
 
 class WikidataItem(object):
@@ -210,6 +151,14 @@ class WikidataItem(object):
         if 'P17' in claims:
             return claims['P17'][0]['mainsnak']['datavalue']['value']['id']
         return None
+
+    def _is_instance_of(self, wikidata_id):
+        claims = self.get_claims()
+        if 'P31' in claims:
+            for instance_of in claims['P31']:
+                if instance_of['mainsnak']['datavalue']['value']['id'] == wikidata_id:
+                    return True
+        return False
 
     def is_political_party(self):
         return self._is_instance_of('Q7278')
@@ -420,10 +369,61 @@ class WikidataItem(object):
                 return True
         return False
 
-    def _is_instance_of(self, wikidata_id):
-        claims = self.get_claims()
-        if 'P31' in claims:
-            for instance_of in claims['P31']:
-                if instance_of['mainsnak']['datavalue']['value']['id'] == wikidata_id:
-                    return True
-        return False
+
+def search_political_party_id(search_str, country_id='Q55', language='en'):
+    wikidata_ids = search_wikidata_ids(search_str, language)
+    wikidata_ids += search_wikidata_ids('Lid-' + search_str, language)
+    possible_items = []
+    for wikidata_id in wikidata_ids:
+        item = WikidataItem(wikidata_id)
+        if item.is_political_party():
+            possible_items.append(item)
+        elif item.is_fractie():
+            possible_items.append(item)
+    if len(possible_items) == 1:
+        return possible_items[0].id
+    for item in possible_items:
+        if item.get_country_id() == country_id:
+            return item.id
+    return ''
+
+
+def search_parliament_member_ids_with_start_date():
+    logger.info('BEGIN')
+    url = 'https://query.wikidata.org/sparql?'
+    params = {
+        'query': 'SELECT ?item WHERE { '
+                 '?item wdt:P31 wd:Q5 . '
+                 '?item p:P39 ?position_held_statement .'
+                 '?position_held_statement ps:P39 wd:Q18887908 .'
+                 '?position_held_statement pq:P580 ?start . '
+                 '} ORDER BY DESC(?start)',
+    ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
+        'format': 'json',
+    }
+    response = request_wikidata(url, params)
+    response_json = response.json()
+    member_ids = []
+    for item in response_json['results']['bindings']:
+        member_id = item['item']['value'].split('/')[-1]
+        member_ids.append(member_id)
+    logger.info('END')
+    return set(member_ids)
+
+
+def search_parliament_member_ids():
+    logger.info('BEGIN')
+    url = 'https://query.wikidata.org/sparql?'
+    params = {
+        'query': 'SELECT ?item WHERE { ?item wdt:P31 wd:Q5 . ?item wdt:P39 wd:Q18887908 . }',
+    ## taken from https://www.wikidata.org/wiki/User:Sjoerddebruin/Dutch_politics/Tweede_Kamer
+        'format': 'json',
+    }
+    response = request_wikidata(url, params)
+    response_json = response.json()
+    member_ids = []
+    for item in response_json['results']['bindings']:
+        member_id = item['item']['value'].split('/')[-1]
+        member_ids.append(member_id)
+    logger.info('END')
+    return member_ids
