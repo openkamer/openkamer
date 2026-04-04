@@ -48,6 +48,7 @@ INSTALLED_APPS = (
 
 MIDDLEWARE = [
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'website.middleware.RequestLoggingMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -173,27 +174,39 @@ REST_FRAMEWORK = {
 LOG_DIR = os.path.join(BASE_DIR, 'log')
 
 # Max. logfile size
-LOGFILE_MAXSIZE = 10 * 1024 * 1024
+LOGFILE_MAXSIZE = 10 * 1024 * 1024  # 10 MB
 
 # Number of old log files that are stored before they are deleted
 # see https://docs.python.org/3/library/logging.handlers.html#rotatingfilehandler
 LOGFILE_BACKUP_COUNT = 3
 
+# Project app names that share the standard DEBUG handler set
+_APP_LOGGER_NAMES = [
+    'website', 'openkamer', 'wikidata', 'scraper', 'parliament',
+    'government', 'document', 'gift', 'travel', 'person', 'stats',
+    'oktwitter', 'django_cron',
+]
+
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    # Keep loggers configured by third-party libraries intact
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': "[%(asctime)s] %(levelname)s [%(name)s::%(funcName)s() (%(lineno)s)]: %(message)s",
-            'datefmt': "%d/%b/%Y %H:%M:%S"
+            'format': '[{asctime}] {levelname:<8} [{name}::{funcName}() ({lineno})]: {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'style': '{',
+        },
+        'access': {
+            # Compact format for the per-request access log
+            'format': '[{asctime}] {message}',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'style': '{',
         },
     },
     'filters': {
         'require_debug_true': {
             '()': 'django.utils.log.RequireDebugTrue',
-        },
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
         },
     },
     'handlers': {
@@ -201,7 +214,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'filters': ['require_debug_true'],
-            'formatter': 'verbose'
+            'formatter': 'verbose',
         },
         'file_django': {
             'level': 'ERROR',
@@ -209,7 +222,8 @@ LOGGING = {
             'filename': os.path.join(LOG_DIR, 'django.log'),
             'maxBytes': LOGFILE_MAXSIZE,
             'backupCount': LOGFILE_BACKUP_COUNT,
-            'formatter': 'verbose'
+            'encoding': 'utf-8',
+            'formatter': 'verbose',
         },
         'file_error': {
             'level': 'ERROR',
@@ -217,7 +231,8 @@ LOGGING = {
             'filename': os.path.join(LOG_DIR, 'error.log'),
             'maxBytes': LOGFILE_MAXSIZE,
             'backupCount': LOGFILE_BACKUP_COUNT,
-            'formatter': 'verbose'
+            'encoding': 'utf-8',
+            'formatter': 'verbose',
         },
         'file_debug': {
             'level': 'DEBUG',
@@ -225,84 +240,70 @@ LOGGING = {
             'filename': os.path.join(LOG_DIR, 'debug.log'),
             'maxBytes': LOGFILE_MAXSIZE,
             'backupCount': LOGFILE_BACKUP_COUNT,
-            'formatter': 'verbose'
+            'encoding': 'utf-8',
+            'formatter': 'verbose',
+        },
+        'file_requests': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'requests.log'),
+            'maxBytes': LOGFILE_MAXSIZE,
+            'backupCount': LOGFILE_BACKUP_COUNT,
+            'encoding': 'utf-8',
+            'formatter': 'access',
         },
     },
     'loggers': {
+        # Catch-all: surface warnings from any third-party library not listed below.
+        # file_debug accepts WARNING+; file_error accepts ERROR+ — both get the right subset.
+        '': {
+            'handlers': ['file_debug', 'file_error', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        # Django framework errors → both django.log and error.log so error.log is complete
         'django': {
-            'handlers': ['file_django', 'console'],
-            'propagate': True,
+            'handlers': ['file_django', 'file_error', 'console'],
             'level': 'ERROR',
+            'propagate': False,
         },
-        'website': {
+        # 4xx → WARNING (only reaches file_debug); 5xx → ERROR (reaches both files)
+        'django.request': {
             'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
+            'level': 'WARNING',
+            'propagate': False,
         },
-        'openkamer': {
+        'django.security': {
             'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
+            'level': 'WARNING',
+            'propagate': False,
         },
-        'wikidata': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
+        # Keep SQL noise off the files; add file_error so DB errors survive in production
+        'django.db.backends': {
+            'handlers': ['file_error', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
         },
-        'scraper': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
+        # Per-request access log
+        'website.request': {
+            'handlers': ['file_requests', 'console'],
+            'level': 'INFO',
+            'propagate': False,
         },
-        'parliament': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'government': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'document': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'gift': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'person': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'stats': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'oktwitter': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'django_cron': {
-            'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
+        # Third-party API client — INFO and above only
         'tkapi': {
             'handlers': ['file_debug', 'file_error', 'console'],
-            'propagate': True,
             'level': 'INFO',
-        },
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
             'propagate': False,
+        },
+        # All project apps — full DEBUG logging
+        **{
+            name: {
+                'handlers': ['file_debug', 'file_error', 'console'],
+                'level': 'DEBUG',
+                'propagate': False,
+            }
+            for name in _APP_LOGGER_NAMES
         },
     },
 }
