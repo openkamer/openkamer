@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 class PartyVotesFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = VoteParty
+        exclude = '__all__'
     type = django_filters.ChoiceFilter(
         method='type_filter',
         choices=PartyVoteBehaviour.VOTING_TYPE_CHOICES,
@@ -29,10 +33,6 @@ class PartyVotesFilter(django_filters.FilterSet):
         method='government_filter',
         label='',
     )
-
-    class Meta:
-        model = VoteParty
-        exclude = '__all__'
 
     def type_filter(selfs, queryset, name, value):
         return queryset.filter(voting_type=value)
