@@ -18,11 +18,20 @@ def request_wikidata(url, params, **kwargs):
     headers = {'User-Agent': 'OpenKamer 1.0', 'Accept-Encoding': 'gzip'}
     params['maxlag'] = MAX_LAG
     response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
-    if response.status_code == 429:
-        backoff = int(response.headers.get('retry-after', REQUEST_TIMEOUT))
-        logger.warning('too many requests for {}, waiting {} seconds before retry'.format(url, backoff))
-        time.sleep(backoff)
-        response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
+    for _ in range(3):
+        if response.status_code == 429:
+            backoff = int(response.headers.get('retry-after', REQUEST_TIMEOUT))
+            logger.warning('too many requests for {}, waiting {} seconds before retry'.format(url, backoff))
+            time.sleep(backoff)
+            response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
+        elif response.status_code == 503:
+            # maxlag exceeded: Wikidata asks us to back off
+            backoff = int(response.headers.get('retry-after', 5))
+            logger.warning('maxlag exceeded for {}, waiting {} seconds before retry'.format(url, backoff))
+            time.sleep(backoff)
+            response = requests.get(url, params, headers=headers, timeout=REQUEST_TIMEOUT, **kwargs)
+        else:
+            break
     return response
 
 
@@ -139,6 +148,9 @@ class WikidataItem(object):
             params['props'] = props
         response = request_wikidata(url, params)
         reponse_json = response.json()
+        if 'entities' not in reponse_json:
+            error = reponse_json.get('error', reponse_json)
+            raise RuntimeError('Wikidata API returned no entities for id {!r}: {}'.format(id, error))
         item = reponse_json['entities'][id]
         WikidataItem._cache[item_hash] = item
         return item
