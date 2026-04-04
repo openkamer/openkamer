@@ -21,22 +21,6 @@ class GovernmentMemberData:
         self.end_date = None
 
 
-def get_government_members(government_wikidata_id, max_members=None) -> List[GovernmentMemberData]:
-    logger.info('BEGIN')
-    language = 'nl'
-    parts = wikidata.WikidataItem(government_wikidata_id).get_parts()
-    members = []
-    for part in parts:
-        member = create_government_member(part, language)
-        logger.info(member.name)
-        logger.info(json.dumps(member.__dict__, sort_keys=True, default=str))
-        members.append(member)
-        if max_members and len(members) >= max_members:
-            break
-    logger.info('END')
-    return members
-
-
 def create_government_member(part, language) -> GovernmentMemberData:
     member = GovernmentMemberData()
     member.wikidata_id = part['mainsnak']['datavalue']['value']['id']
@@ -78,6 +62,22 @@ def create_government_member(part, language) -> GovernmentMemberData:
         if prop['property'] == 'P582':  # end time
             member.end_date = wikidata.WikidataItem.get_date(prop['datavalue']['value']['time'])
     return member
+
+
+def get_government_members(government_wikidata_id, max_members=None) -> List[GovernmentMemberData]:
+    logger.info('BEGIN')
+    language = 'nl'
+    parts = wikidata.WikidataItem(government_wikidata_id).get_parts()
+    members = []
+    for part in parts:
+        member = create_government_member(part, language)
+        logger.info(member.name)
+        logger.info(json.dumps(member.__dict__, sort_keys=True, default=str))
+        members.append(member)
+        if max_members and len(members) >= max_members:
+            break
+    logger.info('END')
+    return members
 
 
 def get_government(government_wikidata_id):
