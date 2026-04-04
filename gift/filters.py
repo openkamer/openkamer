@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class GiftFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Gift
+        exclude = '__all__'
     description = django_filters.CharFilter(method='gift_description_filter', label='')
     person = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),
@@ -30,10 +34,6 @@ class GiftFilter(django_filters.FilterSet):
         choices=Gift.TYPE_CHOICES,
         method='gift_type_filter',
     )
-
-    class Meta:
-        model = Gift
-        exclude = '__all__'
 
     def gift_description_filter(self, queryset, name, value):
         dossiers = queryset.filter(description__icontains=value).distinct()
