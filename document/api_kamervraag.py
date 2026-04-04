@@ -25,12 +25,12 @@ class KVPoliticalPartySerializer(serializers.ModelSerializer):
 
 
 class KVSubmitterSerializer(serializers.ModelSerializer):
-    person = KVPersonSerializer(read_only=True)
-    party = KVPoliticalPartySerializer(read_only=True)
 
     class Meta:
         model = Submitter
         fields = ('person', 'party')
+    person = KVPersonSerializer(read_only=True)
+    party = KVPoliticalPartySerializer(read_only=True)
 
 
 class KVFootNoteSerializer(serializers.ModelSerializer):
@@ -40,8 +40,6 @@ class KVFootNoteSerializer(serializers.ModelSerializer):
 
 
 class KVDocumentSerializer(serializers.ModelSerializer):
-    submitters = KVSubmitterSerializer(read_only=True, many=True)
-    foot_notes = KVFootNoteSerializer(read_only=True, many=True)
 
     class Meta:
         model = Document
@@ -49,6 +47,8 @@ class KVDocumentSerializer(serializers.ModelSerializer):
             'title_full', 'title_short', 'date_published',
             'source_url', 'submitters', 'foot_notes'
         )
+    submitters = KVSubmitterSerializer(read_only=True, many=True)
+    foot_notes = KVFootNoteSerializer(read_only=True, many=True)
 
 
 class VraagSerializer(serializers.ModelSerializer):
@@ -64,22 +64,22 @@ class AntwoordSerializer(serializers.ModelSerializer):
 
 
 class KamerantwoordSerializer(serializers.ModelSerializer):
-    antwoorden = AntwoordSerializer(read_only=True, many=True)
-    document = KVDocumentSerializer(read_only=True)
 
     class Meta:
         model = Kamerantwoord
         fields = ('url', 'document', 'vraagnummer', 'antwoorden')
+    antwoorden = AntwoordSerializer(read_only=True, many=True)
+    document = KVDocumentSerializer(read_only=True)
 
 
 class KamervraagSerializer(serializers.ModelSerializer):
-    vragen = VraagSerializer(read_only=True, many=True)
-    antwoorden = AntwoordSerializer(read_only=True, many=True)
-    document = KVDocumentSerializer(read_only=True)
 
     class Meta:
         model = Kamervraag
         fields = ('url', 'vraagnummer', 'document', 'receiver', 'vragen', 'antwoorden')
+    vragen = VraagSerializer(read_only=True, many=True)
+    antwoorden = AntwoordSerializer(read_only=True, many=True)
+    document = KVDocumentSerializer(read_only=True)
 
 
 class KamervraagViewSet(viewsets.ModelViewSet):
