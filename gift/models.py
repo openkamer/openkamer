@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 class PersonPosition(models.Model):
+
+    class Meta:
+        unique_together = ['person', 'date']
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     party = models.ForeignKey(PoliticalParty, null=True, blank=True, on_delete=models.CASCADE)
     parliament_member = models.ForeignKey(ParliamentMember, null=True, blank=True, on_delete=models.CASCADE)
     date = models.DateField()
-
-    class Meta:
-        unique_together = ['person', 'date']
 
     def save(self, *args, **kwargs):
         party_members = PartyMember.get_at_date(self.person, self.date)
