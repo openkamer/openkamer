@@ -102,23 +102,6 @@ def get_wetsvoorstellen(person):
     return dossiers
 
 
-@register.simple_tag
-def get_dossiers_results(dossiers):
-    aangenomen = dossiers.filter(status=Dossier.AANGENOMEN)
-    verworpen = dossiers.filter(status=Dossier.VERWORPEN)
-    in_behandeling = dossiers.filter(status=Dossier.IN_BEHANDELING) | dossiers.filter(status=Dossier.AANGEHOUDEN)
-    results = creat_results(aangenomen, verworpen, in_behandeling)
-    return results
-
-
-@register.simple_tag
-def get_kamerstukken_results(kamerstukken):
-    aangenomen = kamerstukken.filter(voting__result=Voting.AANGENOMEN)
-    verworpen = kamerstukken.filter(voting__result=Voting.VERWORPEN)
-    results = creat_results(aangenomen, verworpen, None)
-    return results
-
-
 def creat_results(aangenomen, verworpen, in_behandeling):
     n_aangenomen = aangenomen.count()
     n_verworpen = verworpen.count()
@@ -143,6 +126,23 @@ def creat_results(aangenomen, verworpen, in_behandeling):
         'verworpen_percent': verworpen_percent,
         'in_behandeling_percent': in_behandeling_percent
     }
+    return results
+
+
+@register.simple_tag
+def get_dossiers_results(dossiers):
+    aangenomen = dossiers.filter(status=Dossier.AANGENOMEN)
+    verworpen = dossiers.filter(status=Dossier.VERWORPEN)
+    in_behandeling = dossiers.filter(status=Dossier.IN_BEHANDELING) | dossiers.filter(status=Dossier.AANGEHOUDEN)
+    results = creat_results(aangenomen, verworpen, in_behandeling)
+    return results
+
+
+@register.simple_tag
+def get_kamerstukken_results(kamerstukken):
+    aangenomen = kamerstukken.filter(voting__result=Voting.AANGENOMEN)
+    verworpen = kamerstukken.filter(voting__result=Voting.VERWORPEN)
+    results = creat_results(aangenomen, verworpen, None)
     return results
 
 
