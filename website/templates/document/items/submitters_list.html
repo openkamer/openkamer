@@ -3,5 +3,5 @@
   {% if submitter.government_members %}
     ({% for member in submitter.government_members %}{{ member.position.get_position_display|lower }} {% if member.position.ministry %}{{ member.position.ministry }}{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %})
   {% endif %}
-  {% if submitter.party %}(<a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>){% endif %}{% if not forloop.last %},{% endif %}
+  {% if submitter.party and submitter.party.slug %}(<a href="{% url 'party' submitter.party.slug %}">{{ submitter.party.name_short }}</a>){% endif %}{% if not forloop.last %},{% endif %}
 {% endfor %}

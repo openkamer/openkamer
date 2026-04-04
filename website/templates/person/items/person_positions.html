@@ -48,7 +48,7 @@
           {% if member.left %}{{ member.left }}{% else %}heden{% endif %}
         </td>
         <td>
-          {% if member.party %}<a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a>{% endif %}
+          {% if member.party and member.party.slug %}<a href="{% url 'party' member.party.slug %}">{{ member.party.name_short }}</a>{% endif %}
         </td>
       </tr>
     {% endfor %}

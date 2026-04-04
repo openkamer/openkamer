@@ -35,7 +35,7 @@
           <td>{{ person.surname }}</td>
           <td>{{ person.initials }}</td>
           {% get_current_party person.id as party %}
-          <td>{% if party %}<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>{% endif %}</td>
+          <td>{% if party and party.slug %}<a href="{% url 'party' party.slug %}">{{ party.name_short }}</a>{% endif %}</td>
           <td><a href="https://www.twitter.com/{{ person.twitter_username }}">{{ person.twitter_username }}</a></td>
         </tr>
       {% endfor %}

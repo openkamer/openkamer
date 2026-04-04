@@ -8,7 +8,7 @@
         </span>
       </div>
       <div class="col-xs-4 text-right">
-        {% if travel.person_position.party %}
+        {% if travel.person_position.party and travel.person_position.party.slug %}
         <span class="h5">
           <a href="{% url 'party' travel.person_position.party.slug %}">
             {{ travel.person_position.party.name_short }}
