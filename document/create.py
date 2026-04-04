@@ -16,14 +16,14 @@ class DossierId:
         self.dossier_id = dossier_id
         self.dossier_sub_id = dossier_sub_id
 
+    def __hash__(self):
+        return hash('{}-{}'.format(self.dossier_id, self.dossier_sub_id))
+
     def __str__(self):
         dossier_id_str = self.dossier_id
         if self.dossier_sub_id:
             dossier_id_str += '-' + self.dossier_sub_id
         return dossier_id_str
-
-    def __hash__(self):
-        return hash('{}-{}'.format(self.dossier_id, self.dossier_sub_id))
 
 
 def get_dossier_ids() -> List[DossierId]:
