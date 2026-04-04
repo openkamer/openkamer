@@ -36,68 +36,6 @@ from openkamer.voting import VotingFactory
 logger = logging.getLogger(__name__)
 
 
-def create_dossier_retry_on_error(dossier_id, max_tries=3):
-    dossier_id = str(dossier_id)
-    tries = 0
-    while True:
-        try:
-            tries += 1
-            create_or_update_dossier(dossier_id)
-        except (ConnectionError, ConnectTimeout) as error:
-            logger.exception(error)
-            time.sleep(5)  # wait 5 seconds for external servers to relax
-            if tries < max_tries:
-                logger.error('trying again!')
-                continue
-            logger.error('max tries reached, skipping dossier: ' + dossier_id)
-        break
-
-
-@transaction.atomic
-def create_or_update_dossier(dossier_id):
-    logger.info('BEGIN - dossier id: {}'.format(dossier_id))
-    Dossier.objects.filter(dossier_id=dossier_id).delete()
-    dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
-    dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
-
-    dossier_filter = TKDossier.create_filter()
-    dossier_filter.filter_nummer(dossier_id_main)
-    if dossier_id_sub:
-        dossier_filter.filter_toevoeging(dossier_id_sub)
-    dossiers = TKApi.get_dossiers(filter=dossier_filter)
-
-    if len(dossiers) != 1:
-        logger.error('{} dossiers found while one expected for {}'.format(len(dossiers), dossier_id))
-
-    tk_dossier = dossiers[0]
-
-    # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example
-    logger.info('dossier id main: {} | dossier id sub: {}'.format(dossier_id_main, dossier_id_sub))
-    last_besluit = get_besluit_last_with_voting(dossier_id_main, dossier_id_sub)
-    if not last_besluit:
-        last_besluit = get_besluit_last(dossier_id_main, dossier_id_sub)
-
-    decision_text = 'Onbekend'
-    if last_besluit:
-        decision_text = last_besluit.tekst.replace('.', '')
-
-    dossier_new = Dossier.objects.create(
-        dossier_id=dossier_id,
-        dossier_main_id=dossier_id_main,
-        dossier_sub_id=dossier_id_sub,
-        title=tk_dossier.titel,
-        url=dossier_url,
-        decision_text=decision_text
-    )
-    create_dossier_documents(dossier_new, dossier_id)
-    create_dossier_decisions(dossier_id_main, dossier_id_sub, dossier_new)
-    voting_factory = VotingFactory()
-    voting_factory.create_votings(dossier_id)
-    dossier_new.set_derived_fields()
-    logger.info('END - dossier id: ' + str(dossier_id))
-    return dossier_new
-
-
 def get_document_data(tk_document: TKDocument, tk_zaak: Zaak, dossier_id):
     dossier_id = re.sub(r'-\(.*\)', '', dossier_id)  # Rijkswet ID is not used in url
     overheid_document_id = 'kst-{}-{}'.format(dossier_id, tk_document.volgnummer)
@@ -159,6 +97,96 @@ def create_dossier_documents(dossier, dossier_id):
             dossier.categories.add(*category_list)
 
 
+def get_tk_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[TKBesluit]:
+    tk_besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
+    besluiten_dossier = []
+    # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
+    for tk_besluit in tk_besluiten:
+        if str(tk_besluit.zaak.volgnummer) == '0':
+            besluiten_dossier.append(tk_besluit)
+    return besluiten_dossier
+
+
+def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> TKBesluit:
+    tk_besluiten = get_tk_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
+    last_besluit = None
+    for tk_besluit in tk_besluiten:
+        if filter_has_votings and not tk_besluit.stemmingen:
+            continue
+        if tk_besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
+            # TODO: create dossier agendapunt with planned activiteit
+            continue
+        if last_besluit is None or tk_besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
+            last_besluit = tk_besluit
+    return last_besluit
+
+
+def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> TKBesluit:
+    return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
+
+
+@transaction.atomic
+def create_or_update_dossier(dossier_id):
+    logger.info('BEGIN - dossier id: {}'.format(dossier_id))
+    Dossier.objects.filter(dossier_id=dossier_id).delete()
+    dossier_url = 'https://zoek.officielebekendmakingen.nl/dossier/{}'.format(dossier_id)
+    dossier_id_main, dossier_id_sub = Dossier.split_dossier_id(dossier_id)
+
+    dossier_filter = TKDossier.create_filter()
+    dossier_filter.filter_nummer(dossier_id_main)
+    if dossier_id_sub:
+        dossier_filter.filter_toevoeging(dossier_id_sub)
+    dossiers = TKApi.get_dossiers(filter=dossier_filter)
+
+    if len(dossiers) != 1:
+        logger.error('{} dossiers found while one expected for {}'.format(len(dossiers), dossier_id))
+
+    tk_dossier = dossiers[0]
+
+    # TODO BR: create a list of related dossier decisions instead of one, see dossier 34792 for example
+    logger.info('dossier id main: {} | dossier id sub: {}'.format(dossier_id_main, dossier_id_sub))
+    last_besluit = get_besluit_last_with_voting(dossier_id_main, dossier_id_sub)
+    if not last_besluit:
+        last_besluit = get_besluit_last(dossier_id_main, dossier_id_sub)
+
+    decision_text = 'Onbekend'
+    if last_besluit:
+        decision_text = last_besluit.tekst.replace('.', '')
+
+    dossier_new = Dossier.objects.create(
+        dossier_id=dossier_id,
+        dossier_main_id=dossier_id_main,
+        dossier_sub_id=dossier_id_sub,
+        title=tk_dossier.titel,
+        url=dossier_url,
+        decision_text=decision_text
+    )
+    create_dossier_documents(dossier_new, dossier_id)
+    create_dossier_decisions(dossier_id_main, dossier_id_sub, dossier_new)
+    voting_factory = VotingFactory()
+    voting_factory.create_votings(dossier_id)
+    dossier_new.set_derived_fields()
+    logger.info('END - dossier id: ' + str(dossier_id))
+    return dossier_new
+
+
+def create_dossier_retry_on_error(dossier_id, max_tries=3):
+    dossier_id = str(dossier_id)
+    tries = 0
+    while True:
+        try:
+            tries += 1
+            create_or_update_dossier(dossier_id)
+        except (ConnectionError, ConnectTimeout) as error:
+            logger.exception(error)
+            time.sleep(5)  # wait 5 seconds for external servers to relax
+            if tries < max_tries:
+                logger.error('trying again!')
+                continue
+            logger.error('max tries reached, skipping dossier: ' + dossier_id)
+        break
+
+
 def get_inactive_dossier_ids(year=None) -> List[DossierId]:
     dossier_ids_inactive = list(Dossier.objects.filter(status__in=[
         Dossier.VERWORPEN, Dossier.AANGENOMEN, Dossier.INGETROKKEN, Dossier.CONTROVERSIEEL
@@ -171,6 +199,25 @@ def get_inactive_dossier_ids(year=None) -> List[DossierId]:
                 dossier_ids_inactive_year.append(dossier_id)
         dossier_ids_inactive = dossier_ids_inactive_year
     return [DossierId(*Dossier.split_dossier_id(dossier_id)) for dossier_id in dossier_ids_inactive]
+
+
+def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, max_tries=3):
+    logger.info('BEGIN')
+    failed_dossiers = []
+    for dossier in dossier_ids:
+        dossier_id = Dossier.create_dossier_id(dossier.dossier_id, dossier.dossier_sub_id)
+        logger.info('dossier id: {}'.format(dossier_id))
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        if skip_existing and dossiers.exists():
+            logger.info('dossier already exists, skip')
+            continue
+        try:
+            create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=max_tries)
+        except Exception as error:
+            failed_dossiers.append(dossier_id)
+            logger.exception('error for dossier id: ' + str(dossier_id))
+    logger.info('END')
+    return failed_dossiers
 
 
 def create_wetsvoorstellen_active(skip_existing=False, max_tries=3):
@@ -207,53 +254,6 @@ def create_wetsvoorstellen_all(skip_existing=False, max_tries=3):
     failed_dossiers = create_wetsvoorstellen(dossier_ids, skip_existing=skip_existing, max_tries=max_tries)
     logger.info('END')
     return failed_dossiers
-
-
-def create_wetsvoorstellen(dossier_ids: List[DossierId], skip_existing=False, max_tries=3):
-    logger.info('BEGIN')
-    failed_dossiers = []
-    for dossier in dossier_ids:
-        dossier_id = Dossier.create_dossier_id(dossier.dossier_id, dossier.dossier_sub_id)
-        logger.info('dossier id: {}'.format(dossier_id))
-        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-        if skip_existing and dossiers.exists():
-            logger.info('dossier already exists, skip')
-            continue
-        try:
-            create_dossier_retry_on_error(dossier_id=dossier_id, max_tries=max_tries)
-        except Exception as error:
-            failed_dossiers.append(dossier_id)
-            logger.exception('error for dossier id: ' + str(dossier_id))
-    logger.info('END')
-    return failed_dossiers
-
-
-def get_tk_besluiten_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[TKBesluit]:
-    tk_besluiten = queries.get_dossier_besluiten(nummer=dossier_id_main, toevoeging=dossier_id_sub)
-    besluiten_dossier = []
-    # only get main dossier besluiten; ignore kamerstuk besluiten (motie, amendement, etc)
-    for tk_besluit in tk_besluiten:
-        if str(tk_besluit.zaak.volgnummer) == '0':
-            besluiten_dossier.append(tk_besluit)
-    return besluiten_dossier
-
-
-def get_besluit_last(dossier_id_main, dossier_id_sub=None, filter_has_votings=False) -> TKBesluit:
-    tk_besluiten = get_tk_besluiten_dossier_main(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub)
-    last_besluit = None
-    for tk_besluit in tk_besluiten:
-        if filter_has_votings and not tk_besluit.stemmingen:
-            continue
-        if tk_besluit.agendapunt.activiteit.status == ActiviteitStatus.GEPLAND:
-            # TODO: create dossier agendapunt with planned activiteit
-            continue
-        if last_besluit is None or tk_besluit.agendapunt.activiteit.begin > last_besluit.agendapunt.activiteit.begin:
-            last_besluit = tk_besluit
-    return last_besluit
-
-
-def get_besluit_last_with_voting(dossier_id_main, dossier_id_sub=None) -> TKBesluit:
-    return get_besluit_last(dossier_id_main=dossier_id_main, dossier_id_sub=dossier_id_sub, filter_has_votings=True)
 
 
 def get_zaken_dossier_main(dossier_id_main, dossier_id_sub=None) -> List[Zaak]:
