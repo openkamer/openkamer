@@ -27,6 +27,17 @@ TITLES = (
 )
 
 
+def clean_initials(initials):
+    """ Removes the second character in initials, for example: 'Th.H.Ph.' is changed to 'T.H.P.' """
+    parts = initials.split('.')
+    initials_new = ''
+    for part in parts:
+        if not part:
+            continue
+        initials_new += part[0] + '.'
+    return initials_new
+
+
 def get_initials(parlement_and_politiek_id):
     if not parlement_and_politiek_id:
         return ''
@@ -41,14 +52,3 @@ def get_initials(parlement_and_politiek_id):
             initials = name_parts[1]
     initials = clean_initials(initials)
     return initials
-
-
-def clean_initials(initials):
-    """ Removes the second character in initials, for example: 'Th.H.Ph.' is changed to 'T.H.P.' """
-    parts = initials.split('.')
-    initials_new = ''
-    for part in parts:
-        if not part:
-            continue
-        initials_new += part[0] + '.'
-    return initials_new
