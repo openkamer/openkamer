@@ -30,6 +30,10 @@ class DocumentCategoryViewSet(viewsets.ModelViewSet):
 
 
 class DossierSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Dossier
+        fields = ('id', 'dossier_id', 'categories', 'title', 'kamerstukken', 'documents')
     documents = serializers.HyperlinkedRelatedField(read_only=True,
                                                     view_name='document-detail',
                                                     many=True)
@@ -38,10 +42,6 @@ class DossierSerializer(serializers.HyperlinkedModelSerializer):
                                                        view_name='kamerstuk-detail',
                                                        many=True)
 
-    class Meta:
-        model = Dossier
-        fields = ('id', 'dossier_id', 'categories', 'title', 'kamerstukken', 'documents')
-
 
 class DossierViewSet(viewsets.ModelViewSet):
     queryset = Dossier.objects.all()
@@ -49,9 +49,6 @@ class DossierViewSet(viewsets.ModelViewSet):
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
-    submitters = serializers.HyperlinkedRelatedField(read_only=True,
-                                                     view_name='submitter-detail',
-                                                     many=True)
 
     class Meta:
         model = Document
@@ -68,6 +65,9 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'date_published',
             # 'content_html'  # too large, needs link to content
         )
+    submitters = serializers.HyperlinkedRelatedField(read_only=True,
+                                                     view_name='submitter-detail',
+                                                     many=True)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):
@@ -98,6 +98,10 @@ class SubmitterViewSet(viewsets.ModelViewSet):
 
 
 class VotingSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Voting
+        fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes_party', 'votes_individual')
     votes_party = serializers.HyperlinkedRelatedField(
         read_only=True,
         view_name='voteparty-detail',
@@ -109,10 +113,6 @@ class VotingSerializer(serializers.HyperlinkedModelSerializer):
         view_name='voteindividual-detail',
         many=True
     )
-
-    class Meta:
-        model = Voting
-        fields = ('id', 'dossier', 'kamerstuk', 'date', 'result', 'result_percent', 'votes_party', 'votes_individual')
 
 
 class VotingViewSet(viewsets.ModelViewSet):
@@ -140,4 +140,3 @@ class VoteIndividualSerializer(serializers.HyperlinkedModelSerializer):
 class VoteIndividualViewSet(viewsets.ModelViewSet):
     queryset = VoteIndividual.objects.all()
     serializer_class = VoteIndividualSerializer
-
