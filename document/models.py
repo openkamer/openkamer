@@ -22,11 +22,11 @@ logger = logging.getLogger(__name__)
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=250, default='')
 
     class Meta:
         abstract = True
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, default='')
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -35,27 +35,31 @@ class Category(models.Model):
 
 class CategoryDossier(Category):
 
-    def __str__(self):
-        return str(self.name)
-
     class Meta:
         ordering = ['name']
         verbose_name = 'Category (dossier)'
         verbose_name_plural = 'Categories (dossier)'
 
-
-class CategoryDocument(Category):
-
     def __str__(self):
         return str(self.name)
+
+
+class CategoryDocument(Category):
 
     class Meta:
         ordering = ['name']
         verbose_name = 'Category (document)'
         verbose_name_plural = 'Categories (document)'
 
+    def __str__(self):
+        return str(self.name)
+
 
 class Dossier(models.Model):
+
+    class Meta:
+        ordering = ['-dossier_id']
+        unique_together = ['dossier_main_id', 'dossier_sub_id']
     AANGENOMEN = 'AAN'
     VERWORPEN = 'VER'
     INGETROKKEN = 'ING'
@@ -76,13 +80,6 @@ class Dossier(models.Model):
     decision_text = models.CharField(max_length=2000, blank=True)
     status = models.CharField(max_length=3, choices=CHOICES, default=ONBEKEND, db_index=True)
     date_updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-dossier_id']
-        unique_together = ['dossier_main_id', 'dossier_sub_id']
-
-    def __str__(self):
-        return str(self.dossier_id)
 
     @staticmethod
     def create_dossier_id(main_id, sub_id) -> str:
@@ -207,8 +204,14 @@ class Dossier(models.Model):
         response = requests.get(url, timeout=60)
         return response.content.decode('utf-8').splitlines()
 
+    def __str__(self):
+        return str(self.dossier_id)
+
 
 class Document(models.Model):
+
+    class Meta:
+        ordering = ['-date_published']
     dossier = models.ForeignKey(Dossier, blank=True, null=True, on_delete=models.CASCADE)
     document_id = models.CharField(unique=True, max_length=200, blank=True, db_index=True)
     title_full = models.CharField(max_length=3000)
@@ -247,11 +250,11 @@ class Document(models.Model):
     def __str__(self):
         return self.title_short
 
-    class Meta:
-        ordering = ['-date_published']
-
 
 class Submitter(models.Model):
+
+    class Meta:
+        unique_together = ['person', 'document', 'type']
     SUBMITTER = 'submitter'
     RECEIVER = 'receiver'
     TYPE_CHOICES = (
@@ -261,12 +264,6 @@ class Submitter(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     party_slug = models.CharField(max_length=500, blank=True, default='', db_index=True)
     type = models.CharField(choices=TYPE_CHOICES, default=SUBMITTER, max_length=30, db_index=True, null=False)
-
-    class Meta:
-        unique_together = ['person', 'document', 'type']
-
-    def __str__(self):
-        return self.person.fullname()
 
     def update_submitter_party_slug(self):
         party = self.get_party()
@@ -300,6 +297,9 @@ class Submitter(models.Model):
             return members[0].party
         return None
 
+    def __str__(self):
+        return self.person.fullname()
+
 
 class Kamerantwoord(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
@@ -310,13 +310,26 @@ class Kamerantwoord(models.Model):
         return self.antwoord_set.all()
 
 
+class Antwoord(models.Model):
+
+    class Meta:
+        ordering = ['nr']
+    nr = models.IntegerField(db_index=True)
+    kamerantwoord = models.ForeignKey(Kamerantwoord, on_delete=models.CASCADE)
+    text = models.CharField(max_length=50000)
+    see_answer_nr = models.IntegerField(null=True, blank=False)
+
+    def __str__(self):
+        return 'Antwoord ' + str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
+
+
 class Kamervraag(models.Model):
-    document = models.ForeignKey(Document, on_delete=models.CASCADE)
-    vraagnummer = models.CharField(max_length=200, db_index=True)
-    kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-document__date_published']
+    document = models.ForeignKey(Document, on_delete=models.CASCADE)
+    vraagnummer = models.CharField(max_length=200, db_index=True)
+    kamerantwoord = models.OneToOneField(Kamerantwoord, null=True, blank=True, on_delete=models.CASCADE)
 
     @cached_property
     def vragen(self):
@@ -340,12 +353,12 @@ class Kamervraag(models.Model):
 
 
 class Vraag(models.Model):
-    nr = models.IntegerField(db_index=True)
-    kamervraag = models.ForeignKey(Kamervraag, on_delete=models.CASCADE)
-    text = models.CharField(max_length=50000)
 
     class Meta:
         ordering = ['nr']
+    nr = models.IntegerField(db_index=True)
+    kamervraag = models.ForeignKey(Kamervraag, on_delete=models.CASCADE)
+    text = models.CharField(max_length=50000)
 
     @cached_property
     def antwoord(self):
@@ -357,27 +370,14 @@ class Vraag(models.Model):
         return None
 
 
-class Antwoord(models.Model):
-    nr = models.IntegerField(db_index=True)
-    kamerantwoord = models.ForeignKey(Kamerantwoord, on_delete=models.CASCADE)
-    text = models.CharField(max_length=50000)
-    see_answer_nr = models.IntegerField(null=True, blank=False)
+class FootNote(models.Model):
 
     class Meta:
         ordering = ['nr']
-
-    def __str__(self):
-        return 'Antwoord ' + str(self.nr) + ' deel van ' + str(self.kamerantwoord.id)
-
-
-class FootNote(models.Model):
     document = models.ForeignKey(Document, on_delete=models.CASCADE)
     nr = models.IntegerField(db_index=True)
     text = models.CharField(max_length=10000, blank=True, default='')
     url = models.URLField(max_length=1000, blank=True, default='')
-
-    class Meta:
-        ordering = ['nr']
 
 
 class KamervraagMededeling(models.Model):
@@ -388,6 +388,11 @@ class KamervraagMededeling(models.Model):
 
 
 class Kamerstuk(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Kamerstukken'
+        ordering = ['-document__date_published', '-id_sub',]
+        index_together = ['id_main', 'id_sub']
     MOTIE = 'Motie'
     AMENDEMENT = 'Amendement'
     WETSVOORSTEL = 'Wetsvoorstel'
@@ -409,11 +414,6 @@ class Kamerstuk(models.Model):
     original_id = models.CharField(max_length=40, blank=True, db_index=True)  # format: 33885-[XVI]-22
     date_updated = models.DateTimeField(auto_now=True)
     type = models.CharField(choices=TYPE_CHOICES, default=UNKNOWN, max_length=30, db_index=True)
-
-    class Meta:
-        verbose_name_plural = 'Kamerstukken'
-        ordering = ['-document__date_published', '-id_sub',]
-        index_together = ['id_main', 'id_sub']
         # unique_together = ['id_main', 'id_sub']
 
     def save(self, *args, **kwargs):
@@ -421,9 +421,6 @@ class Kamerstuk(models.Model):
         if type:
             self.type = type
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
 
     def get_type(self):
         if 'nota' in self.type_short.lower():
@@ -495,6 +492,9 @@ class Kamerstuk(models.Model):
     def modifications(self):
         stukken = Kamerstuk.objects.filter(original_id=self.id_full)
         return stukken.order_by('document__date_published', 'id_sub')
+
+    def __str__(self):
+        return str(self.id_main) + '-' + str(self.id_sub) + ': ' + str(self.type_long)
 
 
 class Agenda(models.Model):
