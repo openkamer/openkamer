@@ -12,5 +12,3 @@ class Command(BaseCommand):
         # dossier_id = 33885
         dossier_id = options['dossier_id'][0]
         create_or_update_dossier(str(dossier_id))
-
-
