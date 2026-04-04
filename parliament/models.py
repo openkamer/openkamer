@@ -20,9 +20,6 @@ class Parliament(models.Model):
 
     TWEEDE_KAMER_WIKIDATA_ID = 'Q233262'
 
-    def __str__(self):
-        return str(self.name)
-
     def get_members_at_date(self, check_date):
         members = self.members
         members_active = members.filter(joined__lte=check_date, left__gt=check_date) | members.filter(joined__lte=check_date, left=None)
@@ -39,6 +36,9 @@ class Parliament(models.Model):
             return parliaments[0]
         else:
             return Parliament.objects.create(name='Tweede Kamer', wikidata_id=Parliament.TWEEDE_KAMER_WIKIDATA_ID)
+
+    def __str__(self):
+        return str(self.name)
 
 
 class ParliamentMember(models.Model):
@@ -136,6 +136,9 @@ class ParliamentMember(models.Model):
 
 
 class PoliticalParty(models.Model):
+
+    class Meta:
+        verbose_name_plural = "Political parties"
     tk_id = models.CharField(max_length=200, blank=True, null=True, db_index=True)
     name = models.CharField(max_length=200)
     name_short = models.CharField(max_length=200)
@@ -147,12 +150,6 @@ class PoliticalParty(models.Model):
     official_website_url = models.URLField(blank=True, max_length=1000)
     slug = models.SlugField(max_length=250, default='', db_index=True)
     current_parliament_seats = models.IntegerField(default=0)
-
-    def __str__(self):
-        name = self.name_short
-        if self.name_short != self.name:
-            name += ' (' + str(self.name) + ')'
-        return name
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name_short)
@@ -243,8 +240,11 @@ class PoliticalParty(models.Model):
         logger.warning('party not found: ' + name)
         return None
 
-    class Meta:
-        verbose_name_plural = "Political parties"
+    def __str__(self):
+        name = self.name_short
+        if self.name_short != self.name:
+            name += ' (' + str(self.name) + ')'
+        return name
 
 
 class PartyMember(models.Model):
