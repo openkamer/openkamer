@@ -8,22 +8,6 @@ from document.models import Kamerstuk
 logger = logging.getLogger(__name__)
 
 
-@transaction.atomic
-def create_kamerstuk(document, dossier_id, number, type_short, type_long):
-    logger.info('BEGIN')
-    original_id = find_original_kamerstuk_id(dossier_id, type_long)
-    stuk = Kamerstuk.objects.create(
-        document=document,
-        id_main=dossier_id,
-        id_sub=number,
-        type_short=type_short,
-        type_long=type_long,
-        original_id=original_id
-    )
-    logger.info('kamerstuk created: {}'.format(stuk))
-    logger.info('END')
-
-
 def find_original_kamerstuk_id(dossier_id, type_long):
     if 'gewijzigd' not in type_long.lower() and 'nota van wijziging' not in type_long.lower():
         return ''
@@ -44,3 +28,19 @@ def find_original_kamerstuk_id(dossier_id, type_long):
     elif 'voorstel van wet' in type_long.lower() or 'nota van wijziging' in type_long.lower():
         return '{}-voorstel_van_wet'.format(dossier_id)
     return ''
+
+
+@transaction.atomic
+def create_kamerstuk(document, dossier_id, number, type_short, type_long):
+    logger.info('BEGIN')
+    original_id = find_original_kamerstuk_id(dossier_id, type_long)
+    stuk = Kamerstuk.objects.create(
+        document=document,
+        id_main=dossier_id,
+        id_sub=number,
+        type_short=type_short,
+        type_long=type_long,
+        original_id=original_id
+    )
+    logger.info('kamerstuk created: {}'.format(stuk))
+    logger.info('END')
