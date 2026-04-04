@@ -9,5 +9,3 @@ class Command(BaseCommand):
         dossiers = Dossier.objects.all()
         for dossier in dossiers:
             dossier.set_derived_fields()
-
-
