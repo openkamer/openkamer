@@ -12,33 +12,6 @@ from gift.models import Gift, PersonPosition
 logger = logging.getLogger(__name__)
 
 
-@transaction.atomic
-def create_gifts(max_items=None):
-    gifts = TKApi.get_items(PersoonGeschenk, max_items=max_items)
-    logger.info('{} gifts found.'.format(len(gifts)))
-    if len(gifts) < 1000:
-        logger.error('Only {} gifts found. This is unexpected. Skip re-creating gifts.'.format(len(gifts)))
-    Gift.objects.all().delete()
-    PersonPosition.objects.all().delete()
-    for gift in gifts:
-        value = find_gift_value(gift.omschrijving)
-        gift_type = find_gift_type(gift.omschrijving)
-        person = Person.find_surname_initials(gift.persoon.achternaam, gift.persoon.initialen)
-        if person is None:
-            logger.warning('No person found for gift: {}'.format(gift.id))
-            continue
-        if gift.datum is None:
-            logger.warning('No date found for gift: {}'.format(gift.id))
-            continue
-        Gift.objects.create(
-            person=person,
-            value_euro=value,
-            description=gift.omschrijving,
-            date=gift.datum,
-            type=gift_type,
-        )
-
-
 def find_gift_value(text):
     matches = re.findall(r'€\s*(\d+)[,*|.*](\d*)', text)
     if matches is None:
@@ -73,3 +46,30 @@ def find_gift_type(text):
     if 'lunch' in text or 'diner' in text or 'ontbijt' in text:
         return Gift.DINER
     return Gift.ONBEKEND
+
+
+@transaction.atomic
+def create_gifts(max_items=None):
+    gifts = TKApi.get_items(PersoonGeschenk, max_items=max_items)
+    logger.info('{} gifts found.'.format(len(gifts)))
+    if len(gifts) < 1000:
+        logger.error('Only {} gifts found. This is unexpected. Skip re-creating gifts.'.format(len(gifts)))
+    Gift.objects.all().delete()
+    PersonPosition.objects.all().delete()
+    for gift in gifts:
+        value = find_gift_value(gift.omschrijving)
+        gift_type = find_gift_type(gift.omschrijving)
+        person = Person.find_surname_initials(gift.persoon.achternaam, gift.persoon.initialen)
+        if person is None:
+            logger.warning('No person found for gift: {}'.format(gift.id))
+            continue
+        if gift.datum is None:
+            logger.warning('No date found for gift: {}'.format(gift.id))
+            continue
+        Gift.objects.create(
+            person=person,
+            value_euro=value,
+            description=gift.omschrijving,
+            date=gift.datum,
+            type=gift_type,
+        )
