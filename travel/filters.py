@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class TravelFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Travel
+        exclude = '__all__'
     destination = django_filters.CharFilter(method='travel_destination_filter', label='')
     person = django_filters.ModelChoiceFilter(
         queryset=Person.objects.all(),
@@ -26,10 +30,6 @@ class TravelFilter(django_filters.FilterSet):
         method='travel_party_filter',
         label='',
     )
-
-    class Meta:
-        model = Travel
-        exclude = '__all__'
 
     def travel_destination_filter(self, queryset, name, value):
         dossiers = queryset.filter(destination__icontains=value).distinct()
