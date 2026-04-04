@@ -13,11 +13,11 @@ class ParliamentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ParliamentMemberSerializer(serializers.HyperlinkedModelSerializer):
-    political_party = serializers.HyperlinkedRelatedField(read_only=True, view_name='politicalparty-detail')
 
     class Meta:
         model = ParliamentMember
         fields = ('id', 'person', 'political_party', 'parliament', 'joined', 'left')
+    political_party = serializers.HyperlinkedRelatedField(read_only=True, view_name='politicalparty-detail')
 
 
 class PoliticalPartySerializer(serializers.HyperlinkedModelSerializer):
