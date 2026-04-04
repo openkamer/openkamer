@@ -5,16 +5,16 @@ from parliament.models import ParliamentMember
 
 
 class ParliamentMemberFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = ParliamentMember
+        exclude = '__all__'
     party = django_filters.ModelChoiceFilter(
         queryset=PoliticalParty.objects.all().order_by('-current_parliament_seats'),
         to_field_name='slug',
         method='party_filter',
         label='',
     )
-
-    class Meta:
-        model = ParliamentMember
-        exclude = '__all__'
 
     def party_filter(self, queryset, name, value):
         pm_ids = []
