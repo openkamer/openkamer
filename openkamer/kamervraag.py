@@ -28,67 +28,12 @@ from openkamer.document import SubmitterFactory
 logger = logging.getLogger(__name__)
 
 
-def create_kamervragen(year, max_n=None, skip_if_exists=False):
-    logger.info('BEGIN')
-    year = int(year)
-    month = 1
-    begin_datetime = datetime.datetime(year=year, month=month, day=1)
-    end_datetime = datetime.datetime(year=year+1, month=month, day=1)
-    tk_zaken = get_tk_kamervraag_zaken(begin_datetime, end_datetime)
-
-    counter = 1
-    kamervragen = []
-    kamerantwoorden = []
-    for tk_zaak in tk_zaken:
-        try:
-            kamervraag, kamerantwoord = create_for_zaak(tk_zaak, skip_if_exists)
-            kamervragen.append(kamervraag)
-            kamerantwoorden.append(kamerantwoord)
-        except Exception as error:
-            logger.error('error for kamervraag zaak nummber: {}'.format(tk_zaak.nummer))
-            logger.exception(error)
-        if max_n and counter >= max_n:
-            return kamervragen, kamerantwoorden
-        counter += 1
-    logger.info('END')
-    return kamervragen, kamerantwoorden
-
-
-@transaction.atomic
-def create_for_zaak(tk_zaak: tkapi.zaak.Zaak, skip_if_exists=False):
-    logger.info('BEGIN: {}'.format(tk_zaak.nummer))
-    kamervraag = None
-    kamerantwoord = None
-    mededelingen = []
-
-    for tk_doc in tk_zaak.documenten:
-        if tk_doc.soort == DocumentSoort.SCHRIFTELIJKE_VRAGEN:
-            overheid_id = get_overheidnl_id(tk_doc)
-            kamervraag = create_kamervraag(tk_doc, overheid_id, skip_if_exists=skip_if_exists)
-        elif tk_doc.soort == DocumentSoort.ANTWOORD_SCHRIFTELIJKE_VRAGEN:
-            overheid_id = get_overheidnl_id(tk_doc)
-            kamerantwoord = create_kamerantwoord(tk_doc, overheid_id, skip_if_exists=skip_if_exists)
-        elif tk_doc.soort == DocumentSoort.MEDEDELING_UITSTEL_ANTWOORD:
-            overheid_id = get_overheidnl_id(tk_doc)
-            mededeling = create_mededeling(tk_doc, overheid_id)
-            mededelingen.append(mededeling)
-
-    if kamerantwoord:
-        kamervraag.kamerantwoord = kamerantwoord
-        kamervraag.save()
-    for mededeling in mededelingen:
-        mededeling.kamervraag = kamervraag
-        mededeling.save()
-    logger.info('END: {}'.format(tk_zaak.nummer))
-    return kamervraag, kamerantwoord
-
-
-def get_tk_kamervraag_zaken(begin_datetime, end_datetime) -> List[tkapi.zaak.Zaak]:
-    filter = tkapi.zaak.Zaak.create_filter()
-    filter.filter_date_range(begin_datetime, end_datetime)
-    filter.filter_soort(tkapi.zaak.ZaakSoort.SCHRIFTELIJKE_VRAGEN)
-    zaken = tkapi.TKApi.get_zaken(filter=filter)
-    return zaken
+def create_kamervraag_receivers(document: Document, tk_document: TKDocument) -> Submitter or None:
+    for actor in tk_document.zaken[0].actors:
+        if actor.relatie == tkapi.zaak.ZaakActorRelatieSoort.GERICHT_AAN and actor.persoon is not None:
+            SubmitterFactory.create_submitter(
+                document, tk_person=actor.persoon, name=actor.naam, submitter_type=Submitter.RECEIVER
+            )
 
 
 def get_or_create_kamervraag(vraagnummer, document: Document, tk_document: TKDocument) -> Kamervraag:
@@ -105,14 +50,6 @@ def get_or_create_kamervraag(vraagnummer, document: Document, tk_document: TKDoc
     return kamervraag
 
 
-def create_kamervraag_receivers(document: Document, tk_document: TKDocument) -> Submitter or None:
-    for actor in tk_document.zaken[0].actors:
-        if actor.relatie == tkapi.zaak.ZaakActorRelatieSoort.GERICHT_AAN and actor.persoon is not None:
-            SubmitterFactory.create_submitter(
-                document, tk_person=actor.persoon, name=actor.naam, submitter_type=Submitter.RECEIVER
-            )
-
-
 def get_or_create_kamerantwoord(vraagnummer, document):
     kamerantwoorden = Kamerantwoord.objects.filter(vraagnummer=vraagnummer)
     if kamerantwoorden.count() == 1:
@@ -124,42 +61,6 @@ def get_or_create_kamerantwoord(vraagnummer, document):
     kamerantwoord.vraagnummer = vraagnummer
     kamerantwoord.save()
     return kamerantwoord
-
-
-@transaction.atomic
-def create_kamervraag(tk_document: TKDocument, overheidnl_document_id, skip_if_exists=False):
-    if skip_if_exists and Kamervraag.objects.filter(document__document_id=overheidnl_document_id).exists():
-        return Kamervraag.objects.filter(document__document_id=overheidnl_document_id)[0]
-    document_factory = DocumentFactory()
-    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
-    kamervraag = get_or_create_kamervraag(vraagnummer, document, tk_document)
-    create_vragen_from_kamervraag_html(kamervraag)
-    footnotes = create_footnotes(kamervraag.document.content_html)
-    FootNote.objects.filter(document=document).delete()
-    for footnote in footnotes:
-        FootNote.objects.create(document=document, nr=footnote['nr'], text=footnote['text'], url=footnote['url'])
-    return kamervraag
-
-
-@transaction.atomic
-def create_kamerantwoord(tk_document: TKDocument, overheidnl_document_id, skip_if_exists=False):
-    if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id).exists():
-        return Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id)[0]
-    document_factory = DocumentFactory()
-    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
-    kamerantwoord = get_or_create_kamerantwoord(vraagnummer, document)
-    create_antwoorden_from_antwoord_html(kamerantwoord)
-    return kamerantwoord
-
-
-@transaction.atomic
-def create_mededeling(tk_document: TKDocument, overheidnl_document_id):
-    document_factory = DocumentFactory()
-    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
-    KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()
-    mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
-    create_kamervraag_mededeling_from_html(mededeling)
-    return mededeling
 
 
 @transaction.atomic
@@ -182,20 +83,44 @@ def create_vragen_from_kamervraag_html(kamervraag):
     logger.info('END: ' + str(counter) + ' vragen found')
 
 
-@transaction.atomic
-def create_kamervraag_mededeling_from_html(mededeling):
-    tree = lxml.html.fromstring(mededeling.document.content_html)
-    elements = tree.xpath('//div[@class="kamervraagopmerking"]')
-    text = ''
-    for paragraph in elements[0].iter('p'):
-        if paragraph.text is None or paragraph.text == '':
-            logger.warning('empty mededeling text found for antwoord ' + str(mededeling.document.document_url))
+def create_footnotes(footnotes_html):
+    footnotes = []
+    tree = lxml.html.fromstring(footnotes_html)
+    elements = tree.xpath('//div[contains(@class, "voet noot")]')
+    for element in elements:
+        text = element.xpath('p')[0].text_content()
+        note_numbers = element.xpath('.//span[@class="nootnum"]')
+        if note_numbers:
+            nr = note_numbers[0].text_content()
         else:
-            text += re.sub('\s{2,}', ' ', paragraph.text_content()).strip()
-            text += '\n'
-    mededeling.text = text
-    mededeling.save()
-    logger.info('END')
+            nr = None
+        links = element.xpath('p/a')
+        if links:
+            url = links[0].get('href')
+        else:
+            url = ''
+        footnote = {
+            'nr': nr,
+            'text': text,
+            'url': url
+        }
+        footnotes.append(footnote)
+    return footnotes
+
+
+@transaction.atomic
+def create_kamervraag(tk_document: TKDocument, overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamervraag.objects.filter(document__document_id=overheidnl_document_id).exists():
+        return Kamervraag.objects.filter(document__document_id=overheidnl_document_id)[0]
+    document_factory = DocumentFactory()
+    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
+    kamervraag = get_or_create_kamervraag(vraagnummer, document, tk_document)
+    create_vragen_from_kamervraag_html(kamervraag)
+    footnotes = create_footnotes(kamervraag.document.content_html)
+    FootNote.objects.filter(document=document).delete()
+    for footnote in footnotes:
+        FootNote.objects.create(document=document, nr=footnote['nr'], text=footnote['text'], url=footnote['url'])
+    return kamervraag
 
 
 @transaction.atomic
@@ -242,26 +167,101 @@ def create_antwoorden_from_antwoord_html(kamerantwoord):
     logger.info('END')
 
 
-def create_footnotes(footnotes_html):
-    footnotes = []
-    tree = lxml.html.fromstring(footnotes_html)
-    elements = tree.xpath('//div[contains(@class, "voet noot")]')
-    for element in elements:
-        text = element.xpath('p')[0].text_content()
-        note_numbers = element.xpath('.//span[@class="nootnum"]')
-        if note_numbers:
-            nr = note_numbers[0].text_content()
+@transaction.atomic
+def create_kamerantwoord(tk_document: TKDocument, overheidnl_document_id, skip_if_exists=False):
+    if skip_if_exists and Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id).exists():
+        return Kamerantwoord.objects.filter(document__document_id=overheidnl_document_id)[0]
+    document_factory = DocumentFactory()
+    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
+    kamerantwoord = get_or_create_kamerantwoord(vraagnummer, document)
+    create_antwoorden_from_antwoord_html(kamerantwoord)
+    return kamerantwoord
+
+
+@transaction.atomic
+def create_kamervraag_mededeling_from_html(mededeling):
+    tree = lxml.html.fromstring(mededeling.document.content_html)
+    elements = tree.xpath('//div[@class="kamervraagopmerking"]')
+    text = ''
+    for paragraph in elements[0].iter('p'):
+        if paragraph.text is None or paragraph.text == '':
+            logger.warning('empty mededeling text found for antwoord ' + str(mededeling.document.document_url))
         else:
-            nr = None
-        links = element.xpath('p/a')
-        if links:
-            url = links[0].get('href')
-        else:
-            url = ''
-        footnote = {
-            'nr': nr,
-            'text': text,
-            'url': url
-        }
-        footnotes.append(footnote)
-    return footnotes
+            text += re.sub('\s{2,}', ' ', paragraph.text_content()).strip()
+            text += '\n'
+    mededeling.text = text
+    mededeling.save()
+    logger.info('END')
+
+
+@transaction.atomic
+def create_mededeling(tk_document: TKDocument, overheidnl_document_id):
+    document_factory = DocumentFactory()
+    document, vraagnummer = document_factory.create_kamervraag_document(tk_document, overheidnl_document_id)
+    KamervraagMededeling.objects.filter(vraagnummer=vraagnummer).delete()
+    mededeling = KamervraagMededeling.objects.create(document=document, vraagnummer=vraagnummer)
+    create_kamervraag_mededeling_from_html(mededeling)
+    return mededeling
+
+
+@transaction.atomic
+def create_for_zaak(tk_zaak: tkapi.zaak.Zaak, skip_if_exists=False):
+    logger.info('BEGIN: {}'.format(tk_zaak.nummer))
+    kamervraag = None
+    kamerantwoord = None
+    mededelingen = []
+
+    for tk_doc in tk_zaak.documenten:
+        if tk_doc.soort == DocumentSoort.SCHRIFTELIJKE_VRAGEN:
+            overheid_id = get_overheidnl_id(tk_doc)
+            kamervraag = create_kamervraag(tk_doc, overheid_id, skip_if_exists=skip_if_exists)
+        elif tk_doc.soort == DocumentSoort.ANTWOORD_SCHRIFTELIJKE_VRAGEN:
+            overheid_id = get_overheidnl_id(tk_doc)
+            kamerantwoord = create_kamerantwoord(tk_doc, overheid_id, skip_if_exists=skip_if_exists)
+        elif tk_doc.soort == DocumentSoort.MEDEDELING_UITSTEL_ANTWOORD:
+            overheid_id = get_overheidnl_id(tk_doc)
+            mededeling = create_mededeling(tk_doc, overheid_id)
+            mededelingen.append(mededeling)
+
+    if kamerantwoord:
+        kamervraag.kamerantwoord = kamerantwoord
+        kamervraag.save()
+    for mededeling in mededelingen:
+        mededeling.kamervraag = kamervraag
+        mededeling.save()
+    logger.info('END: {}'.format(tk_zaak.nummer))
+    return kamervraag, kamerantwoord
+
+
+def get_tk_kamervraag_zaken(begin_datetime, end_datetime) -> List[tkapi.zaak.Zaak]:
+    filter = tkapi.zaak.Zaak.create_filter()
+    filter.filter_date_range(begin_datetime, end_datetime)
+    filter.filter_soort(tkapi.zaak.ZaakSoort.SCHRIFTELIJKE_VRAGEN)
+    zaken = tkapi.TKApi.get_zaken(filter=filter)
+    return zaken
+
+
+def create_kamervragen(year, max_n=None, skip_if_exists=False):
+    logger.info('BEGIN')
+    year = int(year)
+    month = 1
+    begin_datetime = datetime.datetime(year=year, month=month, day=1)
+    end_datetime = datetime.datetime(year=year+1, month=month, day=1)
+    tk_zaken = get_tk_kamervraag_zaken(begin_datetime, end_datetime)
+
+    counter = 1
+    kamervragen = []
+    kamerantwoorden = []
+    for tk_zaak in tk_zaken:
+        try:
+            kamervraag, kamerantwoord = create_for_zaak(tk_zaak, skip_if_exists)
+            kamervragen.append(kamervraag)
+            kamerantwoorden.append(kamerantwoord)
+        except Exception as error:
+            logger.error('error for kamervraag zaak nummber: {}'.format(tk_zaak.nummer))
+            logger.exception(error)
+        if max_n and counter >= max_n:
+            return kamervragen, kamerantwoorden
+        counter += 1
+    logger.info('END')
+    return kamervragen, kamerantwoorden
