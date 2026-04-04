@@ -34,6 +34,49 @@ from document.models import Submitter
 logger = logging.getLogger(__name__)
 
 
+def create_new_url(url):
+    match_kamerstuk = re.match("kst-(\d+)-(\d+)", url)
+    match_dossier = re.match("/dossier/(\d+)", url)
+    new_url = ''
+    if match_kamerstuk:
+        dossier_id = match_kamerstuk.group(1)
+        sub_id = match_kamerstuk.group(2)
+        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
+        if kamerstukken.exists():
+            new_url = reverse('kamerstuk', args=(dossier_id, sub_id,))
+    elif match_dossier:
+        dossier_id = match_dossier.group(1)
+        if Dossier.objects.filter(dossier_id=dossier_id).exists():
+            new_url = reverse('dossier-timeline', args=(dossier_id,))
+    if not new_url:
+        try:
+            resolve(url)
+            openkamer_url = True
+        except Resolver404:
+            openkamer_url = False
+        if openkamer_url or url[0] == '#' or 'http' in url:  # openkamer, anchor or external url
+            new_url = url
+        else:
+            if url[0] != '/':
+                url = '/' + url
+            new_url = 'https://zoek.officielebekendmakingen.nl' + url
+    return new_url
+
+
+def update_document_html_links(content_html):
+    if not content_html:
+        return content_html
+    tree = lxml.html.fromstring(content_html)
+    a_elements = tree.xpath('//a')
+    for element in a_elements:
+        if not 'href' in element.attrib:
+            continue
+        url = element.attrib['href']
+        new_url = create_new_url(url)
+        element.attrib['href'] = new_url
+    return lxml.html.tostring(tree).decode('utf-8')
+
+
 class DocumentData(object):
 
     def __init__(self, document_id, tk_document: TKDocument, tk_zaak: TKZaak, metadata, content_html):
@@ -82,127 +125,6 @@ class DocumentData(object):
         if not names:
             names = [actor.naam for actor in self.tk_zaak.actors if actor.naam]
         return names
-
-
-class DocumentFactory(object):
-
-    def get_document_data(self, tk_document: TKDocument, overheidnl_document_id) -> DocumentData:
-        logger.info(overheidnl_document_id)
-        metadata = scraper.documents.get_metadata(overheidnl_document_id)
-        overheidnl_document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else overheidnl_document_id
-        content_html = scraper.documents.get_html_content(overheidnl_document_id)
-        tk_zaak = tk_document.zaken[0] if tk_document.zaken else None
-        return DocumentData(
-            overheidnl_document_id,
-            tk_document=tk_document,
-            tk_zaak=tk_zaak,
-            metadata=metadata,
-            content_html=content_html
-        )
-
-    def create_document(self, tk_document: TKDocument, overheidnl_document_id, dossier_id=None, dossier=None) -> Document:
-        logger.info('BEGIN')
-        document_data = self.get_document_data(tk_document, overheidnl_document_id)
-
-        if dossier is None:
-            dossier = self.get_or_create_dossier(dossier_id)
-
-        properties = {
-            'dossier': dossier,
-            'title_full': tk_document.onderwerp,
-            'title_short': tk_document.titel,
-            'publication_type': document_data.tk_document.soort.value,
-            'date_published': document_data.date_published,
-            'source_url': document_data.url,
-            'content_html': document_data.content_html,
-        }
-
-        document = self.create_or_update_document(document_data, properties)
-        logger.info('END')
-        return document
-
-    def create_kamervraag_document(self, tk_document: TKDocument, overheidnl_document_id):
-        logger.info('BEGIN')
-        document_data = self.get_document_data(tk_document, overheidnl_document_id)
-
-        properties = {
-            'dossier': None,
-            'title_full': tk_document.onderwerp,
-            'title_short': tk_document.onderwerp,
-            'publication_type': tk_document.soort.value,
-            'date_published': document_data.date_published,
-            'source_url': document_data.url,
-            'content_html': document_data.content_html,
-        }
-
-        document = self.create_or_update_document(document_data, properties)
-        logger.info('END')
-        return document, document_data._metadata['vraagnummer']
-
-    @staticmethod
-    def create_or_update_document(document_data: DocumentData, properties) -> Document:
-        if not document_data.date_published:
-            logger.error('No published date for document: ' + str(document_data.document_id))
-
-        document, created = Document.objects.update_or_create(
-            document_id=document_data.document_id,
-            defaults=properties
-        )
-        category_list = get_categories(text=document_data.category, category_class=CategoryDocument)
-        document.categories.add(*category_list)
-        SubmitterFactory.create_submitters(document, document_data)
-        return document
-
-    @staticmethod
-    def get_or_create_dossier(dossier_id):
-        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
-        dossier = None
-        if dossiers.exists():
-            dossier = dossiers[0]
-        return dossier
-
-
-def update_document_html_links(content_html):
-    if not content_html:
-        return content_html
-    tree = lxml.html.fromstring(content_html)
-    a_elements = tree.xpath('//a')
-    for element in a_elements:
-        if not 'href' in element.attrib:
-            continue
-        url = element.attrib['href']
-        new_url = create_new_url(url)
-        element.attrib['href'] = new_url
-    return lxml.html.tostring(tree).decode('utf-8')
-
-
-def create_new_url(url):
-    match_kamerstuk = re.match("kst-(\d+)-(\d+)", url)
-    match_dossier = re.match("/dossier/(\d+)", url)
-    new_url = ''
-    if match_kamerstuk:
-        dossier_id = match_kamerstuk.group(1)
-        sub_id = match_kamerstuk.group(2)
-        kamerstukken = Kamerstuk.objects.filter(id_main=dossier_id, id_sub=sub_id)
-        if kamerstukken.exists():
-            new_url = reverse('kamerstuk', args=(dossier_id, sub_id,))
-    elif match_dossier:
-        dossier_id = match_dossier.group(1)
-        if Dossier.objects.filter(dossier_id=dossier_id).exists():
-            new_url = reverse('dossier-timeline', args=(dossier_id,))
-    if not new_url:
-        try:
-            resolve(url)
-            openkamer_url = True
-        except Resolver404:
-            openkamer_url = False
-        if openkamer_url or url[0] == '#' or 'http' in url:  # openkamer, anchor or external url
-            new_url = url
-        else:
-            if url[0] != '/':
-                url = '/' + url
-            new_url = 'https://zoek.officielebekendmakingen.nl' + url
-    return new_url
 
 
 class SubmitterFactory(object):
@@ -308,3 +230,81 @@ def get_categories(text, category_class=CategoryDocument, sep_char='|'):
             category, created = category_class.objects.get_or_create(name=name)
             categories.append(category)
     return categories
+
+
+class DocumentFactory(object):
+
+    def get_document_data(self, tk_document: TKDocument, overheidnl_document_id) -> DocumentData:
+        logger.info(overheidnl_document_id)
+        metadata = scraper.documents.get_metadata(overheidnl_document_id)
+        overheidnl_document_id = metadata['overheidnl_document_id'] if metadata['overheidnl_document_id'] else overheidnl_document_id
+        content_html = scraper.documents.get_html_content(overheidnl_document_id)
+        tk_zaak = tk_document.zaken[0] if tk_document.zaken else None
+        return DocumentData(
+            overheidnl_document_id,
+            tk_document=tk_document,
+            tk_zaak=tk_zaak,
+            metadata=metadata,
+            content_html=content_html
+        )
+
+    def create_document(self, tk_document: TKDocument, overheidnl_document_id, dossier_id=None, dossier=None) -> Document:
+        logger.info('BEGIN')
+        document_data = self.get_document_data(tk_document, overheidnl_document_id)
+
+        if dossier is None:
+            dossier = self.get_or_create_dossier(dossier_id)
+
+        properties = {
+            'dossier': dossier,
+            'title_full': tk_document.onderwerp,
+            'title_short': tk_document.titel,
+            'publication_type': document_data.tk_document.soort.value,
+            'date_published': document_data.date_published,
+            'source_url': document_data.url,
+            'content_html': document_data.content_html,
+        }
+
+        document = self.create_or_update_document(document_data, properties)
+        logger.info('END')
+        return document
+
+    def create_kamervraag_document(self, tk_document: TKDocument, overheidnl_document_id):
+        logger.info('BEGIN')
+        document_data = self.get_document_data(tk_document, overheidnl_document_id)
+
+        properties = {
+            'dossier': None,
+            'title_full': tk_document.onderwerp,
+            'title_short': tk_document.onderwerp,
+            'publication_type': tk_document.soort.value,
+            'date_published': document_data.date_published,
+            'source_url': document_data.url,
+            'content_html': document_data.content_html,
+        }
+
+        document = self.create_or_update_document(document_data, properties)
+        logger.info('END')
+        return document, document_data._metadata['vraagnummer']
+
+    @staticmethod
+    def create_or_update_document(document_data: DocumentData, properties) -> Document:
+        if not document_data.date_published:
+            logger.error('No published date for document: ' + str(document_data.document_id))
+
+        document, created = Document.objects.update_or_create(
+            document_id=document_data.document_id,
+            defaults=properties
+        )
+        category_list = get_categories(text=document_data.category, category_class=CategoryDocument)
+        document.categories.add(*category_list)
+        SubmitterFactory.create_submitters(document, document_data)
+        return document
+
+    @staticmethod
+    def get_or_create_dossier(dossier_id):
+        dossiers = Dossier.objects.filter(dossier_id=dossier_id)
+        dossier = None
+        if dossiers.exists():
+            dossier = dossiers[0]
+        return dossier
