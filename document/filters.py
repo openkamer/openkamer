@@ -30,6 +30,10 @@ class ModelSelect2SlugWidget(autocomplete.ModelSelect2):
 
 
 class DossierFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Dossier
+        exclude = '__all__'
     DOSSIER_STATUS_CHOICES = (
         (Dossier.AANGENOMEN, 'Aangenomen'),
         (Dossier.VERWORPEN, 'Verworpen'),
@@ -70,10 +74,6 @@ class DossierFilter(django_filters.FilterSet):
         widget=forms.CheckboxSelectMultiple(),
     )
 
-    class Meta:
-        model = Dossier
-        exclude = '__all__'
-
     def title_filter(self, queryset, name, value):
         dossiers = queryset.filter(document__title_full__icontains=value).distinct()
         return dossiers
@@ -107,6 +107,10 @@ class DossierFilter(django_filters.FilterSet):
 
 
 class KamervraagFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Kamervraag
+        exclude = '__all__'
     ANSWERED = 'beantwoord'
     UNANSWERED = 'onbeantwoord'
     KAMERVRAAG_STATUS_CHOICES = (
@@ -145,10 +149,6 @@ class KamervraagFilter(django_filters.FilterSet):
         method='year_filter',
     )
 
-    class Meta:
-        model = Kamervraag
-        exclude = '__all__'
-
     def title_filter(self, queryset, name, value):
         return queryset.filter(document__title_full__icontains=value).distinct()
 
@@ -183,6 +183,10 @@ class KamervraagFilter(django_filters.FilterSet):
 
 
 class VotingFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Voting
+        exclude = '__all__'
     VOTING_RESULT_CHOICES = (
         (Voting.AANGENOMEN, 'Aangenomen'),
         (Voting.VERWORPEN, 'Verworpen'),
@@ -208,10 +212,6 @@ class VotingFilter(django_filters.FilterSet):
         label='',
         widget=ModelSelect2SlugWidget(url='party-autocomplete')
     )
-
-    class Meta:
-        model = Voting
-        exclude = '__all__'
 
     def dossier_id_filter(selfs, queryset, name, value):
         return queryset.filter(dossier__dossier_id__icontains=value).distinct()
