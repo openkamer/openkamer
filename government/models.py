@@ -11,14 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 class Government(models.Model):
+
+    class Meta:
+        ordering = ['-date_formed']
     name = models.CharField(max_length=200)
     date_formed = models.DateField(db_index=True)
     date_dissolved = models.DateField(blank=True, null=True, db_index=True)
     wikidata_id = models.CharField(max_length=200, blank=True)
     slug = models.SlugField(max_length=250, default='')
-
-    class Meta:
-        ordering = ['-date_formed']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -118,9 +118,6 @@ class GovernmentPosition(models.Model):
     government = models.ForeignKey(Government, blank=True, null=True, on_delete=models.CASCADE)
     extra_info = models.CharField(max_length=200, blank=True)
 
-    def __str__(self):
-        return self.get_position_display()
-
     @cached_property
     def member_latest(self):
         """Warning: some positions can have more than one current members"""
@@ -166,15 +163,15 @@ class GovernmentPosition(models.Model):
             return GovernmentPosition.SECRETARY_OF_STATE
         return ''
 
+    def __str__(self):
+        return self.get_position_display()
+
 
 class GovernmentMember(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     position = models.ForeignKey(GovernmentPosition, on_delete=models.CASCADE)
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(blank=True, null=True, db_index=True)
-
-    def __str__(self):
-        return str(self.person) + ' as ' + str(self.position)
 
     @cached_property
     def is_active(self):
@@ -191,3 +188,6 @@ class GovernmentMember(models.Model):
               GovernmentMember.objects.filter(person=person, start_date__lte=date, end_date=None)
         gms = gms.order_by('-end_date')
         return gms
+
+    def __str__(self):
+        return str(self.person) + ' as ' + str(self.position)
