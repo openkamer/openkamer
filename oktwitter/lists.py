@@ -19,29 +19,6 @@ api = twitter.Api(
 )
 
 
-def update_current_parliament_members_list():
-    logger.info('BEGIN')
-    current_pms = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
-    update_members_list(
-        list_name='tweedekamerleden',
-        list_owner_id='802459284646850560',
-        members=current_pms
-    )
-    logger.info('END')
-
-
-def update_current_government_members_list():
-    logger.info('BEGIN')
-    current_gov = Government.current()
-    members = current_gov.members_latest
-    update_members_list(
-        list_name='kabinetsleden',
-        list_owner_id='802459284646850560',
-        members=members
-    )
-    logger.info('END')
-
-
 def update_members_list(list_name, list_owner_id, members):
     list_members = api.GetListMembers(
         slug=list_name,
@@ -81,3 +58,26 @@ def update_members_list(list_name, list_owner_id, members):
                 owner_id=list_owner_id,
                 screen_name=username
             )
+
+
+def update_current_parliament_members_list():
+    logger.info('BEGIN')
+    current_pms = Parliament.get_or_create_tweede_kamer().get_members_at_date(datetime.date.today())
+    update_members_list(
+        list_name='tweedekamerleden',
+        list_owner_id='802459284646850560',
+        members=current_pms
+    )
+    logger.info('END')
+
+
+def update_current_government_members_list():
+    logger.info('BEGIN')
+    current_gov = Government.current()
+    members = current_gov.members_latest
+    update_members_list(
+        list_name='kabinetsleden',
+        list_owner_id='802459284646850560',
+        members=members
+    )
+    logger.info('END')
