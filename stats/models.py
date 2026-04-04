@@ -35,14 +35,25 @@ from stats.plots import kamervragen_reply_time_per_year
 logger = logging.getLogger(__name__)
 
 
-def update_all():
-    logger.info('BEGIN')
-    start_date = datetime.date(year=2010, month=1, day=1)
-    SeatsPerParty.create_all(start_date)
-    StatsVotingSubmitter.create()
-    PartyVoteBehaviour.create_all()
-    Plot.create()
-    logger.info('END')
+class StatsVotingSubmitter(models.Model):
+    voting = models.ForeignKey(Voting, on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    party = models.ForeignKey(PoliticalParty, blank=True, null=True, on_delete=models.CASCADE)
+
+    @staticmethod
+    @transaction.atomic
+    def create():
+        logger.info('BEGIN')
+        StatsVotingSubmitter.objects.all().delete()
+        votings = Voting.objects.all()
+        for voting in votings:
+            for submitter in voting.submitters:
+                StatsVotingSubmitter.objects.create(
+                    voting=voting,
+                    person=submitter.person,
+                    party=submitter.party
+                )
+        logger.info('END')
 
 
 class PartyVoteBehaviour(models.Model):
@@ -220,35 +231,11 @@ class PartyVoteBehaviour(models.Model):
         return result
 
 
-class StatsVotingSubmitter(models.Model):
-    voting = models.ForeignKey(Voting, on_delete=models.CASCADE)
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
-    party = models.ForeignKey(PoliticalParty, blank=True, null=True, on_delete=models.CASCADE)
-
-    @staticmethod
-    @transaction.atomic
-    def create():
-        logger.info('BEGIN')
-        StatsVotingSubmitter.objects.all().delete()
-        votings = Voting.objects.all()
-        for voting in votings:
-            for submitter in voting.submitters:
-                StatsVotingSubmitter.objects.create(
-                    voting=voting,
-                    person=submitter.person,
-                    party=submitter.party
-                )
-        logger.info('END')
-
-
 class SeatsPerParty(models.Model):
     date = models.DateField()
     party = models.ForeignKey(PoliticalParty, on_delete=models.CASCADE)
     seats = models.IntegerField(default=0)
     datetime_updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.party.name + ': ' + str(self.seats) + ' seats at ' + str(self.date)
 
     @staticmethod
     def create_all(start_date):
@@ -287,8 +274,14 @@ class SeatsPerParty(models.Model):
             logger.warning('{} entries for single date ({}) and party ({})'.format(infos.count(), date, party))
         return 0
 
+    def __str__(self):
+        return self.party.name + ': ' + str(self.seats) + ' seats at ' + str(self.date)
+
 
 class Plot(models.Model):
+
+    class Meta:
+        ordering = ['-datetime_updated']
     KAMERVRAAG_VS_TIME = 'KVT'
     KAMERVRAAG_VS_TIME_PARTY = 'KVTP'
     KAMERVRAAG_VS_TIME_PARTY_SEATS = 'KVTPS'
@@ -312,9 +305,6 @@ class Plot(models.Model):
     datetime_updated = models.DateTimeField(auto_now=True)
 
     party_slugs = ['pvv', 'sp', 'cda', 'd66', 'vvd', 'pvda', 'gl', 'cu', 'pvdd', 'sgp']
-
-    class Meta:
-        ordering = ['-datetime_updated']
 
 
     @staticmethod
@@ -501,3 +491,13 @@ class Plot(models.Model):
         plot.html = PlotPartySeatsVsTime(party_labels, dates, seats).create_plot()
         plot.save()
         logger.info('END')
+
+
+def update_all():
+    logger.info('BEGIN')
+    start_date = datetime.date(year=2010, month=1, day=1)
+    SeatsPerParty.create_all(start_date)
+    StatsVotingSubmitter.create()
+    PartyVoteBehaviour.create_all()
+    Plot.create()
+    logger.info('END')
